@@ -1,0 +1,69 @@
+<p-dialog
+  header="{{ 'THEME.IMPORT.HEADER' | translate }}"
+  [(visible)]="displayThemeImport"
+  [draggable]="true"
+  [closable]="true"
+  [modal]="true"
+  (onHide)="onImportThemeHide()"
+>
+  <p-fileUpload
+    mode="advanced"
+    name="file"
+    accept=".json"
+    [maxFileSize]="1000000"
+    [headers]="httpHeaders"
+    [customUpload]="true"
+    (onClear)="onImportThemeClear()"
+    (onRemove)="onImportThemeClear()"
+    (onSelect)="onImportThemeSelect($event)"
+    (uploadHandler)="onThemeUpload()"
+    [showUploadButton]="true"
+    [showUploadButton]="!themeImportError"
+    [uploadLabel]="'ACTIONS.UPLOAD' | translate"
+    [cancelLabel]="'ACTIONS.CANCEL' | translate"
+    [chooseLabel]="'ACTIONS.CHOOSE' | translate"
+  ></p-fileUpload>
+
+  <div *ngIf="themeImportRequestDTO" class="flex flex-wrap justify-content-between align-items-center gap-2 mt-4">
+    <span class="p-float-label" controlErrorAnchor>
+      <input
+        pInputText
+        type="text"
+        id="theme_import_themeName"
+        class="w-full pt-3 pb-2"
+        [(ngModel)]="themeImportRequestDTO.name"
+        (ngModelChange)="checkThemeExistence()"
+        [pTooltip]="'THEME.THEME_NAME' | translate"
+        tooltipPosition="top"
+        tooltipEvent="focus"
+      />
+      <label class="ocx-required-label" for="portal_detail_item_portalName">{{ 'THEME.THEME_NAME' | translate }}</label>
+    </span>
+    <app-theme-color-box *ngIf="properties" [properties]="properties" styleClass="h-inputtext" />
+    <div *ngIf="!properties">{{ 'THEME.NO_PROPERTIES' | translate }}</div>
+  </div>
+  <p-message
+    *ngIf="themeImportRequestDTO && themeNameExists"
+    severity="warn"
+    styleClass="mt-3"
+    text="{{ 'THEME.IMPORT.THEME_EXISTS_MESSAGE' | translate }}"
+  ></p-message>
+  <p-message
+    *ngIf="themeImportError"
+    severity="error"
+    styleClass="mt-3"
+    text="{{ 'VALIDATION.ERRORS.PARSE_ERROR' | translate }}"
+  ></p-message>
+
+  <div class="flex justify-content-end gap-3 pt-3">
+    <button
+      pButton
+      type="button"
+      icon="pi pi-times"
+      id="portal_import_button_close"
+      [label]="'ACTIONS.NAVIGATION.CLOSE' | translate"
+      [title]="'ACTIONS.NAVIGATION.CLOSE_WITHOUT_SAVE' | translate"
+      (click)="onImportThemeHide()"
+    ></button>
+  </div>
+</p-dialog>

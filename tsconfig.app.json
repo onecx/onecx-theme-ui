@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "inlineSources": true,
+    "types": [],
+    "target": "es2022",
+    "useDefineForClassFields": false
+  },
+  "files": ["src/main.ts", "src/polyfills.ts", "src/app/theme-mgmt-remote.module.ts"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts"],
+  "exclude": [
+    "src/test-setup.ts",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "**/*.stories.ts",
+    "**/*.stories.js",
+    "jest.config.ts"
+  ]
+}

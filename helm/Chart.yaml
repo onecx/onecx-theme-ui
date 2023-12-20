@@ -1,0 +1,17 @@
+apiVersion: v2
+name: onecx-theme-ui
+version: 0.0.0
+description: Onecx theme UI.
+home: https://github.com/onecx/onecx-theme-ui
+keywords:
+  - theme
+sources:
+  - https://github.com/onecx/onecx-theme-ui
+maintainers:
+  - name: OneCX Developer Team
+    email: tkit_dev@1000kit.org
+dependencies:
+  - name: helm-angular-app
+    version: ^0
+    repository: oci://ghcr.io/onecx/charts
+    alias: app

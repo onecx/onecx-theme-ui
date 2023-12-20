@@ -1,0 +1,128 @@
+<ocx-portal-page permission="THEME#VIEW">
+  <ocx-page-header
+    [loading]="loading"
+    [header]="theme?.name"
+    [subheader]="'THEME.DETAIL.SUBHEADER' | translate"
+    [objectDetails]="objectDetails"
+    [actions]="actions"
+    [figureImage]="headerImageUrl"
+    [figureBackground]="!theme?.logoUrl"
+  >
+  </ocx-page-header>
+  <ocx-page-content>
+    <p-tabView>
+      <p-tabPanel id="theme_detail_panel_props" [header]="'THEME.TABS.PROPERTIES' | translate">
+        <div class="grid grid-nogutter m-3">
+          <div class="col-12 md:col-10 lg:col-10 xl:col-6 flex flex-column row-gap-4">
+            <span class="p-float-label" [title]="'THEME.TOOLTIPS.NAME' | translate">
+              <input pInputText type="text" readonly class="w-full" id="theme_detail_item_name" [value]="theme?.name" />
+              <label for="theme_detail_item_name">{{ 'THEME.NAME' | translate }}</label>
+            </span>
+
+            <span class="p-float-label" [title]="'THEME.TOOLTIPS.DESCRIPTION' | translate">
+              <textarea
+                pInputTextarea
+                readonly
+                class="w-full"
+                autoresize="true"
+                rows="3"
+                id="theme_detail_item_description"
+                [ngModel]="theme?.description"
+                [pTooltip]="'THEME.DESCRIPTION' | translate"
+                tooltipPosition="top"
+                tooltipEvent="focus"
+              ></textarea>
+              <label for="theme_detail_item_description">{{ 'THEME.DESCRIPTION' | translate }}</label>
+            </span>
+            <!--
+            <span class="p-float-label" [title]="'THEME.TOOLTIPS.CSS_FILE' | translate">
+              <input
+                pInputText
+                type="text"
+                readonly
+                class="w-full"
+                id="theme_detail_item_cssFile"
+                [value]="theme?.cssFile"
+              />
+              <label for="theme_detail_item_cssFile">{{'THEME.CSS_FILE' | translate}}</label>
+            </span>
+            -->
+            <div class="flex flex-wrap sm:flex-nowrap align-items-center pb-2 row-gap-2 column-gap-4">
+              <app-image-container
+                [imageUrl]="headerImageUrl"
+                [small]="true"
+                [title]="'LOGO.TOOLTIPS.' + (theme?.logoUrl ? 'IMAGE' : 'PLACEHOLDER') | translate"
+              ></app-image-container>
+              <span class="p-float-label flex-grow-1">
+                <input
+                  pInputText
+                  type="text"
+                  readonly
+                  class="w-full"
+                  id="theme_detail_item_logoUrl"
+                  [value]="theme?.logoUrl"
+                />
+                <label for="theme_detail_item_logoUrl">{{ 'LOGO.LOGO_URL' | translate }}</label>
+              </span>
+            </div>
+          </div>
+        </div>
+      </p-tabPanel>
+
+      <p-tabPanel [header]="'THEME.TABS.INTERN' | translate">
+        <app-theme-intern [theme]="theme" [dateFormat]="dateFormat"></app-theme-intern>
+      </p-tabPanel>
+
+      <p-tabPanel id="theme_detail_panel_variables" [header]="'THEME.TABS.VARIABLES' | translate">
+        <p-panel [showHeader]="false" styleClass="pt-1 pb-0 mx-2 my-1 surface-50">
+          <pre id="theme_detail_panel_variables_content" class="my-2">
+            {{ theme?.properties | json }}
+          </pre>
+        </p-panel>
+      </p-tabPanel>
+    </p-tabView>
+  </ocx-page-content>
+
+  <p-dialog
+    #portalDelete
+    [(visible)]="themeDeleteVisible"
+    [header]="('ACTIONS.DELETE.TOOLTIP' | translate).replace('{{TYPE}}', 'Theme')"
+    [modal]="true"
+    [resizable]="false"
+    [dismissableMask]="true"
+    [style]="{ 'max-width': '425px' }"
+  >
+    <div class="flex column-gap-3 row-gap-1 justify-content-start align-items-center">
+      <div class="pi pi-question-circle text-3xl danger-action-text"></div>
+      <div>
+        <div>{{ this.themeDeleteMessage }}</div>
+        <div class="mt-2">{{ 'ACTIONS.DELETE.MESSAGE_INFO' | translate }}</div>
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <div class="flex flex-wrap column-gap-2 row-gap-1 justify-content-end">
+        <button
+          pButton
+          autofocus
+          type="button"
+          class="m-0"
+          icon="pi pi-times"
+          iconPos="left"
+          [label]="'ACTIONS.CONFIRMATION.NO' | translate"
+          [title]="'ACTIONS.CONFIRMATION.NO.TOOLTIP' | translate"
+          (click)="themeDeleteVisible = false"
+        ></button>
+        <button
+          pButton
+          type="button"
+          class="m-0"
+          icon="pi pi-check"
+          iconPos="left"
+          [label]="'ACTIONS.CONFIRMATION.YES' | translate"
+          [title]="'ACTIONS.CONFIRMATION.YES.TOOLTIP' | translate"
+          (click)="confirmThemeDeletion()"
+        ></button>
+      </div>
+    </ng-template>
+  </p-dialog>
+</ocx-portal-page>

@@ -1,0 +1,274 @@
+<ocx-portal-page permission="THEME#EDIT">
+  <ocx-page-header
+    header="{{ theme ? theme.name : 'Theme Designer' }}"
+    [subheader]="'THEME.DESIGNER.' + mode + '.SUBHEADER' | translate"
+    [actions]="actions"
+    [figureImage]="fetchingLogoUrl"
+    [figureBackground]="!fetchingLogoUrl"
+  ></ocx-page-header>
+  <ocx-page-content>
+    <div>
+      <div class="flex flex-wrap justify-content-between align-items-center my-2 mx-4 p-2 row-gap-2 column-gap-3">
+        <div
+          class="field mb-0 flex flex-wrap sm:flex-nowrap align-items-center row-gap-1 column-gap-3"
+          [title]="'THEME.DETAIL.AUTO_APPLY.TOOLTIP' | translate"
+        >
+          <p-inputSwitch
+            id="autoApplyToggle"
+            name="autoApplyToggle"
+            [disabled]="themeIsCurrentUsedTheme"
+            [(ngModel)]="autoApply || themeIsCurrentUsedTheme"
+          ></p-inputSwitch>
+          <label for="autoApplyToggle">{{ 'THEME.DETAIL.AUTO_APPLY' | translate }}</label>
+        </div>
+        <span
+          *ngIf="themeIsCurrentUsedTheme"
+          class="pi pi-bolt text-primary font-medium"
+          [title]="'THEME.DETAIL.AUTO_APPLY_CURRENT_THEME' | translate"
+        >
+        </span>
+        <div class="field mb-0 w-20rem">
+          <span class="p-float-label">
+            <p-dropdown
+              #themeTemplate
+              [options]="themeTemplates"
+              styleClass="w-full"
+              [(ngModel)]="themeTemplateSelectedId"
+              (onChange)="onThemeTemplateDropdownChange()"
+              [showClear]="false"
+              [autoDisplayFirst]="false"
+              [title]="'THEME.TEMPLATE.SELECTOR.TOOLTIP' | translate"
+            ></p-dropdown>
+            <label for="themeSelector" class="white-space-nowrap">{{ 'THEME.TEMPLATE.SELECTOR' | translate }}</label>
+          </span>
+        </div>
+      </div>
+
+      <form [formGroup]="propertiesForm" class="mx-3 mb-3">
+        <p-fieldset [toggleable]="false" [collapsed]="false" styleClass="py-0 px-3">
+          <ng-template pTemplate="header">
+            <span>{{ 'THEME.GROUPS.BASE' | translate }}</span>
+          </ng-template>
+          <div [formGroup]="basicForm" class="grid grid-nogutter formgrid p-fluid mx-1">
+            <div class="field col-12 mb-4">
+              <span class="p-float-label" controlErrorAnchor>
+                <input pInputText type="text" id="name" formControlName="name" />
+                <label class="ocx-required-label" for="name">Name</label>
+              </span>
+            </div>
+            <div class="field col-12 mb-4">
+              <span class="p-float-label">
+                <input pInputText type="text" id="description" formControlName="description" />
+                <label for="theme_detail_item_description">{{ 'THEME.DESCRIPTION' | translate }}</label>
+              </span>
+            </div>
+            <!--
+            <div class="field col-12 mb-4">
+              <span class="p-float-label" [title]="'THEME.TOOLTIPS.CSS_FILE' | translate">
+                <input pInputText type="text" id="theme_detail_item_cssFile" formControlName="cssFile" />
+                <label for="theme_detail_item_cssFile">{{'THEME.CSS_FILE' | translate}}</label>
+              </span>
+            </div>
+            -->
+            <!-- helper inputs because p-fileupload does not work inside inputgroup -->
+            <input
+              hidden
+              type="file"
+              hidden
+              #selectedFileInputLogo
+              (change)="onFileUpload($event, 'logo')"
+              accept=".png, .jpg, .jpeg"
+            />
+            <input
+              hidden
+              type="file"
+              hidden
+              #selectedFileInputFavicon
+              (change)="onFileUpload($event, 'favicon')"
+              accept=".png, .jpg, .jpeg"
+            />
+
+            <div class="field col-12 mb-3">
+              <div class="flex flex-wrap sm:flex-nowrap align-items-center pb-2 row-gap-2 column-gap-4">
+                <app-image-container
+                  [imageUrl]="fetchingLogoUrl"
+                  [small]="true"
+                  [title]="'LOGO.TOOLTIPS.' + (fetchingLogoUrl ? 'IMAGE' : 'PLACEHOLDER') | translate"
+                ></app-image-container>
+                <div class="flex flex-column gap-1 w-full">
+                  <div class="p-inputgroup">
+                    <span
+                      id="theme_detail_upload_logo1"
+                      class="p-inputgroup-addon bg-primary cursor-pointer"
+                      [title]="'LOGO.TOOLTIPS.UPLOAD' | translate"
+                      (click)="selectedFileInputLogo.click()"
+                    >
+                      <i class="pi pi-upload"></i>
+                    </span>
+                    <span class="p-float-label">
+                      <input pInputText type="text" id="theme_detail_upload_logo" formControlName="logoUrl" />
+                      <label for="theme_detail_upload_logo">{{ 'Logo' }}</label>
+                    </span>
+                    <span
+                      id="theme_detail_upload_logo2"
+                      class="p-inputgroup-addon bg-primary cursor-pointer"
+                      [title]="'Upload Logo'"
+                      (click)="selectedFileInputLogo.click()"
+                    >
+                      <i class="pi pi-upload"></i>
+                    </span>
+                  </div>
+                  <label *ngIf="displayFileTypeErrorLogo" class="control-error">
+                    {{ 'VALIDATION.ERRORS.FILETYPE_PATTERN_ERROR' | translate }}
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="field col-12 mb-0">
+              <div class="flex flex-wrap sm:flex-nowrap align-items-center row-gap-2 column-gap-4">
+                <app-image-container
+                  [imageUrl]="fetchingFaviconUrl"
+                  [small]="true"
+                  [title]="'LOGO.TOOLTIPS.' + (fetchingLogoUrl ? 'IMAGE' : 'PLACEHOLDER') | translate"
+                ></app-image-container>
+                <div class="flex flex-column gap-1 w-full">
+                  <div class="p-inputgroup">
+                    <span
+                      id="theme_detail_upload_favicon1"
+                      class="p-inputgroup-addon bg-primary cursor-pointer"
+                      [title]="'Upload Favicon'"
+                      (click)="selectedFileInputFavicon.click()"
+                    >
+                      <i class="pi pi-upload"></i>
+                    </span>
+                    <span class="p-float-label">
+                      <input pInputText type="text" id="favicon" formControlName="faviconUrl" />
+                      <label for="favicon">Favicon</label>
+                    </span>
+                    <div class="flex flex-column">
+                      <span
+                        id="theme_detail_upload_favicon2"
+                        class="p-inputgroup-addon bg-primary cursor-pointer"
+                        [title]="'Upload Favicon'"
+                        (click)="selectedFileInputFavicon.click()"
+                      >
+                        <i class="pi pi-upload"></i>
+                      </span>
+                    </div>
+                  </div>
+                  <label *ngIf="this.displayFileTypeErrorFavicon" class="control-error">
+                    {{ 'VALIDATION.ERRORS.FILETYPE_PATTERN_ERROR' | translate }}
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </p-fieldset>
+
+        <p-fieldset [toggleable]="false" [collapsed]="false" styleClass="py-0 px-2 mt-3">
+          <ng-template pTemplate="header">
+            <span>{{ 'THEME.GROUPS.FONT' | translate }}</span>
+          </ng-template>
+          <div [formGroup]="fontForm" class="grid grid-nogutter grid-row-gap formgrid p-fluid">
+            <div class="col-12 sm:col-9 md:col-9 lg:col-9 xl:9">
+              <div class="p-inputgroup px-3">
+                <span class="p-float-label">
+                  <input pInputText type="text" id="font-family" formControlName="font-family" class="w-full" />
+                  <label for="font-family">font-family</label>
+                </span>
+              </div>
+            </div>
+            <div class="col-12 sm:col-3 md:col-3 lg:col-3 xl:3">
+              <div class="p-inputgroup px-3">
+                <span class="p-float-label">
+                  <input pInputText type="text" id="font-size" formControlName="font-size" class="w-full" />
+                  <label for="font-size">font-size</label>
+                </span>
+              </div>
+            </div>
+          </div>
+        </p-fieldset>
+
+        <p-fieldset *ngFor="let group of groups" [toggleable]="false" [collapsed]="false" styleClass="py-0 px-2 mt-3">
+          <ng-template pTemplate="header">
+            <span [title]="group.title">{{ group.title }}</span>
+          </ng-template>
+          <div [formGroup]="group.formGroup" class="grid grid-nogutter grid-row-gap formgrid p-fluid">
+            <div class="col-12 sm:col-6 md:col-4 lg:col-4 xl:col-3" *ngFor="let item of themeVars[group.key]">
+              <div class="p-inputgroup px-3">
+                <span class="p-float-label">
+                  <input
+                    pInputText
+                    id="color-{{ item }}"
+                    [formControlName]="item"
+                    [value]="group.formGroup.value[item]"
+                  />
+                  <label for="color-{{ item }}">{{ item }}</label>
+                </span>
+                <p-overlayPanel #op>
+                  <ng-template pTemplate>
+                    <div style="width: 220px; display: inline-block">
+                      <color-sketch [width]="100" [formControlName]="item"></color-sketch>
+                    </div>
+                  </ng-template>
+                </p-overlayPanel>
+                <span
+                  class="p-inputgroup-addon"
+                  (click)="op.toggle($event)"
+                  [ngStyle]="{
+                    'background-color': group.formGroup.value[item]
+                  }"
+                >
+                </span>
+              </div>
+            </div>
+          </div>
+        </p-fieldset>
+      </form>
+    </div>
+  </ocx-page-content>
+</ocx-portal-page>
+
+<!-- save as a new theme -->
+<p-dialog
+  [header]="'ACTIONS.CREATE.THEME' | translate"
+  [(visible)]="saveAsNewPopupDisplay"
+  [draggable]="true"
+  [closable]="true"
+  [modal]="true"
+  [style]="{ width: '20vw' }"
+  [baseZIndex]="10000"
+  (onShow)="onShowSaveAsDialog()"
+>
+  <span class="p-float-label block mt-1">
+    <input
+      #saveAsThemeName
+      pInputText
+      id="theme_detail_new_theme_name"
+      class="w-full"
+      type="text"
+      [placeholder]="'THEME.NAME' | translate"
+    />
+    <label for="theme_detail_new_theme_name"> {{ 'THEME.NAME' | translate }} </label>
+  </span>
+  <ng-template pTemplate="footer">
+    <div class="flex flex-wrap gap-2 justify-content-end">
+      <p-button
+        icon="pi pi-times"
+        styleClass="m-0"
+        [label]="'ACTIONS.CANCEL' | translate"
+        (click)="saveAsNewPopupDisplay = false"
+      ></p-button>
+      <p-button
+        icon="pi pi-save"
+        styleClass="m-0"
+        [disabled]="saveAsThemeName.value === ''"
+        [label]="'ACTIONS.SAVE' | translate"
+        (click)="saveTheme(saveAsThemeName.value)"
+      ></p-button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- confirm the use of a theme as template -->
+<p-confirmDialog />
