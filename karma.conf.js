@@ -25,7 +25,7 @@ module.exports = function (config) {
       suppressAll: true // removes the duplicated traces
     },
     coverageReporter: {
-      dir: require('path').join(__dirname, './coverage/library-ui'),
+      dir: require('path').join(__dirname, './coverage/app'),
       subdir: '.',
       reporters: [{ type: 'html' }, { type: 'text-summary' }]
     },
@@ -34,14 +34,14 @@ module.exports = function (config) {
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
-    browsers: ['Chrome', 'HeadlessChrome'],
+    browsers: ['HeadlessChrome'],
+    singleRun: false,
+    restartOnFileChange: true,
     customLaunchers: {
       HeadlessChrome: {
         base: 'ChromeHeadless',
         flags: ['--no-sandbox']
       }
-    },
-    singleRun: false,
-    restartOnFileChange: true
+    }
   })
 }

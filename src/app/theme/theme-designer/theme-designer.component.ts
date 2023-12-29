@@ -11,8 +11,9 @@ import { themeVariables } from '../theme-variables'
 import { environment } from '../../../environments/environment'
 import { CreateThemeDTO, ImageV1APIService, ThemeDTO, ThemesAPIService } from '../../generated'
 import { dropDownSortItemsByLabel, dropDownGetLabelByValue, setFetchUrls } from '../../shared/utils'
+
 @Component({
-  selector: 'app-theme-designer',
+  selector: 'tm-theme-designer',
   templateUrl: './theme-designer.component.html',
   styleUrls: ['./theme-designer.component.scss'],
   providers: [ConfirmationService]

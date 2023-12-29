@@ -1,20 +1,25 @@
-/* tslint:disable:no-unused-variable */
+import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
-import { ActivatedRoute } from '@angular/router'
-import { ThemeDetailComponent } from './theme-detail.component'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
-import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { HttpClient } from '@angular/common/http'
-import { HttpLoaderFactory } from 'src/app/app.module'
+import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { RouterTestingModule } from "@angular/router/testing"
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
+
+import { PortalMessageService, ConfigurationService } from '@onecx/portal-integration-angular'
+import { HttpLoaderFactory } from 'src/app/shared/shared.module'
+import { ThemeDetailComponent } from './theme-detail.component'
 
 describe('ThemeDetailComponent', () => {
   let component: ThemeDetailComponent
   let fixture: ComponentFixture<ThemeDetailComponent>
 
+  const msgServiceSpy = jasmine.createSpyObj<PortalMessageService>('PortalMessageService', ['success', 'error', 'info'])
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ThemeDetailComponent],
       imports: [
+        RouterTestingModule,
         HttpClientTestingModule,
         TranslateModule.forRoot({
           loader: {
@@ -24,19 +29,11 @@ describe('ThemeDetailComponent', () => {
           }
         })
       ],
-      providers: [
-        {
-          provide: ActivatedRoute,
-          useValue: {
-            snapshot: {
-              paramMap: {
-                get: () => '1'
-              }
-            }
-          }
-        }
-      ]
-    }).compileComponents()
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents(),
+      msgServiceSpy.success.calls.reset()
+    msgServiceSpy.error.calls.reset()
+    msgServiceSpy.info.calls.reset()
   }))
 
   beforeEach(() => {

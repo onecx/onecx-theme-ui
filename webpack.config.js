@@ -2,7 +2,7 @@ const { ModifyEntryPlugin } = require('@angular-architects/module-federation/src
 const { share, withModuleFederationPlugin } = require('@angular-architects/module-federation/webpack')
 
 const config = withModuleFederationPlugin({
-  name: 'theme-mgmt',
+  name: 'theme-mgmt-ui',
   filename: 'remoteEntry.js',
   exposes: {
     './ThemeMgmtModule': 'src/app/theme-mgmt-remote.module.ts'

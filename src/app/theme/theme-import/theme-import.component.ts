@@ -8,7 +8,7 @@ import { CreateThemeDTO, ThemeDTO } from '../../generated'
 import { PortalMessageService } from '@onecx/portal-integration-angular'
 
 @Component({
-  selector: 'app-theme-import',
+  selector: 'tm-theme-import',
   templateUrl: './theme-import.component.html',
   styleUrls: ['./theme-import.component.scss']
 })

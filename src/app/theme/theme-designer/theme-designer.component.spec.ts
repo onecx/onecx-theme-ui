@@ -1,21 +1,19 @@
+import { NO_ERRORS_SCHEMA } from '@angular/core'
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { HttpClient } from '@angular/common/http'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
-import { ActivatedRoute } from '@angular/router'
-import { TranslateModule, TranslateLoader } from '@ngx-translate/core'
-import { ConfigurationService } from '@onecx/portal-integration-angular'
-import { MessageService } from 'primeng/api'
-import { HttpLoaderFactory } from 'src/app/app.module'
+import { RouterTestingModule } from "@angular/router/testing"
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 
+import { ConfigurationService, PortalMessageService } from '@onecx/portal-integration-angular'
+import { HttpLoaderFactory } from 'src/app/shared/shared.module'
 import { ThemeDesignerComponent } from './theme-designer.component'
 
 describe('ThemeDesignerComponent', () => {
   let component: ThemeDesignerComponent
   let fixture: ComponentFixture<ThemeDesignerComponent>
-  const messageServiceMock: jasmine.SpyObj<MessageService> = jasmine.createSpyObj<MessageService>('MessageService', [
-    'add'
-  ])
 
+  const msgServiceSpy = jasmine.createSpyObj<PortalMessageService>('PortalMessageService', ['success', 'error', 'info'])
   const configServiceSpy = {
     getProperty: jasmine.createSpy('getProperty').and.returnValue('123'),
     getPortal: jasmine.createSpy('getPortal').and.returnValue({
@@ -30,6 +28,7 @@ describe('ThemeDesignerComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ThemeDesignerComponent],
       imports: [
+        RouterTestingModule,
         HttpClientTestingModule,
         TranslateModule.forRoot({
           loader: {
@@ -39,22 +38,15 @@ describe('ThemeDesignerComponent', () => {
           }
         })
       ],
+      schemas: [NO_ERRORS_SCHEMA],
       providers: [
         { provide: ConfigurationService, useValue: configServiceSpy },
-        { provide: MessageService, useValue: messageServiceMock },
-        {
-          provide: ActivatedRoute,
-          useValue: {
-            snapshot: {
-              paramMap: {
-                get: () => '1',
-                has: () => '1'
-              }
-            }
-          }
-        }
+        { provide: PortalMessageService, useValue: msgServiceSpy }
       ]
-    }).compileComponents()
+    }).compileComponents(),
+      msgServiceSpy.success.calls.reset()
+    msgServiceSpy.error.calls.reset()
+    msgServiceSpy.info.calls.reset()
   }))
 
   beforeEach(() => {

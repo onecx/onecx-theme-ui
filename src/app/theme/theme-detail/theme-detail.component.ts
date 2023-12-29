@@ -102,7 +102,7 @@ export class ThemeDetailComponent implements OnInit {
         label: data['ACTIONS.NAVIGATION.CLOSE'],
         title: data['ACTIONS.NAVIGATION.CLOSE.TOOLTIP'],
         actionCallback: () => this.close(),
-        icon: 'pi pi-arrow-left',
+        icon: 'pi pi-times',
         show: 'always',
         permission: 'THEME#SEARCH'
       },

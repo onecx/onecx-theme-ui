@@ -4,7 +4,7 @@ import { TranslateService } from '@ngx-translate/core'
 import { ThemeDTO } from '../../../generated/model/themeDTO'
 
 @Component({
-  selector: 'app-theme-intern',
+  selector: 'tm-theme-intern',
   templateUrl: './theme-intern.component.html'
 })
 export class ThemeInternComponent {

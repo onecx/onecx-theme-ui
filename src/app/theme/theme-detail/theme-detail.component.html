@@ -48,11 +48,11 @@
             </span>
             -->
             <div class="flex flex-wrap sm:flex-nowrap align-items-center pb-2 row-gap-2 column-gap-4">
-              <app-image-container
+              <tm-image-container
                 [imageUrl]="headerImageUrl"
                 [small]="true"
                 [title]="'LOGO.TOOLTIPS.' + (theme?.logoUrl ? 'IMAGE' : 'PLACEHOLDER') | translate"
-              ></app-image-container>
+              ></tm-image-container>
               <span class="p-float-label flex-grow-1">
                 <input
                   pInputText
@@ -70,7 +70,7 @@
       </p-tabPanel>
 
       <p-tabPanel [header]="'THEME.TABS.INTERN' | translate">
-        <app-theme-intern [theme]="theme" [dateFormat]="dateFormat"></app-theme-intern>
+        <tm-theme-intern [theme]="theme" [dateFormat]="dateFormat"></tm-theme-intern>
       </p-tabPanel>
 
       <p-tabPanel id="theme_detail_panel_variables" [header]="'THEME.TABS.VARIABLES' | translate">

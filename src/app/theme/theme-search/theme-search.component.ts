@@ -34,22 +34,22 @@ export class ThemeSearchComponent implements OnInit {
   ngOnInit(): void {
     this.loadThemes()
     this.translate
-      .get(['ACTIONS.CREATE.THEME', 'ACTIONS.CREATE.THEME.TOOLTIP', 'ACTIONS.IMPORT.LABEL', 'ACTIONS.IMPORT.PORTAL'])
+      .get(['ACTIONS.CREATE.THEME', 'ACTIONS.CREATE.THEME.TOOLTIP', 'ACTIONS.IMPORT.LABEL', 'ACTIONS.IMPORT.TOOLTIP'])
       .subscribe((data) => {
         this.prepareActionButtons(data)
       })
     this.translate
       .get([
+        'THEME.NAME',
+        'THEME.DESCRIPTION',
         'SEARCH.SORT_BY',
         'SEARCH.FILTER',
         'SEARCH.FILTER_OF',
-        'THEME.NAME',
-        'THEME.DESCRIPTION',
+        'SEARCH.SORT_DIRECTION_ASC',
+        'SEARCH.SORT_DIRECTION_DESC',
         'GENERAL.TOOLTIP.VIEW_MODE_GRID',
         'GENERAL.TOOLTIP.VIEW_MODE_LIST',
-        'GENERAL.TOOLTIP.VIEW_MODE_TABLE',
-        'SEARCH.SORT_DIRECTION_ASC',
-        'SEARCH.SORT_DIRECTION_DESC'
+        'GENERAL.TOOLTIP.VIEW_MODE_TABLE'
       ])
       .subscribe((data) => {
         this.prepareTranslations(data)
@@ -73,7 +73,7 @@ export class ThemeSearchComponent implements OnInit {
       },
       {
         label: data['ACTIONS.IMPORT.LABEL'],
-        title: data['ACTIONS.IMPORT.PORTAL'],
+        title: data['ACTIONS.IMPORT.TOOLTIP'],
         actionCallback: () => this.onImportThemeClick(),
         permission: 'THEME#IMPORT',
         icon: 'pi pi-upload',
@@ -90,7 +90,6 @@ export class ThemeSearchComponent implements OnInit {
       viewModeToggleTooltips: {
         grid: data['GENERAL.TOOLTIP.VIEW_MODE_GRID'],
         list: data['GENERAL.TOOLTIP.VIEW_MODE_LIST']
-        // table: data['GENERAL.TOOLTIP.VIEW_MODE_TABLE'],
       },
       sortOrderTooltips: {
         ascending: data['SEARCH.SORT_DIRECTION_ASC'],
