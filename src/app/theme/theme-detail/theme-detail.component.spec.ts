@@ -2,10 +2,10 @@ import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { HttpClient } from '@angular/common/http'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
-import { RouterTestingModule } from "@angular/router/testing"
+import { RouterTestingModule } from '@angular/router/testing'
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 
-import { PortalMessageService, ConfigurationService } from '@onecx/portal-integration-angular'
+import { PortalMessageService } from '@onecx/portal-integration-angular'
 import { HttpLoaderFactory } from 'src/app/shared/shared.module'
 import { ThemeDetailComponent } from './theme-detail.component'
 
