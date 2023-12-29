@@ -1,12 +1,13 @@
 FROM oci://ghcr.io/onecx/docker-spa-base:v1
 
-# Copy applicaiton build
+# Copy nginx configuration
 COPY nginx/locations.conf $DIR_LOCATION/locations.conf
-# Copy applicaiton build
-COPY dist/theme-mgmt-ui/ $DIR_HTML
+# Copy application build
+COPY dist/onecx-theme-ui/ $DIR_HTML
 
-#Optional extend list of application environments
+# Optional extend list of application environments
 #ENV CONFIG_ENV_LIST BFF_URL,APP_BASE_HREF
+
 # Application environments default values
 ENV BFF_URL http://onecx-theme-bff:8080/
 ENV APP_BASE_HREF /theme-mgmt/
