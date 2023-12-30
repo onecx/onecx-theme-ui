@@ -1,15 +1,15 @@
 /* eslint-disable */
 export default {
-  displayName: 'theme-mgmt-ui',
+  displayName: 'onecx-theme-ui',
   preset: './jest.preset.js',
-  setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
+  setupFilesAfterEnv: ['./src/test-setup.ts'],
   globals: {},
-  coverageDirectory: './coverage/app',
+  coverageDirectory: './coverage',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [
       'jest-preset-angular',
       {
-        tsconfig: '<rootDir>/tsconfig.spec.json',
+        tsconfig: './tsconfig.spec.json',
         stringifyContentPathRegex: '\\.(html|svg)$'
       }
     ]
