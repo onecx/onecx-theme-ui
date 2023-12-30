@@ -1,0 +1,16 @@
+::ng-deep {
+  .grid.grid-row-gap {
+    grid-row-gap: 1.5rem;
+  }
+
+  .p-fieldset {
+    background-color: var(--body-bg-color) !important;
+    .p-fieldset-legend {
+      background-color: transparent;
+      padding: 0.3rem 0.4rem;
+    }
+    .p-fieldset-content {
+      padding: 1rem 0;
+    }
+  }
+}
