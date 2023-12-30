@@ -17,6 +17,6 @@ const routes: Routes = [
 })
 export class ThemeMgmtModule {
   constructor(@Inject(MFE_INFO) mfeInfo?: MfeInfo) {
-    console.info('Theme Mgmt Module constructor', mfeInfo)
+    console.info('Theme Mgmt Module constructor (test 1)', mfeInfo)
   }
 }
