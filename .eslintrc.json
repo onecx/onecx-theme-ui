@@ -3,6 +3,7 @@
   "ignorePatterns": [
     ".angular/**",
     ".husky/**",
+    ".github/**",
     "coverage/**",
     "dist/**",
     "helm/**",

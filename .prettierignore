@@ -1,7 +1,9 @@
 .angular/**
 .husky/**
 .docusaurus/
+.github/**
 .prettierignore
+.browserslistrc
 coverage/**
 dist/**
 helm/**
