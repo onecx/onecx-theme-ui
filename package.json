@@ -3,10 +3,8 @@
   "version": "0.0.0",
   "license": "Apache-2.0",
   "config": {
-    "portal": {
-      "openapiYaml": "src/assets/api/portal-mgmt-api.yaml",
-      "openapiOutput": "src/app/generated"
-    }
+    "openapiYaml": "src/assets/api/portal-mgmt-api.yaml",
+    "openapiOutput": "src/app/generated"
   },
   "scripts": {
     "build": "ng build",
@@ -17,13 +15,13 @@
     "eslint": "eslint --ext .js,.ts src",
     "format": "ng lint --fix",
     "browsers": "npx browserslist",
+    "sonar": "npx sonarqube-scanner -Dproject.settings=sonar-local-project.properties",
     "test": "ng test",
-    "test:ci": "ng test --watch=false --browsers=ChromeHeadless --code-coverage --progress",
-    "apigen-portal-cleanup": "rm -rf $npm_package_config_portal_openapiOutput",
-    "apigen-portal-format": "npx prettier $npm_package_config_portal_openapiYaml --write && npx prettier $npm_package_config_portal_openapiOutput/**/* --write",
-    "apigen-portal-generate": "openapi-generator-cli generate -i $npm_package_config_portal_openapiYaml -g typescript-angular -c apigen.yaml -o $npm_package_config_portal_openapiOutput --type-mappings AnyType=object",
-    "apigen-portal": "npm run apigen-portal-cleanup && npm run apigen-portal-generate && npm run apigen-portal-format",
-    "apigen": "npm run apigen-portal"
+    "test:ci": "ng test --watch=false --browsers=ChromeHeadless --code-coverage",
+    "apigen-cleanup": "rm -rf $npm_package_config_openapiOutput",
+    "apigen-format": "npx prettier $npm_package_config_openapiYaml --write && npx prettier $npm_package_config_openapiOutput/**/* --write",
+    "apigen-generate": "openapi-generator-cli generate -i $npm_package_config_openapiYaml -g typescript-angular -c apigen.yaml -o $npm_package_config_openapiOutput --type-mappings AnyType=object",
+    "apigen": "npm run apigen-cleanup && npm run apigen-generate && npm run apigen-format"
   },
   "private": true,
   "husky": {
@@ -77,6 +75,7 @@
     "primeng": "^15.3.0",
     "regenerator-runtime": "0.13.11",
     "rxjs": "7.8.1",
+    "sonarqube-scanner": "^3.3.0",
     "tslib": "^2.5.0",
     "zod": "^3.22.1",
     "zone.js": "~0.12.0"

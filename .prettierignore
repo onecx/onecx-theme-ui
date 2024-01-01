@@ -2,12 +2,13 @@
 .husky/**
 .docusaurus/
 .github/**
+.scannerwork/
 .prettierignore
 .browserslistrc
-coverage/**
 dist/**
 helm/**
 nginx/**
+reports/**
 node_modules
 CHANGELOG.md
 README.md
