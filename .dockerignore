@@ -8,7 +8,6 @@
 /node_modules
 
 # IDEs and editors
-.vscode/
 /.idea
 .project
 .classpath
@@ -25,12 +24,12 @@
 !.vscode/extensions.json
 
 # misc
-/.sass-cache
-/.gitlab*
-/connect.lock
-/coverage
-/libpeerconnection.log
-/typings
+.sass-cache
+.gitlab*
+.scannerwork
+connect.lock
+reports
+typings
 *.log
 
 # e2e
