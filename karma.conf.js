@@ -4,12 +4,15 @@
 module.exports = function (config) {
   config.set({
     basePath: '',
+    logLevel: config.LOG_INFO,
     frameworks: ['jasmine', '@angular-devkit/build-angular'],
     plugins: [
       require('karma-chrome-launcher'),
       require('karma-coverage'),
       require('karma-jasmine'),
       require('karma-jasmine-html-reporter'),
+      require('karma-junit-reporter'),
+      require('karma-sonarqube-unit-reporter'),
       require('@angular-devkit/build-angular/plugins/karma')
     ],
     client: {
@@ -24,19 +27,44 @@ module.exports = function (config) {
     jasmineHtmlReporter: {
       suppressAll: true // removes the duplicated traces
     },
+    junitReporter: {
+      outputDir: 'reports/unit-test-results', // results will be saved as $outputDir/$browserName.xml
+      outputFile: 'results-junit-tests.xml', // if included, results will be saved as $outputDir/$browserName/$outputFile
+      suite: 'models', // suite will become the package name attribute in xml testsuite element
+      useBrowserName: false, // add browser name to report and classes names
+      nameFormatter: undefined, // function (browser, result) to customize the name attribute in xml testcase element
+      classNameFormatter: undefined, // function (browser, result) to customize the classname attribute in xml testcase element
+      properties: {} // key value pair of properties to add to the <properties> section of the report
+    },
+    sonarqubeReporter: {
+      basePath: 'src/app', // test files folder
+      filePattern: '**/*.spec.ts', // test files glob pattern
+      encoding: 'utf-8', // test files encoding
+      outputFolder: 'sonar', // report destination
+      legacyMode: false, // report for Sonarqube < 6.2 (disabled)
+      reportName: 'sonarqube_report.xml'
+    },
+    sonarQubeUnitReporter: {
+      sonarQubeVersion: 'LATEST',
+      outputFile: 'reports/sonarqube_report.xml',
+      testPaths: ['./src/app'],
+      testFilePattern: '**/*.spec.ts',
+      useBrowserName: false
+    },
     coverageReporter: {
-      dir: require('path').join(__dirname, './reports/coverage'),
-      subdir: '.',
+      includeAllSources: true,
+      dir: 'reports',
+      subdir: 'coverage',
       reporters: [{ type: 'html' }, { type: 'text-summary' }, { type: 'lcov' }]
     },
-    reporters: ['progress', 'kjhtml'],
+    reporters: ['progress', 'kjhtml', 'coverage', 'sonarqubeUnit', 'junit'],
+    preprocessors: { 'src/**/*.js': ['coverage'] },
     port: 9876,
     colors: true,
-    logLevel: config.LOG_INFO,
     autoWatch: true,
-    browsers: ['HeadlessChrome'],
     singleRun: false,
     restartOnFileChange: true,
+    browsers: ['HeadlessChrome'],
     customLaunchers: {
       HeadlessChrome: {
         base: 'ChromeHeadless',
