@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "license": "Apache-2.0",
   "config": {
-    "openapiYaml": "src/assets/api/portal-mgmt-api.yaml",
+    "openapiYaml": "src/assets/api/themes-bff-api.yaml",
     "openapiOutput": "src/app/generated"
   },
   "scripts": {

@@ -4,7 +4,7 @@ import { Observable } from 'rxjs'
 import { DataView } from 'primeng/dataview'
 import { TranslateService } from '@ngx-translate/core'
 import { Action, DataViewControlTranslations } from '@onecx/portal-integration-angular'
-import { ThemeDTO, ThemesAPIService } from '../../generated'
+import { GetThemesResponse, ThemesAPIService } from '../../generated'
 import { limitText } from '../../shared/utils'
 
 @Component({
@@ -12,7 +12,7 @@ import { limitText } from '../../shared/utils'
   styleUrls: ['./theme-search.component.scss']
 })
 export class ThemeSearchComponent implements OnInit {
-  themes$!: Observable<ThemeDTO[]>
+  themes$!: Observable<GetThemesResponse>
   public actions: Action[] = []
   public viewMode = 'grid'
   public filter: string | undefined
@@ -57,7 +57,7 @@ export class ThemeSearchComponent implements OnInit {
   }
 
   public loadThemes(): void {
-    this.themes$ = this.themeApi.getThemes()
+    this.themes$ = this.themeApi.getThemes({})
   }
 
   prepareActionButtons(data: any): void {

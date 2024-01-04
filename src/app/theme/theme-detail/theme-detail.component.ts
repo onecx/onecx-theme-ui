@@ -7,7 +7,7 @@ import FileSaver from 'file-saver'
 
 import { Action, ConfigurationService, ObjectDetailItem, PortalMessageService } from '@onecx/portal-integration-angular'
 import { filterObject, limitText, sortByLocale } from '../../shared/utils'
-import { ThemeDTO, ThemesAPIService, PortalIdentifierDTO } from '../../generated'
+import { Theme, ThemesAPIService, Workspace } from '../../generated'
 import { environment } from '../../../environments/environment'
 
 @Component({
@@ -16,7 +16,8 @@ import { environment } from '../../../environments/environment'
   providers: [ConfigurationService]
 })
 export class ThemeDetailComponent implements OnInit {
-  theme: ThemeDTO | undefined
+  theme: Theme | undefined
+  usedInWorkspace: Workspace[] | undefined
   themeId!: string
   themeDeleteVisible = false
   themeDeleteMessage = ''
@@ -51,7 +52,8 @@ export class ThemeDetailComponent implements OnInit {
       )
       .subscribe({
         next: (data) => {
-          this.theme = data
+          this.theme = data.resource
+          this.usedInWorkspace = data.workspaces
           this.preparePage()
           this.setHeaderImageUrl()
         },
@@ -194,7 +196,7 @@ export class ThemeDetailComponent implements OnInit {
       'portalId',
       'tenantId',
       'portals'
-    ]) as ThemeDTO
+    ]) as Theme
     const themeJSON = JSON.stringify(themeExportData, null, 2)
     FileSaver.saveAs(new Blob([themeJSON], { type: 'text/json' }), `${this.theme?.name + '_Theme'}.json`)
   }
@@ -209,7 +211,7 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   public prepareUsedInPortalList(): string {
-    const arr = this.theme?.portals?.map((portal: PortalIdentifierDTO) => portal.portalName)
+    const arr = this.usedInWorkspace?.map((workspace: Workspace) => workspace.workspaceName)
     return arr?.sort(sortByLocale).join(', ') || ''
   }
 }

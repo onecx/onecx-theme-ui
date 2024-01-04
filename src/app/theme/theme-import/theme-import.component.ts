@@ -4,7 +4,7 @@ import { TranslateService } from '@ngx-translate/core'
 import { ActivatedRoute, Router } from '@angular/router'
 
 import { ThemesAPIService } from './../../generated/api/themes.service'
-import { CreateThemeDTO, ThemeDTO } from '../../generated'
+import { Theme, ThemeSnapshot } from '../../generated'
 import { PortalMessageService } from '@onecx/portal-integration-angular'
 
 @Component({
@@ -17,11 +17,11 @@ export class ThemeImportComponent implements OnInit {
   @Output() public displayThemeImportChange = new EventEmitter<boolean>()
   @Output() public uploadEmitter = new EventEmitter()
 
-  private themes!: ThemeDTO[]
+  private themes!: Theme[]
   public themeName = ''
   public themeNameExists = false
   public themeImportError = false
-  public themeImportRequestDTO: ThemeDTO | null = null
+  public themeImportRequestDTO: ThemeSnapshot | null = null
   public httpHeaders!: HttpHeaders
   public properties: any = null
 
@@ -62,7 +62,7 @@ export class ThemeImportComponent implements OnInit {
   public checkThemeExistence() {
     this.themeNameExists = false
     for (const { name } of this.themes) {
-      if (name === this.themeImportRequestDTO?.name) {
+      if (name === this.themeImportRequestDTO?.themes) {
         this.themeNameExists = true
       }
     }
@@ -77,8 +77,8 @@ export class ThemeImportComponent implements OnInit {
   }
   public onThemeUpload(): void {
     this.themeApi
-      .createNewTheme({
-        createThemeDTO: this.themeImportRequestDTO as CreateThemeDTO
+      .importThemes({
+        themeSnapshot: this.themeImportRequestDTO as ThemeSnapshot
       })
       .subscribe({
         next: (data) => {
@@ -94,14 +94,16 @@ export class ThemeImportComponent implements OnInit {
       })
   }
 
-  private isThemeImportRequestDTO(obj: unknown): obj is ThemeDTO {
-    const dto = obj as ThemeDTO
+  private isThemeImportRequestDTO(obj: unknown): obj is Theme {
+    const dto = obj as Theme
     return !!(typeof dto === 'object' && dto && dto.name)
   }
 
   private getThemes(emit: boolean): void {
-    this.themeApi.getThemes().subscribe((themes) => {
-      this.themes = themes
+    this.themeApi.getThemes({}).subscribe((themes) => {
+      if (themes.stream) {
+        this.themes = themes.stream
+      }
       if (emit) this.uploadEmitter.emit()
     })
   }
