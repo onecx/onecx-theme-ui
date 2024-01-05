@@ -48,7 +48,7 @@ export const basePathProvider = (mfeInfo: MfeInfo) => {
   console.log(
     'Base path provider: ' + (mfeInfo ? mfeInfo.remoteBaseUrl + '' + environment.apiPrefix : '' + environment.apiPrefix)
   )
-  return mfeInfo ? mfeInfo.remoteBaseUrl + '/' + environment.apiPrefix : '' + environment.apiPrefix
+  return mfeInfo ? mfeInfo.remoteBaseUrl + '' + environment.apiPrefix : '' + environment.apiPrefix
 }
 
 export function HttpLoaderFactory(http: HttpClient, mfeInfo: MfeInfo) {
