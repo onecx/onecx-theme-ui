@@ -12,6 +12,6 @@
 
 
 export interface ExportThemeRequest { 
-    names?: Set<string>;
+    names?: Array<string>;
 }
 

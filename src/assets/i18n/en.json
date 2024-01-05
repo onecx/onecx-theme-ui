@@ -34,7 +34,8 @@
     "EXPORT": {
       "LABEL": "Export",
       "TOOLTIP": "Export definition in JSON format",
-      "THEME": "Export Theme"
+      "THEME": "Export Theme",
+      "EXPORT_THEME_FAIL": "An error occurred, the Theme was not exported."
     },
     "IMPORT": {
       "LABEL": "Import",
