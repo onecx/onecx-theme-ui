@@ -1,7 +1,7 @@
 apiVersion: v2
 name: onecx-theme-ui
 version: 0.0.0
-description: Onecx theme UI.
+description: OneCX Theme UI.
 home: https://github.com/onecx/onecx-theme-ui
 keywords:
   - theme

@@ -1,0 +1,516 @@
+---
+openapi: 3.0.3
+info:
+  title: onecx-theme-bff
+  description: OneCx theme Bff
+  version: '1.0'
+servers:
+  - url: http://onecx-theme-bff:8080/
+tags:
+  - name: theme
+paths:
+  /themes:
+    get:
+      tags:
+        - themes
+      description: Find all themes
+      operationId: getThemes
+      parameters:
+        - $ref: '#/components/parameters/pageNumber'
+        - $ref: '#/components/parameters/pageSize'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetThemesResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetailResponse'
+        '404':
+          description: Not found
+    post:
+      tags:
+        - themes
+      description: Create theme
+      operationId: createTheme
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateThemeRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateThemeResponse'
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetailResponse'
+        '404':
+          description: Not Found
+  /themes/{id}:
+    get:
+      tags:
+        - themes
+      description: Find theme by id
+      operationId: getThemeById
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetThemeResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetailResponse'
+        '404':
+          description: Not Found
+    put:
+      tags:
+        - themes
+      description: Update theme
+      operationId: updateTheme
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateThemeRequest'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateThemeResponse'
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetailResponse'
+        '404':
+          description: Not Found
+    delete:
+      tags:
+        - themes
+      description: Delete theme
+      operationId: deleteTheme
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetailResponse'
+  /themes/name/{name}:
+    get:
+      tags:
+        - themes
+      description: Find theme by name including workspace
+      operationId: getThemeByName
+      parameters:
+        - $ref: '#/components/parameters/name'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetThemeResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetailResponse'
+        '404':
+          description: Not Found
+  /themes/search:
+    post:
+      tags:
+        - themes
+      description: Search themes by criteria
+      operationId: searchThemes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchThemeRequest'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchThemeResponse'
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetailResponse'
+        '404':
+          description: Not Found
+  /themes/export:
+    post:
+      tags:
+        - themes
+      description: Export list of themes
+      operationId: exportThemes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExportThemeRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThemeSnapshot'
+        '404':
+          description: No themes founds
+  /themes/import:
+    post:
+      tags:
+        - themes
+      description: Import themes
+      operationId: importThemes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThemeSnapshot'
+      responses:
+        '200':
+          description: Import result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportThemeResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetailResponse'
+components:
+  schemas:
+    Theme:
+      type: object
+      properties:
+        version:
+          format: int32
+          type: integer
+        creationDate:
+          $ref: '#/components/schemas/OffsetDateTime'
+        creationUser:
+          type: string
+        modificationDate:
+          $ref: '#/components/schemas/OffsetDateTime'
+        modificationUser:
+          type: string
+        id:
+          type: string
+        name:
+          minLength: 2
+          type: string
+        cssFile:
+          type: string
+        description:
+          type: string
+        assetsUrl:
+          type: string
+        logoUrl:
+          type: string
+        faviconUrl:
+          type: string
+        previewImageUrl:
+          type: string
+        assetsUpdateDate:
+          type: string
+        properties:
+          type: object
+    ThemeUpdateCreate:
+      type: object
+      properties:
+        version:
+          format: int32
+          type: integer
+        creationDate:
+          $ref: '#/components/schemas/OffsetDateTime'
+        creationUser:
+          type: string
+        modificationDate:
+          $ref: '#/components/schemas/OffsetDateTime'
+        modificationUser:
+          type: string
+        name:
+          minLength: 2
+          type: string
+        cssFile:
+          type: string
+        description:
+          type: string
+        assetsUrl:
+          type: string
+        logoUrl:
+          type: string
+        faviconUrl:
+          type: string
+        previewImageUrl:
+          type: string
+        assetsUpdateDate:
+          type: string
+        properties:
+          type: object
+
+    GetThemeResponse:
+      required:
+        - resource
+      type: object
+      properties:
+        resource:
+          $ref: '#/components/schemas/Theme'
+        workspaces:
+          type: array
+          items:
+            $ref: '#/components/schemas/Workspace'
+    GetThemesResponse:
+      allOf: # Combines the PagingResponse and the Resources
+        - $ref: '#/components/schemas/PagingResponse'
+        - type: object
+          properties:
+            stream:
+              type: array
+              items:
+                $ref: '#/components/schemas/Theme'
+    CreateThemeResponse:
+      required:
+        - resource
+      type: object
+      properties:
+        resource:
+          $ref: '#/components/schemas/Theme'
+    UpdateThemeResponse:
+      required:
+        - resource
+      type: object
+      properties:
+        resource:
+          $ref: '#/components/schemas/Theme'
+    OffsetDateTime:
+      format: date-time
+      type: string
+      example: 2022-03-10T12:15:50-04:00
+    ProblemDetailResponse:
+      type: object
+      properties:
+        errorCode:
+          type: string
+        detail:
+          type: string
+        params:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProblemDetailParam'
+        invalidParams:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProblemDetailInvalidParam'
+    ProblemDetailParam:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+    ProblemDetailInvalidParam:
+      type: object
+      properties:
+        name:
+          type: string
+        message:
+          type: string
+    ValidationConstraint:
+      type: object
+      properties:
+        name:
+          type: string
+        message:
+          type: string
+    CreateThemeRequest:
+      required:
+        - resource
+      type: object
+      properties:
+        resource:
+          $ref: '#/components/schemas/ThemeUpdateCreate'
+    UpdateThemeRequest:
+      required:
+        - resource
+      type: object
+      properties:
+        resource:
+          $ref: '#/components/schemas/ThemeUpdateCreate'
+    SearchThemeRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        pageNumber:
+          type: integer
+          format: int32
+          default: 0
+        pageSize:
+          type: integer
+          format: int32
+    SearchThemeResponse:
+      allOf:
+        - $ref: '#/components/schemas/PagingResponse'
+        - type: object
+          properties:
+            stream:
+              type: array
+              items:
+                $ref: '#/components/schemas/Theme'
+    PagingResponse:
+      type: object
+      properties:
+        totalElements:
+          format: int64
+          type: integer
+        number:
+          format: int32
+          type: integer
+        size:
+          format: int32
+          type: integer
+        totalPages:
+          format: int64
+          type: integer
+    Workspace:
+      type: object
+      properties:
+        workspaceName:
+          type: string
+        description:
+          type: string
+    ExportThemeRequest:
+      type: object
+      properties:
+        names:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+    ThemeSnapshot:
+      type: object
+      properties:
+        id:
+          type: string
+          minLength: 10
+          description: ID of the request
+        created:
+          $ref: '#/components/schemas/OffsetDateTime'
+        themes:
+          type: object
+          nullable: false
+          additionalProperties:
+            $ref: '#/components/schemas/EximTheme'
+    ImportThemeResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          minLength: 10
+          description: ID of the request
+        themes:
+          additionalProperties:
+            $ref: '#/components/schemas/ImportThemeResponseStatus'
+    ImportThemeResponseStatus:
+      type: string
+      enum:
+        - UPDATE
+        - CREATED
+        - SKIP
+    EximTheme:
+      type: object
+      properties:
+        cssFile:
+          type: string
+        description:
+          type: string
+        assetsUrl:
+          type: string
+        logoUrl:
+          type: string
+        faviconUrl:
+          type: string
+        previewImageUrl:
+          type: string
+        assetsUpdateDate:
+          type: string
+        properties:
+          type: object
+  parameters:
+    pageNumber:
+      in: query
+      name: pageNumber
+      required: false
+      schema:
+        type: integer
+        format: int32
+        default: 0
+    pageSize:
+      in: query
+      name: pageSize
+      required: false
+      schema:
+        type: integer
+        format: int32
+        default: 100
+    id:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+    name:
+      in: path
+      name: name
+      required: true
+      schema:
+        type: string

@@ -9,7 +9,7 @@ import { Action, ConfigurationService, ThemeService, PortalMessageService } from
 
 import { themeVariables } from '../theme-variables'
 import { environment } from '../../../environments/environment'
-import { CreateThemeDTO, ImageV1APIService, ThemeDTO, ThemesAPIService } from '../../generated'
+import { GetThemeResponse, Theme, ThemesAPIService, ThemeUpdateCreate, UpdateThemeResponse } from '../../generated'
 import { dropDownSortItemsByLabel, dropDownGetLabelByValue, setFetchUrls } from '../../shared/utils'
 
 @Component({
@@ -24,8 +24,8 @@ export class ThemeDesignerComponent implements OnInit {
   @ViewChild('selectedFileInputFavicon') selectedFileInputFavicon: ElementRef | undefined
 
   public actions: Action[] = []
-  themes: ThemeDTO[] = []
-  theme: ThemeDTO | undefined
+  themes: Theme[] = []
+  theme: Theme | undefined
   themeId: string | null
   themeVars = themeVariables
   themeTemplates!: SelectItem[]
@@ -59,7 +59,7 @@ export class ThemeDesignerComponent implements OnInit {
     private router: Router,
     private themeApi: ThemesAPIService,
     private themeService: ThemeService,
-    private imageApi: ImageV1APIService,
+    //private imageApi: ImageV1APIService,
     private config: ConfigurationService,
     private translate: TranslateService,
     private confirmation: ConfirmationService,
@@ -153,10 +153,10 @@ export class ThemeDesignerComponent implements OnInit {
   ngOnInit(): void {
     if (this.mode === 'EDIT' && this.themeId) {
       this.getThemeById(this.themeId).subscribe((data) => {
-        this.theme = data
+        this.theme = data.resource
         this.basicForm.patchValue(data)
         this.propertiesForm.reset()
-        this.propertiesForm.patchValue(data.properties || {})
+        this.propertiesForm.patchValue(data.resource.properties || {})
         this.setFetchUrls()
       })
     } else {
@@ -207,12 +207,14 @@ export class ThemeDesignerComponent implements OnInit {
 
   // DropDown Theme Template
   private loadThemeTemplates(): void {
-    this.themeApi.getThemes().subscribe((data) => {
-      this.themeTemplates = [...data.map(this.themeDropdownMappingFn).sort(dropDownSortItemsByLabel)]
+    this.themeApi.getThemes({}).subscribe((data) => {
+      if (data.stream !== undefined) {
+        this.themeTemplates = [...data.stream.map(this.themeDropdownMappingFn).sort(dropDownSortItemsByLabel)]
+      }
     })
   }
 
-  private themeDropdownMappingFn = (theme: ThemeDTO) => {
+  private themeDropdownMappingFn = (theme: Theme) => {
     return {
       label: theme.name,
       value: theme.id
@@ -241,15 +243,15 @@ export class ThemeDesignerComponent implements OnInit {
       () => {
         this.getThemeById(this.themeTemplateSelectedId).subscribe((result) => {
           if (this.mode === 'NEW') {
-            this.basicForm.controls['name'].setValue(data['GENERAL.COPY_OF'] + result.name)
-            this.basicForm.controls['description'].setValue(result.description)
-            this.basicForm.controls['faviconUrl'].setValue(result.faviconUrl)
-            this.basicForm.controls['logoUrl'].setValue(result.logoUrl)
+            this.basicForm.controls['name'].setValue(data['GENERAL.COPY_OF'] + result.resource.name)
+            this.basicForm.controls['description'].setValue(result.resource.description)
+            this.basicForm.controls['faviconUrl'].setValue(result.resource.faviconUrl)
+            this.basicForm.controls['logoUrl'].setValue(result.resource.logoUrl)
             this.setFetchUrls()
           }
-          if (result.properties) {
+          if (result.resource.properties) {
             this.propertiesForm.reset()
-            this.propertiesForm.patchValue(result.properties)
+            this.propertiesForm.patchValue(result.resource.properties)
           }
         })
       },
@@ -286,17 +288,17 @@ export class ThemeDesignerComponent implements OnInit {
       this.getThemeById(this.themeId!)
         .pipe(
           switchMap((data) => {
-            data.properties = this.propertiesForm.value
+            data.resource.properties = this.propertiesForm.value
             Object.assign(data, this.basicForm.value)
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             return this.themeApi.updateTheme({
               id: this.themeId!,
-              updateThemeDTO: data
+              updateThemeRequest: data
             })
           })
         )
         .subscribe({
-          next: (data: ThemeDTO) => {
+          next: (data: UpdateThemeResponse) => {
             this.msgService.success({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_OK' })
             // apply theme changes immediately if it is the theme of the current portal
             if (this.themeIsCurrentUsedTheme) {
@@ -312,18 +314,18 @@ export class ThemeDesignerComponent implements OnInit {
   }
 
   public saveTheme(newThemename: string): void {
-    const newTheme: CreateThemeDTO = { ...this.basicForm.value }
+    const newTheme: ThemeUpdateCreate = { ...this.basicForm.value }
     newTheme.name = newThemename
     newTheme.properties = this.propertiesForm.value
 
-    this.themeApi.createNewTheme({ createThemeDTO: newTheme }).subscribe({
+    this.themeApi.createTheme({ createThemeRequest: { resource: newTheme } }).subscribe({
       next: (data) => {
         if (this.mode === 'EDIT') {
-          this.router.navigate([`../../${data.id}`], {
+          this.router.navigate([`../../${data.resource.id}`], {
             relativeTo: this.route
           })
         } else {
-          this.router.navigate([`../${data.id}`], { relativeTo: this.route })
+          this.router.navigate([`../${data.resource.id}`], { relativeTo: this.route })
         }
         this.msgService.success({ summaryKey: 'ACTIONS.CREATE.MESSAGE.CREATE_OK' })
       },
@@ -353,7 +355,7 @@ export class ThemeDesignerComponent implements OnInit {
     }
   }
 
-  private getThemeById(id: string): Observable<ThemeDTO> {
+  private getThemeById(id: string): Observable<GetThemeResponse> {
     return this.themeApi.getThemeById({ id: id })
   }
 
@@ -361,6 +363,7 @@ export class ThemeDesignerComponent implements OnInit {
   public onFileUpload(ev: Event, fieldType: 'logo' | 'favicon'): void {
     this.displayFileTypeErrorLogo = false
     this.displayFileTypeErrorFavicon = false
+    /**
     if (ev.target && (ev.target as HTMLInputElement).files) {
       const files = (ev.target as HTMLInputElement).files
       if (files) {
@@ -378,6 +381,7 @@ export class ThemeDesignerComponent implements OnInit {
         }
       }
     }
+     */
   }
   private setFetchUrls(): void {
     this.fetchingLogoUrl = setFetchUrls(this.apiPrefix, this.basicForm.value.logoUrl)

@@ -77,8 +77,8 @@
           "builder": "ngx-build-plus:dev-server",
           "options": {
             "browserTarget": "onecx-theme-ui:build",
-            "port": 5020,
-            "publicHost": "http://localhost:5020",
+            "port": 4200,
+            "publicHost": "http://localhost:4200",
             "extraWebpackConfig": "webpack.config.js",
             "proxyConfig": "proxy.conf.js"
           },

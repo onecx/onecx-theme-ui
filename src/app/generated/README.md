@@ -1,93 +1,226 @@
-# OneCX portal core
+## @
 
-This is a monorepo containing all core UI parts of the OneCX portal suite.
+### Building
 
-## Structure
-
-This project uses NX monorepo:
-
-[Nx Documentation](https://nx.dev/angular)
-
-[10-minute video showing all Nx features](https://nx.dev/getting-started/intro)
-
-[Interactive Tutorial](https://nx.dev/tutorial/01-create-application)
-
-![S=structure graph](nx-graph.png)
-
-### portal-integration-angular
-
-Publishable integration lib for Angular projects
-
-## Getting started
-
-To run the suite locally, you'll need to launch the required backend & auth services first. You can do that for example by cloning [tkit-dev-env](https://gitlab.com/1000kit/demo-workshop/tkit-dev-env) and running `docker-compose up -d traefik tkit-portal-server keycloak-app apm ahm`. Check the [README.md](https://gitlab.com/1000kit/demo-workshop/tkit-dev-env/-/blob/master/README.md) for more information.
-
-- use correct node and npm version: `nvm use`
-- install dependencies: `npm i`
-- start the shell: `nx run portal-mf-shell:serve`
-- start welcome page portlet: `nx run portal-welcome:serve`
-- run any of the microfrontends you need (e.g. `nx run theme-mgmt:serve`) and import their permissions to APM service (e.g. `npx nx run theme-mgmt:apm-sync`)
-- open your browser on [http://localhost:4300/admin](http://localhost:4300/admin) and login as `onecx`/`onecx` user
-- use `npx nx format:check --verbose=true --base develop` to format code before committing
-
-## Docs
-
-Run docs locally using `npx nx serve docs`
-
-## Storybook
-
-Publishable component libraries use storybook for documentation. To start it locally run:
-
+To install the required dependencies and to build the typescript sources run:
 ```
-nx run portal-integration-angular:storybook
+npm install
+npm run build
 ```
 
-## Building
+### publishing
 
-You can build any service locally using standard NX commands e.g. `npx nx run <project>:<target>` or run some target on all affect projects using `npx nx affected`. The CI pipeline in the project will run build, lint and publish stages by default.
+First build the package then run ```npm publish dist``` (don't forget to specify the `dist` folder!)
 
-For apps/microfrontends we build dockerimage and helm chart as release artifacts. You can run the corresponding tasks locally using `npx nx run <project>:docker --push` and `npx nx run <project>:helm`.
+### consuming
 
-## Other tasks
+Navigate to the folder of your consuming project and run one of next commands.
 
-### Sync permissions with APM
-
-Each app defines its permissions in a form CSV file (matrix of permission x role). These permissions are then bundled with the app will be rendered as k8s config map in runtime. Locally we dont use Helm/K8s therefore you need to manually push these permissions to APM service. If you use tkit-dev-env setup then we there is a custom nx target defined for this purpose:
+_published:_
 
 ```
-npx nx run <you-app-name>:apm-sync
+npm install @ --save
 ```
 
-See `libs/build-plugin/src/executors/permission-sync` for more info.
+_without publishing (not recommended):_
 
-## Publishing libs & services
+```
+npm install PATH_TO_GENERATED_PACKAGE/dist.tgz --save
+```
 
-### Publishing `@onecx/portal-integration-angular` package
+_It's important to take the tgz file, otherwise you'll get trouble with links on windows_
 
-To publish the `@onecx/portal-integration-angular` library to our private npm registry hosted [on Gitlab](https://gitlab.com/1000kit/apps/tkit-portal/onecx-portal-core-ui/-/packages) you need to complete the following steps:
+_using `npm link`:_
 
-1. Build the library: `npx nx run portal-integration-angular:build`
-2. Copy credentials to the output folder: `cp tools/.npmrc_WRITE dist/libs/portal-integration-angular/.npmrc`
-3. Publish the library: `cd dist/libs/portal-integration-angular && npm publish`
+In PATH_TO_GENERATED_PACKAGE/dist:
+```
+npm link
+```
 
-### Publishing `@onecx/portal-layout-styles` package
+In your project:
+```
+npm link 
+```
 
-To publish the `@onecx/portal-layout-styles` library to our private npm registry hosted [on Gitlab](https://gitlab.com/1000kit/apps/tkit-portal/onecx-portal-core-ui/-/packages) you need to complete the following steps:
+__Note for Windows users:__ The Angular CLI has troubles to use linked npm packages.
+Please refer to this issue https://github.com/angular/angular-cli/issues/8284 for a solution / workaround.
+Published packages are not effected by this issue.
 
-1. Build the library: `npx nx run portal-layout-styles:build`
-2. Copy credentials to the output folder: `cp tools/.npmrc_WRITE dist/libs/portal-layout-styles/.npmrc`
-3. Publish the library: `cd dist/libs/portal-layout-styles && npm publish`
 
-## Development
+#### General usage
 
-The project uses conventional commits.
+In your Angular project:
 
-## Known issue
 
-### Tests
+```
+// without configuring providers
+import { ApiModule } from '';
+import { HttpClientModule } from '@angular/common/http';
 
-... are missing or failing - should be provided.
+@NgModule({
+    imports: [
+        ApiModule,
+        // make sure to import the HttpClientModule in the AppModule only,
+        // see https://github.com/angular/angular/issues/20575
+        HttpClientModule
+    ],
+    declarations: [ AppComponent ],
+    providers: [],
+    bootstrap: [ AppComponent ]
+})
+export class AppModule {}
+```
 
-### Husky
+```
+// configuring providers
+import { ApiModule, Configuration, ConfigurationParameters } from '';
 
-If you experience problems on commit whith hooks, make sure the husky is a `nvm` [aware](https://github.com/typicode/husky/issues/77#issuecomment-630065185)
+export function apiConfigFactory (): Configuration {
+  const params: ConfigurationParameters = {
+    // set configuration parameters here.
+  }
+  return new Configuration(params);
+}
+
+@NgModule({
+    imports: [ ApiModule.forRoot(apiConfigFactory) ],
+    declarations: [ AppComponent ],
+    providers: [],
+    bootstrap: [ AppComponent ]
+})
+export class AppModule {}
+```
+
+```
+// configuring providers with an authentication service that manages your access tokens
+import { ApiModule, Configuration } from '';
+
+@NgModule({
+    imports: [ ApiModule ],
+    declarations: [ AppComponent ],
+    providers: [
+      {
+        provide: Configuration,
+        useFactory: (authService: AuthService) => new Configuration(
+          {
+            basePath: environment.apiUrl,
+            accessToken: authService.getAccessToken.bind(authService)
+          }
+        ),
+        deps: [AuthService],
+        multi: false
+      }
+    ],
+    bootstrap: [ AppComponent ]
+})
+export class AppModule {}
+```
+
+```
+import { DefaultApi } from '';
+
+export class AppComponent {
+    constructor(private apiGateway: DefaultApi) { }
+}
+```
+
+Note: The ApiModule is restricted to being instantiated once app wide.
+This is to ensure that all services are treated as singletons.
+
+#### Using multiple OpenAPI files / APIs / ApiModules
+In order to use multiple `ApiModules` generated from different OpenAPI files,
+you can create an alias name when importing the modules
+in order to avoid naming conflicts:
+```
+import { ApiModule } from 'my-api-path';
+import { ApiModule as OtherApiModule } from 'my-other-api-path';
+import { HttpClientModule } from '@angular/common/http';
+
+@NgModule({
+  imports: [
+    ApiModule,
+    OtherApiModule,
+    // make sure to import the HttpClientModule in the AppModule only,
+    // see https://github.com/angular/angular/issues/20575
+    HttpClientModule
+  ]
+})
+export class AppModule {
+
+}
+```
+
+
+### Set service base path
+If different than the generated base path, during app bootstrap, you can provide the base path to your service.
+
+```
+import { BASE_PATH } from '';
+
+bootstrap(AppComponent, [
+    { provide: BASE_PATH, useValue: 'https://your-web-service.com' },
+]);
+```
+or
+
+```
+import { BASE_PATH } from '';
+
+@NgModule({
+    imports: [],
+    declarations: [ AppComponent ],
+    providers: [ provide: BASE_PATH, useValue: 'https://your-web-service.com' ],
+    bootstrap: [ AppComponent ]
+})
+export class AppModule {}
+```
+
+
+#### Using @angular/cli
+First extend your `src/environments/*.ts` files by adding the corresponding base path:
+
+```
+export const environment = {
+  production: false,
+  API_BASE_PATH: 'http://127.0.0.1:8080'
+};
+```
+
+In the src/app/app.module.ts:
+```
+import { BASE_PATH } from '';
+import { environment } from '../environments/environment';
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [ ],
+  providers: [{ provide: BASE_PATH, useValue: environment.API_BASE_PATH }],
+  bootstrap: [ AppComponent ]
+})
+export class AppModule { }
+```
+
+### Customizing path parameter encoding
+
+Without further customization, only [path-parameters][parameter-locations-url] of [style][style-values-url] 'simple'
+and Dates for format 'date-time' are encoded correctly.
+
+Other styles (e.g. "matrix") are not that easy to encode
+and thus are best delegated to other libraries (e.g.: [@honoluluhenk/http-param-expander]).
+
+To implement your own parameter encoding (or call another library),
+pass an arrow-function or method-reference to the `encodeParam` property of the Configuration-object
+(see [General Usage](#general-usage) above).
+
+Example value for use in your Configuration-Provider:
+```typescript
+new Configuration({
+    encodeParam: (param: Param) => myFancyParamEncoder(param),
+})
+```
+
+[parameter-locations-url]: https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.1.0.md#parameter-locations
+[style-values-url]: https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.1.0.md#style-values
+[@honoluluhenk/http-param-expander]: https://www.npmjs.com/package/@honoluluhenk/http-param-expander

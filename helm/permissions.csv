@@ -1,4 +1,4 @@
-PERMISSION NAME;PERMISSION_KEY;portal-mgmt-admin;portal-mgmt-user;
+PERMISSION NAME;PERMISSION_KEY;onecx-theme-admin;onecx-theme-user;
 Theme create;THEME#CREATE;x;;
 Theme delete;THEME#DELETE;x;;
 Theme edit;THEME#EDIT;x;;

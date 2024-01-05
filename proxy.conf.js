@@ -17,11 +17,11 @@ const bypassFn = function (req, res) {
 }
 
 const PROXY_CONFIG = {
-  '/portal-api': {
-    target: 'http://tkit-portal-server',
+  '/themes-bff': {
+    target: 'http://onecx-theme-bff',
     secure: false,
     pathRewrite: {
-      '^.*/portal-api': ''
+      '^.*/themes-bff': ''
     },
     changeOrigin: true,
     logLevel: 'debug',

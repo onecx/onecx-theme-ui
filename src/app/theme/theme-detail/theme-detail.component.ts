@@ -6,8 +6,8 @@ import { TranslateService } from '@ngx-translate/core'
 import FileSaver from 'file-saver'
 
 import { Action, ConfigurationService, ObjectDetailItem, PortalMessageService } from '@onecx/portal-integration-angular'
-import { filterObject, limitText, sortByLocale } from '../../shared/utils'
-import { ThemeDTO, ThemesAPIService, PortalIdentifierDTO } from '../../generated'
+import { limitText, sortByLocale } from '../../shared/utils'
+import { ExportThemeRequest, Theme, ThemesAPIService, Workspace } from '../../generated'
 import { environment } from '../../../environments/environment'
 
 @Component({
@@ -16,7 +16,8 @@ import { environment } from '../../../environments/environment'
   providers: [ConfigurationService]
 })
 export class ThemeDetailComponent implements OnInit {
-  theme: ThemeDTO | undefined
+  theme: Theme | undefined
+  usedInWorkspace: Workspace[] | undefined
   themeId!: string
   themeDeleteVisible = false
   themeDeleteMessage = ''
@@ -51,7 +52,8 @@ export class ThemeDetailComponent implements OnInit {
       )
       .subscribe({
         next: (data) => {
-          this.theme = data
+          this.theme = data.resource
+          this.usedInWorkspace = data.workspaces
           this.preparePage()
           this.setHeaderImageUrl()
         },
@@ -185,18 +187,24 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   onExportTheme(): void {
-    const themeExportData = filterObject(this.theme, [
-      'creationDate',
-      'creationUser',
-      'modificationDate',
-      'modificationUser',
-      'id',
-      'portalId',
-      'tenantId',
-      'portals'
-    ]) as ThemeDTO
-    const themeJSON = JSON.stringify(themeExportData, null, 2)
-    FileSaver.saveAs(new Blob([themeJSON], { type: 'text/json' }), `${this.theme?.name + '_Theme'}.json`)
+    if (this.theme?.name) {
+      const exportThemeRequest: ExportThemeRequest = { names: [this.theme.name] }
+      console.log(exportThemeRequest)
+      this.themeApi
+        .exportThemes({
+          exportThemeRequest
+        })
+        .subscribe({
+          next: (data) => {
+            const themeJSON = JSON.stringify(data, null, 2)
+            FileSaver.saveAs(new Blob([themeJSON], { type: 'text/json' }), `${this.theme?.name + '_Theme'}.json`)
+          },
+          error: (err) => {
+            console.log(err)
+            this.msgService.error({ summaryKey: 'ACTIONS.EXPORT.EXPORT_THEME_FAIL' })
+          }
+        })
+    }
   }
 
   private setHeaderImageUrl(): void {
@@ -209,7 +217,7 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   public prepareUsedInPortalList(): string {
-    const arr = this.theme?.portals?.map((portal: PortalIdentifierDTO) => portal.portalName)
+    const arr = this.usedInWorkspace?.map((workspace: Workspace) => workspace.workspaceName)
     return arr?.sort(sortByLocale).join(', ') || ''
   }
 }
