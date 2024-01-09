@@ -84,14 +84,14 @@ export class ThemeImportComponent implements OnInit {
       })
       .subscribe({
         next: (data) => {
-          this.msgService.success({ summaryKey: 'PORTAL_IMPORT.IMPORT_THEME_SUCCESS' })
+          this.msgService.success({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_SUCCESS' })
           this.onImportThemeClear()
           this.displayThemeImport = false
           this.uploadEmitter.emit()
           this.router.navigate([`./${data.id}`], { relativeTo: this.route })
         },
         error: () => {
-          this.msgService.error({ summaryKey: 'PORTAL_IMPORT.IMPORT_THEME_FAIL' })
+          this.msgService.error({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_FAIL' })
         }
       })
   }

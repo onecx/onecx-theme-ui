@@ -1,7 +1,11 @@
 {
   "name": "onecx-theme-ui",
+  "private": true,
   "version": "0.0.0",
   "license": "Apache-2.0",
+  "contributors": [
+    "OneCX Development Team <onecx-development-team@onecx.org>"
+  ],
   "config": {
     "openapiYaml": "src/assets/api/themes-bff-api.yaml",
     "openapiOutput": "src/app/generated"
@@ -13,7 +17,7 @@
     "start": "ng serve --configuration=development --proxy-config=proxy.conf.js",
     "prepare": "husky install",
     "lint": "ng lint",
-    "eslint": "eslint --ext .js,.ts src",
+    "eslint": "eslint --quiet --ext .js,.ts src/**",
     "format": "ng lint --fix",
     "browsers": "npx browserslist",
     "test": "ng test",
@@ -25,7 +29,6 @@
     "apigen-generate": "openapi-generator-cli generate -i $npm_package_config_openapiYaml -g typescript-angular -c apigen.yaml -o $npm_package_config_openapiOutput --type-mappings=AnyType=object,set=Array",
     "apigen": "npm run apigen-cleanup && npm run apigen-generate && npm run apigen-format"
   },
-  "private": true,
   "husky": {
     "hooks": {
       "pre-commit": "pretty-quick --staged"
@@ -39,9 +42,7 @@
       "tsConfig": "tsconfig.spec.json",
       "karmaConfig": "karma.conf.js",
       "codeCoverageExclude": [
-        "src/app/generated/**/*",
-        "src/app/**/*.spec.ts",
-        "src/app/test/**/*"
+        "src/app/generated/**/*"
       ]
     }
   },

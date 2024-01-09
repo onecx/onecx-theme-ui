@@ -52,7 +52,9 @@ export const basePathProvider = (mfeInfo: MfeInfo) => {
 }
 
 export function HttpLoaderFactory(http: HttpClient, mfeInfo: MfeInfo) {
-  console.log(`Configuring translation loader ${mfeInfo?.remoteBaseUrl}`)
+  if (mfeInfo) {
+    console.log(`Configuring translation loader ${mfeInfo?.remoteBaseUrl}`)
+  }
   // if running standalone then load the app assets directly from remote base URL
   const appAssetPrefix = mfeInfo && mfeInfo.remoteBaseUrl ? mfeInfo.remoteBaseUrl : './'
   return new TranslateCombinedLoader(
