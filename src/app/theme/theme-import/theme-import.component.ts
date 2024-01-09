@@ -4,7 +4,7 @@ import { TranslateService } from '@ngx-translate/core'
 import { ActivatedRoute, Router } from '@angular/router'
 
 import { ThemesAPIService } from './../../generated/api/themes.service'
-import { CreateThemeDTO, ThemeDTO } from '../../generated'
+import { Theme, ThemeSnapshot } from '../../generated'
 import { PortalMessageService } from '@onecx/portal-integration-angular'
 
 @Component({
@@ -17,11 +17,11 @@ export class ThemeImportComponent implements OnInit {
   @Output() public displayThemeImportChange = new EventEmitter<boolean>()
   @Output() public uploadEmitter = new EventEmitter()
 
-  private themes!: ThemeDTO[]
+  private themes!: Theme[]
   public themeName = ''
   public themeNameExists = false
   public themeImportError = false
-  public themeImportRequestDTO: ThemeDTO | null = null
+  public themeSnapshot: ThemeSnapshot | null = null
   public httpHeaders!: HttpHeaders
   public properties: any = null
 
@@ -41,13 +41,15 @@ export class ThemeImportComponent implements OnInit {
 
   public onImportThemeSelect(event: { files: FileList }): void {
     event.files[0].text().then((text) => {
-      this.themeImportRequestDTO = null
+      this.themeSnapshot = null
       try {
-        const themeImportRequestDTO = JSON.parse(text)
-        if (this.isThemeImportRequestDTO(themeImportRequestDTO)) {
-          this.themeImportRequestDTO = themeImportRequestDTO
+        const themeSnapshot = JSON.parse(text)
+        if (this.isThemeImportRequestDTO(themeSnapshot)) {
+          this.themeSnapshot = themeSnapshot
           this.themeImportError = false
-          this.properties = themeImportRequestDTO.properties
+          if (themeSnapshot.themes !== undefined) {
+            this.properties = themeSnapshot?.themes[0].properties
+          }
           this.checkThemeExistence()
         } else {
           console.error('Theme Import Error: not valid data ')
@@ -62,7 +64,7 @@ export class ThemeImportComponent implements OnInit {
   public checkThemeExistence() {
     this.themeNameExists = false
     for (const { name } of this.themes) {
-      if (name === this.themeImportRequestDTO?.name) {
+      if (name === this.themeSnapshot?.themes) {
         this.themeNameExists = true
       }
     }
@@ -72,36 +74,38 @@ export class ThemeImportComponent implements OnInit {
     this.displayThemeImportChange.emit(false)
   }
   public onImportThemeClear(): void {
-    this.themeImportRequestDTO = null
+    this.themeSnapshot = null
     this.themeImportError = false
   }
   public onThemeUpload(): void {
     this.themeApi
-      .createNewTheme({
-        createThemeDTO: this.themeImportRequestDTO as CreateThemeDTO
+      .importThemes({
+        themeSnapshot: this.themeSnapshot as ThemeSnapshot
       })
       .subscribe({
         next: (data) => {
-          this.msgService.success({ summaryKey: 'PORTAL_IMPORT.IMPORT_THEME_SUCCESS' })
+          this.msgService.success({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_SUCCESS' })
           this.onImportThemeClear()
           this.displayThemeImport = false
           this.uploadEmitter.emit()
           this.router.navigate([`./${data.id}`], { relativeTo: this.route })
         },
         error: () => {
-          this.msgService.error({ summaryKey: 'PORTAL_IMPORT.IMPORT_THEME_FAIL' })
+          this.msgService.error({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_FAIL' })
         }
       })
   }
 
-  private isThemeImportRequestDTO(obj: unknown): obj is ThemeDTO {
-    const dto = obj as ThemeDTO
-    return !!(typeof dto === 'object' && dto && dto.name)
+  private isThemeImportRequestDTO(obj: unknown): obj is ThemeSnapshot {
+    const dto = obj as ThemeSnapshot
+    return !!(typeof dto === 'object' && dto)
   }
 
   private getThemes(emit: boolean): void {
-    this.themeApi.getThemes().subscribe((themes) => {
-      this.themes = themes
+    this.themeApi.getThemes({}).subscribe((themes) => {
+      if (themes.stream) {
+        this.themes = themes.stream
+      }
       if (emit) this.uploadEmitter.emit()
     })
   }

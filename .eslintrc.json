@@ -11,7 +11,9 @@
     "node_modules/**",
     "src/app/generated/**",
     "src/app/api/*",
-    "src/app/model/*"
+    "src/app/model/*",
+    "src/**/*.ico",
+    "src/**/*.svg"
   ],
   "overrides": [
     {

@@ -11,7 +11,6 @@ module.exports = function (config) {
       require('karma-coverage'),
       require('karma-jasmine'),
       require('karma-jasmine-html-reporter'),
-      require('karma-junit-reporter'),
       require('karma-sonarqube-unit-reporter'),
       require('@angular-devkit/build-angular/plugins/karma')
     ],
@@ -26,15 +25,6 @@ module.exports = function (config) {
     },
     jasmineHtmlReporter: {
       suppressAll: true // removes the duplicated traces
-    },
-    junitReporter: {
-      outputDir: 'reports/unit-test-results', // results will be saved as $outputDir/$browserName.xml
-      outputFile: 'results-junit-tests.xml', // if included, results will be saved as $outputDir/$browserName/$outputFile
-      suite: 'models', // suite will become the package name attribute in xml testsuite element
-      useBrowserName: false, // add browser name to report and classes names
-      nameFormatter: undefined, // function (browser, result) to customize the name attribute in xml testcase element
-      classNameFormatter: undefined, // function (browser, result) to customize the classname attribute in xml testcase element
-      properties: {} // key value pair of properties to add to the <properties> section of the report
     },
     sonarqubeReporter: {
       basePath: 'src/app', // test files folder
@@ -55,9 +45,9 @@ module.exports = function (config) {
       includeAllSources: true,
       dir: 'reports',
       subdir: 'coverage',
-      reporters: [{ type: 'html' }, { type: 'text-summary' }, { type: 'lcov' }]
+      reporters: [{ type: 'html' }, { type: 'text-summary' }]
     },
-    reporters: ['progress', 'kjhtml', 'coverage', 'sonarqubeUnit', 'junit'],
+    reporters: ['progress', 'kjhtml', 'coverage', 'sonarqubeUnit'],
     preprocessors: { 'src/**/*.js': ['coverage'] },
     port: 9876,
     colors: true,
