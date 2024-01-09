@@ -24,14 +24,14 @@
     [chooseLabel]="'ACTIONS.CHOOSE' | translate"
   ></p-fileUpload>
 
-  <div *ngIf="themeImportRequestDTO" class="flex flex-wrap justify-content-between align-items-center gap-2 mt-4">
+  <div *ngIf="themeSnapshot" class="flex flex-wrap justify-content-between align-items-center gap-2 mt-4">
     <span class="p-float-label" controlErrorAnchor>
       <input
         pInputText
         type="text"
         id="theme_import_themeName"
         class="w-full pt-3 pb-2"
-        [(ngModel)]="themeImportRequestDTO.name"
+        [(ngModel)]="themeSnapshot.themes"
         (ngModelChange)="checkThemeExistence()"
         [pTooltip]="'THEME.THEME_NAME' | translate"
         tooltipPosition="top"
@@ -43,7 +43,7 @@
     <div *ngIf="!properties">{{ 'THEME.NO_PROPERTIES' | translate }}</div>
   </div>
   <p-message
-    *ngIf="themeImportRequestDTO && themeNameExists"
+    *ngIf="themeSnapshot && themeNameExists"
     severity="warn"
     styleClass="mt-3"
     text="{{ 'THEME.IMPORT.THEME_EXISTS_MESSAGE' | translate }}"
