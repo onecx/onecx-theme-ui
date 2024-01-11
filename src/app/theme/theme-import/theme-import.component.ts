@@ -52,7 +52,7 @@ export class ThemeImportComponent implements OnInit {
           }
           this.checkThemeExistence()
         } else {
-          console.error('Theme Import Error: not valid data')
+          console.error('Theme Import Error: not valid data ')
           this.themeImportError = true
         }
       } catch (err) {
