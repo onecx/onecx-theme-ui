@@ -17,13 +17,13 @@
     "start": "ng serve --configuration=development --proxy-config=proxy.conf.js",
     "prepare": "husky install",
     "lint": "ng lint",
-    "eslint": "eslint --quiet --ext .js,.ts src/**",
+    "eslint": "eslint --quiet --ext .js,.ts src",
     "format": "ng lint --fix",
     "browsers": "npx browserslist",
     "test": "ng test",
     "test:ci": "ng test --watch=false --browsers=ChromeHeadless --code-coverage",
     "karma": "rm -rf reports && npm run test:ci",
-    "sonar": "npx sonarqube-scanner -Dproject.settings=sonar-local-project.properties",
+    "sonar": "npx sonarqube-scanner -Dproject.settings=sonar-project.properties",
     "apigen-cleanup": "rm -rf $npm_package_config_openapiOutput",
     "apigen-format": "npx prettier $npm_package_config_openapiYaml --write && npx prettier $npm_package_config_openapiOutput/**/* --write",
     "apigen-generate": "openapi-generator-cli generate -i $npm_package_config_openapiYaml -g typescript-angular -c apigen.yaml -o $npm_package_config_openapiOutput --type-mappings=AnyType=object,set=Array",
@@ -32,18 +32,6 @@
   "husky": {
     "hooks": {
       "pre-commit": "pretty-quick --staged"
-    }
-  },
-  "test": {
-    "builder": "@angular-devkit/build-angular:karma",
-    "options": {
-      "main": "src/test.ts",
-      "polyfills": "src/polyfills.ts",
-      "tsConfig": "tsconfig.spec.json",
-      "karmaConfig": "karma.conf.js",
-      "codeCoverageExclude": [
-        "src/app/generated/**/*"
-      ]
     }
   },
   "dependencies": {
