@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms'
 import { RouterModule, Routes } from '@angular/router'
 import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { FieldsetModule } from 'primeng/fieldset'
+import { ConfirmDialogModule } from 'primeng/confirmdialog'
 
 import { MFE_INFO, PortalCoreModule, MyMissingTranslationHandler } from '@onecx/portal-integration-angular'
 
@@ -72,6 +73,7 @@ const routes: Routes = [
   imports: [
     FormsModule,
     FieldsetModule,
+    ConfirmDialogModule,
     PortalCoreModule.forMicroFrontend(),
     [RouterModule.forChild(routes)],
     SharedModule,

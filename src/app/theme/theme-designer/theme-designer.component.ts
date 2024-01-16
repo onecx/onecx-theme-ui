@@ -154,7 +154,7 @@ export class ThemeDesignerComponent implements OnInit {
     if (this.mode === 'EDIT' && this.themeId) {
       this.getThemeById(this.themeId).subscribe((data) => {
         this.theme = data.resource
-        this.basicForm.patchValue(data)
+        this.basicForm.patchValue(data.resource)
         this.propertiesForm.reset()
         this.propertiesForm.patchValue(data.resource.properties || {})
         this.setFetchUrls()
@@ -289,7 +289,7 @@ export class ThemeDesignerComponent implements OnInit {
         .pipe(
           switchMap((data) => {
             data.resource.properties = this.propertiesForm.value
-            Object.assign(data, this.basicForm.value)
+            Object.assign(data.resource, this.basicForm.value)
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             return this.themeApi.updateTheme({
               id: this.themeId!,

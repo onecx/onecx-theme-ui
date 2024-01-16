@@ -10,10 +10,8 @@ export const themeVariables: ThemeVariablesType = {
   topbar: [
     'topbar-bg-color',
     'topbar-item-text-color',
-    'topbar-bg-color',
     'topbar-text-color',
     'topbar-left-bg-color',
-    'topbar-item-text-color',
     'topbar-item-text-hover-bg-color',
     'topbar-menu-button-bg-color',
     'logo-color'

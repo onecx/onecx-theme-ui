@@ -99,7 +99,7 @@ export class ThemeSearchComponent implements OnInit {
     }
   }
 
-  private onNewTheme(): void {
+  public onNewTheme(): void {
     this.router.navigate(['./new'], { relativeTo: this.route })
   }
   public onLayoutChange(viewMode: string): void {
