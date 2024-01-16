@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms'
 import { RouterModule, Routes } from '@angular/router'
 import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { FieldsetModule } from 'primeng/fieldset'
+import { ConfirmDialogModule } from 'primeng/confirmdialog'
 
 import { MFE_INFO, PortalCoreModule, MyMissingTranslationHandler } from '@onecx/portal-integration-angular'
 
@@ -16,7 +17,6 @@ import { ThemeImportComponent } from './theme-import/theme-import.component'
 import { ThemeDetailComponent } from './theme-detail/theme-detail.component'
 import { ThemeInternComponent } from './theme-detail/theme-intern/theme-intern.component'
 import { ThemeDesignerComponent } from './theme-designer/theme-designer.component'
-import { ConfirmDialogModule } from 'primeng/confirmdialog'
 
 const routes: Routes = [
   {
