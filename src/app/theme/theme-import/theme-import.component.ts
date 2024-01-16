@@ -17,7 +17,7 @@ export class ThemeImportComponent implements OnInit {
   @Output() public displayThemeImportChange = new EventEmitter<boolean>()
   @Output() public uploadEmitter = new EventEmitter()
 
-  private themes!: Theme[]
+  public themes!: Theme[]
   public themeName = ''
   public themeNameExists = false
   public themeImportError = false
@@ -35,12 +35,12 @@ export class ThemeImportComponent implements OnInit {
 
   ngOnInit(): void {
     this.httpHeaders = new HttpHeaders()
-    this.httpHeaders.set('Content-Type', 'application/json')
+    this.httpHeaders = this.httpHeaders.set('Content-Type', 'application/json')
     this.getThemes(false)
   }
 
-  public onImportThemeSelect(event: { files: FileList }): void {
-    event.files[0].text().then((text) => {
+  public async onImportThemeSelect(event: { files: FileList }): Promise<void> {
+    return event.files[0].text().then((text) => {
       this.themeSnapshot = null
       try {
         const themeSnapshot = JSON.parse(text)
@@ -48,7 +48,7 @@ export class ThemeImportComponent implements OnInit {
           this.themeSnapshot = themeSnapshot
           this.themeImportError = false
           if (themeSnapshot.themes !== undefined) {
-            this.properties = themeSnapshot?.themes[0].properties
+            this.properties = themeSnapshot.themes[Object.keys(themeSnapshot.themes)[0]].properties
           }
           this.checkThemeExistence()
         } else {
@@ -63,8 +63,8 @@ export class ThemeImportComponent implements OnInit {
 
   public checkThemeExistence() {
     this.themeNameExists = false
-    for (const { name } of this.themes) {
-      if (name === this.themeSnapshot?.themes) {
+    if (this.themeSnapshot?.themes) {
+      if (this.themes.find((theme) => Object.keys(this.themeSnapshot!.themes!).indexOf(theme.name!) > -1)) {
         this.themeNameExists = true
       }
     }
@@ -98,7 +98,7 @@ export class ThemeImportComponent implements OnInit {
 
   private isThemeImportRequestDTO(obj: unknown): obj is ThemeSnapshot {
     const dto = obj as ThemeSnapshot
-    return !!(typeof dto === 'object' && dto)
+    return !!(typeof dto === 'object' && dto && dto.themes)
   }
 
   private getThemes(emit: boolean): void {

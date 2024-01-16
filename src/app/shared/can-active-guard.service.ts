@@ -44,7 +44,7 @@ export class CanActivateGuard implements CanActivate {
     )
   }
 
-  private getBestMatchLanguage(lang: string): string {
+  public getBestMatchLanguage(lang: string): string {
     if (SUPPORTED_LANGUAGES.includes(lang)) {
       return lang
     } else {

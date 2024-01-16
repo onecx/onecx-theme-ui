@@ -165,7 +165,7 @@ export class ThemeDetailComponent implements OnInit {
     }
   }
 
-  private close(): void {
+  public close(): void {
     this.router.navigate(['./..'], { relativeTo: this.route })
   }
 

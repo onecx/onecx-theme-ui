@@ -16,6 +16,7 @@ import { ThemeImportComponent } from './theme-import/theme-import.component'
 import { ThemeDetailComponent } from './theme-detail/theme-detail.component'
 import { ThemeInternComponent } from './theme-detail/theme-intern/theme-intern.component'
 import { ThemeDesignerComponent } from './theme-designer/theme-designer.component'
+import { ConfirmDialogModule } from 'primeng/confirmdialog'
 
 const routes: Routes = [
   {
@@ -72,6 +73,7 @@ const routes: Routes = [
   imports: [
     FormsModule,
     FieldsetModule,
+    ConfirmDialogModule,
     PortalCoreModule.forMicroFrontend(),
     [RouterModule.forChild(routes)],
     SharedModule,
