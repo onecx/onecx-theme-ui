@@ -17,25 +17,15 @@ const bypassFn = function (req, res) {
 }
 
 const PROXY_CONFIG = {
-  '/themes-bff': {
+  '/theme-bff': {
     target: 'http://onecx-theme-bff',
     secure: false,
     pathRewrite: {
-      '^.*/themes-bff': ''
+      '^.*/theme-bff': ''
     },
     changeOrigin: true,
     logLevel: 'debug',
     bypass: bypassFn
-  },
-  '/ahm-api': {
-    target: 'http://ahm',
-    secure: false,
-    pathRewrite: {
-      '^.*/ahm-api': ''
-    },
-    changeOrigin: true,
-    logLevel: 'debug',
-    bypass: logFn
   }
 }
 
