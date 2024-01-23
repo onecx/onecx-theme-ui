@@ -19,3 +19,5 @@ jobs:
   build:
     uses: onecx/ci-angular/.github/workflows/build.yml@v1
     secrets: inherit
+    with:
+      helmEventTargetRepository: onecx/onecx-theme
