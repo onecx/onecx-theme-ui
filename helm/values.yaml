@@ -13,7 +13,7 @@ app:
       spec:
         exposedModule: "./ThemeMgmtModule"
         description: "Theme Mgmt module"
-        note: "Theme Mgmt module auto import via MF operator"
+        note: "Theme Mgmt UI module auto import via MF operator"
     # Permission
     permission:
       enabled: true

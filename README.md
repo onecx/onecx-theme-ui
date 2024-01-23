@@ -1,3 +1,3 @@
 # onecx-theme-ui
 
-OneCX Theme Mgmt
+OneCX Theme Mgmt UI
