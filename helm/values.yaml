@@ -4,9 +4,31 @@ app:
     repository: 'onecx/onecx-theme-ui'
   routing:
     enabled: true
+    path: /ui/mfe/theme/
+  
   operator:
-    apm:
-      enabled: false
+    # Microfrontend
+    microfrontend:
+      enabled: true
+      spec:
+        exposedModule: "./ThemeMgmtModule"
+        description: "Theme Mgmt module"
+        note: "Theme Mgmt module auto import via MF operator"
+    # Permission
+    permission:
+      enabled: true
+      spec:
+        permissions:
+          THEME:
+            CREATE: Create theme
+            EDIT: Edit theme
+            DELETE: Delete theme
+            SAVE: Update and save theme
+            IMPORT: Import theme
+            EXPORT: Export theme
+            VIEW: View mode for theme
+            SEARCH: Search theme
+    # Keycloak
     keycloak:
       enabled: true
       client: |-

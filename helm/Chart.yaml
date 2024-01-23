@@ -13,5 +13,6 @@ maintainers:
 dependencies:
   - name: helm-angular-app
     version: ^0
-    repository: oci://ghcr.io/onecx/charts
+    # repository: oci://ghcr.io/onecx/charts
+    repostirory: "file://../../helm-angular-app"
     alias: app
