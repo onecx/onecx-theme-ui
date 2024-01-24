@@ -218,6 +218,6 @@ export class ThemeDetailComponent implements OnInit {
 
   public prepareUsedInPortalList(): string {
     const arr = this.usedInWorkspace?.map((workspace: Workspace) => workspace.workspaceName)
-    return arr?.sort(sortByLocale).join(', ') || ''
+    return arr?.sort(sortByLocale).join(', ') ?? ''
   }
 }

@@ -4,16 +4,16 @@ app:
     repository: 'onecx/onecx-theme-ui'
   routing:
     enabled: true
-    path: /ui/mfe/theme/
+    path: /mfe/theme/
   
   operator:
     # Microfrontend
     microfrontend:
       enabled: true
       spec:
-        exposedModule: "./ThemeMgmtModule"
-        description: "Theme Mgmt module"
-        note: "Theme Mgmt UI module auto import via MF operator"
+        exposedModule: "./OneCXThemeModule"
+        description: "OneCX Theme Module"
+        note: "OneCX Theme UI module auto import via MF operator"
     # Permission
     permission:
       enabled: true
@@ -33,9 +33,9 @@ app:
       enabled: true
       client: |-
         { 
-          "clientId": "theme-mgmt-ui",
+          "clientId": "onecx-theme-ui",
           "enabled": true,
-          "description": "Keycloak client for theme-mgmt-ui",
+          "description": "Keycloak client for onecx-theme-ui",
           "redirectUris": ["*"],
           "webOrigins": ["*"],
           "publicClient": true,
