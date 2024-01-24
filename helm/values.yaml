@@ -35,7 +35,7 @@ app:
         { 
           "clientId": "onecx-theme-ui",
           "enabled": true,
-          "description": "Keycloak client for theme-mgmt-ui",
+          "description": "Keycloak client for onecx-theme-ui",
           "redirectUris": ["*"],
           "webOrigins": ["*"],
           "publicClient": true,
