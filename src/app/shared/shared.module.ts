@@ -45,10 +45,8 @@ import { ImageContainerComponent } from './image-container/image-container.compo
 import { ThemeColorBoxComponent } from './theme-color-box/theme-color-box.component'
 
 export const basePathProvider = (mfeInfo: MfeInfo) => {
-  console.log(
-    'Base path provider: ' + (mfeInfo ? mfeInfo.remoteBaseUrl + '' + environment.apiPrefix : '' + environment.apiPrefix)
-  )
-  return mfeInfo ? mfeInfo.remoteBaseUrl + '' + environment.apiPrefix : '' + environment.apiPrefix
+  console.log('Base path provider: ' + (mfeInfo ? mfeInfo?.remoteBaseUrl : '') + environment.apiPrefix)
+  return (mfeInfo ? mfeInfo?.remoteBaseUrl : '') + environment.apiPrefix
 }
 
 export function HttpLoaderFactory(http: HttpClient, mfeInfo: MfeInfo) {
@@ -56,7 +54,7 @@ export function HttpLoaderFactory(http: HttpClient, mfeInfo: MfeInfo) {
     console.log(`Configuring translation loader ${mfeInfo?.remoteBaseUrl}`)
   }
   // if running standalone then load the app assets directly from remote base URL
-  const appAssetPrefix = mfeInfo && mfeInfo.remoteBaseUrl ? mfeInfo.remoteBaseUrl : './'
+  const appAssetPrefix = mfeInfo?.remoteBaseUrl ? mfeInfo.remoteBaseUrl : './'
   return new TranslateCombinedLoader(
     new TranslateHttpLoader(http, appAssetPrefix + 'assets/i18n/', '.json'),
     new TranslateHttpLoader(http, appAssetPrefix + 'onecx-portal-lib/assets/i18n/', '.json')
