@@ -5,7 +5,7 @@ const config = withModuleFederationPlugin({
   name: 'onecx-theme-ui',
   filename: 'remoteEntry.js',
   exposes: {
-    './ThemeMgmtModule': 'src/app/theme-mgmt-remote.module.ts'
+    './OneCXThemeModule': 'src/app/onecx-theme-remote.module.ts'
   },
   shared: share({
     '@angular/core': { singleton: true, strictVersion: true, requiredVersion: 'auto' },

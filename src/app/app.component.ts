@@ -4,5 +4,5 @@ import { Component } from '@angular/core'
   templateUrl: './app.component.html'
 })
 export class AppComponent {
-  title = 'theme-mgmt'
+  title = 'onecx-theme-ui'
 }

@@ -15,8 +15,8 @@ const routes: Routes = [
   providers: [],
   schemas: []
 })
-export class ThemeMgmtModule {
+export class OneCXThemeModule {
   constructor(@Inject(MFE_INFO) mfeInfo?: MfeInfo) {
-    console.info('Theme Mgmt Module constructor', mfeInfo)
+    console.info('OneCX Theme Module constructor', mfeInfo)
   }
 }
