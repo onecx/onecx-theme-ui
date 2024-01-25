@@ -53,7 +53,7 @@
     "@onecx/integration-interface": "^3.7.1",
     "@onecx/keycloak-auth": "^3.7.1",
     "@onecx/portal-integration-angular": "^3.7.1",
-    "@onecx/portal-layout-styles": "^3.7.1",
+    "@onecx/portal-layout-styles": "^4.0.2",
     "file-saver": "^2.0.5",
     "i18n-iso-countries": "^7.6.0",
     "ngx-color": "^8.0.3",
