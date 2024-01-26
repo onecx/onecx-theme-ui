@@ -1,16 +1,15 @@
+import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
-import { HttpClient } from '@angular/common/http'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
-import { RouterTestingModule } from '@angular/router/testing'
-import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core'
-
-import { HttpLoaderFactory } from 'src/app/shared/shared.module'
-import { ThemeSearchComponent } from './theme-search.component'
-import { ThemesAPIService } from 'src/app/generated'
-import { of } from 'rxjs'
 import { Router } from '@angular/router'
+import { RouterTestingModule } from '@angular/router/testing'
+import { TranslateService } from '@ngx-translate/core'
+import { TranslateTestingModule } from 'ngx-translate-testing'
 import { DataViewModule } from 'primeng/dataview'
+import { of } from 'rxjs'
+
+import { ThemesAPIService } from 'src/app/generated'
+import { ThemeSearchComponent } from './theme-search.component'
 
 describe('ThemeSearchComponent', () => {
   let component: ThemeSearchComponent
@@ -25,20 +24,12 @@ describe('ThemeSearchComponent', () => {
         RouterTestingModule,
         HttpClientTestingModule,
         DataViewModule,
-        TranslateModule.forRoot({
-          loader: {
-            provide: TranslateLoader,
-            useFactory: HttpLoaderFactory,
-            deps: [HttpClient]
-          }
-        })
+        TranslateTestingModule.withTranslations({
+          de: require('src/assets/i18n/de.json'),
+          en: require('src/assets/i18n/en.json')
+        }).withDefaultLanguage('en')
       ],
-      providers: [
-        {
-          provide: ThemesAPIService,
-          useValue: themeApiSpy
-        }
-      ],
+      providers: [{ provide: ThemesAPIService, useValue: themeApiSpy }],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents()
   }))
@@ -75,14 +66,7 @@ describe('ThemeSearchComponent', () => {
     }
     spyOn(translateService, 'get').and.returnValues(of(actionsTranslations), of(generalTranslations))
     const themesResponse = {
-      stream: [
-        {
-          name: 'theme1'
-        },
-        {
-          name: 'theme2'
-        }
-      ]
+      stream: [{ name: 'theme1' }, { name: 'theme2' }]
     }
     const themesObservable = of(themesResponse as any)
     themeApiSpy.getThemes.and.returnValue(themesObservable)
@@ -128,17 +112,13 @@ describe('ThemeSearchComponent', () => {
   it('should navigate to theme detail on new theme callback', () => {
     const router = TestBed.inject(Router)
     spyOn(router, 'navigate')
-
     component.onNewTheme()
-
     expect(router.navigate).toHaveBeenCalledOnceWith(['./new'], jasmine.any(Object))
   })
 
   it('should change viewMode on layout change', () => {
     expect(component.viewMode).toBe('grid')
-
     component.onLayoutChange('list')
-
     expect(component.viewMode).toBe('list')
   })
 
@@ -146,38 +126,28 @@ describe('ThemeSearchComponent', () => {
     component.dv = jasmine.createSpyObj('DataView', ['filter'])
     component.filter = ''
     const myFilter = 'myTheme'
-
     component.onFilterChange(myFilter)
-
     expect(component.filter).toBe(myFilter)
     expect(component.dv!.filter).toHaveBeenCalledOnceWith(myFilter, 'contains')
   })
 
   it('should change field to sort by on sort change', () => {
     component.sortField = 'name'
-
     component.onSortChange('description')
-
     expect(component.sortField).toBe('description')
   })
 
   it('should change sorting direction on sorting direction change', () => {
     component.sortOrder = 1
-
     component.onSortDirChange(true)
-
     expect(component.sortOrder).toBe(-1)
-
     component.onSortDirChange(false)
-
     expect(component.sortOrder).toBe(1)
   })
 
   it('should show import dialog on import theme click', () => {
     component.themeImportDialogVisible = false
-
     component.onImportThemeClick()
-
     expect(component.themeImportDialogVisible).toBe(true)
   })
 })

@@ -1,16 +1,15 @@
 import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA, NgModule } from '@angular/core'
-import { HttpClient } from '@angular/common/http'
+import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
 import { RouterModule, Routes } from '@angular/router'
-import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { FieldsetModule } from 'primeng/fieldset'
 import { ConfirmDialogModule } from 'primeng/confirmdialog'
+import { ConfirmationService } from 'primeng/api'
 
-import { MFE_INFO, PortalCoreModule, MyMissingTranslationHandler } from '@onecx/portal-integration-angular'
+import { addInitializeModuleGuard, InitializeModuleGuard, PortalCoreModule } from '@onecx/portal-integration-angular'
 
-import { CanActivateGuard } from '../shared/can-active-guard.service'
 import { LabelResolver } from '../shared/label.resolver'
-import { HttpLoaderFactory, SharedModule } from '../shared/shared.module'
+import { SharedModule } from '../shared/shared.module'
 
 import { ThemeSearchComponent } from './theme-search/theme-search.component'
 import { ThemeImportComponent } from './theme-import/theme-import.component'
@@ -22,44 +21,34 @@ const routes: Routes = [
   {
     path: '',
     component: ThemeSearchComponent,
-    canActivate: [CanActivateGuard],
     pathMatch: 'full'
   },
   {
     path: 'new',
-    canActivate: [CanActivateGuard],
     component: ThemeDesignerComponent,
     data: {
       breadcrumb: 'BREADCRUMBS.CREATE',
       breadcrumbFn: (data: any) => `${data.labeli18n}`
     },
-    resolve: {
-      labeli18n: LabelResolver
-    }
+    resolve: { labeli18n: LabelResolver }
   },
   {
     path: ':id',
-    canActivate: [CanActivateGuard],
     component: ThemeDetailComponent,
     data: {
       breadcrumb: 'BREADCRUMBS.DETAIL',
       breadcrumbFn: (data: any) => `${data.labeli18n}`
     },
-    resolve: {
-      labeli18n: LabelResolver
-    }
+    resolve: { labeli18n: LabelResolver }
   },
   {
     path: ':id/edit',
-    canActivate: [CanActivateGuard],
     component: ThemeDesignerComponent,
     data: {
       breadcrumb: 'BREADCRUMBS.EDIT',
       breadcrumbFn: (data: any) => `${data.labeli18n}`
     },
-    resolve: {
-      labeli18n: LabelResolver
-    }
+    resolve: { labeli18n: LabelResolver }
   }
 ]
 @NgModule({
@@ -71,26 +60,15 @@ const routes: Routes = [
     ThemeInternComponent
   ],
   imports: [
-    FormsModule,
-    FieldsetModule,
+    CommonModule,
     ConfirmDialogModule,
+    FieldsetModule,
+    FormsModule,
     PortalCoreModule.forMicroFrontend(),
-    [RouterModule.forChild(routes)],
-    SharedModule,
-    TranslateModule.forChild({
-      isolate: true,
-      missingTranslationHandler: {
-        provide: MissingTranslationHandler,
-        useClass: MyMissingTranslationHandler
-      },
-      loader: {
-        provide: TranslateLoader,
-        useFactory: HttpLoaderFactory,
-        deps: [HttpClient, MFE_INFO]
-      }
-    })
+    [RouterModule.forChild(addInitializeModuleGuard(routes))],
+    SharedModule
   ],
-  providers: [],
+  providers: [ConfirmationService, InitializeModuleGuard],
   schemas: [NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA]
 })
 export class ThemeModule {

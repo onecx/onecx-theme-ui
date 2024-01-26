@@ -1,4 +1,4 @@
-<ocx-portal-page permission="THEME#EDIT">
+<ocx-portal-page permission="THEME#EDIT" helpArticleId="PAGE_THEME_DESIGNER">
   <ocx-page-header
     header="{{ theme ? theme.name : 'Theme Designer' }}"
     [subheader]="'THEME.DESIGNER.' + mode + '.SUBHEADER' | translate"
@@ -82,11 +82,11 @@
 
             <div class="field col-12 mb-3">
               <div class="flex flex-wrap sm:flex-nowrap align-items-center pb-2 row-gap-2 column-gap-4">
-                <tm-image-container
+                <app-image-container
                   [imageUrl]="fetchingLogoUrl"
                   [small]="true"
                   [title]="'LOGO.TOOLTIPS.' + (fetchingLogoUrl ? 'IMAGE' : 'PLACEHOLDER') | translate"
-                ></tm-image-container>
+                ></app-image-container>
                 <div class="flex flex-column gap-1 w-full">
                   <div class="p-inputgroup">
                     <span
@@ -118,11 +118,11 @@
             </div>
             <div class="field col-12 mb-0">
               <div class="flex flex-wrap sm:flex-nowrap align-items-center row-gap-2 column-gap-4">
-                <tm-image-container
+                <app-image-container
                   [imageUrl]="fetchingFaviconUrl"
                   [small]="true"
                   [title]="'LOGO.TOOLTIPS.' + (fetchingLogoUrl ? 'IMAGE' : 'PLACEHOLDER') | translate"
-                ></tm-image-container>
+                ></app-image-container>
                 <div class="flex flex-column gap-1 w-full">
                   <div class="p-inputgroup">
                     <span

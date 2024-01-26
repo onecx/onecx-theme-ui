@@ -1,7 +1,7 @@
-import { Inject, NgModule } from '@angular/core'
+import { NgModule } from '@angular/core'
 import { RouterModule, Routes } from '@angular/router'
 
-import { MFE_INFO, MfeInfo, PortalCoreModule } from '@onecx/portal-integration-angular'
+import { addInitializeModuleGuard, InitializeModuleGuard, PortalCoreModule } from '@onecx/portal-integration-angular'
 
 const routes: Routes = [
   {
@@ -10,13 +10,13 @@ const routes: Routes = [
   }
 ]
 @NgModule({
-  imports: [PortalCoreModule.forMicroFrontend(), RouterModule.forChild(routes)],
+  imports: [PortalCoreModule.forMicroFrontend(), RouterModule.forChild(addInitializeModuleGuard(routes))],
   exports: [],
-  providers: [],
+  providers: [InitializeModuleGuard],
   schemas: []
 })
 export class OneCXThemeModule {
-  constructor(@Inject(MFE_INFO) mfeInfo?: MfeInfo) {
-    console.info('OneCX Theme Module constructor', mfeInfo)
+  constructor() {
+    console.info('OneCX Theme Module constructor')
   }
 }

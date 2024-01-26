@@ -1,27 +1,29 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from '@angular/core/testing'
-import { HttpClient, HttpErrorResponse } from '@angular/common/http'
+import { HttpErrorResponse } from '@angular/common/http'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
-import { RouterTestingModule } from '@angular/router/testing'
-import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core'
-
-import { ConfigurationService, PortalMessageService, ThemeService } from '@onecx/portal-integration-angular'
-import { HttpLoaderFactory } from 'src/app/shared/shared.module'
-import { ThemeDesignerComponent } from './theme-designer.component'
-import { ConfirmationService } from 'primeng/api'
-import { ThemesAPIService } from 'src/app/generated'
-import { ActivatedRoute, Router } from '@angular/router'
-import { themeVariables } from '../theme-variables'
-import { of, throwError } from 'rxjs'
-import { environment } from 'src/environments/environment'
-import { ConfirmDialog, ConfirmDialogModule } from 'primeng/confirmdialog'
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { By } from '@angular/platform-browser'
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { ActivatedRoute, Router } from '@angular/router'
+import { RouterTestingModule } from '@angular/router/testing'
+import { TranslateService } from '@ngx-translate/core'
+import { TranslateTestingModule } from 'ngx-translate-testing'
+import { of, throwError } from 'rxjs'
+
+import { ConfirmationService } from 'primeng/api'
 import { InputSwitchModule } from 'primeng/inputswitch'
 import { DialogModule } from 'primeng/dialog'
 import { DropdownModule } from 'primeng/dropdown'
 import { OverlayPanelModule } from 'primeng/overlaypanel'
+import { ConfirmDialog, ConfirmDialogModule } from 'primeng/confirmdialog'
+
+import { ConfigurationService, PortalMessageService, ThemeService } from '@onecx/portal-integration-angular'
+
+import { ThemesAPIService } from 'src/app/generated'
+import { prepareUrl } from 'src/app/shared/utils'
+import { themeVariables } from './theme-variables'
+import { ThemeDesignerComponent } from './theme-designer.component'
 
 describe('ThemeDesignerComponent', () => {
   let component: ThemeDesignerComponent
@@ -49,23 +51,20 @@ describe('ThemeDesignerComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ThemeDesignerComponent],
       imports: [
-        RouterTestingModule,
-        HttpClientTestingModule,
-        TranslateModule.forRoot({
-          loader: {
-            provide: TranslateLoader,
-            useFactory: HttpLoaderFactory,
-            deps: [HttpClient]
-          }
-        }),
+        BrowserAnimationsModule,
         ConfirmDialogModule,
         DialogModule,
         DropdownModule,
-        OverlayPanelModule,
-        BrowserAnimationsModule,
-        ReactiveFormsModule,
         FormsModule,
-        InputSwitchModule
+        InputSwitchModule,
+        HttpClientTestingModule,
+        OverlayPanelModule,
+        ReactiveFormsModule,
+        RouterTestingModule,
+        TranslateTestingModule.withTranslations({
+          de: require('src/assets/i18n/de.json'),
+          en: require('src/assets/i18n/en.json')
+        }).withDefaultLanguage('en')
       ],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
@@ -270,8 +269,8 @@ describe('ThemeDesignerComponent', () => {
 
       component.ngOnInit()
 
-      expect(component.fetchingLogoUrl).toBe(environment.apiPrefix + themeData.logoUrl)
-      expect(component.fetchingFaviconUrl).toBe(environment.apiPrefix + themeData.faviconUrl)
+      expect(component.fetchingLogoUrl).toBe(prepareUrl(themeData.logoUrl))
+      expect(component.fetchingFaviconUrl).toBe(prepareUrl(themeData.faviconUrl))
     })
 
     it('should fetch logo and favicon from external source on edit mode when http[s] present', () => {
@@ -941,8 +940,8 @@ describe('ThemeDesignerComponent', () => {
           general: jasmine.objectContaining({ 'primary-color': 'rgb(255,255,255)' })
         })
       )
-      expect(component.fetchingFaviconUrl).toBe(environment.apiPrefix + 'fetchedFavUrl')
-      expect(component.fetchingLogoUrl).toBe(environment.apiPrefix + 'fetchedLogoUrl')
+      expect(component.fetchingFaviconUrl).toBe(prepareUrl('fetchedFavUrl'))
+      expect(component.fetchingLogoUrl).toBe(prepareUrl('fetchedLogoUrl'))
     })
   })
 })

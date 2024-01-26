@@ -1,19 +1,18 @@
 import { Component, OnInit } from '@angular/core'
 import { DatePipe } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
-import { finalize } from 'rxjs'
 import { TranslateService } from '@ngx-translate/core'
+import { finalize } from 'rxjs'
 import FileSaver from 'file-saver'
 
-import { Action, ConfigurationService, ObjectDetailItem, PortalMessageService } from '@onecx/portal-integration-angular'
-import { limitText, sortByLocale } from '../../shared/utils'
-import { ExportThemeRequest, Theme, ThemesAPIService, Workspace } from '../../generated'
-import { environment } from '../../../environments/environment'
+import { Action, ObjectDetailItem, PortalMessageService, UserService } from '@onecx/portal-integration-angular'
+
+import { limitText, prepareUrl, sortByLocale } from 'src/app/shared/utils'
+import { ExportThemeRequest, Theme, ThemesAPIService, Workspace } from 'src/app/generated'
 
 @Component({
   templateUrl: './theme-detail.component.html',
-  styleUrls: ['./theme-detail.component.scss'],
-  providers: [ConfigurationService]
+  styleUrls: ['./theme-detail.component.scss']
 })
 export class ThemeDetailComponent implements OnInit {
   theme: Theme | undefined
@@ -23,7 +22,6 @@ export class ThemeDetailComponent implements OnInit {
   themeDeleteMessage = ''
   themePortalList = ''
   loading = true
-  private apiPrefix = environment.apiPrefix
   public dateFormat = 'medium'
   // page header
   public actions: Action[] = []
@@ -31,15 +29,15 @@ export class ThemeDetailComponent implements OnInit {
   public headerImageUrl?: string
 
   constructor(
+    private user: UserService,
     private router: Router,
     private route: ActivatedRoute,
     private themeApi: ThemesAPIService,
-    private config: ConfigurationService,
     private msgService: PortalMessageService,
     private translate: TranslateService
   ) {
     this.themeId = this.route.snapshot.paramMap.get('id') || ''
-    this.dateFormat = this.config.lang === 'de' ? 'dd.MM.yyyy HH:mm:ss' : 'medium'
+    this.dateFormat = this.user.lang$.getValue() === 'de' ? 'dd.MM.yyyy HH:mm:ss' : 'medium'
   }
 
   ngOnInit(): void {
@@ -55,7 +53,7 @@ export class ThemeDetailComponent implements OnInit {
           this.theme = data.resource
           this.usedInWorkspace = data.workspaces
           this.preparePage()
-          this.setHeaderImageUrl()
+          this.headerImageUrl = prepareUrl(this.theme?.logoUrl)
         },
         error: (err) => {
           this.msgService.error({
@@ -204,15 +202,6 @@ export class ThemeDetailComponent implements OnInit {
             this.msgService.error({ summaryKey: 'ACTIONS.EXPORT.EXPORT_THEME_FAIL' })
           }
         })
-    }
-  }
-
-  private setHeaderImageUrl(): void {
-    // img format is from BE or from Internet
-    if (this.theme?.logoUrl && !this.theme.logoUrl.match(/^(http|https)/g)) {
-      this.headerImageUrl = this.apiPrefix + this.theme.logoUrl
-    } else {
-      this.headerImageUrl = this.theme?.logoUrl
     }
   }
 

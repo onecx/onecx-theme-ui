@@ -5,15 +5,13 @@ import { Observable, debounceTime, switchMap } from 'rxjs'
 import { TranslateService } from '@ngx-translate/core'
 import { ConfirmationService, SelectItem } from 'primeng/api'
 
-import { Action, ConfigurationService, ThemeService, PortalMessageService } from '@onecx/portal-integration-angular'
-
-import { themeVariables } from '../theme-variables'
-import { environment } from '../../../environments/environment'
-import { GetThemeResponse, Theme, ThemesAPIService, ThemeUpdateCreate, UpdateThemeResponse } from '../../generated'
-import { dropDownSortItemsByLabel, dropDownGetLabelByValue, setFetchUrls } from '../../shared/utils'
+import { Action, AppStateService, PortalMessageService, ThemeService } from '@onecx/portal-integration-angular'
+import { dropDownSortItemsByLabel, dropDownGetLabelByValue, prepareUrl } from 'src/app/shared/utils'
+import { GetThemeResponse, Theme, ThemesAPIService, ThemeUpdateCreate, UpdateThemeResponse } from 'src/app/generated'
+import { themeVariables } from './theme-variables'
 
 @Component({
-  selector: 'tm-theme-designer',
+  selector: 'app-theme-designer',
   templateUrl: './theme-designer.component.html',
   styleUrls: ['./theme-designer.component.scss'],
   providers: [ConfirmationService]
@@ -34,7 +32,6 @@ export class ThemeDesignerComponent implements OnInit {
 
   mode: 'EDIT' | 'NEW' = 'NEW'
   autoApply = false
-  apiPrefix = environment.apiPrefix
   saveAsNewPopupDisplay = false
   fetchingLogoUrl?: string
   fetchingFaviconUrl?: string
@@ -57,17 +54,17 @@ export class ThemeDesignerComponent implements OnInit {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
+    private appStateService: AppStateService,
     private themeApi: ThemesAPIService,
     private themeService: ThemeService,
     //private imageApi: ImageV1APIService,
-    private config: ConfigurationService,
     private translate: TranslateService,
     private confirmation: ConfirmationService,
     private msgService: PortalMessageService
   ) {
     this.mode = route.snapshot.paramMap.has('id') ? 'EDIT' : 'NEW'
     this.themeId = route.snapshot.paramMap.get('id')
-    this.themeIsCurrentUsedTheme = this.themeId === this.config.getPortal().themeId
+    //this.themeIsCurrentUsedTheme = this.themeId === this.appStateService.currentPortal$.getValue()?.themeId
     this.translate
       .get([
         'ACTIONS.CANCEL',
@@ -157,7 +154,8 @@ export class ThemeDesignerComponent implements OnInit {
         this.basicForm.patchValue(data.resource)
         this.propertiesForm.reset()
         this.propertiesForm.patchValue(data.resource.properties || {})
-        this.setFetchUrls()
+        this.fetchingLogoUrl = prepareUrl(this.basicForm.value.logoUrl)
+        this.fetchingFaviconUrl = prepareUrl(this.basicForm.value.faviconUrl)
       })
     } else {
       const currentVars: { [key: string]: { [key: string]: string } } = {}
@@ -247,7 +245,8 @@ export class ThemeDesignerComponent implements OnInit {
             this.basicForm.controls['description'].setValue(result.resource.description)
             this.basicForm.controls['faviconUrl'].setValue(result.resource.faviconUrl)
             this.basicForm.controls['logoUrl'].setValue(result.resource.logoUrl)
-            this.setFetchUrls()
+            this.fetchingLogoUrl = prepareUrl(this.basicForm.value.logoUrl)
+            this.fetchingFaviconUrl = prepareUrl(this.basicForm.value.faviconUrl)
           }
           if (result.resource.properties) {
             this.propertiesForm.reset()
@@ -371,7 +370,8 @@ export class ThemeDesignerComponent implements OnInit {
           Array.from(files).forEach((file) => {
             this.imageApi.uploadImage({ image: file }).subscribe((data) => {
               this.basicForm.controls[fieldType + 'Url'].setValue(data.imageUrl)
-              this.setFetchUrls()
+              this.fetchingLogoUrl = prepareUrl(this.basicForm.value.logoUrl)
+              this.fetchingFaviconUrl = prepareUrl(this.basicForm.value.faviconUrl)
               this.msgService.info({ summaryKey: 'LOGO.UPLOADED' })
             })
           })
@@ -382,10 +382,6 @@ export class ThemeDesignerComponent implements OnInit {
       }
     }
      */
-  }
-  private setFetchUrls(): void {
-    this.fetchingLogoUrl = setFetchUrls(this.apiPrefix, this.basicForm.value.logoUrl)
-    this.fetchingFaviconUrl = setFetchUrls(this.apiPrefix, this.basicForm.value.faviconUrl)
   }
 
   // Applying Styles

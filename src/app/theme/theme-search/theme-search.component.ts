@@ -1,11 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
+import { TranslateService } from '@ngx-translate/core'
 import { Observable } from 'rxjs'
 import { DataView } from 'primeng/dataview'
-import { TranslateService } from '@ngx-translate/core'
+
 import { Action, DataViewControlTranslations } from '@onecx/portal-integration-angular'
-import { GetThemesResponse, ThemesAPIService } from '../../generated'
-import { limitText } from '../../shared/utils'
+
+import { GetThemesResponse, ThemesAPIService } from 'src/app/generated'
+import { limitText } from 'src/app/shared/utils'
 
 @Component({
   templateUrl: './theme-search.component.html',
