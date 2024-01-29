@@ -1,14 +1,7 @@
 import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA, NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { HttpClient } from '@angular/common/http'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import {
-  MissingTranslationHandler,
-  MissingTranslationHandlerParams,
-  TranslateLoader,
-  TranslateModule,
-  TranslateService
-} from '@ngx-translate/core'
+import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { ColorSketchModule } from 'ngx-color/sketch'
 import { ErrorTailorModule } from '@ngneat/error-tailor'
 
@@ -37,26 +30,18 @@ import { ToastModule } from 'primeng/toast'
 import {
   AppStateService,
   ConfigurationService,
-  createTranslateLoader,
   PortalDialogService,
   PortalApiConfiguration
 } from '@onecx/portal-integration-angular'
 
-import { Configuration } from '../generated'
+import { Configuration } from 'src/app/generated'
 import { LabelResolver } from './label.resolver'
-import { environment } from '../../environments/environment'
+import { environment } from 'src/environments/environment'
 import { ImageContainerComponent } from './image-container/image-container.component'
 import { ThemeColorBoxComponent } from './theme-color-box/theme-color-box.component'
 
 export function apiConfigProvider(configService: ConfigurationService, appStateService: AppStateService) {
   return new PortalApiConfiguration(Configuration, environment.apiPrefix, configService, appStateService)
-}
-
-export class MyMissingTranslationHandler implements MissingTranslationHandler {
-  handle(params: MissingTranslationHandlerParams) {
-    console.log(`Missing translation for ${params.key}`)
-    return params.key
-  }
 }
 
 @NgModule({
@@ -86,15 +71,7 @@ export class MyMissingTranslationHandler implements MissingTranslationHandler {
     TabViewModule,
     TableModule,
     ToastModule,
-    TranslateModule.forRoot({
-      isolate: true,
-      loader: {
-        provide: TranslateLoader,
-        useFactory: createTranslateLoader,
-        deps: [HttpClient, AppStateService]
-      },
-      missingTranslationHandler: { provide: MissingTranslationHandler, useClass: MyMissingTranslationHandler }
-    }),
+    TranslateModule,
     ErrorTailorModule.forRoot({
       controlErrorsOn: { async: true, blur: true, change: true },
       errors: {

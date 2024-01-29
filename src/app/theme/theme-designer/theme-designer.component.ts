@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
-import { Observable, debounceTime, switchMap } from 'rxjs'
+import { Observable, debounceTime, map, switchMap } from 'rxjs'
 import { TranslateService } from '@ngx-translate/core'
 import { ConfirmationService, SelectItem } from 'primeng/api'
 
@@ -21,34 +21,35 @@ export class ThemeDesignerComponent implements OnInit {
   @ViewChild('selectedFileInputLogo') selectedFileInputLogo: ElementRef | undefined
   @ViewChild('selectedFileInputFavicon') selectedFileInputFavicon: ElementRef | undefined
 
-  public actions: Action[] = []
-  themes: Theme[] = []
-  theme: Theme | undefined
-  themeId: string | null
-  themeVars = themeVariables
-  themeTemplates!: SelectItem[]
-  themeTemplateSelectedId = ''
-  themeIsCurrentUsedTheme = false
+  public actions: Action[] = [] // TODO: remove if tests using actions$
+  public actions$: Observable<Action[]> | undefined
+  public themes: Theme[] = []
+  public theme: Theme | undefined
+  public themeId: string | null
+  public themeVars = themeVariables
+  public themeTemplates!: SelectItem[]
+  public themeTemplateSelectedId = ''
+  public themeIsCurrentUsedTheme = false
+  public fetchingLogoUrl?: string
+  public fetchingFaviconUrl?: string
 
-  mode: 'EDIT' | 'NEW' = 'NEW'
-  autoApply = false
-  saveAsNewPopupDisplay = false
-  fetchingLogoUrl?: string
-  fetchingFaviconUrl?: string
+  public mode: 'EDIT' | 'NEW' = 'NEW'
+  public autoApply = false
+  public saveAsNewPopupDisplay = false
+  public displayFileTypeErrorLogo = false
+  public displayFileTypeErrorFavicon = false
 
-  fontForm: FormGroup
-  basicForm: FormGroup
-  sidebarForm: FormGroup
-  topbarForm: FormGroup
-  generalForm: FormGroup
-  propertiesForm: FormGroup
-  groups: {
+  public fontForm: FormGroup
+  public basicForm: FormGroup
+  public sidebarForm: FormGroup
+  public topbarForm: FormGroup
+  public generalForm: FormGroup
+  public propertiesForm: FormGroup
+  public groups: {
     title: string
     formGroup: FormGroup
     key: keyof typeof themeVariables
   }[]
-  public displayFileTypeErrorLogo = false
-  public displayFileTypeErrorFavicon = false
 
   constructor(
     private fb: FormBuilder,
@@ -64,19 +65,8 @@ export class ThemeDesignerComponent implements OnInit {
   ) {
     this.mode = route.snapshot.paramMap.has('id') ? 'EDIT' : 'NEW'
     this.themeId = route.snapshot.paramMap.get('id')
-    //this.themeIsCurrentUsedTheme = this.themeId === this.appStateService.currentPortal$.getValue()?.themeId
-    this.translate
-      .get([
-        'ACTIONS.CANCEL',
-        'ACTIONS.TOOLTIPS.CANCEL_AND_CLOSE',
-        'ACTIONS.SAVE',
-        'ACTIONS.TOOLTIPS.SAVE',
-        'ACTIONS.SAVE_AS',
-        'ACTIONS.TOOLTIPS.SAVE_AS'
-      ])
-      .subscribe((data) => {
-        this.prepareActionButtons(data)
-      })
+    this.themeIsCurrentUsedTheme = this.themeId === this.appStateService.currentPortal$.getValue()?.themeId
+    this.prepareActionButtons()
     this.fontForm = new FormGroup({})
     this.topbarForm = new FormGroup({})
     this.generalForm = new FormGroup({})
@@ -89,7 +79,7 @@ export class ThemeDesignerComponent implements OnInit {
       },
       {
         key: 'topbar',
-        title: 'Topbar - Portal Header',
+        title: 'Topbar - Workspace Header',
         formGroup: this.topbarForm
       },
       {
@@ -171,36 +161,48 @@ export class ThemeDesignerComponent implements OnInit {
     this.loadThemeTemplates()
   }
 
-  private prepareActionButtons(data: any): void {
-    this.actions = [] // provoke change event
-    this.actions.push(
-      {
-        label: data['ACTIONS.CANCEL'],
-        title: data['ACTIONS.TOOLTIPS.CANCEL_AND_CLOSE'],
-        actionCallback: () => this.close(),
-        icon: 'pi pi-times',
-        show: 'always',
-        permission: 'THEME#VIEW'
-      },
-      {
-        label: data['ACTIONS.SAVE'],
-        title: data['ACTIONS.TOOLTIPS.SAVE'],
-        actionCallback: () => this.updateTheme(),
-        icon: 'pi pi-save',
-        show: 'always',
-        conditional: true,
-        showCondition: this.mode === 'EDIT',
-        permission: 'THEME#SAVE'
-      },
-      {
-        label: data['ACTIONS.SAVE_AS'],
-        title: data['ACTIONS.TOOLTIPS.SAVE_AS'],
-        actionCallback: () => this.saveAsNewPopup(),
-        icon: 'pi pi-plus-circle',
-        show: 'always',
-        permission: 'THEME#CREATE'
-      }
-    )
+  private prepareActionButtons(): void {
+    this.actions$ = this.translate
+      .get([
+        'ACTIONS.CANCEL',
+        'ACTIONS.TOOLTIPS.CANCEL_AND_CLOSE',
+        'ACTIONS.SAVE',
+        'ACTIONS.TOOLTIPS.SAVE',
+        'ACTIONS.SAVE_AS',
+        'ACTIONS.TOOLTIPS.SAVE_AS'
+      ])
+      .pipe(
+        map((data) => {
+          return [
+            {
+              label: data['ACTIONS.CANCEL'],
+              title: data['ACTIONS.TOOLTIPS.CANCEL_AND_CLOSE'],
+              actionCallback: () => this.close(),
+              icon: 'pi pi-times',
+              show: 'always',
+              permission: 'THEME#VIEW'
+            },
+            {
+              label: data['ACTIONS.SAVE'],
+              title: data['ACTIONS.TOOLTIPS.SAVE'],
+              actionCallback: () => this.updateTheme(),
+              icon: 'pi pi-save',
+              show: 'always',
+              conditional: true,
+              showCondition: this.mode === 'EDIT',
+              permission: 'THEME#SAVE'
+            },
+            {
+              label: data['ACTIONS.SAVE_AS'],
+              title: data['ACTIONS.TOOLTIPS.SAVE_AS'],
+              actionCallback: () => this.saveAsNewPopup(),
+              icon: 'pi pi-plus-circle',
+              show: 'always',
+              permission: 'THEME#CREATE'
+            }
+          ]
+        })
+      )
   }
 
   // DropDown Theme Template

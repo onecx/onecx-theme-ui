@@ -1,7 +1,16 @@
+import { HttpClient } from '@angular/common/http'
 import { NgModule } from '@angular/core'
 import { RouterModule, Routes } from '@angular/router'
+import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core'
 
-import { addInitializeModuleGuard, InitializeModuleGuard, PortalCoreModule } from '@onecx/portal-integration-angular'
+import {
+  addInitializeModuleGuard,
+  AppStateService,
+  ConfigurationService,
+  createTranslateLoader,
+  PortalCoreModule,
+  PortalMissingTranslationHandler
+} from '@onecx/portal-integration-angular'
 
 const routes: Routes = [
   {
@@ -10,9 +19,21 @@ const routes: Routes = [
   }
 ]
 @NgModule({
-  imports: [PortalCoreModule.forMicroFrontend(), RouterModule.forChild(addInitializeModuleGuard(routes))],
+  imports: [
+    PortalCoreModule.forMicroFrontend(),
+    RouterModule.forChild(addInitializeModuleGuard(routes)),
+    TranslateModule.forRoot({
+      isolate: true,
+      loader: {
+        provide: TranslateLoader,
+        useFactory: createTranslateLoader,
+        deps: [HttpClient, AppStateService]
+      },
+      missingTranslationHandler: { provide: MissingTranslationHandler, useClass: PortalMissingTranslationHandler }
+    })
+  ],
   exports: [],
-  providers: [InitializeModuleGuard],
+  providers: [ConfigurationService],
   schemas: []
 })
 export class OneCXThemeModule {
