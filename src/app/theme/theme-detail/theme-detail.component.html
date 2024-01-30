@@ -1,4 +1,4 @@
-<ocx-portal-page permission="THEME#VIEW">
+<ocx-portal-page permission="THEME#VIEW" helpArticleId="PAGE_THEME_DETAIL">
   <ocx-page-header
     [loading]="loading"
     [header]="theme?.name"
@@ -35,11 +35,11 @@
               <label for="theme_detail_item_description">{{ 'THEME.DESCRIPTION' | translate }}</label>
             </span>
             <div class="flex flex-wrap sm:flex-nowrap align-items-center pb-2 row-gap-2 column-gap-4">
-              <tm-image-container
+              <app-image-container
                 [imageUrl]="headerImageUrl"
                 [small]="true"
                 [title]="'LOGO.TOOLTIPS.' + (theme?.logoUrl ? 'IMAGE' : 'PLACEHOLDER') | translate"
-              ></tm-image-container>
+              ></app-image-container>
               <span class="p-float-label flex-grow-1">
                 <input
                   pInputText
@@ -57,7 +57,7 @@
       </p-tabPanel>
 
       <p-tabPanel [header]="'THEME.TABS.INTERN' | translate">
-        <tm-theme-intern [theme]="theme" [dateFormat]="dateFormat"></tm-theme-intern>
+        <app-theme-intern [theme]="theme" [dateFormat]="dateFormat"></app-theme-intern>
       </p-tabPanel>
 
       <p-tabPanel id="theme_detail_panel_variables" [header]="'THEME.TABS.VARIABLES' | translate">

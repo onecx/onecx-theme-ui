@@ -1,19 +1,17 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
-import { Observable, debounceTime, switchMap } from 'rxjs'
+import { Observable, debounceTime, map, switchMap } from 'rxjs'
 import { TranslateService } from '@ngx-translate/core'
 import { ConfirmationService, SelectItem } from 'primeng/api'
 
-import { Action, ConfigurationService, ThemeService, PortalMessageService } from '@onecx/portal-integration-angular'
-
-import { themeVariables } from '../theme-variables'
-import { environment } from '../../../environments/environment'
-import { GetThemeResponse, Theme, ThemesAPIService, ThemeUpdateCreate, UpdateThemeResponse } from '../../generated'
-import { dropDownSortItemsByLabel, dropDownGetLabelByValue, setFetchUrls } from '../../shared/utils'
+import { Action, AppStateService, PortalMessageService, ThemeService } from '@onecx/portal-integration-angular'
+import { dropDownSortItemsByLabel, dropDownGetLabelByValue, prepareUrl } from 'src/app/shared/utils'
+import { GetThemeResponse, Theme, ThemesAPIService, ThemeUpdateCreate, UpdateThemeResponse } from 'src/app/generated'
+import { themeVariables } from './theme-variables'
 
 @Component({
-  selector: 'tm-theme-designer',
+  selector: 'app-theme-designer',
   templateUrl: './theme-designer.component.html',
   styleUrls: ['./theme-designer.component.scss'],
   providers: [ConfirmationService]
@@ -23,51 +21,53 @@ export class ThemeDesignerComponent implements OnInit {
   @ViewChild('selectedFileInputLogo') selectedFileInputLogo: ElementRef | undefined
   @ViewChild('selectedFileInputFavicon') selectedFileInputFavicon: ElementRef | undefined
 
-  public actions: Action[] = []
-  themes: Theme[] = []
-  theme: Theme | undefined
-  themeId: string | null
-  themeVars = themeVariables
-  themeTemplates!: SelectItem[]
-  themeTemplateSelectedId = ''
-  themeIsCurrentUsedTheme = false
+  public actions: Action[] = [] // TODO: remove if tests are using actions$
+  public actions$: Observable<Action[]> | undefined
+  public themes: Theme[] = []
+  public theme: Theme | undefined
+  public themeId: string | null
+  public themeVars = themeVariables
+  public themeTemplates!: SelectItem[]
+  public themeTemplateSelectedId = ''
+  public themeIsCurrentUsedTheme = false
+  public fetchingLogoUrl?: string
+  public fetchingFaviconUrl?: string
 
-  mode: 'EDIT' | 'NEW' = 'NEW'
-  autoApply = false
-  apiPrefix = environment.apiPrefix
-  saveAsNewPopupDisplay = false
-  fetchingLogoUrl?: string
-  fetchingFaviconUrl?: string
+  public mode: 'EDIT' | 'NEW' = 'NEW'
+  public autoApply = false
+  public saveAsNewPopupDisplay = false
+  public displayFileTypeErrorLogo = false
+  public displayFileTypeErrorFavicon = false
 
-  fontForm: FormGroup
-  basicForm: FormGroup
-  sidebarForm: FormGroup
-  topbarForm: FormGroup
-  generalForm: FormGroup
-  propertiesForm: FormGroup
-  groups: {
+  public fontForm: FormGroup
+  public basicForm: FormGroup
+  public sidebarForm: FormGroup
+  public topbarForm: FormGroup
+  public generalForm: FormGroup
+  public propertiesForm: FormGroup
+  public groups: {
     title: string
     formGroup: FormGroup
     key: keyof typeof themeVariables
   }[]
-  public displayFileTypeErrorLogo = false
-  public displayFileTypeErrorFavicon = false
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
+    private appStateService: AppStateService,
     private themeApi: ThemesAPIService,
     private themeService: ThemeService,
     //private imageApi: ImageV1APIService,
-    private config: ConfigurationService,
     private translate: TranslateService,
     private confirmation: ConfirmationService,
     private msgService: PortalMessageService
   ) {
     this.mode = route.snapshot.paramMap.has('id') ? 'EDIT' : 'NEW'
     this.themeId = route.snapshot.paramMap.get('id')
-    this.themeIsCurrentUsedTheme = this.themeId === this.config.getPortal().themeId
+    this.themeIsCurrentUsedTheme = this.themeId === this.appStateService.currentPortal$.getValue()?.themeId
+    this.prepareActionButtons()
+    /* TODO: remove this */
     this.translate
       .get([
         'ACTIONS.CANCEL',
@@ -78,8 +78,9 @@ export class ThemeDesignerComponent implements OnInit {
         'ACTIONS.TOOLTIPS.SAVE_AS'
       ])
       .subscribe((data) => {
-        this.prepareActionButtons(data)
+        this.prepareActionButtons_old(data)
       })
+
     this.fontForm = new FormGroup({})
     this.topbarForm = new FormGroup({})
     this.generalForm = new FormGroup({})
@@ -92,7 +93,7 @@ export class ThemeDesignerComponent implements OnInit {
       },
       {
         key: 'topbar',
-        title: 'Topbar - Portal Header',
+        title: 'Topbar - Workspace Header',
         formGroup: this.topbarForm
       },
       {
@@ -157,7 +158,8 @@ export class ThemeDesignerComponent implements OnInit {
         this.basicForm.patchValue(data.resource)
         this.propertiesForm.reset()
         this.propertiesForm.patchValue(data.resource.properties || {})
-        this.setFetchUrls()
+        this.fetchingLogoUrl = prepareUrl(this.basicForm.value.logoUrl)
+        this.fetchingFaviconUrl = prepareUrl(this.basicForm.value.faviconUrl)
       })
     } else {
       const currentVars: { [key: string]: { [key: string]: string } } = {}
@@ -173,7 +175,8 @@ export class ThemeDesignerComponent implements OnInit {
     this.loadThemeTemplates()
   }
 
-  private prepareActionButtons(data: any): void {
+  /* TODO: remove this */
+  private prepareActionButtons_old(data: any): void {
     this.actions = [] // provoke change event
     this.actions.push(
       {
@@ -203,6 +206,49 @@ export class ThemeDesignerComponent implements OnInit {
         permission: 'THEME#CREATE'
       }
     )
+  }
+  private prepareActionButtons(): void {
+    this.actions$ = this.translate
+      .get([
+        'ACTIONS.CANCEL',
+        'ACTIONS.TOOLTIPS.CANCEL_AND_CLOSE',
+        'ACTIONS.SAVE',
+        'ACTIONS.TOOLTIPS.SAVE',
+        'ACTIONS.SAVE_AS',
+        'ACTIONS.TOOLTIPS.SAVE_AS'
+      ])
+      .pipe(
+        map((data) => {
+          return [
+            {
+              label: data['ACTIONS.CANCEL'],
+              title: data['ACTIONS.TOOLTIPS.CANCEL_AND_CLOSE'],
+              actionCallback: () => this.close(),
+              icon: 'pi pi-times',
+              show: 'always',
+              permission: 'THEME#VIEW'
+            },
+            {
+              label: data['ACTIONS.SAVE'],
+              title: data['ACTIONS.TOOLTIPS.SAVE'],
+              actionCallback: () => this.updateTheme(),
+              icon: 'pi pi-save',
+              show: 'always',
+              conditional: true,
+              showCondition: this.mode === 'EDIT',
+              permission: 'THEME#SAVE'
+            },
+            {
+              label: data['ACTIONS.SAVE_AS'],
+              title: data['ACTIONS.TOOLTIPS.SAVE_AS'],
+              actionCallback: () => this.saveAsNewPopup(),
+              icon: 'pi pi-plus-circle',
+              show: 'always',
+              permission: 'THEME#CREATE'
+            }
+          ]
+        })
+      )
   }
 
   // DropDown Theme Template
@@ -247,7 +293,8 @@ export class ThemeDesignerComponent implements OnInit {
             this.basicForm.controls['description'].setValue(result.resource.description)
             this.basicForm.controls['faviconUrl'].setValue(result.resource.faviconUrl)
             this.basicForm.controls['logoUrl'].setValue(result.resource.logoUrl)
-            this.setFetchUrls()
+            this.fetchingLogoUrl = prepareUrl(this.basicForm.value.logoUrl)
+            this.fetchingFaviconUrl = prepareUrl(this.basicForm.value.faviconUrl)
           }
           if (result.resource.properties) {
             this.propertiesForm.reset()
@@ -371,7 +418,8 @@ export class ThemeDesignerComponent implements OnInit {
           Array.from(files).forEach((file) => {
             this.imageApi.uploadImage({ image: file }).subscribe((data) => {
               this.basicForm.controls[fieldType + 'Url'].setValue(data.imageUrl)
-              this.setFetchUrls()
+              this.fetchingLogoUrl = prepareUrl(this.basicForm.value.logoUrl)
+              this.fetchingFaviconUrl = prepareUrl(this.basicForm.value.faviconUrl)
               this.msgService.info({ summaryKey: 'LOGO.UPLOADED' })
             })
           })
@@ -382,10 +430,6 @@ export class ThemeDesignerComponent implements OnInit {
       }
     }
      */
-  }
-  private setFetchUrls(): void {
-    this.fetchingLogoUrl = setFetchUrls(this.apiPrefix, this.basicForm.value.logoUrl)
-    this.fetchingFaviconUrl = setFetchUrls(this.apiPrefix, this.basicForm.value.faviconUrl)
   }
 
   // Applying Styles

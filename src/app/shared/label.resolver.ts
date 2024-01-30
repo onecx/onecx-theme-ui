@@ -7,8 +7,13 @@ import { Observable } from 'rxjs'
 @Injectable()
 export class LabelResolver implements Resolve<string> {
   constructor(private translate: TranslateService) {}
-  /* eslint-disable @typescript-eslint/no-unused-vars */
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): string | Observable<string> | Promise<string> {
+  resolve(route: ActivatedRouteSnapshot, _state: RouterStateSnapshot): string | Observable<string> | Promise<string> {
     return route.data['breadcrumb'] ? this.translate.instant(route.data['breadcrumb']) : route.routeConfig?.path
+    /* TODO: use this if tests are running with it.
+  resolve(route: ActivatedRouteSnapshot, _state: RouterStateSnapshot): string | Observable<string> | Promise<string> {
+    return route.data['breadcrumb']
+      ? this.translate.get(route.data['breadcrumb']).pipe(map((t) => t.toString()))
+      : route.routeConfig?.path ?? ''
+    */
   }
 }

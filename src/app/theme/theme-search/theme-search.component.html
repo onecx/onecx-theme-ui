@@ -48,11 +48,11 @@
           >
             <div class="col-12 md:col-2 lg:col-2 xl:col-2 text-center">
               <div class="flex flex-column justify-content-center align-items-center gap-1 md:gap-2 h-full">
-                <tm-image-container
+                <app-image-container
                   [imageUrl]="theme.logoUrl"
                   [small]="true"
                   [title]="'LOGO.TOOLTIPS.' + (theme.logoUrl ? 'IMAGE' : 'PLACEHOLDER') | translate"
-                ></tm-image-container>
+                ></app-image-container>
               </div>
             </div>
             <div class="col-12 md:col-5 lg:col-5 xl:col-6">
@@ -63,7 +63,7 @@
             </div>
             <div class="col-12 md:col-5 lg:col-5 xl:col-4 text-center">
               <div class="flex flex-column justify-content-center align-items-center h-full">
-                <tm-theme-color-box [properties]="theme.properties" styleClass="h-1rem md:h-2rem" />
+                <app-theme-color-box [properties]="theme.properties" styleClass="h-1rem md:h-2rem" />
               </div>
             </div>
           </div>
@@ -74,10 +74,10 @@
               <div
                 class="h-3rem md:h-5rem lg:h-6rem flex flex-column justify-content-center align-items-center text-center"
               >
-                <tm-image-container [imageUrl]="theme.logoUrl" [small]="false"></tm-image-container>
+                <app-image-container [imageUrl]="theme.logoUrl" [small]="false"></app-image-container>
               </div>
               <div class="flex flex-column justify-content-center align-items-center">
-                <tm-theme-color-box [properties]="theme.properties" styleClass="h-05rem md:h-1rem" />
+                <app-theme-color-box [properties]="theme.properties" styleClass="h-05rem md:h-1rem" />
               </div>
               <div class="h-3rem flex flex-column justify-content-between gap-1 lg:gap-2 my-1 lg:my-2 text-center">
                 <div class="font-bold text-xl lg:text-2xl" [title]="'Theme: ' + limitText(theme.name, 100)">
@@ -91,5 +91,5 @@
       </p-dataView>
     </ng-container>
   </ocx-page-content>
-  <tm-theme-import [(displayThemeImport)]="themeImportDialogVisible" (uploadEmitter)="loadThemes()"></tm-theme-import>
+  <app-theme-import [(displayThemeImport)]="themeImportDialogVisible" (uploadEmitter)="loadThemes()"></app-theme-import>
 </ocx-portal-page>

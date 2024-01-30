@@ -1,11 +1,10 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { NO_ERRORS_SCHEMA, SimpleChange } from '@angular/core'
-import { ImageContainerComponent } from './image-container.component'
-import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
-import { HttpLoaderFactory } from '../shared.module'
-import { HttpClient } from '@angular/common/http'
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
-import { environment } from 'src/environments/environment'
+import { TranslateTestingModule } from 'ngx-translate-testing'
+
+import { ImageContainerComponent } from './image-container.component'
+import { prepareUrl } from 'src/app/shared/utils'
 
 describe('ThemeColorBoxComponent', () => {
   let component: ImageContainerComponent
@@ -16,13 +15,10 @@ describe('ThemeColorBoxComponent', () => {
       declarations: [ImageContainerComponent],
       imports: [
         HttpClientTestingModule,
-        TranslateModule.forRoot({
-          loader: {
-            provide: TranslateLoader,
-            useFactory: HttpLoaderFactory,
-            deps: [HttpClient]
-          }
-        })
+        TranslateTestingModule.withTranslations({
+          de: require('src/assets/i18n/de.json'),
+          en: require('src/assets/i18n/en.json')
+        }).withDefaultLanguage('en')
       ],
       providers: [],
       schemas: [NO_ERRORS_SCHEMA]
@@ -53,8 +49,7 @@ describe('ThemeColorBoxComponent', () => {
     component.imageUrl = 'imageUrl'
 
     component.ngOnChanges(changes)
-
-    expect(component.imageUrl).toBe(environment.apiPrefix + 'imageUrl')
+    expect(component.imageUrl).toBe(prepareUrl('imageUrl') ?? '')
   })
 
   it('should use image from external resource after change', () => {

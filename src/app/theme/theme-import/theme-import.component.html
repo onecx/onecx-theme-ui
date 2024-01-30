@@ -39,7 +39,7 @@
       />
       <label class="ocx-required-label" for="portal_detail_item_portalName">{{ 'THEME.THEME_NAME' | translate }}</label>
     </span>
-    <tm-theme-color-box *ngIf="properties" [properties]="properties" styleClass="h-inputtext" />
+    <app-theme-color-box *ngIf="properties" [properties]="properties" styleClass="h-inputtext" />
     <div *ngIf="!properties">{{ 'THEME.NO_PROPERTIES' | translate }}</div>
   </div>
   <p-message

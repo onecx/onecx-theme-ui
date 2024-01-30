@@ -1,10 +1,10 @@
 import { Component, Input } from '@angular/core'
 import { TranslateService } from '@ngx-translate/core'
 
-import { Theme } from '../../../generated'
+import { Theme } from 'src/app/generated'
 
 @Component({
-  selector: 'tm-theme-intern',
+  selector: 'app-theme-intern',
   templateUrl: './theme-intern.component.html'
 })
 export class ThemeInternComponent {

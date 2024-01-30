@@ -1,8 +1,9 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core'
+import { Location } from '@angular/common'
 import { environment } from '../../../environments/environment'
 
 @Component({
-  selector: 'tm-image-container',
+  selector: 'app-image-container',
   styleUrls: ['./image-container.component.scss'],
   templateUrl: './image-container.component.html'
 })
@@ -21,11 +22,10 @@ export class ImageContainerComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['imageUrl']) {
       this.displayPlaceHolder = false
-
       // if image Url does not start with a http the api-prefix ...
       //   ...then it stored in the backend. So we need to put prefix in front
       if (this.imageUrl && !this.imageUrl.match(/^(http|https)/g) && !this.imageUrl.startsWith(this.apiPrefix)) {
-        this.imageUrl = this.apiPrefix + this.imageUrl
+        this.imageUrl = Location.joinWithSlash(this.apiPrefix, this.imageUrl)
       }
     }
   }

@@ -3,12 +3,12 @@ import { HttpHeaders } from '@angular/common/http'
 import { TranslateService } from '@ngx-translate/core'
 import { ActivatedRoute, Router } from '@angular/router'
 
-import { ThemesAPIService } from './../../generated/api/themes.service'
-import { Theme, ThemeSnapshot } from '../../generated'
 import { PortalMessageService } from '@onecx/portal-integration-angular'
 
+import { Theme, ThemesAPIService, ThemeSnapshot } from 'src/app/generated'
+
 @Component({
-  selector: 'tm-theme-import',
+  selector: 'app-theme-import',
   templateUrl: './theme-import.component.html',
   styleUrls: ['./theme-import.component.scss']
 })

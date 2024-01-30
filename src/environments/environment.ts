@@ -9,5 +9,5 @@ export const environment = {
   KEYCLOAK_CLIENT_ID: 'portal-mf-shell',
   TKIT_PORTAL_ID: 'ADMIN',
   skipRemoteConfigLoad: true,
-  apiPrefix: 'theme-bff'
+  apiPrefix: 'bff'
 }

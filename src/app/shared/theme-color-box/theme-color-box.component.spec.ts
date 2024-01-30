@@ -1,10 +1,9 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
-import { ThemeColorBoxComponent } from './theme-color-box.component'
 import { NO_ERRORS_SCHEMA } from '@angular/core'
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
-import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
-import { HttpLoaderFactory } from '../shared.module'
-import { HttpClient } from '@angular/common/http'
+import { TranslateTestingModule } from 'ngx-translate-testing'
+
+import { ThemeColorBoxComponent } from './theme-color-box.component'
 
 describe('ThemeColorBoxComponent', () => {
   let component: ThemeColorBoxComponent
@@ -15,13 +14,10 @@ describe('ThemeColorBoxComponent', () => {
       declarations: [ThemeColorBoxComponent],
       imports: [
         HttpClientTestingModule,
-        TranslateModule.forRoot({
-          loader: {
-            provide: TranslateLoader,
-            useFactory: HttpLoaderFactory,
-            deps: [HttpClient]
-          }
-        })
+        TranslateTestingModule.withTranslations({
+          de: require('src/assets/i18n/de.json'),
+          en: require('src/assets/i18n/en.json')
+        }).withDefaultLanguage('en')
       ],
       providers: [],
       schemas: [NO_ERRORS_SCHEMA]
