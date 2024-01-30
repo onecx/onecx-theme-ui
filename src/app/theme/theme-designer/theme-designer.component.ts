@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
-import { Observable, debounceTime, switchMap } from 'rxjs'
+import { Observable, debounceTime, map, switchMap } from 'rxjs'
 import { TranslateService } from '@ngx-translate/core'
 import { ConfirmationService, SelectItem } from 'primeng/api'
 
@@ -21,7 +21,7 @@ export class ThemeDesignerComponent implements OnInit {
   @ViewChild('selectedFileInputLogo') selectedFileInputLogo: ElementRef | undefined
   @ViewChild('selectedFileInputFavicon') selectedFileInputFavicon: ElementRef | undefined
 
-  public actions: Action[] = [] // TODO: remove if tests using actions$
+  public actions: Action[] = [] // TODO: remove if tests are using actions$
   public actions$: Observable<Action[]> | undefined
   public themes: Theme[] = []
   public theme: Theme | undefined
@@ -66,7 +66,8 @@ export class ThemeDesignerComponent implements OnInit {
     this.mode = route.snapshot.paramMap.has('id') ? 'EDIT' : 'NEW'
     this.themeId = route.snapshot.paramMap.get('id')
     this.themeIsCurrentUsedTheme = this.themeId === this.appStateService.currentPortal$.getValue()?.themeId
-    //this.prepareActionButtons()
+    this.prepareActionButtons()
+    /* TODO: remove this */
     this.translate
       .get([
         'ACTIONS.CANCEL',
@@ -174,6 +175,7 @@ export class ThemeDesignerComponent implements OnInit {
     this.loadThemeTemplates()
   }
 
+  /* TODO: remove this */
   private prepareActionButtons_old(data: any): void {
     this.actions = [] // provoke change event
     this.actions.push(
@@ -206,7 +208,6 @@ export class ThemeDesignerComponent implements OnInit {
     )
   }
   private prepareActionButtons(): void {
-    /* TODO: use this 
     this.actions$ = this.translate
       .get([
         'ACTIONS.CANCEL',
@@ -248,7 +249,6 @@ export class ThemeDesignerComponent implements OnInit {
           ]
         })
       )
-      */
   }
 
   // DropDown Theme Template
