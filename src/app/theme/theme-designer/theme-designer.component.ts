@@ -24,7 +24,8 @@ export class ThemeDesignerComponent implements OnInit {
   public actions$: Observable<Action[]> | undefined
   public themes: Theme[] = []
   public theme: Theme | undefined
-  public themeId: string | null
+  public themeId: string | undefined
+  public themeName: string | null
   public themeVars = themeVariables
   public themeTemplates!: SelectItem[]
   public themeTemplateSelectedId = ''
@@ -62,9 +63,8 @@ export class ThemeDesignerComponent implements OnInit {
     private confirmation: ConfirmationService,
     private msgService: PortalMessageService
   ) {
-    this.mode = route.snapshot.paramMap.has('id') ? 'EDIT' : 'NEW'
-    this.themeId = route.snapshot.paramMap.get('id')
-    this.themeIsCurrentUsedTheme = this.themeId === this.appStateService.currentPortal$.getValue()?.themeId
+    this.mode = route.snapshot.paramMap.has('name') ? 'EDIT' : 'NEW'
+    this.themeName = route.snapshot.paramMap.get('name')
     this.prepareActionButtons()
 
     this.fontForm = new FormGroup({})
@@ -138,14 +138,16 @@ export class ThemeDesignerComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.mode === 'EDIT' && this.themeId) {
-      this.getThemeById(this.themeId).subscribe((data) => {
+    if (this.mode === 'EDIT' && this.themeName) {
+      this.themeApi.getThemeByName({ name: this.themeName }).subscribe((data) => {
         this.theme = data.resource
         this.basicForm.patchValue(data.resource)
         this.propertiesForm.reset()
         this.propertiesForm.patchValue(data.resource.properties || {})
         this.fetchingLogoUrl = prepareUrl(this.basicForm.value.logoUrl)
         this.fetchingFaviconUrl = prepareUrl(this.basicForm.value.faviconUrl)
+        this.themeId = data.resource.id
+        this.themeIsCurrentUsedTheme = this.themeId === this.appStateService.currentPortal$.getValue()?.themeId
       })
     } else {
       const currentVars: { [key: string]: { [key: string]: string } } = {}
@@ -286,7 +288,8 @@ export class ThemeDesignerComponent implements OnInit {
       this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_NOK' })
     } else {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.getThemeById(this.themeId!)
+      this.themeApi
+        .getThemeByName({ name: this.themeName! })
         .pipe(
           switchMap((data) => {
             data.resource.properties = this.propertiesForm.value
@@ -322,11 +325,11 @@ export class ThemeDesignerComponent implements OnInit {
     this.themeApi.createTheme({ createThemeRequest: { resource: newTheme } }).subscribe({
       next: (data) => {
         if (this.mode === 'EDIT') {
-          this.router.navigate([`../../${data.resource.id}`], {
+          this.router.navigate([`../../${data.resource.name}`], {
             relativeTo: this.route
           })
         } else {
-          this.router.navigate([`../${data.resource.id}`], { relativeTo: this.route })
+          this.router.navigate([`../${data.resource.name}`], { relativeTo: this.route })
         }
         this.msgService.success({ summaryKey: 'ACTIONS.CREATE.MESSAGE.CREATE_OK' })
       },

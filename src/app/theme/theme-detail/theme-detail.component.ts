@@ -17,6 +17,7 @@ import { ExportThemeRequest, Theme, ThemesAPIService, Workspace } from 'src/app/
 export class ThemeDetailComponent implements OnInit {
   theme: Theme | undefined
   usedInWorkspace: Workspace[] | undefined
+  themeName!: string
   themeId!: string
   themeDeleteVisible = false
   themeDeleteMessage = ''
@@ -36,13 +37,13 @@ export class ThemeDetailComponent implements OnInit {
     private msgService: PortalMessageService,
     private translate: TranslateService
   ) {
-    this.themeId = this.route.snapshot.paramMap.get('id') || ''
+    this.themeName = this.route.snapshot.paramMap.get('name') || ''
     this.dateFormat = this.user.lang$.getValue() === 'de' ? 'dd.MM.yyyy HH:mm:ss' : 'medium'
   }
 
   ngOnInit(): void {
     this.themeApi
-      .getThemeById({ id: this.themeId })
+      .getThemeByName({ name: this.themeName })
       .pipe(
         finalize(() => {
           this.loading = false

@@ -32,7 +32,7 @@ describe('ThemeDetailComponent', () => {
     })
   }
   const themesApiSpy = jasmine.createSpyObj<ThemesAPIService>('ThemesAPIService', [
-    'getThemeById',
+    'getThemeByName',
     'deleteTheme',
     'exportThemes'
   ])
@@ -58,8 +58,8 @@ describe('ThemeDetailComponent', () => {
     }).compileComponents()
     msgServiceSpy.success.calls.reset()
     msgServiceSpy.error.calls.reset()
-    themesApiSpy.getThemeById.and.returnValue(of({}) as any)
-    themesApiSpy.getThemeById.calls.reset()
+    themesApiSpy.getThemeByName.and.returnValue(of({}) as any)
+    themesApiSpy.getThemeByName.calls.reset()
     themesApiSpy.exportThemes.and.returnValue(of({}) as any)
     themesApiSpy.exportThemes.calls.reset()
   }))
@@ -76,9 +76,9 @@ describe('ThemeDetailComponent', () => {
   })
 
   it('should create with provided id and get theme', async () => {
-    const id = 'themeId'
+    const name = 'themeName'
     const route = TestBed.inject(ActivatedRoute)
-    spyOn(route.snapshot.paramMap, 'get').and.returnValue(id)
+    spyOn(route.snapshot.paramMap, 'get').and.returnValue(name)
     translateService.use('de')
 
     // recreate component to test constructor
@@ -86,13 +86,13 @@ describe('ThemeDetailComponent', () => {
     component = fixture.componentInstance
     fixture.detectChanges()
 
-    themesApiSpy.getThemeById.calls.reset()
+    themesApiSpy.getThemeByName.calls.reset()
     component.loading = true
 
     await component.ngOnInit()
-    expect(component.themeId).toBe(id)
+    expect(component.themeName).toBe(name)
     expect(component.dateFormat).toBe('medium')
-    expect(themesApiSpy.getThemeById).toHaveBeenCalledOnceWith({ id: id })
+    expect(themesApiSpy.getThemeByName).toHaveBeenCalledOnceWith({ name: name })
     expect(component.loading).toBe(false)
   })
 
@@ -117,7 +117,7 @@ describe('ThemeDetailComponent', () => {
         }
       ]
     }
-    themesApiSpy.getThemeById.and.returnValue(of(themeResponse) as any)
+    themesApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
 
     const translateService = TestBed.inject(TranslateService)
     const actionsTranslations = {
@@ -195,7 +195,7 @@ describe('ThemeDetailComponent', () => {
         }
       ]
     }
-    themesApiSpy.getThemeById.and.returnValue(of(themeResponse) as any)
+    themesApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
 
     const translateService = TestBed.inject(TranslateService)
     const actionsTranslations = {
@@ -241,7 +241,7 @@ describe('ThemeDetailComponent', () => {
 
   it('should display not found error and close page on theme fetch failure', () => {
     spyOn(component, 'close')
-    themesApiSpy.getThemeById.and.returnValue(
+    themesApiSpy.getThemeByName.and.returnValue(
       throwError(
         () =>
           new HttpErrorResponse({
@@ -261,7 +261,7 @@ describe('ThemeDetailComponent', () => {
 
   it('should display catched error and close page on theme fetch failure', () => {
     spyOn(component, 'close')
-    themesApiSpy.getThemeById.and.returnValue(
+    themesApiSpy.getThemeByName.and.returnValue(
       throwError(
         () =>
           new HttpErrorResponse({
@@ -303,7 +303,7 @@ describe('ThemeDetailComponent', () => {
       },
       workspaces: []
     }
-    themesApiSpy.getThemeById.and.returnValue(of(themeResponse) as any)
+    themesApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
 
     await component.ngOnInit()
 
@@ -319,7 +319,7 @@ describe('ThemeDetailComponent', () => {
       },
       workspaces: []
     }
-    themesApiSpy.getThemeById.and.returnValue(of(themeResponse) as any)
+    themesApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
     await component.ngOnInit()
     expect(component.headerImageUrl).toBe(url)
   })

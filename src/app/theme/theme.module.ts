@@ -33,7 +33,7 @@ const routes: Routes = [
     resolve: { labeli18n: LabelResolver }
   },
   {
-    path: ':id',
+    path: ':name',
     component: ThemeDetailComponent,
     data: {
       breadcrumb: 'BREADCRUMBS.DETAIL',
@@ -42,7 +42,7 @@ const routes: Routes = [
     resolve: { labeli18n: LabelResolver }
   },
   {
-    path: ':id/edit',
+    path: ':name/edit',
     component: ThemeDesignerComponent,
     data: {
       breadcrumb: 'BREADCRUMBS.EDIT',
