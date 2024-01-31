@@ -44,7 +44,8 @@ describe('ThemeDesignerComponent', () => {
     'getThemes',
     'updateTheme',
     'createTheme',
-    'getThemeById'
+    'getThemeById',
+    'getThemeByName'
   ])
 
   beforeEach(waitForAsync(() => {
@@ -79,6 +80,7 @@ describe('ThemeDesignerComponent', () => {
     msgServiceSpy.error.calls.reset()
     msgServiceSpy.info.calls.reset()
     themeApiSpy.getThemeById.calls.reset()
+    themeApiSpy.getThemeByName.calls.reset()
     themeApiSpy.updateTheme.calls.reset()
     themeApiSpy.createTheme.calls.reset()
     themeApiSpy.getThemes.calls.reset()
@@ -88,6 +90,7 @@ describe('ThemeDesignerComponent', () => {
     themeApiSpy.updateTheme.and.returnValue(of({}) as any)
     themeApiSpy.createTheme.and.returnValue(of({}) as any)
     themeApiSpy.getThemeById.and.returnValue(of({}) as any)
+    themeApiSpy.getThemeByName.and.returnValue(of({}) as any)
   }))
 
   describe('when constructing', () => {
@@ -117,13 +120,13 @@ describe('ThemeDesignerComponent', () => {
 
     it('should populate state and create forms', () => {
       const activatedRoute = TestBed.inject(ActivatedRoute)
-      spyOn(activatedRoute.snapshot.paramMap, 'get').and.returnValue('themeId')
+      spyOn(activatedRoute.snapshot.paramMap, 'get').and.returnValue('themeName')
 
       fixture = TestBed.createComponent(ThemeDesignerComponent)
       component = fixture.componentInstance
       fixture.detectChanges()
 
-      expect(component.themeId).toBe('themeId')
+      expect(component.themeName).toBe('themeName')
       expect(component.themeIsCurrentUsedTheme).toBeFalse()
       expect(Object.keys(component.fontForm.controls).length).toBe(themeVariables.font.length)
       expect(Object.keys(component.generalForm.controls).length).toBe(themeVariables.general.length)
@@ -239,20 +242,21 @@ describe('ThemeDesignerComponent', () => {
       const themeResponse = {
         resource: themeData
       }
-      themeApiSpy.getThemeById.and.returnValue(of(themeResponse) as any)
+      themeApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
       component.mode = 'EDIT'
-      component.themeId = 'themeId'
+      component.themeName = 'themeName'
 
       component.ngOnInit()
 
       expect(component.theme).toBe(themeData)
-      expect(themeApiSpy.getThemeById).toHaveBeenCalledOnceWith({ id: 'themeId' })
+      expect(themeApiSpy.getThemeByName).toHaveBeenCalledOnceWith({ name: 'themeName' })
       expect(component.basicForm.controls['name'].value).toBe(themeData.name)
       expect(component.basicForm.controls['description'].value).toBe(themeData.description)
       expect(component.basicForm.controls['logoUrl'].value).toBe(themeData.logoUrl)
       expect(component.basicForm.controls['faviconUrl'].value).toBe(themeData.faviconUrl)
       expect(component.fontForm.controls['font-family'].value).toBe('myFont')
       expect(component.generalForm.controls['primary-color'].value).toBe('rgb(0,0,0)')
+      expect(component.themeId).toBe('id')
     })
 
     it('should fetch logo and favicon from backend on edit mode when no http[s] present', () => {
@@ -264,9 +268,9 @@ describe('ThemeDesignerComponent', () => {
       const themeResponse = {
         resource: themeData
       }
-      themeApiSpy.getThemeById.and.returnValue(of(themeResponse) as any)
+      themeApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
       component.mode = 'EDIT'
-      component.themeId = 'themeId'
+      component.themeName = 'themeName'
 
       component.ngOnInit()
 
@@ -282,9 +286,9 @@ describe('ThemeDesignerComponent', () => {
       const themeResponse = {
         resource: themeData
       }
-      themeApiSpy.getThemeById.and.returnValue(of(themeResponse) as any)
+      themeApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
       component.mode = 'EDIT'
-      component.themeId = 'themeId'
+      component.themeName = 'themeName'
 
       component.ngOnInit()
 
@@ -376,7 +380,7 @@ describe('ThemeDesignerComponent', () => {
       const themeResponse = {
         resource: themeData
       }
-      themeApiSpy.getThemeById.and.returnValue(of(themeResponse) as any)
+      themeApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
       themeApiSpy.updateTheme.and.returnValue(throwError(() => new Error()))
 
       component.actions$?.subscribe((actions) => {
@@ -408,7 +412,7 @@ describe('ThemeDesignerComponent', () => {
       const themeResponse = {
         resource: themeData
       }
-      themeApiSpy.getThemeById.and.returnValue(of(themeResponse) as any)
+      themeApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
 
       component.fontForm.patchValue({
         'font-family': 'updatedFont'
@@ -471,7 +475,7 @@ describe('ThemeDesignerComponent', () => {
       const themeResponse = {
         resource: themeData
       }
-      themeApiSpy.getThemeById.and.returnValue(of(themeResponse) as any)
+      themeApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
 
       const updateThemeData = {
         resource: {
@@ -552,7 +556,7 @@ describe('ThemeDesignerComponent', () => {
       themeApiSpy.createTheme.and.returnValue(
         of({
           resource: {
-            id: 'myThemeId'
+            name: 'myTheme'
           }
         }) as any
       )
@@ -578,7 +582,7 @@ describe('ThemeDesignerComponent', () => {
         })
       )
       expect(router.navigate).toHaveBeenCalledOnceWith(
-        [`../../myThemeId`],
+        [`../../myTheme`],
         jasmine.objectContaining({ relativeTo: route })
       )
     })
@@ -605,7 +609,7 @@ describe('ThemeDesignerComponent', () => {
       themeApiSpy.createTheme.and.returnValue(
         of({
           resource: {
-            id: 'myThemeId'
+            name: 'myTheme'
           }
         }) as any
       )
@@ -613,10 +617,7 @@ describe('ThemeDesignerComponent', () => {
 
       component.saveTheme('myTheme')
 
-      expect(router.navigate).toHaveBeenCalledOnceWith(
-        [`../myThemeId`],
-        jasmine.objectContaining({ relativeTo: route })
-      )
+      expect(router.navigate).toHaveBeenCalledOnceWith([`../myTheme`], jasmine.objectContaining({ relativeTo: route }))
     })
 
     it('should display save as new popup on save as click', (done: DoneFn) => {
