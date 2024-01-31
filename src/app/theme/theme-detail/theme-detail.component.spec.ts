@@ -405,7 +405,7 @@ describe('ThemeDetailComponent', () => {
     )
     expect(FileSaver.saveAs).toHaveBeenCalledOnceWith(jasmine.any(Blob), 'themeName_Theme.json')
   })
-  /*
+
   it('should display error on theme export fail', () => {
     themesApiSpy.exportThemes.and.returnValue(throwError(() => new Error()))
     component.theme = {
@@ -414,5 +414,4 @@ describe('ThemeDetailComponent', () => {
     component.onExportTheme()
     expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EXPORT.EXPORT_THEME_FAIL' })
   })
-  */
 })
