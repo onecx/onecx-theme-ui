@@ -8,8 +8,8 @@ import { ConfirmationService } from 'primeng/api'
 
 import { addInitializeModuleGuard, InitializeModuleGuard, PortalCoreModule } from '@onecx/portal-integration-angular'
 
-import { LabelResolver } from '../shared/label.resolver'
-import { SharedModule } from '../shared/shared.module'
+import { LabelResolver } from 'src/app/shared/label.resolver'
+import { SharedModule } from 'src/app/shared/shared.module'
 
 import { ThemeSearchComponent } from './theme-search/theme-search.component'
 import { ThemeImportComponent } from './theme-import/theme-import.component'

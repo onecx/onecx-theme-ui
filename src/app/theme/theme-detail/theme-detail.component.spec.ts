@@ -12,7 +12,7 @@ import FileSaver from 'file-saver'
 import { ConfigurationService, PortalMessageService } from '@onecx/portal-integration-angular'
 
 import { prepareUrl } from 'src/app/shared/utils'
-import { ThemesAPIService } from 'src/app/generated'
+import { ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeDetailComponent } from './theme-detail.component'
 
 describe('ThemeDetailComponent', () => {

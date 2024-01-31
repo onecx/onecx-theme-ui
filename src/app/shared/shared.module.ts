@@ -34,7 +34,7 @@ import {
   PortalApiConfiguration
 } from '@onecx/portal-integration-angular'
 
-import { Configuration } from 'src/app/generated'
+import { Configuration } from 'src/app/shared/generated'
 import { LabelResolver } from './label.resolver'
 import { environment } from 'src/environments/environment'
 import { ImageContainerComponent } from './image-container/image-container.component'

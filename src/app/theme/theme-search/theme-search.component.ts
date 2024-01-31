@@ -6,7 +6,7 @@ import { DataView } from 'primeng/dataview'
 
 import { Action, DataViewControlTranslations } from '@onecx/portal-integration-angular'
 
-import { GetThemesResponse, ThemesAPIService } from 'src/app/generated'
+import { GetThemesResponse, ThemesAPIService } from 'src/app/shared/generated'
 import { limitText } from 'src/app/shared/utils'
 
 @Component({

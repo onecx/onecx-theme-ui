@@ -8,7 +8,7 @@ import { TranslateTestingModule } from 'ngx-translate-testing'
 import { DataViewModule } from 'primeng/dataview'
 import { of } from 'rxjs'
 
-import { ThemesAPIService } from 'src/app/generated'
+import { ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeSearchComponent } from './theme-search.component'
 
 describe('ThemeSearchComponent', () => {

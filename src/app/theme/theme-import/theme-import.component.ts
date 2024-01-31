@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router'
 
 import { PortalMessageService } from '@onecx/portal-integration-angular'
 
-import { Theme, ThemesAPIService, ThemeSnapshot } from 'src/app/generated'
+import { Theme, ThemesAPIService, ThemeSnapshot } from 'src/app/shared/generated'
 
 @Component({
   selector: 'app-theme-import',

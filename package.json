@@ -8,7 +8,7 @@
   ],
   "config": {
     "openapiYaml": "src/assets/api/themes-bff-api.yaml",
-    "openapiOutput": "src/app/generated"
+    "openapiOutput": "src/app/shared/generated"
   },
   "scripts": {
     "build": "ng build",

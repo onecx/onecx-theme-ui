@@ -8,7 +8,7 @@ import FileSaver from 'file-saver'
 import { Action, ObjectDetailItem, PortalMessageService, UserService } from '@onecx/portal-integration-angular'
 
 import { limitText, prepareUrl, sortByLocale } from 'src/app/shared/utils'
-import { ExportThemeRequest, Theme, ThemesAPIService, Workspace } from 'src/app/generated'
+import { ExportThemeRequest, Theme, ThemesAPIService, Workspace } from 'src/app/shared/generated'
 
 @Component({
   templateUrl: './theme-detail.component.html',
@@ -18,7 +18,6 @@ export class ThemeDetailComponent implements OnInit {
   theme: Theme | undefined
   usedInWorkspace: Workspace[] | undefined
   themeName!: string
-  themeId!: string
   themeDeleteVisible = false
   themeDeleteMessage = ''
   themePortalList = ''
@@ -174,7 +173,7 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   private deleteTheme(): void {
-    this.themeApi.deleteTheme({ id: this.themeId }).subscribe({
+    this.themeApi.deleteTheme({ id: this.theme?.id! }).subscribe({
       next: () => {
         this.router.navigate(['..'], { relativeTo: this.route })
         this.msgService.success({ summaryKey: 'ACTIONS.DELETE.THEME_OK' })

@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core'
 import { TranslateService } from '@ngx-translate/core'
 
-import { Theme } from 'src/app/generated'
+import { Theme } from 'src/app/shared/generated'
 
 @Component({
   selector: 'app-theme-intern',

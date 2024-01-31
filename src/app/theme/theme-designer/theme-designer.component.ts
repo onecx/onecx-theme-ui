@@ -7,7 +7,13 @@ import { ConfirmationService, SelectItem } from 'primeng/api'
 
 import { Action, AppStateService, PortalMessageService, ThemeService } from '@onecx/portal-integration-angular'
 import { dropDownSortItemsByLabel, dropDownGetLabelByValue, prepareUrl } from 'src/app/shared/utils'
-import { GetThemeResponse, Theme, ThemesAPIService, ThemeUpdateCreate, UpdateThemeResponse } from 'src/app/generated'
+import {
+  GetThemeResponse,
+  Theme,
+  ThemesAPIService,
+  ThemeUpdateCreate,
+  UpdateThemeResponse
+} from 'src/app/shared/generated'
 import { themeVariables } from './theme-variables'
 
 @Component({
