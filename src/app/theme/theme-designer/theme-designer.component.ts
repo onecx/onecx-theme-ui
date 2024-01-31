@@ -21,7 +21,6 @@ export class ThemeDesignerComponent implements OnInit {
   @ViewChild('selectedFileInputLogo') selectedFileInputLogo: ElementRef | undefined
   @ViewChild('selectedFileInputFavicon') selectedFileInputFavicon: ElementRef | undefined
 
-  public actions: Action[] = [] // TODO: remove if tests are using actions$
   public actions$: Observable<Action[]> | undefined
   public themes: Theme[] = []
   public theme: Theme | undefined
@@ -67,19 +66,6 @@ export class ThemeDesignerComponent implements OnInit {
     this.themeId = route.snapshot.paramMap.get('id')
     this.themeIsCurrentUsedTheme = this.themeId === this.appStateService.currentPortal$.getValue()?.themeId
     this.prepareActionButtons()
-    /* TODO: remove this */
-    this.translate
-      .get([
-        'ACTIONS.CANCEL',
-        'ACTIONS.TOOLTIPS.CANCEL_AND_CLOSE',
-        'ACTIONS.SAVE',
-        'ACTIONS.TOOLTIPS.SAVE',
-        'ACTIONS.SAVE_AS',
-        'ACTIONS.TOOLTIPS.SAVE_AS'
-      ])
-      .subscribe((data) => {
-        this.prepareActionButtons_old(data)
-      })
 
     this.fontForm = new FormGroup({})
     this.topbarForm = new FormGroup({})
@@ -175,38 +161,6 @@ export class ThemeDesignerComponent implements OnInit {
     this.loadThemeTemplates()
   }
 
-  /* TODO: remove this */
-  private prepareActionButtons_old(data: any): void {
-    this.actions = [] // provoke change event
-    this.actions.push(
-      {
-        label: data['ACTIONS.CANCEL'],
-        title: data['ACTIONS.TOOLTIPS.CANCEL_AND_CLOSE'],
-        actionCallback: () => this.close(),
-        icon: 'pi pi-times',
-        show: 'always',
-        permission: 'THEME#VIEW'
-      },
-      {
-        label: data['ACTIONS.SAVE'],
-        title: data['ACTIONS.TOOLTIPS.SAVE'],
-        actionCallback: () => this.updateTheme(),
-        icon: 'pi pi-save',
-        show: 'always',
-        conditional: true,
-        showCondition: this.mode === 'EDIT',
-        permission: 'THEME#SAVE'
-      },
-      {
-        label: data['ACTIONS.SAVE_AS'],
-        title: data['ACTIONS.TOOLTIPS.SAVE_AS'],
-        actionCallback: () => this.saveAsNewPopup(),
-        icon: 'pi pi-plus-circle',
-        show: 'always',
-        permission: 'THEME#CREATE'
-      }
-    )
-  }
   private prepareActionButtons(): void {
     this.actions$ = this.translate
       .get([

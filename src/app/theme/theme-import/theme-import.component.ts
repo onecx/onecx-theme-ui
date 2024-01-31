@@ -98,7 +98,7 @@ export class ThemeImportComponent implements OnInit {
 
   private isThemeImportRequestDTO(obj: unknown): obj is ThemeSnapshot {
     const dto = obj as ThemeSnapshot
-    return !!(typeof dto === 'object' && dto && dto.themes)
+    return !!(typeof dto === 'object' && dto?.themes)
   }
 
   private getThemes(emit: boolean): void {
