@@ -131,7 +131,7 @@ describe('ThemeDesignerComponent', () => {
       expect(Object.keys(component.sidebarForm.controls).length).toBe(themeVariables.sidebar.length)
     })
 
-    it('should load translations', () => {
+    it('should load translations', (done: DoneFn) => {
       const translateService = TestBed.inject(TranslateService)
       const actionsTranslations = {
         'ACTIONS.CANCEL': 'actionCancel',
@@ -147,27 +147,28 @@ describe('ThemeDesignerComponent', () => {
       component = fixture.componentInstance
       fixture.detectChanges()
 
-      expect(component.actions.length).toBe(3)
-      const cancelAction = component.actions.filter(
-        (a) => a.label === 'actionCancel' && a.title === 'actionTooltipsCancelAndClose'
-      )[0]
-      spyOn<any>(component, 'close')
-      cancelAction.actionCallback()
-      expect(component['close']).toHaveBeenCalledTimes(1)
+      // simulate async pipe
+      component.actions$?.subscribe((actions) => {
+        expect(actions.length).toBe(3)
+        const cancelAction = actions.filter(
+          (a) => a.label === 'actionCancel' && a.title === 'actionTooltipsCancelAndClose'
+        )[0]
+        spyOn<any>(component, 'close')
+        cancelAction.actionCallback()
+        expect(component['close']).toHaveBeenCalledTimes(1)
 
-      const saveAction = component.actions.filter(
-        (a) => a.label === 'actionsSave' && a.title === 'actionsTooltipsSave'
-      )[0]
-      spyOn<any>(component, 'updateTheme')
-      saveAction.actionCallback()
-      expect(component['updateTheme']).toHaveBeenCalledTimes(1)
+        const saveAction = actions.filter((a) => a.label === 'actionsSave' && a.title === 'actionsTooltipsSave')[0]
+        spyOn<any>(component, 'updateTheme')
+        saveAction.actionCallback()
+        expect(component['updateTheme']).toHaveBeenCalledTimes(1)
 
-      const saveAsAction = component.actions.filter(
-        (a) => a.label === 'actionSaveAs' && a.title === 'actionTooltipsSaveAs'
-      )[0]
-      spyOn(component, 'saveAsNewPopup')
-      saveAsAction.actionCallback()
-      expect(component.saveAsNewPopup).toHaveBeenCalledTimes(1)
+        const saveAsAction = actions.filter((a) => a.label === 'actionSaveAs' && a.title === 'actionTooltipsSaveAs')[0]
+        spyOn(component, 'saveAsNewPopup')
+        saveAsAction.actionCallback()
+        expect(component.saveAsNewPopup).toHaveBeenCalledTimes(1)
+
+        done()
+      })
     })
 
     it('should update document style on form changes', fakeAsync(() => {
@@ -331,24 +332,32 @@ describe('ThemeDesignerComponent', () => {
       ])
     })
 
-    it('should navigate back on close', () => {
+    it('should navigate back on close', (done: DoneFn) => {
       const router = TestBed.inject(Router)
       spyOn(router, 'navigate')
 
-      component.actions[0].actionCallback()
+      component.actions$?.subscribe((actions) => {
+        const closeAction = actions[0]
+        closeAction.actionCallback()
+        expect(router.navigate).toHaveBeenCalledOnceWith(['./..'], jasmine.any(Object))
 
-      expect(router.navigate).toHaveBeenCalledOnceWith(['./..'], jasmine.any(Object))
+        done()
+      })
     })
 
-    it('should display error when updating theme with invalid form', () => {
+    it('should display error when updating theme with invalid form', (done: DoneFn) => {
       spyOnProperty(component.propertiesForm, 'invalid').and.returnValue(true)
 
-      component.actions[1].actionCallback()
+      component.actions$?.subscribe((actions) => {
+        const updateThemeAction = actions[1]
+        updateThemeAction.actionCallback()
+        expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_NOK' })
 
-      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_NOK' })
+        done()
+      })
     })
 
-    it('should display error when updating theme call fails', () => {
+    it('should display error when updating theme call fails', (done: DoneFn) => {
       const themeData = {
         id: 'id',
         description: 'desc',
@@ -370,12 +379,16 @@ describe('ThemeDesignerComponent', () => {
       themeApiSpy.getThemeById.and.returnValue(of(themeResponse) as any)
       themeApiSpy.updateTheme.and.returnValue(throwError(() => new Error()))
 
-      component.actions[1].actionCallback()
+      component.actions$?.subscribe((actions) => {
+        const updateThemeAction = actions[1]
+        updateThemeAction.actionCallback()
+        expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_NOK' })
 
-      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_NOK' })
+        done()
+      })
     })
 
-    it('should only update properties and base theme data and show success when updating theme call is successful', () => {
+    it('should only update properties and base theme data and show success when updating theme call is successful', (done: DoneFn) => {
       component.themeId = 'id'
       const themeData = {
         id: 'id',
@@ -413,27 +426,32 @@ describe('ThemeDesignerComponent', () => {
 
       themeApiSpy.updateTheme.and.returnValue(of({}) as any)
 
-      component.actions[1].actionCallback()
-      expect(msgServiceSpy.success).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_OK' })
-      expect(themeApiSpy.updateTheme).toHaveBeenCalledTimes(1)
-      const updateArgs = themeApiSpy.updateTheme.calls.mostRecent().args[0]
-      expect(updateArgs.updateThemeRequest?.resource.name).toBe(newBasicData.name)
-      expect(updateArgs.updateThemeRequest?.resource.description).toBe(newBasicData.description)
-      expect(updateArgs.updateThemeRequest?.resource.logoUrl).toBe(newBasicData.logoUrl)
-      expect(updateArgs.updateThemeRequest?.resource.faviconUrl).toBe(newBasicData.faviconUrl)
-      expect(updateArgs.updateThemeRequest?.resource.properties).toEqual(
-        jasmine.objectContaining({
-          font: jasmine.objectContaining({
-            'font-family': 'updatedFont'
-          }),
-          general: jasmine.objectContaining({
-            'primary-color': 'rgb(255,255,255)'
+      component.actions$?.subscribe((actions) => {
+        const updateThemeAction = actions[1]
+        updateThemeAction.actionCallback()
+        expect(msgServiceSpy.success).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_OK' })
+        expect(themeApiSpy.updateTheme).toHaveBeenCalledTimes(1)
+        const updateArgs = themeApiSpy.updateTheme.calls.mostRecent().args[0]
+        expect(updateArgs.updateThemeRequest?.resource.name).toBe(newBasicData.name)
+        expect(updateArgs.updateThemeRequest?.resource.description).toBe(newBasicData.description)
+        expect(updateArgs.updateThemeRequest?.resource.logoUrl).toBe(newBasicData.logoUrl)
+        expect(updateArgs.updateThemeRequest?.resource.faviconUrl).toBe(newBasicData.faviconUrl)
+        expect(updateArgs.updateThemeRequest?.resource.properties).toEqual(
+          jasmine.objectContaining({
+            font: jasmine.objectContaining({
+              'font-family': 'updatedFont'
+            }),
+            general: jasmine.objectContaining({
+              'primary-color': 'rgb(255,255,255)'
+            })
           })
-        })
-      )
+        )
+
+        done()
+      })
     })
 
-    it('should apply changes when updating current theme is successful', () => {
+    it('should apply changes when updating current theme is successful', (done: DoneFn) => {
       component.themeId = 'id'
       const themeData = {
         id: 'id',
@@ -464,9 +482,13 @@ describe('ThemeDesignerComponent', () => {
 
       component.themeIsCurrentUsedTheme = true
 
-      component.actions[1].actionCallback()
+      component.actions$?.subscribe((actions) => {
+        const updateThemeAction = actions[1]
+        updateThemeAction.actionCallback()
+        expect(themeServiceSpy.apply).toHaveBeenCalledOnceWith(updateThemeData as any)
 
-      expect(themeServiceSpy.apply).toHaveBeenCalledOnceWith(updateThemeData as any)
+        done()
+      })
     })
 
     it('should display theme already exists message on theme save failure', () => {
@@ -597,12 +619,16 @@ describe('ThemeDesignerComponent', () => {
       )
     })
 
-    it('should display save as new popup on save as click', () => {
+    it('should display save as new popup on save as click', (done: DoneFn) => {
       component.saveAsNewPopupDisplay = false
 
-      component.actions[2].actionCallback()
+      component.actions$?.subscribe((actions) => {
+        const saveAction = actions[2]
+        saveAction.actionCallback()
+        expect(component.saveAsNewPopupDisplay).toBe(true)
 
-      expect(component.saveAsNewPopupDisplay).toBe(true)
+        done()
+      })
     })
 
     it('should use form theme name in save as dialog while in NEW mode', () => {
