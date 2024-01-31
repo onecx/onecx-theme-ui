@@ -8,7 +8,7 @@ import { of, throwError } from 'rxjs'
 
 import { PortalMessageService } from '@onecx/portal-integration-angular'
 
-import { ThemesAPIService } from 'src/app/generated'
+import { ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeImportComponent } from './theme-import.component'
 
 describe('ThemeImportComponent', () => {

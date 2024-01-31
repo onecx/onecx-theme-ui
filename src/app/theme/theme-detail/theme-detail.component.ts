@@ -8,7 +8,7 @@ import FileSaver from 'file-saver'
 import { Action, ObjectDetailItem, PortalMessageService, UserService } from '@onecx/portal-integration-angular'
 
 import { limitText, prepareUrl, sortByLocale } from 'src/app/shared/utils'
-import { ExportThemeRequest, Theme, ThemesAPIService, Workspace } from 'src/app/generated'
+import { ExportThemeRequest, Theme, ThemesAPIService, Workspace } from 'src/app/shared/generated'
 
 @Component({
   templateUrl: './theme-detail.component.html',

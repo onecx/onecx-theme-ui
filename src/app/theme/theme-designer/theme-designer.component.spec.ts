@@ -20,7 +20,7 @@ import { ConfirmDialog, ConfirmDialogModule } from 'primeng/confirmdialog'
 
 import { ConfigurationService, PortalMessageService, ThemeService } from '@onecx/portal-integration-angular'
 
-import { ThemesAPIService } from 'src/app/generated'
+import { ThemesAPIService } from 'src/app/shared/generated'
 import { prepareUrl } from 'src/app/shared/utils'
 import { themeVariables } from './theme-variables'
 import { ThemeDesignerComponent } from './theme-designer.component'
