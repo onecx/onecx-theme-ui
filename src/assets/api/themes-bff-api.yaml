@@ -8,6 +8,7 @@ servers:
   - url: http://onecx-theme-bff:8080/
 tags:
   - name: theme
+  - name: images
 paths:
   /themes:
     get:
@@ -226,8 +227,90 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetailResponse'
+  /images:
+    post:
+      tags:
+        - images
+      description: Upload Images
+      operationId: uploadImage
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  format: binary
+                  description: file data
+                  type: string
+            encoding:
+              image:
+                contentType: application/octet-stream
+      responses:
+        '201':
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageInfo'
+  /images/{imageId}:
+    get:
+      tags:
+        - images
+      description: Get Image by id
+      operationId: getImage
+      parameters:
+        - name: imageId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+    put:
+      tags:
+        - images
+      description: update Images
+      operationId: updateImage
+      parameters:
+        - name: imageId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  format: binary
+                  description: file data
+                  type: string
+            encoding:
+              image:
+                contentType: application/octet-stream
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageInfo'
 components:
   schemas:
+    ImageInfo:
+      type: object
+      properties:
+        id:
+          type: string
     Theme:
       type: object
       properties:

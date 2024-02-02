@@ -9,6 +9,7 @@ import { Action, AppStateService, PortalMessageService, ThemeService } from '@on
 import { dropDownSortItemsByLabel, dropDownGetLabelByValue, prepareUrl } from 'src/app/shared/utils'
 import {
   GetThemeResponse,
+  ImagesAPIService,
   Theme,
   ThemesAPIService,
   ThemeUpdateCreate,
@@ -64,7 +65,7 @@ export class ThemeDesignerComponent implements OnInit {
     private appStateService: AppStateService,
     private themeApi: ThemesAPIService,
     private themeService: ThemeService,
-    //private imageApi: ImageV1APIService,
+    private imageApi: ImagesAPIService,
     private translate: TranslateService,
     private confirmation: ConfirmationService,
     private msgService: PortalMessageService
@@ -373,14 +374,16 @@ export class ThemeDesignerComponent implements OnInit {
   public onFileUpload(ev: Event, fieldType: 'logo' | 'favicon'): void {
     this.displayFileTypeErrorLogo = false
     this.displayFileTypeErrorFavicon = false
-    /**
+
     if (ev.target && (ev.target as HTMLInputElement).files) {
       const files = (ev.target as HTMLInputElement).files
       if (files) {
         if (files[0].name.match(/^.*.(jpg|jpeg|png)$/)) {
           Array.from(files).forEach((file) => {
             this.imageApi.uploadImage({ image: file }).subscribe((data) => {
-              this.basicForm.controls[fieldType + 'Url'].setValue(data.imageUrl)
+              this.basicForm.controls[fieldType + 'Url'].setValue(
+                this.imageApi.configuration.basePath + '/images/' + data.id
+              )
               this.fetchingLogoUrl = prepareUrl(this.basicForm.value.logoUrl)
               this.fetchingFaviconUrl = prepareUrl(this.basicForm.value.faviconUrl)
               this.msgService.info({ summaryKey: 'LOGO.UPLOADED' })
@@ -392,7 +395,6 @@ export class ThemeDesignerComponent implements OnInit {
         }
       }
     }
-     */
   }
 
   // Applying Styles
