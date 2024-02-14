@@ -48,6 +48,7 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log('THEMEBYNAME')
     this.themeApi
       .getThemeByName({ name: this.themeName })
       .pipe(
@@ -216,10 +217,13 @@ export class ThemeDetailComponent implements OnInit {
     return arr?.sort(sortByLocale).join(', ') ?? ''
   }
 
-  getLogoUrl(): string | undefined {
-    if (this.theme?.logoUrl != null) {
-      return prepareUrl(this.theme.logoUrl)
+  getLogoUrl(theme: Theme | undefined): string | undefined {
+    if (!theme) {
+      return undefined
     }
-    return this.imageApi.configuration.basePath + '/images/' + this.theme?.name + '/logo'
+    if (theme.logoUrl != null) {
+      return prepareUrl(theme.logoUrl)
+    }
+    return this.imageApi.configuration.basePath + '/images/' + theme.name + '/logo'
   }
 }

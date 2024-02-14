@@ -102,7 +102,10 @@ export class ThemeSearchComponent implements OnInit {
     }
   }
 
-  getLogoUrl(theme: Theme): string | undefined {
+  getLogoUrl(theme: Theme | undefined): string | undefined {
+    if (!theme) {
+      return undefined
+    }
     if (theme.logoUrl != null) {
       return prepareUrl(theme.logoUrl)
     }
