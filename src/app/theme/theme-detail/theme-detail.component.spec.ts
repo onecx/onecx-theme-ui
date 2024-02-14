@@ -112,7 +112,7 @@ describe('ThemeDetailComponent', () => {
       },
       workspaces: [
         {
-          workspaceName: 'workspace',
+          name: 'workspace',
           description: 'workspaceDesc'
         }
       ]
@@ -188,10 +188,10 @@ describe('ThemeDetailComponent', () => {
       },
       workspaces: [
         {
-          workspaceName: 'portal1'
+          name: 'portal1'
         },
         {
-          workspaceName: 'myPortal'
+          name: 'myPortal'
         }
       ]
     }
@@ -375,7 +375,7 @@ describe('ThemeDetailComponent', () => {
     )
 
     component.theme = {
-      version: 1,
+      modificationCount: 1,
       name: 'themeName',
       logoUrl: 'url',
 

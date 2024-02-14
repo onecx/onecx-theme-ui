@@ -28,7 +28,9 @@
       "TOOLTIP": "Die Eigenschaften bearbeiten",
       "MESSAGE": {
         "CHANGE_OK": "Das Theme wurde erfolgreich geändert",
-        "CHANGE_NOK": "Ein Fehler ist aufgetreten. Das Theme wurde nicht geändert."
+        "CHANGE_NOK": "Ein Fehler ist aufgetreten. Das Theme wurde nicht geändert.",
+        "IMAGE_CONSTRAINT": "Ein Fehler ist aufgetreten. Bitte füge einen Namen hinzu bevor das Bild geladen wird.",
+        "IMAGE_CONSTRAINT_SIZE": "Ein Fehler ist aufgetreten. Das Bild ist zu groß."
       }
     },
     "EXPORT": {

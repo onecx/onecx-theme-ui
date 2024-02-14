@@ -12,7 +12,7 @@
 
 
 export interface Workspace { 
-    workspaceName?: string;
+    name?: string;
     description?: string;
 }
 

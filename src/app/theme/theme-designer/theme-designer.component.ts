@@ -9,11 +9,13 @@ import { Action, AppStateService, PortalMessageService, ThemeService } from '@on
 import { dropDownSortItemsByLabel, dropDownGetLabelByValue, prepareUrl } from 'src/app/shared/utils'
 import {
   GetThemeResponse,
-  ImagesAPIService,
+  ImagesInternalAPIService,
+  RefType,
   Theme,
   ThemesAPIService,
   ThemeUpdateCreate,
-  UpdateThemeResponse
+  UpdateThemeResponse,
+  UploadImageRequestParams
 } from 'src/app/shared/generated'
 import { themeVariables } from './theme-variables'
 
@@ -65,7 +67,7 @@ export class ThemeDesignerComponent implements OnInit {
     private appStateService: AppStateService,
     private themeApi: ThemesAPIService,
     private themeService: ThemeService,
-    private imageApi: ImagesAPIService,
+    private imageApi: ImagesInternalAPIService,
     private translate: TranslateService,
     private confirmation: ConfirmationService,
     private msgService: PortalMessageService
@@ -328,6 +330,12 @@ export class ThemeDesignerComponent implements OnInit {
     const newTheme: ThemeUpdateCreate = { ...this.basicForm.value }
     newTheme.name = newThemename
     newTheme.properties = this.propertiesForm.value
+    if (this.fetchingFaviconUrl != null) {
+      newTheme.faviconUrl = undefined
+    }
+    if (this.fetchingLogoUrl != null) {
+      newTheme.logoUrl = undefined
+    }
 
     this.themeApi.createTheme({ createThemeRequest: { resource: newTheme } }).subscribe({
       next: (data) => {
@@ -372,28 +380,73 @@ export class ThemeDesignerComponent implements OnInit {
 
   // Image Files
   public onFileUpload(ev: Event, fieldType: 'logo' | 'favicon'): void {
-    this.displayFileTypeErrorLogo = false
-    this.displayFileTypeErrorFavicon = false
+    var currThemeName = this.basicForm.controls['name'].value
+    if (currThemeName == null || currThemeName == '') {
+      this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.IMAGE_CONSTRAINT' })
+    } else {
+      this.displayFileTypeErrorLogo = false
+      this.displayFileTypeErrorFavicon = false
+      if (ev.target && (ev.target as HTMLInputElement).files) {
+        const files = (ev.target as HTMLInputElement).files
 
-    if (ev.target && (ev.target as HTMLInputElement).files) {
-      const files = (ev.target as HTMLInputElement).files
-      if (files) {
-        if (files[0].name.match(/^.*.(jpg|jpeg|png)$/)) {
-          Array.from(files).forEach((file) => {
-            this.imageApi.uploadImage({ image: file }).subscribe((data) => {
-              this.basicForm.controls[fieldType + 'Url'].setValue(
-                this.imageApi.configuration.basePath + '/images/' + data.id
-              )
-              this.fetchingLogoUrl = prepareUrl(this.basicForm.value.logoUrl)
-              this.fetchingFaviconUrl = prepareUrl(this.basicForm.value.faviconUrl)
-              this.msgService.info({ summaryKey: 'LOGO.UPLOADED' })
-            })
-          })
+        if (files && files.length > 20000) {
+          this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.IMAGE_CONSTRAINT_SIZE' })
+        } else if (files && currThemeName) {
+          this.saveImage(currThemeName, fieldType, files!)
         } else {
-          this.displayFileTypeErrorLogo = fieldType === 'logo'
-          this.displayFileTypeErrorFavicon = fieldType === 'favicon'
+          this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.IMAGE_CONSTRAINT' })
         }
       }
+    }
+  }
+
+  saveImage(currThemeName: string, fieldType: string, files: FileList) {
+    var requestParameters: UploadImageRequestParams
+    const blob = new Blob([files[0]], { type: files[0].type })
+    var imageType: RefType
+    if (fieldType === 'logo') {
+      imageType = RefType.Logo
+    } else {
+      imageType = RefType.Favicon
+    }
+    requestParameters = {
+      contentLength: files.length,
+      refId: currThemeName!,
+      refType: imageType,
+      body: blob
+    }
+
+    // Check if UPDATE or UPLOAD
+    if (
+      ((fieldType == 'logo' && this.fetchingLogoUrl != null) ||
+        (fieldType == 'favicon' && this.fetchingFaviconUrl != null)) &&
+      files[0].name.match(/^.*.(jpg|jpeg|png)$/)
+    ) {
+      this.imageApi.updateImage(requestParameters).subscribe((data) => {
+        this.basicForm.controls[fieldType + 'Url'].setValue(files[0].name)
+        if (fieldType == 'logo') {
+          this.fetchingLogoUrl = this.imageApi.configuration.basePath + '/images/' + currThemeName + '/' + fieldType
+        } else {
+          this.fetchingFaviconUrl = this.imageApi.configuration.basePath + '/images/' + currThemeName + '/' + fieldType
+        }
+        this.msgService.info({ summaryKey: 'LOGO.UPLOADED' })
+      })
+    } else if (files[0].name.match(/^.*.(jpg|jpeg|png)$/)) {
+      Array.from(files).forEach((file) => {
+        this.imageApi.uploadImage(requestParameters).subscribe((data) => {
+          this.basicForm.controls[fieldType + 'Url'].setValue(files[0].name)
+          if (fieldType == 'logo') {
+            this.fetchingLogoUrl = this.imageApi.configuration.basePath + '/images/' + currThemeName + '/' + fieldType
+          } else {
+            this.fetchingFaviconUrl =
+              this.imageApi.configuration.basePath + '/images/' + currThemeName + '/' + fieldType
+          }
+          this.msgService.info({ summaryKey: 'LOGO.UPLOADED' })
+        })
+      })
+    } else {
+      this.displayFileTypeErrorLogo = fieldType === 'logo'
+      this.displayFileTypeErrorFavicon = fieldType === 'favicon'
     }
   }
 

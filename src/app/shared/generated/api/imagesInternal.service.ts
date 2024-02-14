@@ -20,6 +20,10 @@ import { Observable }                                        from 'rxjs';
 
 // @ts-ignore
 import { ImageInfo } from '../model/imageInfo';
+// @ts-ignore
+import { ProblemDetailResponse } from '../model/problemDetailResponse';
+// @ts-ignore
+import { RefType } from '../model/refType';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -27,25 +31,29 @@ import { Configuration }                                     from '../configurat
 
 
 export interface GetImageRequestParams {
-    imageId: string;
+    refId: string;
+    refType: RefType;
 }
 
 export interface UpdateImageRequestParams {
-    imageId: string;
-    /** file data */
-    image?: Blob;
+    refId: string;
+    refType: RefType;
+    body: Blob;
+    contentLength?: number;
 }
 
 export interface UploadImageRequestParams {
-    /** file data */
-    image?: Blob;
+    contentLength: number;
+    refId: string;
+    refType: RefType;
+    body: Blob;
 }
 
 
 @Injectable({
   providedIn: 'any'
 })
-export class ImagesAPIService {
+export class ImagesInternalAPIService {
 
     protected basePath = 'http://onecx-theme-bff:8080';
     public defaultHeaders = new HttpHeaders();
@@ -69,19 +77,6 @@ export class ImagesAPIService {
         this.encoder = this.configuration.encoder || new CustomHttpParameterCodec();
     }
 
-    /**
-     * @param consumes string[] mime-types
-     * @return true: consumes contains 'multipart/form-data', false: otherwise
-     */
-    private canConsumeForm(consumes: string[]): boolean {
-        const form = 'multipart/form-data';
-        for (const consume of consumes) {
-            if (form === consume) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     // @ts-ignore
     private addToHttpParams(httpParams: HttpParams, value: any, key?: string): HttpParams {
@@ -125,13 +120,17 @@ export class ImagesAPIService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getImage(requestParameters: GetImageRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/octet-stream', context?: HttpContext}): Observable<Blob>;
-    public getImage(requestParameters: GetImageRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/octet-stream', context?: HttpContext}): Observable<HttpResponse<Blob>>;
-    public getImage(requestParameters: GetImageRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/octet-stream', context?: HttpContext}): Observable<HttpEvent<Blob>>;
-    public getImage(requestParameters: GetImageRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/octet-stream', context?: HttpContext}): Observable<any> {
-        const imageId = requestParameters.imageId;
-        if (imageId === null || imageId === undefined) {
-            throw new Error('Required parameter imageId was null or undefined when calling getImage.');
+    public getImage(requestParameters: GetImageRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'image/*' | 'application/json', context?: HttpContext}): Observable<Blob>;
+    public getImage(requestParameters: GetImageRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'image/*' | 'application/json', context?: HttpContext}): Observable<HttpResponse<Blob>>;
+    public getImage(requestParameters: GetImageRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'image/*' | 'application/json', context?: HttpContext}): Observable<HttpEvent<Blob>>;
+    public getImage(requestParameters: GetImageRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'image/*' | 'application/json', context?: HttpContext}): Observable<any> {
+        const refId = requestParameters.refId;
+        if (refId === null || refId === undefined) {
+            throw new Error('Required parameter refId was null or undefined when calling getImage.');
+        }
+        const refType = requestParameters.refType;
+        if (refType === null || refType === undefined) {
+            throw new Error('Required parameter refType was null or undefined when calling getImage.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -140,7 +139,8 @@ export class ImagesAPIService {
         if (localVarHttpHeaderAcceptSelected === undefined) {
             // to determine the Accept header
             const httpHeaderAccepts: string[] = [
-                'application/octet-stream'
+                'image/*',
+                'application/json'
             ];
             localVarHttpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
         }
@@ -154,7 +154,7 @@ export class ImagesAPIService {
         }
 
 
-        let localVarPath = `/images/${this.configuration.encodeParam({name: "imageId", value: imageId, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}`;
+        let localVarPath = `/images/${this.configuration.encodeParam({name: "refId", value: refId, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "refType", value: refType, in: "path", style: "simple", explode: false, dataType: "RefType", dataFormat: undefined})}`;
         return this.httpClient.request('get', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
@@ -177,13 +177,24 @@ export class ImagesAPIService {
     public updateImage(requestParameters: UpdateImageRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpResponse<ImageInfo>>;
     public updateImage(requestParameters: UpdateImageRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpEvent<ImageInfo>>;
     public updateImage(requestParameters: UpdateImageRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any> {
-        const imageId = requestParameters.imageId;
-        if (imageId === null || imageId === undefined) {
-            throw new Error('Required parameter imageId was null or undefined when calling updateImage.');
+        const refId = requestParameters.refId;
+        if (refId === null || refId === undefined) {
+            throw new Error('Required parameter refId was null or undefined when calling updateImage.');
         }
-        const image = requestParameters.image;
+        const refType = requestParameters.refType;
+        if (refType === null || refType === undefined) {
+            throw new Error('Required parameter refType was null or undefined when calling updateImage.');
+        }
+        const body = requestParameters.body;
+        if (body === null || body === undefined) {
+            throw new Error('Required parameter body was null or undefined when calling updateImage.');
+        }
+        const contentLength = requestParameters.contentLength;
 
         let localVarHeaders = this.defaultHeaders;
+        if (contentLength !== undefined && contentLength !== null) {
+            localVarHeaders = localVarHeaders.set('Content-Length', String(contentLength));
+        }
 
         let localVarHttpHeaderAcceptSelected: string | undefined = options && options.httpHeaderAccept;
         if (localVarHttpHeaderAcceptSelected === undefined) {
@@ -202,27 +213,14 @@ export class ImagesAPIService {
             localVarHttpContext = new HttpContext();
         }
 
+
         // to determine the Content-Type header
         const consumes: string[] = [
-            'multipart/form-data'
+            'image/*'
         ];
-
-        const canConsumeForm = this.canConsumeForm(consumes);
-
-        let localVarFormParams: { append(param: string, value: any): any; };
-        let localVarUseForm = false;
-        let localVarConvertFormParamsToString = false;
-        // use FormData to transmit files using content-type "multipart/form-data"
-        // see https://stackoverflow.com/questions/4007969/application-x-www-form-urlencoded-or-multipart-form-data
-        localVarUseForm = canConsumeForm;
-        if (localVarUseForm) {
-            localVarFormParams = new FormData();
-        } else {
-            localVarFormParams = new HttpParams({encoder: this.encoder});
-        }
-
-        if (image !== undefined) {
-            localVarFormParams = localVarFormParams.append('image', <any>image) as any || localVarFormParams;
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
         }
 
         let responseType_: 'text' | 'json' | 'blob' = 'json';
@@ -236,11 +234,11 @@ export class ImagesAPIService {
             }
         }
 
-        let localVarPath = `/images/${this.configuration.encodeParam({name: "imageId", value: imageId, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}`;
+        let localVarPath = `/images/${this.configuration.encodeParam({name: "refId", value: refId, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "refType", value: refType, in: "path", style: "simple", explode: false, dataType: "RefType", dataFormat: undefined})}`;
         return this.httpClient.request<ImageInfo>('put', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: localVarConvertFormParamsToString ? localVarFormParams.toString() : localVarFormParams,
+                body: body,
                 responseType: <any>responseType_,
                 withCredentials: this.configuration.withCredentials,
                 headers: localVarHeaders,
@@ -260,9 +258,27 @@ export class ImagesAPIService {
     public uploadImage(requestParameters: UploadImageRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpResponse<ImageInfo>>;
     public uploadImage(requestParameters: UploadImageRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpEvent<ImageInfo>>;
     public uploadImage(requestParameters: UploadImageRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any> {
-        const image = requestParameters.image;
+        const contentLength = requestParameters.contentLength;
+        if (contentLength === null || contentLength === undefined) {
+            throw new Error('Required parameter contentLength was null or undefined when calling uploadImage.');
+        }
+        const refId = requestParameters.refId;
+        if (refId === null || refId === undefined) {
+            throw new Error('Required parameter refId was null or undefined when calling uploadImage.');
+        }
+        const refType = requestParameters.refType;
+        if (refType === null || refType === undefined) {
+            throw new Error('Required parameter refType was null or undefined when calling uploadImage.');
+        }
+        const body = requestParameters.body;
+        if (body === null || body === undefined) {
+            throw new Error('Required parameter body was null or undefined when calling uploadImage.');
+        }
 
         let localVarHeaders = this.defaultHeaders;
+        if (contentLength !== undefined && contentLength !== null) {
+            localVarHeaders = localVarHeaders.set('Content-Length', String(contentLength));
+        }
 
         let localVarHttpHeaderAcceptSelected: string | undefined = options && options.httpHeaderAccept;
         if (localVarHttpHeaderAcceptSelected === undefined) {
@@ -281,27 +297,14 @@ export class ImagesAPIService {
             localVarHttpContext = new HttpContext();
         }
 
+
         // to determine the Content-Type header
         const consumes: string[] = [
-            'multipart/form-data'
+            'image/*'
         ];
-
-        const canConsumeForm = this.canConsumeForm(consumes);
-
-        let localVarFormParams: { append(param: string, value: any): any; };
-        let localVarUseForm = false;
-        let localVarConvertFormParamsToString = false;
-        // use FormData to transmit files using content-type "multipart/form-data"
-        // see https://stackoverflow.com/questions/4007969/application-x-www-form-urlencoded-or-multipart-form-data
-        localVarUseForm = canConsumeForm;
-        if (localVarUseForm) {
-            localVarFormParams = new FormData();
-        } else {
-            localVarFormParams = new HttpParams({encoder: this.encoder});
-        }
-
-        if (image !== undefined) {
-            localVarFormParams = localVarFormParams.append('image', <any>image) as any || localVarFormParams;
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
         }
 
         let responseType_: 'text' | 'json' | 'blob' = 'json';
@@ -315,11 +318,11 @@ export class ImagesAPIService {
             }
         }
 
-        let localVarPath = `/images`;
+        let localVarPath = `/images/${this.configuration.encodeParam({name: "refId", value: refId, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "refType", value: refType, in: "path", style: "simple", explode: false, dataType: "RefType", dataFormat: undefined})}`;
         return this.httpClient.request<ImageInfo>('post', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: localVarConvertFormParamsToString ? localVarFormParams.toString() : localVarFormParams,
+                body: body,
                 responseType: <any>responseType_,
                 withCredentials: this.configuration.withCredentials,
                 headers: localVarHeaders,

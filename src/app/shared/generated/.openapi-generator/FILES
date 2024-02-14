@@ -3,7 +3,7 @@
 README.md
 api.module.ts
 api/api.ts
-api/images.service.ts
+api/imagesInternal.service.ts
 api/themes.service.ts
 configuration.ts
 encoder.ts
@@ -23,6 +23,7 @@ model/pagingResponse.ts
 model/problemDetailInvalidParam.ts
 model/problemDetailParam.ts
 model/problemDetailResponse.ts
+model/refType.ts
 model/searchThemeRequest.ts
 model/searchThemeResponse.ts
 model/theme.ts
@@ -30,7 +31,6 @@ model/themeSnapshot.ts
 model/themeUpdateCreate.ts
 model/updateThemeRequest.ts
 model/updateThemeResponse.ts
-model/validationConstraint.ts
 model/workspace.ts
 param.ts
 variables.ts

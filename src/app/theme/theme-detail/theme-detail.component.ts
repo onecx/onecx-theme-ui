@@ -8,7 +8,13 @@ import FileSaver from 'file-saver'
 import { Action, ObjectDetailItem, PortalMessageService, UserService } from '@onecx/portal-integration-angular'
 
 import { limitText, prepareUrl, sortByLocale } from 'src/app/shared/utils'
-import { ExportThemeRequest, Theme, ThemesAPIService, Workspace } from 'src/app/shared/generated'
+import {
+  ExportThemeRequest,
+  ImagesInternalAPIService,
+  Theme,
+  ThemesAPIService,
+  Workspace
+} from 'src/app/shared/generated'
 
 @Component({
   templateUrl: './theme-detail.component.html',
@@ -34,7 +40,8 @@ export class ThemeDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private themeApi: ThemesAPIService,
     private msgService: PortalMessageService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private imageApi: ImagesInternalAPIService
   ) {
     this.themeName = this.route.snapshot.paramMap.get('name') || ''
     this.dateFormat = this.user.lang$.getValue() === 'de' ? 'dd.MM.yyyy HH:mm:ss' : 'medium'
@@ -187,7 +194,6 @@ export class ThemeDetailComponent implements OnInit {
   onExportTheme(): void {
     if (this.theme?.name) {
       const exportThemeRequest: ExportThemeRequest = { names: [this.theme.name] }
-      console.log(exportThemeRequest)
       this.themeApi
         .exportThemes({
           exportThemeRequest
@@ -206,7 +212,14 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   public prepareUsedInPortalList(): string {
-    const arr = this.usedInWorkspace?.map((workspace: Workspace) => workspace.workspaceName)
+    const arr = this.usedInWorkspace?.map((workspace: Workspace) => workspace.name)
     return arr?.sort(sortByLocale).join(', ') ?? ''
+  }
+
+  getLogoUrl(): string | undefined {
+    if (this.theme?.logoUrl != null) {
+      return prepareUrl(this.theme.logoUrl)
+    }
+    return this.imageApi.configuration.basePath + '/images/' + this.theme?.name + '/logo'
   }
 }
