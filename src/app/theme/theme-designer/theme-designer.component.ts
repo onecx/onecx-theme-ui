@@ -417,7 +417,6 @@ export class ThemeDesignerComponent implements OnInit {
   }
 
   saveImage(currThemeName: string, fieldType: string, files: FileList) {
-
     // Set request parameter
     var requestParameters: UploadImageRequestParams
     const blob = new Blob([files[0]], { type: files[0].type })
@@ -463,18 +462,16 @@ export class ThemeDesignerComponent implements OnInit {
         })
       })
     } else {
-      this.displayFileTypeErrorLogo = (fieldType === 'logo')
-      this.displayFileTypeErrorFavicon = (fieldType === 'favicon')
+      this.displayFileTypeErrorLogo = fieldType === 'logo'
+      this.displayFileTypeErrorFavicon = fieldType === 'favicon'
     }
   }
 
-
-  constraintUpload():boolean{
-
+  constraintUpload(): boolean {
     var currThemeName = this.basicForm.controls['name'].value
     if (currThemeName == null || currThemeName == '') {
-      return false;
+      return false
     }
-    return true;
+    return true
   }
 }
