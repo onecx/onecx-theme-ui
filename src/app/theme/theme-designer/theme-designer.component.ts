@@ -378,29 +378,47 @@ export class ThemeDesignerComponent implements OnInit {
     return this.themeApi.getThemeById({ id: id })
   }
 
+  // Applying Styles
+  private updateCssVar(varName: string, value: string): void {
+    document.documentElement.style.setProperty(`--${varName}`, value)
+    const rgb = this.hexToRgb(value)
+    if (rgb) {
+      document.documentElement.style.setProperty(`--${varName}-rgb`, `${rgb.r},${rgb.g},${rgb.b}`)
+    }
+  }
+
+  private hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+    return result
+      ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16)
+        }
+      : null
+  }
+
   // Image Files
   public onFileUpload(ev: Event, fieldType: 'logo' | 'favicon'): void {
     var currThemeName = this.basicForm.controls['name'].value
-    if (currThemeName == null || currThemeName == '') {
-      this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.IMAGE_CONSTRAINT' })
-    } else {
-      this.displayFileTypeErrorLogo = false
-      this.displayFileTypeErrorFavicon = false
-      if (ev.target && (ev.target as HTMLInputElement).files) {
-        const files = (ev.target as HTMLInputElement).files
+    this.displayFileTypeErrorLogo = false
+    this.displayFileTypeErrorFavicon = false
+    if (ev.target && (ev.target as HTMLInputElement).files) {
+      const files = (ev.target as HTMLInputElement).files
 
-        if (files && files.length > 20000) {
-          this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.IMAGE_CONSTRAINT_SIZE' })
-        } else if (files && currThemeName) {
-          this.saveImage(currThemeName, fieldType, files!)
-        } else {
-          this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.IMAGE_CONSTRAINT' })
-        }
+      if (files && files.length > 20000) {
+        this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.IMAGE_CONSTRAINT_SIZE' })
+      } else if (files && currThemeName) {
+        this.saveImage(currThemeName, fieldType, files!)
+      } else {
+        this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.IMAGE_CONSTRAINT' })
       }
     }
   }
 
   saveImage(currThemeName: string, fieldType: string, files: FileList) {
+
+    // Set request parameter
     var requestParameters: UploadImageRequestParams
     const blob = new Blob([files[0]], { type: files[0].type })
     var imageType: RefType
@@ -445,28 +463,18 @@ export class ThemeDesignerComponent implements OnInit {
         })
       })
     } else {
-      this.displayFileTypeErrorLogo = fieldType === 'logo'
-      this.displayFileTypeErrorFavicon = fieldType === 'favicon'
+      this.displayFileTypeErrorLogo = (fieldType === 'logo')
+      this.displayFileTypeErrorFavicon = (fieldType === 'favicon')
     }
   }
 
-  // Applying Styles
-  private updateCssVar(varName: string, value: string): void {
-    document.documentElement.style.setProperty(`--${varName}`, value)
-    const rgb = this.hexToRgb(value)
-    if (rgb) {
-      document.documentElement.style.setProperty(`--${varName}-rgb`, `${rgb.r},${rgb.g},${rgb.b}`)
-    }
-  }
 
-  private hexToRgb(hex: string): { r: number; g: number; b: number } | null {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-    return result
-      ? {
-          r: parseInt(result[1], 16),
-          g: parseInt(result[2], 16),
-          b: parseInt(result[3], 16)
-        }
-      : null
+  constraintUpload():boolean{
+
+    var currThemeName = this.basicForm.controls['name'].value
+    if (currThemeName == null || currThemeName == '') {
+      return false;
+    }
+    return true;
   }
 }

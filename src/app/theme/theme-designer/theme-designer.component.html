@@ -80,7 +80,7 @@
               accept=".png, .jpg, .jpeg"
             />
 
-            <div class="field col-12 mb-3">
+            <div class="field col-12 mb-3" *ngIf="constraintUpload()">
               <div class="flex flex-wrap sm:flex-nowrap align-items-center pb-2 row-gap-2 column-gap-4">
                 <app-image-container
                   [imageUrl]="fetchingLogoUrl"
@@ -116,7 +116,7 @@
                 </div>
               </div>
             </div>
-            <div class="field col-12 mb-0">
+            <div class="field col-12 mb-0" *ngIf="constraintUpload()">
               <div class="flex flex-wrap sm:flex-nowrap align-items-center row-gap-2 column-gap-4">
                 <app-image-container
                   [imageUrl]="fetchingFaviconUrl"
