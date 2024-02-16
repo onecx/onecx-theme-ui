@@ -6,8 +6,9 @@ import { TranslateService } from '@ngx-translate/core'
 import { ConfirmationService, SelectItem } from 'primeng/api'
 
 import { Action, AppStateService, PortalMessageService, ThemeService } from '@onecx/portal-integration-angular'
-import { dropDownSortItemsByLabel, dropDownGetLabelByValue, prepareUrl } from 'src/app/shared/utils'
+import { dropDownSortItemsByLabel, dropDownGetLabelByValue } from 'src/app/shared/utils'
 import {
+  GetImageRequestParams,
   GetThemeResponse,
   ImagesInternalAPIService,
   RefType,
@@ -41,6 +42,8 @@ export class ThemeDesignerComponent implements OnInit {
   public themeIsCurrentUsedTheme = false
   public fetchingLogoUrl?: string
   public fetchingFaviconUrl?: string
+  public imageLogoExists: boolean | undefined
+  public imageFaviconExists: boolean | undefined
 
   public mode: 'EDIT' | 'NEW' = 'NEW'
   public autoApply = false
@@ -147,6 +150,8 @@ export class ThemeDesignerComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.imageLogoExists = false
+    this.imageFaviconExists = false
     if (this.mode === 'EDIT' && this.themeName) {
       this.themeApi.getThemeByName({ name: this.themeName }).subscribe((data) => {
         this.theme = data.resource
@@ -157,6 +162,8 @@ export class ThemeDesignerComponent implements OnInit {
         this.fetchingFaviconUrl = this.getImageUrl(this.theme, 'favicon')
         this.themeId = data.resource.id
         this.themeIsCurrentUsedTheme = this.themeId === this.appStateService.currentPortal$.getValue()?.themeId
+        this.imageLogoExists = this.urlExists(data.resource.logoUrl)
+        this.imageFaviconExists = this.urlExists(data.resource.faviconUrl)
       })
     } else {
       const currentVars: { [key: string]: { [key: string]: string } } = {}
@@ -169,6 +176,7 @@ export class ThemeDesignerComponent implements OnInit {
       this.propertiesForm.reset()
       this.propertiesForm.patchValue(currentVars)
     }
+
     this.loadThemeTemplates()
   }
 
@@ -258,8 +266,8 @@ export class ThemeDesignerComponent implements OnInit {
             this.basicForm.controls['description'].setValue(result.resource.description)
             this.basicForm.controls['faviconUrl'].setValue(this.getImageUrl(result.resource, 'favicon'))
             this.basicForm.controls['logoUrl'].setValue(this.getImageUrl(result.resource, 'logo'))
-            this.fetchingLogoUrl = prepareUrl(this.basicForm.value.logoUrl)
-            this.fetchingFaviconUrl = prepareUrl(this.basicForm.value.faviconUrl)
+            this.fetchingLogoUrl = this.getImageUrl(this.theme, 'logo')
+            this.fetchingFaviconUrl = this.getImageUrl(this.theme, 'favicon')
           }
           if (result.resource.properties) {
             this.propertiesForm.reset()
@@ -293,6 +301,7 @@ export class ThemeDesignerComponent implements OnInit {
   }
 
   private updateTheme(): void {
+    console.log('UPDATE__________________________________DATA' + this.basicForm.controls['logoUrl'].value)
     if (this.propertiesForm.invalid) {
       this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_NOK' })
     } else {
@@ -302,6 +311,18 @@ export class ThemeDesignerComponent implements OnInit {
         .pipe(
           switchMap((data) => {
             data.resource.properties = this.propertiesForm.value
+            if (this.imageFaviconExists) {
+              data.resource.faviconUrl = undefined
+            } else {
+              data.resource.faviconUrl = this.basicForm.controls['faviconUrl'].value
+            }
+            if (this.imageLogoExists) {
+              data.resource.logoUrl = undefined
+            } else {
+              data.resource.faviconUrl = this.basicForm.controls['logoUrl'].value
+            }
+            console.log('exist_____________________________' + this.imageFaviconExists + '--' + this.imageLogoExists)
+            console.log('UPDATEDATA_____________________________' + JSON.stringify(data))
             Object.assign(data.resource, this.basicForm.value)
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             return this.themeApi.updateTheme({
@@ -330,10 +351,10 @@ export class ThemeDesignerComponent implements OnInit {
     const newTheme: ThemeUpdateCreate = { ...this.basicForm.value }
     newTheme.name = newThemename
     newTheme.properties = this.propertiesForm.value
-    if (this.fetchingFaviconUrl != null) {
+    if (this.imageFaviconExists) {
       newTheme.faviconUrl = undefined
     }
-    if (this.fetchingLogoUrl != null) {
+    if (this.imageLogoExists) {
       newTheme.logoUrl = undefined
     }
 
@@ -433,38 +454,50 @@ export class ThemeDesignerComponent implements OnInit {
       body: blob
     }
 
-    // Check if UPDATE or UPLOAD
-    if (
-      ((fieldType == 'logo' && this.fetchingLogoUrl != null) ||
-        (fieldType == 'favicon' && this.fetchingFaviconUrl != null)) &&
-      files[0].name.match(/^.*.(jpg|jpeg|png)$/)
-    ) {
-      this.imageApi.updateImage(requestParameters).subscribe((data) => {
-        this.basicForm.controls[fieldType + 'Url'].setValue(files[0].name)
-        if (fieldType == 'logo') {
-          this.fetchingLogoUrl = this.imageApi.configuration.basePath + '/images/' + currThemeName + '/' + fieldType
-        } else {
-          this.fetchingFaviconUrl = this.imageApi.configuration.basePath + '/images/' + currThemeName + '/' + fieldType
-        }
-        this.msgService.info({ summaryKey: 'LOGO.UPLOADED' })
-      })
-    } else if (files[0].name.match(/^.*.(jpg|jpeg|png)$/)) {
-      Array.from(files).forEach((file) => {
-        this.imageApi.uploadImage(requestParameters).subscribe((data) => {
-          this.basicForm.controls[fieldType + 'Url'].setValue(files[0].name)
-          if (fieldType == 'logo') {
-            this.fetchingLogoUrl = this.imageApi.configuration.basePath + '/images/' + currThemeName + '/' + fieldType
-          } else {
-            this.fetchingFaviconUrl =
-              this.imageApi.configuration.basePath + '/images/' + currThemeName + '/' + fieldType
-          }
-          this.msgService.info({ summaryKey: 'LOGO.UPLOADED' })
-        })
-      })
-    } else {
-      this.displayFileTypeErrorLogo = fieldType === 'logo'
-      this.displayFileTypeErrorFavicon = fieldType === 'favicon'
+    var requestParametersGet: GetImageRequestParams
+    requestParametersGet = {
+      refId: currThemeName!,
+      refType: imageType
     }
+
+    this.imageApi.getImage(requestParametersGet).subscribe(
+      (res) => {
+        if (files[0].name.match(/^.*.(jpg|jpeg|png)$/)) {
+          this.imageApi.updateImage(requestParameters).subscribe((data) => {
+            if (fieldType == 'logo') {
+              this.imageLogoExists = true
+              this.fetchingLogoUrl = this.imageApi.configuration.basePath + '/images/' + currThemeName + '/' + fieldType
+            } else {
+              this.imageFaviconExists = true
+              this.fetchingFaviconUrl =
+                this.imageApi.configuration.basePath + '/images/' + currThemeName + '/' + fieldType
+            }
+            this.msgService.info({ summaryKey: 'LOGO.UPLOADED' })
+          })
+        }
+      },
+      (err) => {
+        if (files[0].name.match(/^.*.(jpg|jpeg|png)$/)) {
+          Array.from(files).forEach((file) => {
+            this.imageApi.uploadImage(requestParameters).subscribe((data) => {
+              if (fieldType == 'logo') {
+                this.imageLogoExists = true
+                this.fetchingLogoUrl =
+                  this.imageApi.configuration.basePath + '/images/' + currThemeName + '/' + fieldType
+              } else {
+                this.imageFaviconExists = true
+                this.fetchingFaviconUrl =
+                  this.imageApi.configuration.basePath + '/images/' + currThemeName + '/' + fieldType
+              }
+              this.msgService.info({ summaryKey: 'LOGO.UPLOADED' })
+            })
+          })
+        } else {
+          this.displayFileTypeErrorLogo = fieldType === 'logo'
+          this.displayFileTypeErrorFavicon = fieldType === 'favicon'
+        }
+      }
+    )
   }
 
   constraintUpload(): boolean {
@@ -480,15 +513,22 @@ export class ThemeDesignerComponent implements OnInit {
       return undefined
     }
     if (imageType == 'logo') {
-      if (theme.logoUrl != null) {
+      if (theme.logoUrl != null && theme.logoUrl != '') {
         return theme.logoUrl
       }
       return this.imageApi.configuration.basePath + '/images/' + theme.name + '/logo'
     } else {
-      if (theme.logoUrl != null) {
+      if (theme.faviconUrl != null && theme.faviconUrl != '') {
         return theme.faviconUrl
       }
       return this.imageApi.configuration.basePath + '/images/' + theme.name + '/favicon'
     }
+  }
+
+  urlExists(url: string | undefined): boolean {
+    if (url == undefined || url === '') {
+      return true
+    }
+    return false
   }
 }

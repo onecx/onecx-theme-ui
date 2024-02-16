@@ -11,7 +11,6 @@ import FileSaver from 'file-saver'
 
 import { ConfigurationService, PortalMessageService } from '@onecx/portal-integration-angular'
 
-import { prepareUrl } from 'src/app/shared/utils'
 import { ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeDetailComponent } from './theme-detail.component'
 
@@ -307,7 +306,7 @@ describe('ThemeDetailComponent', () => {
 
     await component.ngOnInit()
 
-    expect(component.headerImageUrl).toBe(prepareUrl('logo123.png'))
+    expect(component.headerImageUrl).toBe('logo123.png')
   })
 
   it('should set header image url without prefix when theme logo has http/https', async () => {

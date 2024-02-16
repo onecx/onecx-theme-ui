@@ -7,7 +7,7 @@ import FileSaver from 'file-saver'
 
 import { Action, ObjectDetailItem, PortalMessageService, UserService } from '@onecx/portal-integration-angular'
 
-import { limitText, prepareUrl, sortByLocale } from 'src/app/shared/utils'
+import { limitText, sortByLocale } from 'src/app/shared/utils'
 import {
   ExportThemeRequest,
   ImagesInternalAPIService,
@@ -220,8 +220,8 @@ export class ThemeDetailComponent implements OnInit {
     if (!theme) {
       return undefined
     }
-    if (theme.logoUrl != null) {
-      return prepareUrl(theme.logoUrl)
+    if (theme.logoUrl != null && theme.logoUrl != '') {
+      return theme.logoUrl
     }
     return this.imageApi.configuration.basePath + '/images/' + theme.name + '/logo'
   }

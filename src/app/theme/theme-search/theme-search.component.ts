@@ -7,7 +7,7 @@ import { DataView } from 'primeng/dataview'
 import { Action, DataViewControlTranslations } from '@onecx/portal-integration-angular'
 
 import { GetThemesResponse, ImagesInternalAPIService, Theme, ThemesAPIService } from 'src/app/shared/generated'
-import { limitText, prepareUrl } from 'src/app/shared/utils'
+import { limitText } from 'src/app/shared/utils'
 
 @Component({
   templateUrl: './theme-search.component.html',
@@ -106,8 +106,8 @@ export class ThemeSearchComponent implements OnInit {
     if (!theme) {
       return undefined
     }
-    if (theme.logoUrl != null) {
-      return prepareUrl(theme.logoUrl)
+    if (theme.logoUrl != null && theme.logoUrl != '') {
+      return theme.logoUrl
     }
     return this.imageApi.configuration.basePath + '/images/' + theme.name + '/logo'
   }
