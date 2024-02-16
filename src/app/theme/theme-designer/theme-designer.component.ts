@@ -406,7 +406,7 @@ export class ThemeDesignerComponent implements OnInit {
     if (ev.target && (ev.target as HTMLInputElement).files) {
       const files = (ev.target as HTMLInputElement).files
 
-      if (files && files[0].size > 20000) {
+      if (files && files[0].size > 110000) {
         this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.IMAGE_CONSTRAINT_SIZE' })
       } else if (files && currThemeName) {
         this.saveImage(currThemeName, fieldType, files)
