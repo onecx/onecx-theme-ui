@@ -259,25 +259,6 @@ describe('ThemeDesignerComponent', () => {
       expect(component.themeId).toBe('id')
     })
 
-    it('should fetch logo and favicon from backend on edit mode when no http[s] present', () => {
-      const themeData = {
-        name: 'themeName',
-        logoUrl: 'logo_url',
-        faviconUrl: 'fav_url'
-      }
-      const themeResponse = {
-        resource: themeData
-      }
-      themeApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
-      component.mode = 'EDIT'
-      component.themeName = 'themeName'
-
-      component.ngOnInit()
-
-      expect(component.fetchingLogoUrl).toBe(prepareUrl(themeData.logoUrl))
-      expect(component.fetchingFaviconUrl).toBe(prepareUrl(themeData.faviconUrl))
-    })
-
     it('should fetch logo and favicon from external source on edit mode when http[s] present', () => {
       const themeData = {
         logoUrl: 'http://myWeb.com/logo_url',

@@ -481,12 +481,12 @@ export class ThemeDesignerComponent implements OnInit {
     }
     if (imageType == 'logo') {
       if (theme.logoUrl != null) {
-        return prepareUrl(theme.logoUrl)
+        return theme.logoUrl
       }
       return this.imageApi.configuration.basePath + '/images/' + theme.name + '/logo'
     } else {
       if (theme.logoUrl != null) {
-        return prepareUrl(theme.faviconUrl)
+        return theme.faviconUrl
       }
       return this.imageApi.configuration.basePath + '/images/' + theme.name + '/favicon'
     }
