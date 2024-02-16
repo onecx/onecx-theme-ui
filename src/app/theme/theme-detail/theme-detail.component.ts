@@ -48,7 +48,6 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('THEMEBYNAME')
     this.themeApi
       .getThemeByName({ name: this.themeName })
       .pipe(
@@ -61,7 +60,7 @@ export class ThemeDetailComponent implements OnInit {
           this.theme = data.resource
           this.usedInWorkspace = data.workspaces
           this.preparePage()
-          this.headerImageUrl = prepareUrl(this.theme?.logoUrl)
+          this.headerImageUrl = this.getLogoUrl(this.theme)
         },
         error: (err) => {
           this.msgService.error({

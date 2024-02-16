@@ -153,8 +153,8 @@ export class ThemeDesignerComponent implements OnInit {
         this.basicForm.patchValue(data.resource)
         this.propertiesForm.reset()
         this.propertiesForm.patchValue(data.resource.properties || {})
-        this.fetchingLogoUrl = prepareUrl(this.basicForm.value.logoUrl)
-        this.fetchingFaviconUrl = prepareUrl(this.basicForm.value.faviconUrl)
+        this.fetchingLogoUrl = this.getImageUrl(this.theme, 'logo')
+        this.fetchingFaviconUrl = this.getImageUrl(this.theme, 'favicon')
         this.themeId = data.resource.id
         this.themeIsCurrentUsedTheme = this.themeId === this.appStateService.currentPortal$.getValue()?.themeId
       })
@@ -256,8 +256,8 @@ export class ThemeDesignerComponent implements OnInit {
           if (this.mode === 'NEW') {
             this.basicForm.controls['name'].setValue(data['GENERAL.COPY_OF'] + result.resource.name)
             this.basicForm.controls['description'].setValue(result.resource.description)
-            this.basicForm.controls['faviconUrl'].setValue(result.resource.faviconUrl)
-            this.basicForm.controls['logoUrl'].setValue(result.resource.logoUrl)
+            this.basicForm.controls['faviconUrl'].setValue(this.getImageUrl(result.resource, 'favicon'))
+            this.basicForm.controls['logoUrl'].setValue(this.getImageUrl(result.resource, 'logo'))
             this.fetchingLogoUrl = prepareUrl(this.basicForm.value.logoUrl)
             this.fetchingFaviconUrl = prepareUrl(this.basicForm.value.faviconUrl)
           }
@@ -406,10 +406,10 @@ export class ThemeDesignerComponent implements OnInit {
     if (ev.target && (ev.target as HTMLInputElement).files) {
       const files = (ev.target as HTMLInputElement).files
 
-      if (files && files.length > 20000) {
+      if (files && files[0].size > 20000) {
         this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.IMAGE_CONSTRAINT_SIZE' })
       } else if (files && currThemeName) {
-        this.saveImage(currThemeName, fieldType, files!)
+        this.saveImage(currThemeName, fieldType, files)
       } else {
         this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.IMAGE_CONSTRAINT' })
       }
@@ -473,5 +473,22 @@ export class ThemeDesignerComponent implements OnInit {
       return false
     }
     return true
+  }
+
+  getImageUrl(theme: Theme | undefined, imageType: string): string | undefined {
+    if (!theme) {
+      return undefined
+    }
+    if (imageType == 'logo') {
+      if (theme.logoUrl != null) {
+        return prepareUrl(theme.logoUrl)
+      }
+      return this.imageApi.configuration.basePath + '/images/' + theme.name + '/logo'
+    } else {
+      if (theme.logoUrl != null) {
+        return prepareUrl(theme.faviconUrl)
+      }
+      return this.imageApi.configuration.basePath + '/images/' + theme.name + '/favicon'
+    }
   }
 }
