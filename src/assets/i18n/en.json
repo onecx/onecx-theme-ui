@@ -28,7 +28,9 @@
       "TOOLTIP": "Edit properties",
       "MESSAGE": {
         "CHANGE_OK": "The Theme was changed successfully",
-        "CHANGE_NOK": "An error has occurred. The Theme was not changed."
+        "CHANGE_NOK": "An error has occurred. The Theme was not changed.",
+        "IMAGE_CONSTRAINT": "An error has occurred. Please add a theme name before uploading a file.",
+        "IMAGE_CONSTRAINT_SIZE": "An error has occurred. The image is too large."
       }
     },
     "EXPORT": {

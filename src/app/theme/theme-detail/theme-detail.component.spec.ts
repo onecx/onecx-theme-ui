@@ -11,7 +11,6 @@ import FileSaver from 'file-saver'
 
 import { ConfigurationService, PortalMessageService } from '@onecx/portal-integration-angular'
 
-import { prepareUrl } from 'src/app/shared/utils'
 import { ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeDetailComponent } from './theme-detail.component'
 
@@ -112,7 +111,7 @@ describe('ThemeDetailComponent', () => {
       },
       workspaces: [
         {
-          workspaceName: 'workspace',
+          name: 'workspace',
           description: 'workspaceDesc'
         }
       ]
@@ -188,10 +187,10 @@ describe('ThemeDetailComponent', () => {
       },
       workspaces: [
         {
-          workspaceName: 'portal1'
+          name: 'portal1'
         },
         {
-          workspaceName: 'myPortal'
+          name: 'myPortal'
         }
       ]
     }
@@ -307,7 +306,7 @@ describe('ThemeDetailComponent', () => {
 
     await component.ngOnInit()
 
-    expect(component.headerImageUrl).toBe(prepareUrl('logo123.png'))
+    expect(component.headerImageUrl).toBe('logo123.png')
   })
 
   it('should set header image url without prefix when theme logo has http/https', async () => {
@@ -375,7 +374,7 @@ describe('ThemeDetailComponent', () => {
     )
 
     component.theme = {
-      version: 1,
+      modificationCount: 1,
       name: 'themeName',
       logoUrl: 'url',
 

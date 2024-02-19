@@ -6,7 +6,7 @@ import { DataView } from 'primeng/dataview'
 
 import { Action, DataViewControlTranslations } from '@onecx/portal-integration-angular'
 
-import { GetThemesResponse, ThemesAPIService } from 'src/app/shared/generated'
+import { GetThemesResponse, ImagesInternalAPIService, Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { limitText } from 'src/app/shared/utils'
 
 @Component({
@@ -30,7 +30,8 @@ export class ThemeSearchComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private themeApi: ThemesAPIService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private imageApi: ImagesInternalAPIService
   ) {}
 
   ngOnInit(): void {
@@ -99,6 +100,16 @@ export class ThemeSearchComponent implements OnInit {
       },
       sortDropdownTooltip: data['SEARCH.SORT_BY']
     }
+  }
+
+  getLogoUrl(theme: Theme | undefined): string | undefined {
+    if (!theme) {
+      return undefined
+    }
+    if (theme.logoUrl != null && theme.logoUrl != '') {
+      return theme.logoUrl
+    }
+    return this.imageApi.configuration.basePath + '/images/' + theme.name + '/logo'
   }
 
   public onNewTheme(): void {

@@ -11,8 +11,8 @@
  */
 
 
-export interface ValidationConstraint { 
-    name?: string;
-    message?: string;
+export enum RefType {
+    Logo = 'logo',
+    Favicon = 'favicon'
 }
 
