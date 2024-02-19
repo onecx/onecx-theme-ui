@@ -301,7 +301,6 @@ export class ThemeDesignerComponent implements OnInit {
   }
 
   private updateTheme(): void {
-    console.log('UPDATE__________________________________DATA' + this.basicForm.controls['logoUrl'].value)
     if (this.propertiesForm.invalid) {
       this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_NOK' })
     } else {
@@ -321,8 +320,6 @@ export class ThemeDesignerComponent implements OnInit {
             } else {
               data.resource.faviconUrl = this.basicForm.controls['logoUrl'].value
             }
-            console.log('exist_____________________________' + this.imageFaviconExists + '--' + this.imageLogoExists)
-            console.log('UPDATEDATA_____________________________' + JSON.stringify(data))
             Object.assign(data.resource, this.basicForm.value)
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             return this.themeApi.updateTheme({
@@ -473,6 +470,7 @@ export class ThemeDesignerComponent implements OnInit {
                 this.imageApi.configuration.basePath + '/images/' + currThemeName + '/' + fieldType
             }
             this.msgService.info({ summaryKey: 'LOGO.UPLOADED' })
+            this.basicForm.controls[fieldType +'Url'].setValue('')
           })
         }
       },
@@ -490,6 +488,7 @@ export class ThemeDesignerComponent implements OnInit {
                   this.imageApi.configuration.basePath + '/images/' + currThemeName + '/' + fieldType
               }
               this.msgService.info({ summaryKey: 'LOGO.UPLOADED' })
+              this.basicForm.controls[fieldType +'Url'].setValue('')
             })
           })
         } else {
