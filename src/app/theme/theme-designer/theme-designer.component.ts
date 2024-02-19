@@ -440,8 +440,10 @@ export class ThemeDesignerComponent implements OnInit {
     const blob = new Blob([files[0]], { type: files[0].type })
     var imageType: RefType
     if (fieldType === 'logo') {
+      this.fetchingLogoUrl = undefined
       imageType = RefType.Logo
     } else {
+      this.fetchingFaviconUrl = undefined
       imageType = RefType.Favicon
     }
     requestParameters = {
@@ -466,11 +468,10 @@ export class ThemeDesignerComponent implements OnInit {
               this.fetchingLogoUrl = this.imageApi.configuration.basePath + '/images/' + currThemeName + '/' + fieldType
             } else {
               this.imageFaviconExists = true
-              this.fetchingFaviconUrl =
-                this.imageApi.configuration.basePath + '/images/' + currThemeName + '/' + fieldType
+              this.fetchingFaviconUrl = this.imageApi.configuration.basePath + '/images/' + currThemeName + '/' + fieldType
             }
             this.msgService.info({ summaryKey: 'LOGO.UPLOADED' })
-            this.basicForm.controls[fieldType +'Url'].setValue('')
+            this.basicForm.controls[fieldType + 'Url'].setValue('')
           })
         }
       },
@@ -480,21 +481,20 @@ export class ThemeDesignerComponent implements OnInit {
             this.imageApi.uploadImage(requestParameters).subscribe((data) => {
               if (fieldType == 'logo') {
                 this.imageLogoExists = true
-                this.fetchingLogoUrl =
-                  this.imageApi.configuration.basePath + '/images/' + currThemeName + '/' + fieldType
+                this.fetchingLogoUrl = this.imageApi.configuration.basePath + '/images/' + currThemeName + '/' + fieldType
               } else {
                 this.imageFaviconExists = true
-                this.fetchingFaviconUrl =
-                  this.imageApi.configuration.basePath + '/images/' + currThemeName + '/' + fieldType
+                this.fetchingFaviconUrl = this.imageApi.configuration.basePath + '/images/' + currThemeName + '/' + fieldType
               }
               this.msgService.info({ summaryKey: 'LOGO.UPLOADED' })
-              this.basicForm.controls[fieldType +'Url'].setValue('')
+              this.basicForm.controls[fieldType + 'Url'].setValue('')
             })
           })
         } else {
           this.displayFileTypeErrorLogo = fieldType === 'logo'
           this.displayFileTypeErrorFavicon = fieldType === 'favicon'
         }
+        
       }
     )
   }
@@ -529,5 +529,25 @@ export class ThemeDesignerComponent implements OnInit {
       return true
     }
     return false
+  }
+
+  inputChange(event: Event, fieldType: string){
+    if (fieldType == 'logo') {
+      setTimeout(()=>{   
+      this.fetchingLogoUrl = this.basicForm.controls['logoUrl'].value
+    }, 1000);
+    } else {
+      setTimeout(()=>{   
+      this.fetchingFaviconUrl = this.basicForm.controls['faviconUrl'].value
+    }, 1000);
+    }
+    
+    if(this.imageLogoExists && this.basicForm.controls['logoUrl'].value==''){
+      this.fetchingLogoUrl = this.imageApi.configuration.basePath + '/images/' + this.theme?.name + '/logo'
+    }
+    if(this.imageFaviconExists && this.basicForm.controls['faviconUrl'].value==''){
+      this.fetchingFaviconUrl = this.imageApi.configuration.basePath + '/images/' + this.theme?.name + '/favicon'
+    }
+    
   }
 }

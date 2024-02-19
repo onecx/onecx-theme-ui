@@ -98,7 +98,7 @@
                       <i class="pi pi-upload"></i>
                     </span>
                     <span class="p-float-label">
-                      <input pInputText type="text" id="theme_detail_upload_logo" formControlName="logoUrl" />
+                      <input pInputText type="text" id="theme_detail_upload_logo" formControlName="logoUrl" (input)="inputChange($event, 'logo')" />
                       <label for="theme_detail_upload_logo">{{ 'Logo' }}</label>
                     </span>
                     <span
@@ -134,7 +134,7 @@
                       <i class="pi pi-upload"></i>
                     </span>
                     <span class="p-float-label">
-                      <input pInputText type="text" id="favicon" formControlName="faviconUrl" />
+                      <input pInputText type="text" id="favicon" formControlName="faviconUrl" (input)="inputChange($event, 'favicon')" />
                       <label for="favicon">Favicon</label>
                     </span>
                     <div class="flex flex-column">
