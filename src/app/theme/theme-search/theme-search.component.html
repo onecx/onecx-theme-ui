@@ -49,7 +49,7 @@
             <div class="col-12 md:col-2 lg:col-2 xl:col-2 text-center">
               <div class="flex flex-column justify-content-center align-items-center gap-1 md:gap-2 h-full">
                 <app-image-container
-                  [imageUrl]="theme.logoUrl"
+                  [imageUrl]="getLogoUrl(theme)"
                   [small]="true"
                   [title]="'LOGO.TOOLTIPS.' + (theme.logoUrl ? 'IMAGE' : 'PLACEHOLDER') | translate"
                 ></app-image-container>
@@ -74,7 +74,7 @@
               <div
                 class="h-3rem md:h-5rem lg:h-6rem flex flex-column justify-content-center align-items-center text-center"
               >
-                <app-image-container [imageUrl]="theme.logoUrl" [small]="false"></app-image-container>
+                <app-image-container [imageUrl]="getLogoUrl(theme)" [small]="false"></app-image-container>
               </div>
               <div class="flex flex-column justify-content-center align-items-center">
                 <app-theme-color-box [properties]="theme.properties" styleClass="h-05rem md:h-1rem" />

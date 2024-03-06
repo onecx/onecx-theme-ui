@@ -30,6 +30,7 @@ export const themeVariables: ThemeVariablesType = {
     'solid-surface-text-color',
     'divider-color',
     'button-hover-bg',
+    'button-active-bg',
     'danger-button-bg',
     'info-message-bg',
     'success-message-bg',

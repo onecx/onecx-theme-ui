@@ -11,8 +11,7 @@
  */
 
 
-export interface Workspace { 
-    name?: string;
-    description?: string;
+export interface ImageInfo { 
+    id?: string;
 }
 

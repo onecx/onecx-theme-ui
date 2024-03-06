@@ -12,7 +12,7 @@
 
 
 export interface ThemeUpdateCreate { 
-    version?: number;
+    modificationCount?: number;
     creationDate?: string;
     creationUser?: string;
     modificationDate?: string;

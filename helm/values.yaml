@@ -30,27 +30,10 @@ app:
             SEARCH: Search theme
     # Keycloak
     keycloak:
-      enabled: true
-      client: |-
-        { 
-          "clientId": "onecx-theme-ui",
-          "enabled": true,
-          "description": "Keycloak client for onecx-theme-ui",
-          "redirectUris": ["*"],
-          "webOrigins": ["*"],
-          "publicClient": true,
-          "protocol": "openid-connect"
-        }
-      roles: |-
-        [
-           {
-             "name": "onecx-theme-admin",
-             "description": "OneCX Theme admin"
-           },
-           {
-             "name": "onecx-theme-user",
-             "description": "OneCX Theme user"
-           }
-         ]
+      client:
+        enabled: true
+        spec:
+          kcConfig:
+            clientId: "onecx-theme-ui"
 
 # PIPE Config

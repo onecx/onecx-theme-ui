@@ -12,7 +12,7 @@
 
 
 export interface Theme { 
-    version?: number;
+    modificationCount?: number;
     creationDate?: string;
     creationUser?: string;
     modificationDate?: string;
