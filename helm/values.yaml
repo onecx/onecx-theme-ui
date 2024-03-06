@@ -34,6 +34,6 @@ app:
         enabled: true
         spec:
           kcConfig:
-            clientId: "onecx-theme-ui"    
+            clientId: "onecx-theme-ui"
 
 # PIPE Config
