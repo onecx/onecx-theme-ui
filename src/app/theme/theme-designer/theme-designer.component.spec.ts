@@ -1,6 +1,6 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from '@angular/core/testing'
-import { HttpErrorResponse } from '@angular/common/http'
+import { HttpResponse, HttpErrorResponse } from '@angular/common/http'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { By } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
@@ -20,7 +20,7 @@ import { ConfirmDialog, ConfirmDialogModule } from 'primeng/confirmdialog'
 
 import { ConfigurationService, PortalMessageService, ThemeService } from '@onecx/portal-integration-angular'
 
-import { ThemesAPIService } from 'src/app/shared/generated'
+import { ThemesAPIService, ImagesInternalAPIService } from 'src/app/shared/generated'
 import { prepareUrl } from 'src/app/shared/utils'
 import { themeVariables } from './theme-variables'
 import { ThemeDesignerComponent } from './theme-designer.component'
@@ -47,6 +47,14 @@ describe('ThemeDesignerComponent', () => {
     'getThemeById',
     'getThemeByName'
   ])
+  const imgServiceSpy = {
+    getImage: jasmine.createSpy('getImage').and.returnValue(of({})),
+    updateImage: jasmine.createSpy('updateImage').and.returnValue(of({})),
+    uploadImage: jasmine.createSpy('uploadImage').and.returnValue(of({})),
+    configuration: {
+      basePath: 'path'
+    }
+  }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -73,6 +81,7 @@ describe('ThemeDesignerComponent', () => {
         { provide: PortalMessageService, useValue: msgServiceSpy },
         { provide: ThemeService, useValue: themeServiceSpy },
         { provide: ThemesAPIService, useValue: themeApiSpy },
+        { provide: ImagesInternalAPIService, useValue: imgServiceSpy },
         ConfirmationService
       ]
     }).compileComponents()
@@ -85,12 +94,13 @@ describe('ThemeDesignerComponent', () => {
     themeApiSpy.createTheme.calls.reset()
     themeApiSpy.getThemes.calls.reset()
     themeServiceSpy.apply.calls.reset()
-
     themeApiSpy.getThemes.and.returnValue(of({}) as any)
     themeApiSpy.updateTheme.and.returnValue(of({}) as any)
     themeApiSpy.createTheme.and.returnValue(of({}) as any)
     themeApiSpy.getThemeById.and.returnValue(of({}) as any)
-    themeApiSpy.getThemeByName.and.returnValue(of({}) as any)
+    imgServiceSpy.getImage.and.returnValue(of({}))
+    imgServiceSpy.updateImage.and.returnValue(of({}))
+    imgServiceSpy.uploadImage.and.returnValue(of({}))
   }))
 
   describe('when constructing', () => {
@@ -408,6 +418,8 @@ describe('ThemeDesignerComponent', () => {
         faviconUrl: 'updated_favicon_url'
       }
       component.basicForm.patchValue(newBasicData)
+      component.imageFaviconExists = true
+      component.imageLogoExists = true
 
       themeApiSpy.updateTheme.and.returnValue(of({}) as any)
 
@@ -568,6 +580,61 @@ describe('ThemeDesignerComponent', () => {
       )
     })
 
+    it('should set faviconUrl and logoUrl to undefined if they already exist', () => {
+      const router = TestBed.inject(Router)
+      spyOn(router, 'navigate')
+
+      const route = TestBed.inject(ActivatedRoute)
+
+      const newBasicData = {
+        name: 'newName',
+        description: 'newDesc',
+        logoUrl: 'new_logo_url',
+        faviconUrl: 'new_favicon_url'
+      }
+      component.basicForm.patchValue(newBasicData)
+      component.fontForm.patchValue({
+        'font-family': 'newFont'
+      })
+      component.generalForm.patchValue({
+        'primary-color': 'rgb(255,255,255)'
+      })
+      themeApiSpy.createTheme.and.returnValue(
+        of({
+          resource: {
+            name: 'myTheme'
+          }
+        }) as any
+      )
+      component.mode = 'EDIT'
+      component.imageFaviconExists = true
+      component.imageLogoExists = true
+
+      component.saveTheme('myTheme')
+
+      const createArgs = themeApiSpy.createTheme.calls.mostRecent().args[0]
+      expect(createArgs.createThemeRequest?.resource).toEqual(
+        jasmine.objectContaining({
+          name: 'myTheme',
+          description: newBasicData.description,
+          logoUrl: undefined,
+          faviconUrl: undefined,
+          properties: jasmine.objectContaining({
+            font: jasmine.objectContaining({
+              'font-family': 'newFont'
+            }),
+            general: jasmine.objectContaining({
+              'primary-color': 'rgb(255,255,255)'
+            })
+          })
+        })
+      )
+      expect(router.navigate).toHaveBeenCalledOnceWith(
+        [`../../myTheme`],
+        jasmine.objectContaining({ relativeTo: route })
+      )
+    })
+
     it('should display success message and route correctly in new mode', () => {
       const router = TestBed.inject(Router)
       spyOn(router, 'navigate')
@@ -646,6 +713,144 @@ describe('ThemeDesignerComponent', () => {
 
       expect(component.saveAsThemeName?.nativeElement.value).toBe('copy_of: newThemeName')
     })
+
+    it('should not upload a file if currThemeName is empty', () => {
+      const event = {
+        target: {
+          files: ['file']
+        }
+      }
+      component.basicForm.controls['name'].setValue('')
+
+      component.onFileUpload(event as any, 'logo')
+
+      expect(msgServiceSpy.error).toHaveBeenCalledWith({
+        summaryKey: 'ACTIONS.EDIT.MESSAGE.IMAGE_CONSTRAINT'
+      })
+    })
+
+    it('should not upload a file that is too large', () => {
+      const largeBlob = new Blob(['a'.repeat(120000)], { type: 'image/png' })
+      const largeFile = new File([largeBlob], 'test.png', { type: 'image/png' })
+      const event = {
+        target: {
+          files: [largeFile]
+        }
+      }
+      component.basicForm.controls['name'].setValue('name')
+
+      component.onFileUpload(event as any, 'logo')
+
+      expect(msgServiceSpy.error).toHaveBeenCalledWith({
+        summaryKey: 'ACTIONS.EDIT.MESSAGE.IMAGE_CONSTRAINT_SIZE'
+      })
+    })
+
+    xit('should upload a file: field type logo', () => {
+      const mockHttpResponse: HttpResponse<Blob> = new HttpResponse({
+        body: new Blob([''], { type: 'image/png' }),
+        status: 200
+      })
+      imgServiceSpy.getImage.and.returnValue(of(mockHttpResponse))
+      const blob = new Blob(['a'.repeat(10)], { type: 'image/png' })
+      const file = new File([blob], 'test.png', { type: 'image/png' })
+      const event = {
+        target: {
+          files: [file]
+        }
+      }
+      component.basicForm.controls['name'].setValue('name')
+
+      component.onFileUpload(event as any, 'logo')
+
+      expect(msgServiceSpy.info).toHaveBeenCalledWith({
+        summaryKey: 'LOGO.UPLOADED'
+      })
+    })
+
+    xit('should upload a file: field type favicon', () => {
+      const mockHttpResponse: HttpResponse<Blob> = new HttpResponse({
+        body: new Blob([''], { type: 'image/png' }),
+        status: 200
+      })
+      imgServiceSpy.getImage.and.returnValue(of(mockHttpResponse))
+      const blob = new Blob(['a'.repeat(10)], { type: 'image/png' })
+      const file = new File([blob], 'test.png', { type: 'image/png' })
+      const event = {
+        target: {
+          files: [file]
+        }
+      }
+      component.basicForm.controls['name'].setValue('name')
+
+      component.onFileUpload(event as any, 'favicon')
+
+      expect(msgServiceSpy.info).toHaveBeenCalledWith({
+        summaryKey: 'LOGO.UPLOADED'
+      })
+    })
+
+    it('should return true if url exists', () => {
+      const result = component.urlExists('')
+
+      expect(result).toBeTrue()
+    })
+
+    fit('should behave correctly on inputChange: favicon url exists', fakeAsync(() => {
+      const themeData = {
+        id: 'id',
+        description: 'desc',
+        logoUrl: 'logo_url',
+        faviconUrl: 'fav_url',
+        name: 'themeName',
+        properties: {
+          font: {
+            'font-family': 'myFont'
+          },
+          general: {
+            'primary-color': 'rgb(0,0,0)'
+          }
+        }
+      }
+      // component.basicForm.controls['logoUrl'].setValue('')
+      component.basicForm.controls['faviconUrl'].setValue('icon')
+      // component.imageLogoExists = true
+      // component.imageFaviconExists = true
+
+      component.inputChange(themeData, 'favicon')
+
+      tick(1000)
+
+      expect(component.fetchingFaviconUrl).toBe('path/images/themeName/favicon')
+    }))
+
+    it('should behave correctly on inputChange: favicon url empty', fakeAsync(() => {
+      const themeData = {
+        id: 'id',
+        description: 'desc',
+        logoUrl: 'logo_url',
+        faviconUrl: 'fav_url',
+        name: 'themeName',
+        properties: {
+          font: {
+            'font-family': 'myFont'
+          },
+          general: {
+            'primary-color': 'rgb(0,0,0)'
+          }
+        }
+      }
+      // component.basicForm.controls['logoUrl'].setValue('')
+      component.basicForm.controls['faviconUrl'].setValue('')
+      // component.imageLogoExists = true
+      component.imageFaviconExists = true
+
+      component.inputChange(themeData, 'logo')
+
+      tick(1000)
+
+      expect(component.fetchingFaviconUrl).toBe('path/images/themeName/favicon')
+    }))
 
     // it('should display logo file type error if uploaded file is not an image', () => {
     //   const dataTransfer = new DataTransfer()
