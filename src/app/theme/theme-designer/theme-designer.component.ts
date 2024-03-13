@@ -156,6 +156,7 @@ export class ThemeDesignerComponent implements OnInit {
       this.themeApi.getThemeByName({ name: this.themeName }).subscribe((data) => {
         this.theme = data.resource
         this.basicForm.patchValue(data.resource)
+        this.basicForm.controls['name'].disable()
         this.propertiesForm.reset()
         this.propertiesForm.patchValue(data.resource.properties || {})
         this.fetchingLogoUrl = this.getImageUrl(this.theme, 'logo')
