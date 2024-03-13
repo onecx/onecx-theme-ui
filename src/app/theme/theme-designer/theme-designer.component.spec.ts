@@ -177,22 +177,22 @@ describe('ThemeDesignerComponent', () => {
 
       component.autoApply = true
 
-      const fontFormControlEl = fixture.debugElement.query(By.css('#font-family'))
+      const fontFormControlEl = fixture.debugElement.query(By.css('#theme_detail_font-family'))
       expect(fontFormControlEl).toBeDefined()
       fontFormControlEl.nativeElement.value = 'newFamily'
       fontFormControlEl.nativeElement.dispatchEvent(new Event('input'))
 
-      const generalFormControlEl = fixture.debugElement.query(By.css('#color-primary-color'))
+      const generalFormControlEl = fixture.debugElement.query(By.css('#theme_detail_item_color-primary-color'))
       expect(generalFormControlEl).toBeDefined()
       generalFormControlEl.nativeElement.value = 'rgba(0, 0, 0, 0.87)'
       generalFormControlEl.nativeElement.dispatchEvent(new Event('input'))
 
-      const topbarFormControlEl = fixture.debugElement.query(By.css('#color-topbar-bg-color'))
+      const topbarFormControlEl = fixture.debugElement.query(By.css('#theme_detail_item_color-topbar-bg-color'))
       expect(topbarFormControlEl).toBeDefined()
       topbarFormControlEl.nativeElement.value = '#000000'
       topbarFormControlEl.nativeElement.dispatchEvent(new Event('input'))
 
-      const sidebarFormControlEl = fixture.debugElement.query(By.css('#color-menu-text-color'))
+      const sidebarFormControlEl = fixture.debugElement.query(By.css('#theme_detail_item_color-menu-text-color'))
       expect(sidebarFormControlEl).toBeDefined()
       sidebarFormControlEl.nativeElement.value = '#102030'
       sidebarFormControlEl.nativeElement.dispatchEvent(new Event('input'))
