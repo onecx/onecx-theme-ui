@@ -14,12 +14,12 @@
           [title]="'THEME.DETAIL.AUTO_APPLY.TOOLTIP' | translate"
         >
           <p-inputSwitch
-            id="autoApplyToggle"
+            id="theme_designer_header_is_current_theme"
             name="autoApplyToggle"
             [disabled]="themeIsCurrentUsedTheme"
             [(ngModel)]="autoApply || themeIsCurrentUsedTheme"
           ></p-inputSwitch>
-          <label for="autoApplyToggle">{{ 'THEME.DETAIL.AUTO_APPLY' | translate }}</label>
+          <label for="theme_designer_header_is_current_theme">{{ 'THEME.DETAIL.AUTO_APPLY' | translate }}</label>
         </div>
         <span
           *ngIf="themeIsCurrentUsedTheme"
@@ -31,6 +31,7 @@
           <span class="p-float-label">
             <p-dropdown
               #themeTemplate
+              id="theme_designer_fields_selected_theme"
               [options]="themeTemplates"
               styleClass="w-full"
               [(ngModel)]="themeTemplateSelectedId"
@@ -39,7 +40,9 @@
               [autoDisplayFirst]="false"
               [title]="'THEME.TEMPLATE.SELECTOR.TOOLTIP' | translate"
             ></p-dropdown>
-            <label for="themeSelector" class="white-space-nowrap">{{ 'THEME.TEMPLATE.SELECTOR' | translate }}</label>
+            <label for="theme_designer_fields_selected_theme" class="white-space-nowrap">
+              {{ 'THEME.TEMPLATE.SELECTOR' | translate }}</label
+            >
           </span>
         </div>
       </div>
@@ -52,14 +55,14 @@
           <div [formGroup]="basicForm" class="grid grid-nogutter formgrid p-fluid mx-1">
             <div class="field col-12 mb-4">
               <span class="p-float-label" controlErrorAnchor>
-                <input pInputText type="text" id="name" formControlName="name" />
-                <label class="ocx-required-label" for="name">Name</label>
+                <input pInputText type="text" id="theme_designer_field_name" formControlName="name" />
+                <label class="ocx-required-label" for="theme_designer_field_name">Name</label>
               </span>
             </div>
             <div class="field col-12 mb-4">
               <span class="p-float-label">
-                <input pInputText type="text" id="description" formControlName="description" />
-                <label for="theme_detail_item_description">{{ 'THEME.DESCRIPTION' | translate }}</label>
+                <input pInputText type="text" id="theme_designer_field_description" formControlName="description" />
+                <label for="theme_designer_field_description">{{ 'THEME.DESCRIPTION' | translate }}</label>
               </span>
             </div>
             <!-- helper inputs because p-fileupload does not work inside inputgroup -->
@@ -116,7 +119,7 @@
                       <i class="pi pi-upload"></i>
                     </span>
                   </div>
-                  <label *ngIf="displayFileTypeErrorLogo" class="control-error">
+                  <label *ngIf="displayFileTypeErrorLogo" for="theme_detail_upload_logo" class="control-error">
                     {{ 'VALIDATION.ERRORS.FILETYPE_PATTERN_ERROR' | translate }}
                   </label>
                 </div>
@@ -144,10 +147,11 @@
                         pInputText
                         type="text"
                         id="favicon"
+                        id="theme_detail_upload_favicon"
                         formControlName="faviconUrl"
                         (input)="inputChange(theme, 'favicon')"
                       />
-                      <label for="favicon">Favicon</label>
+                      <label for="theme_detail_upload_favicon">Favicon</label>
                     </span>
                     <div class="flex flex-column">
                       <span
@@ -160,7 +164,11 @@
                       </span>
                     </div>
                   </div>
-                  <label *ngIf="this.displayFileTypeErrorFavicon" class="control-error">
+                  <label
+                    *ngIf="this.displayFileTypeErrorFavicon"
+                    for="theme_detail_upload_favicon"
+                    class="control-error"
+                  >
                     {{ 'VALIDATION.ERRORS.FILETYPE_PATTERN_ERROR' | translate }}
                   </label>
                 </div>
@@ -177,16 +185,28 @@
             <div class="col-12 sm:col-9 md:col-9 lg:col-9 xl:9">
               <div class="p-inputgroup px-3">
                 <span class="p-float-label">
-                  <input pInputText type="text" id="font-family" formControlName="font-family" class="w-full" />
-                  <label for="font-family">font-family</label>
+                  <input
+                    pInputText
+                    type="text"
+                    id="theme_detail_font-family"
+                    formControlName="font-family"
+                    class="w-full"
+                  />
+                  <label for="theme_detail_font-family">font-family</label>
                 </span>
               </div>
             </div>
             <div class="col-12 sm:col-3 md:col-3 lg:col-3 xl:3">
               <div class="p-inputgroup px-3">
                 <span class="p-float-label">
-                  <input pInputText type="text" id="font-size" formControlName="font-size" class="w-full" />
-                  <label for="font-size">font-size</label>
+                  <input
+                    pInputText
+                    type="text"
+                    id="theme_detail_font-size"
+                    formControlName="font-size"
+                    class="w-full"
+                  />
+                  <label for="theme_detail_font-size">font-size</label>
                 </span>
               </div>
             </div>
@@ -203,11 +223,11 @@
                 <span class="p-float-label">
                   <input
                     pInputText
-                    id="color-{{ item }}"
+                    id="theme_detail_item_color-{{ item }}"
                     [formControlName]="item"
                     [value]="group.formGroup.value[item]"
                   />
-                  <label for="color-{{ item }}">{{ item }}</label>
+                  <label for="theme_detail_item_color-{{ item }}">{{ item }}</label>
                 </span>
                 <p-overlayPanel #op>
                   <ng-template pTemplate>

@@ -419,7 +419,7 @@ export class ThemeDesignerComponent implements OnInit {
 
   // Image Files
   public onFileUpload(ev: Event, fieldType: 'logo' | 'favicon'): void {
-    var currThemeName = this.basicForm.controls['name'].value
+    let currThemeName = this.basicForm.controls['name'].value
     this.displayFileTypeErrorLogo = false
     this.displayFileTypeErrorFavicon = false
     if (ev.target && (ev.target as HTMLInputElement).files) {
@@ -437,26 +437,26 @@ export class ThemeDesignerComponent implements OnInit {
 
   saveImage(currThemeName: string, fieldType: string, files: FileList) {
     // Set request parameter
-    var requestParameters: UploadImageRequestParams
+    if (!currThemeName || currThemeName === '') return
+    let requestParameters: UploadImageRequestParams
     const blob = new Blob([files[0]], { type: files[0].type })
-    var imageType: RefType
+    let imageType: RefType = RefType.Logo
     if (fieldType === 'logo') {
       this.fetchingLogoUrl = undefined
-      imageType = RefType.Logo
     } else {
       this.fetchingFaviconUrl = undefined
       imageType = RefType.Favicon
     }
     requestParameters = {
       contentLength: files.length,
-      refId: currThemeName!,
+      refId: currThemeName,
       refType: imageType,
       body: blob
     }
 
-    var requestParametersGet: GetImageRequestParams
+    let requestParametersGet: GetImageRequestParams
     requestParametersGet = {
-      refId: currThemeName!,
+      refId: currThemeName,
       refType: imageType
     }
 
@@ -464,7 +464,7 @@ export class ThemeDesignerComponent implements OnInit {
       (res) => {
         if (files[0].name.match(/^.*.(jpg|jpeg|png)$/)) {
           this.imageApi.updateImage(requestParameters).subscribe((data) => {
-            if (fieldType == 'logo') {
+            if (fieldType === 'logo') {
               this.imageLogoExists = true
               this.fetchingLogoUrl = this.imageApi.configuration.basePath + '/images/' + currThemeName + '/' + fieldType
             } else {
@@ -481,7 +481,7 @@ export class ThemeDesignerComponent implements OnInit {
         if (files[0].name.match(/^.*.(jpg|jpeg|png)$/)) {
           Array.from(files).forEach((file) => {
             this.imageApi.uploadImage(requestParameters).subscribe((data) => {
-              if (fieldType == 'logo') {
+              if (fieldType === 'logo') {
                 this.imageLogoExists = true
                 this.fetchingLogoUrl =
                   this.imageApi.configuration.basePath + '/images/' + currThemeName + '/' + fieldType
@@ -503,8 +503,8 @@ export class ThemeDesignerComponent implements OnInit {
   }
 
   constraintUpload(): boolean {
-    var currThemeName = this.basicForm.controls['name'].value
-    if (currThemeName == null || currThemeName == '') {
+    const currThemeName = this.basicForm.controls['name'].value
+    if (currThemeName === null || currThemeName === '') {
       return false
     }
     return true
@@ -514,13 +514,13 @@ export class ThemeDesignerComponent implements OnInit {
     if (!theme) {
       return undefined
     }
-    if (imageType == 'logo') {
-      if (theme.logoUrl != null && theme.logoUrl != '') {
+    if (imageType === 'logo') {
+      if (theme.logoUrl !== null && theme.logoUrl != '') {
         return theme.logoUrl
       }
       return this.imageApi.configuration.basePath + '/images/' + theme.name + '/logo'
     } else {
-      if (theme.faviconUrl != null && theme.faviconUrl != '') {
+      if (theme.faviconUrl !== null && theme.faviconUrl !== '') {
         return theme.faviconUrl
       }
       return this.imageApi.configuration.basePath + '/images/' + theme.name + '/favicon'
@@ -528,24 +528,21 @@ export class ThemeDesignerComponent implements OnInit {
   }
 
   urlExists(url: string | undefined): boolean {
-    if (url == undefined || url === '') {
-      return true
-    }
-    return false
+    return !url || url === ''
   }
 
   inputChange(theme: Theme | undefined, fieldType: string) {
     setTimeout(() => {
-      if (fieldType == 'logo') {
+      if (fieldType === 'logo') {
         this.fetchingLogoUrl = this.basicForm.controls['logoUrl'].value
       } else {
         this.fetchingFaviconUrl = this.basicForm.controls['faviconUrl'].value
       }
 
-      if (this.imageLogoExists && this.basicForm.controls['logoUrl'].value == '') {
+      if (this.imageLogoExists && this.basicForm.controls['logoUrl'].value === '') {
         this.fetchingLogoUrl = this.imageApi.configuration.basePath + '/images/' + theme?.name + '/logo'
       }
-      if (this.imageFaviconExists && this.basicForm.controls['faviconUrl'].value == '') {
+      if (this.imageFaviconExists && this.basicForm.controls['faviconUrl'].value === '') {
         this.fetchingFaviconUrl = this.imageApi.configuration.basePath + '/images/' + theme?.name + '/favicon'
       }
     }, 1000)
