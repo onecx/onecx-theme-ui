@@ -23,7 +23,7 @@ export function dropDownSortItemsByLabel(a: SelectItem, b: SelectItem): number {
     b.label ? (b.label as string).toUpperCase() : ''
   )
 }
-export function dropDownGetLabelByValue(ddArray: SelectItem[], val: string): string | undefined {
+export function dropDownGetLabelByValue(ddArray: SelectItem[], val: string): string {
   const a: any = ddArray.find((item: SelectItem) => {
     return item?.value == val
   })

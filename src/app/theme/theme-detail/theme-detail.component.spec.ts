@@ -9,7 +9,7 @@ import { TranslateTestingModule } from 'ngx-translate-testing'
 import { of, throwError } from 'rxjs'
 import FileSaver from 'file-saver'
 
-import { ConfigurationService, PortalMessageService } from '@onecx/portal-integration-angular'
+import { ConfigurationService, PortalMessageService, UserService } from '@onecx/portal-integration-angular'
 
 import { ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeDetailComponent } from './theme-detail.component'
@@ -19,16 +19,16 @@ describe('ThemeDetailComponent', () => {
   let fixture: ComponentFixture<ThemeDetailComponent>
   let translateService: TranslateService
 
+  const mockUserService = {
+    lang$: {
+      getValue: jasmine.createSpy('getValue').and.returnValue('en')
+    }
+  }
   const msgServiceSpy = jasmine.createSpyObj<PortalMessageService>('PortalMessageService', ['success', 'error'])
 
   const configServiceSpy = {
     getProperty: jasmine.createSpy('getProperty').and.returnValue('123'),
-    getPortal: jasmine.createSpy('getPortal').and.returnValue({
-      themeId: '1234',
-      portalName: 'test',
-      baseUrl: '/',
-      microfrontendRegistrations: []
-    })
+    lang: 'en'
   }
   const themesApiSpy = jasmine.createSpyObj<ThemesAPIService>('ThemesAPIService', [
     'getThemeByName',
@@ -49,6 +49,7 @@ describe('ThemeDetailComponent', () => {
         }).withDefaultLanguage('de')
       ],
       providers: [
+        { provide: UserService, useValue: mockUserService },
         { provide: PortalMessageService, useValue: msgServiceSpy },
         { provide: ConfigurationService, useValue: configServiceSpy },
         { provide: ThemesAPIService, useValue: themesApiSpy }
@@ -69,6 +70,12 @@ describe('ThemeDetailComponent', () => {
     component = fixture.componentInstance
     fixture.detectChanges()
   })
+
+  function initializeComponent(): void {
+    fixture = TestBed.createComponent(ThemeDetailComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+  }
 
   it('should create', () => {
     expect(component).toBeTruthy()
@@ -97,11 +104,15 @@ describe('ThemeDetailComponent', () => {
 
   it('should create with default dateFormat', async () => {
     // recreate component to test constructor
-    fixture = TestBed.createComponent(ThemeDetailComponent)
-    component = fixture.componentInstance
-    fixture.detectChanges()
+    initializeComponent()
 
     expect(component.dateFormat).toBe('medium')
+  })
+
+  it('should call this.user.lang$ from the constructor and set this.dateFormat to the default format if user.lang$ is not de', () => {
+    mockUserService.lang$.getValue.and.returnValue('de')
+    initializeComponent()
+    expect(component.dateFormat).toEqual('dd.MM.yyyy HH:mm:ss')
   })
 
   it('should load theme and action translations on successful call', async () => {

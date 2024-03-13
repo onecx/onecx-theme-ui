@@ -106,7 +106,7 @@ export class ThemeImportComponent implements OnInit {
       if (themes.stream) {
         this.themes = themes.stream
       }
-      if (emit) this.uploadEmitter.emit()
+      // if (emit) this.uploadEmitter.emit()
     })
   }
 }
