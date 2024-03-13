@@ -242,7 +242,7 @@ export class ThemeDesignerComponent implements OnInit {
   }
 
   public onThemeTemplateDropdownChange(): void {
-    const themeName = dropDownGetLabelByValue(this.themeTemplates, this.themeTemplateSelectedId) ?? ''
+    const themeName = dropDownGetLabelByValue(this.themeTemplates, this.themeTemplateSelectedId)
     this.translate
       .get([
         'GENERAL.COPY_OF',

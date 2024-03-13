@@ -18,7 +18,7 @@ import { DropdownModule } from 'primeng/dropdown'
 import { OverlayPanelModule } from 'primeng/overlaypanel'
 import { ConfirmDialog, ConfirmDialogModule } from 'primeng/confirmdialog'
 
-import { ConfigurationService, PortalMessageService, ThemeService } from '@onecx/portal-integration-angular'
+import { PortalMessageService, ThemeService } from '@onecx/portal-integration-angular'
 
 import { ThemesAPIService, ImagesInternalAPIService } from 'src/app/shared/generated'
 import { prepareUrl } from 'src/app/shared/utils'
@@ -30,15 +30,6 @@ describe('ThemeDesignerComponent', () => {
   let fixture: ComponentFixture<ThemeDesignerComponent>
 
   const msgServiceSpy = jasmine.createSpyObj<PortalMessageService>('PortalMessageService', ['success', 'error', 'info'])
-  const configServiceSpy = {
-    getProperty: jasmine.createSpy('getProperty').and.returnValue('123'),
-    getPortal: jasmine.createSpy('getPortal').and.returnValue({
-      themeId: '1234',
-      portalName: 'test',
-      baseUrl: '/',
-      microfrontendRegistrations: []
-    })
-  }
   const themeServiceSpy = jasmine.createSpyObj<ThemeService>('ThemeService', ['apply'])
   const themeApiSpy = jasmine.createSpyObj<ThemesAPIService>('ThemesAPIService', [
     'getThemes',
@@ -77,7 +68,6 @@ describe('ThemeDesignerComponent', () => {
       ],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
-        { provide: ConfigurationService, useValue: configServiceSpy },
         { provide: PortalMessageService, useValue: msgServiceSpy },
         { provide: ThemeService, useValue: themeServiceSpy },
         { provide: ThemesAPIService, useValue: themeApiSpy },
@@ -103,6 +93,12 @@ describe('ThemeDesignerComponent', () => {
     imgServiceSpy.uploadImage.and.returnValue(of({}))
   }))
 
+  function initializeComponent(): void {
+    fixture = TestBed.createComponent(ThemeDesignerComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+  }
+
   describe('when constructing', () => {
     beforeEach(() => {})
 
@@ -110,9 +106,7 @@ describe('ThemeDesignerComponent', () => {
       const activatedRoute = TestBed.inject(ActivatedRoute)
       spyOn(activatedRoute.snapshot.paramMap, 'has').and.returnValue(true)
 
-      fixture = TestBed.createComponent(ThemeDesignerComponent)
-      component = fixture.componentInstance
-      fixture.detectChanges()
+      initializeComponent()
 
       expect(component.mode).toBe('EDIT')
     })
@@ -121,9 +115,7 @@ describe('ThemeDesignerComponent', () => {
       const activatedRoute = TestBed.inject(ActivatedRoute)
       spyOn(activatedRoute.snapshot.paramMap, 'has').and.returnValue(false)
 
-      fixture = TestBed.createComponent(ThemeDesignerComponent)
-      component = fixture.componentInstance
-      fixture.detectChanges()
+      initializeComponent()
 
       expect(component.mode).toBe('NEW')
     })
@@ -132,9 +124,7 @@ describe('ThemeDesignerComponent', () => {
       const activatedRoute = TestBed.inject(ActivatedRoute)
       spyOn(activatedRoute.snapshot.paramMap, 'get').and.returnValue('themeName')
 
-      fixture = TestBed.createComponent(ThemeDesignerComponent)
-      component = fixture.componentInstance
-      fixture.detectChanges()
+      initializeComponent()
 
       expect(component.themeName).toBe('themeName')
       expect(component.themeIsCurrentUsedTheme).toBeFalse()
@@ -156,9 +146,7 @@ describe('ThemeDesignerComponent', () => {
       }
       spyOn(translateService, 'get').and.returnValue(of(actionsTranslations))
 
-      fixture = TestBed.createComponent(ThemeDesignerComponent)
-      component = fixture.componentInstance
-      fixture.detectChanges()
+      initializeComponent()
 
       // simulate async pipe
       component.actions$?.subscribe((actions) => {
@@ -185,9 +173,7 @@ describe('ThemeDesignerComponent', () => {
     })
 
     it('should update document style on form changes', fakeAsync(() => {
-      fixture = TestBed.createComponent(ThemeDesignerComponent)
-      component = fixture.componentInstance
-      fixture.detectChanges()
+      initializeComponent()
 
       component.autoApply = true
 
@@ -219,14 +205,18 @@ describe('ThemeDesignerComponent', () => {
       expect(document.documentElement.style.getPropertyValue(`--topbar-bg-color-rgb`)).toBe('0,0,0')
       expect(document.documentElement.style.getPropertyValue(`--menu-text-color`)).toBe('#102030')
       expect(document.documentElement.style.getPropertyValue(`--menu-text-color-rgb`)).toBe('16,32,48')
+
+      sidebarFormControlEl.nativeElement.value = null
+      sidebarFormControlEl.nativeElement.dispatchEvent(new Event('input'))
+      fixture.detectChanges()
+      tick(300)
+      expect(document.documentElement.style.getPropertyValue(`--menu-text-color`)).toBe('')
     }))
   })
 
   describe('after creation', () => {
     beforeEach(() => {
-      fixture = TestBed.createComponent(ThemeDesignerComponent)
-      component = fixture.componentInstance
-      fixture.detectChanges()
+      initializeComponent()
     })
 
     it('should create', () => {
