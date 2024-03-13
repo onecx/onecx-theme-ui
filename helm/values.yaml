@@ -12,8 +12,8 @@ app:
       enabled: true
       spec:
         exposedModule: "./OneCXThemeModule"
-        description: "OneCX Theme Module"
-        note: "OneCX Theme UI module auto import via MF operator"
+        description: "OneCX Theme UI"
+        note: "OneCX Theme UI auto import via MF operator"
     # Permission
     permission:
       enabled: true
@@ -21,13 +21,13 @@ app:
         permissions:
           THEME:
             CREATE: Create theme
-            EDIT: Edit theme
             DELETE: Delete theme
+            EDIT: Edit theme
             SAVE: Update and save theme
+            SEARCH: Search theme
+            VIEW: View mode for theme
             IMPORT: Import theme
             EXPORT: Export theme
-            VIEW: View mode for theme
-            SEARCH: Search theme
     # Keycloak
     keycloak:
       client:
