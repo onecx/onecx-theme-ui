@@ -136,6 +136,6 @@
     "url-loader": "^4.1.1",
     "webpack": "^5.82.0",
     "webpack-merge": "^5.8.0",
-    "winston": "^3.8.2"
+    "winston": "^3.12.0"
   }
 }
