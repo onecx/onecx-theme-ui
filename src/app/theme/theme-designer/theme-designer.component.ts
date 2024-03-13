@@ -437,7 +437,6 @@ export class ThemeDesignerComponent implements OnInit {
 
   saveImage(currThemeName: string, fieldType: string, files: FileList) {
     // Set request parameter
-    if (!currThemeName || currThemeName === '') return
     let requestParameters: UploadImageRequestParams
     const blob = new Blob([files[0]], { type: files[0].type })
     let imageType: RefType = RefType.Logo
