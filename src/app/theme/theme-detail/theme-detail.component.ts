@@ -22,11 +22,11 @@ import {
 })
 export class ThemeDetailComponent implements OnInit {
   theme: Theme | undefined
-  usedInWorkspace: Workspace[] | undefined
+  usedInWorkspaces: Workspace[] | undefined
   themeName!: string
   themeDeleteVisible = false
   themeDeleteMessage = ''
-  themePortalList = ''
+  workspaceList = ''
   loading = true
   public dateFormat = 'medium'
   // page header
@@ -58,7 +58,7 @@ export class ThemeDetailComponent implements OnInit {
       .subscribe({
         next: (data) => {
           this.theme = data.resource
-          this.usedInWorkspace = data.workspaces
+          this.usedInWorkspaces = data.workspaces
           this.preparePage()
           this.headerImageUrl = this.getLogoUrl(this.theme)
         },
@@ -144,7 +144,7 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   private prepareObjectDetails(data: any): void {
-    this.themePortalList = this.prepareUsedInPortalList()
+    this.workspaceList = this.prepareWorkspaceList()
     if (this.theme) {
       this.objectDetails = [
         {
@@ -163,7 +163,7 @@ export class ThemeDetailComponent implements OnInit {
         },
         {
           label: data['THEME.WORKSPACES'],
-          value: limitText(this.themePortalList, 100),
+          value: limitText(this.workspaceList, 100),
           tooltip: data['THEME.TOOLTIPS.WORKSPACES']
         }
       ]
@@ -211,8 +211,8 @@ export class ThemeDetailComponent implements OnInit {
     }
   }
 
-  public prepareUsedInPortalList(): string {
-    const arr = this.usedInWorkspace?.map((workspace: Workspace) => workspace.name)
+  public prepareWorkspaceList(): string {
+    const arr = this.usedInWorkspaces?.map((workspace: Workspace) => workspace.name)
     return arr?.sort(sortByLocale).join(', ') ?? ''
   }
 
