@@ -75,7 +75,7 @@ export class ThemeImportComponent implements OnInit {
     this.themeImportError = false
   }
   public onThemeUpload(): void {
-    if (!this.themeSnapshot || !this.themeSnapshot.themes) return
+    if (!this.themeSnapshot?.themes) return
     let key: string[] = Object.keys(this.themeSnapshot?.themes)
     if (key[0] !== this.themeName) {
       // save the theme properties to be reassigned on new key
@@ -85,7 +85,7 @@ export class ThemeImportComponent implements OnInit {
     }
     this.themeApi
       .importThemes({
-        themeSnapshot: this.themeSnapshot as ThemeSnapshot
+        themeSnapshot: this.themeSnapshot
       })
       .subscribe({
         next: (data) => {
