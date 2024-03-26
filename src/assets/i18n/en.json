@@ -18,7 +18,7 @@
     "DELETE": {
       "LABEL": "Delete",
       "TOOLTIP": "Delete theme",
-      "THEME_MESSAGE": "Do you want to delete {{ITEM}}?",
+      "THEME_MESSAGE": "Do you want to delete \"{{ITEM}}\"?",
       "MESSAGE_INFO": "This action cannot be undone!",
       "THEME_NOK": "Theme could not be deleted",
       "THEME_OK": "Theme deleted successfully"

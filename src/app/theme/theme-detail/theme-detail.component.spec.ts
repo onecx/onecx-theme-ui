@@ -154,7 +154,7 @@ describe('ThemeDetailComponent', () => {
     await component.ngOnInit()
 
     expect(component.theme).toEqual(themeResponse['resource'])
-    expect(component.usedInWorkspace).toEqual(themeResponse['workspaces'])
+    expect(component.usedInWorkspaces).toEqual(themeResponse['workspaces'])
 
     expect(component.actions.length).toBe(4)
     const closeAction = component.actions.filter(
@@ -198,10 +198,10 @@ describe('ThemeDetailComponent', () => {
       },
       workspaces: [
         {
-          name: 'portal1'
+          name: 'workspace1'
         },
         {
-          name: 'myPortal'
+          name: 'workspace2'
         }
       ]
     }
@@ -231,7 +231,7 @@ describe('ThemeDetailComponent', () => {
 
     await component.ngOnInit()
 
-    expect(component.themePortalList).toBe('myPortal, portal1')
+    expect(component.workspaceList).toBe('workspace1, workspace2')
     expect(component.objectDetails.length).toBe(3)
     const creationDate = component.objectDetails.filter(
       (detail) => detail.label === 'detailCreationDate' && detail.tooltip === 'detailTooltipsCreationDate'
@@ -246,7 +246,7 @@ describe('ThemeDetailComponent', () => {
     const workspaces = component.objectDetails.filter(
       (detail) => detail.label === 'themeWorkspaces' && detail.tooltip === 'themeTooltipsWorkspaces'
     )[0]
-    expect(workspaces.value).toBe('myPortal, portal1')
+    expect(workspaces.value).toBe('workspace1, workspace2')
   })
 
   it('should display not found error and close page on theme fetch failure', () => {
@@ -289,10 +289,10 @@ describe('ThemeDetailComponent', () => {
     expect(component.close).toHaveBeenCalledTimes(1)
   })
 
-  it('should return empty string if theme has no portals', () => {
+  it('should return empty string if theme has no workspaces', () => {
     component.theme = undefined
 
-    const result = component.prepareUsedInPortalList()
+    const result = component.prepareWorkspaceList()
     expect(result).toBe('')
   })
 

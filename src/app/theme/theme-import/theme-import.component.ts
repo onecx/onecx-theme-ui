@@ -36,7 +36,7 @@ export class ThemeImportComponent implements OnInit {
   ngOnInit(): void {
     this.httpHeaders = new HttpHeaders()
     this.httpHeaders = this.httpHeaders.set('Content-Type', 'application/json')
-    this.getThemes(false)
+    this.getThemes()
   }
 
   public async onImportThemeSelect(event: { files: FileList }): Promise<void> {
@@ -47,8 +47,10 @@ export class ThemeImportComponent implements OnInit {
         if (this.isThemeImportRequestDTO(themeSnapshot)) {
           this.themeSnapshot = themeSnapshot
           this.themeImportError = false
-          if (themeSnapshot.themes !== undefined) {
-            this.properties = themeSnapshot.themes[Object.keys(themeSnapshot.themes)[0]].properties
+          if (themeSnapshot.themes) {
+            let key: string[] = Object.keys(themeSnapshot.themes)
+            this.themeName = key[0]
+            this.properties = themeSnapshot.themes[key[0]].properties
           }
           this.checkThemeExistence()
         } else {
@@ -62,12 +64,7 @@ export class ThemeImportComponent implements OnInit {
   }
 
   public checkThemeExistence() {
-    this.themeNameExists = false
-    if (this.themeSnapshot?.themes) {
-      if (this.themes.find((theme) => Object.keys(this.themeSnapshot!.themes!).indexOf(theme.name!) > -1)) {
-        this.themeNameExists = true
-      }
-    }
+    this.themeNameExists = this.themes.filter((theme) => theme.name === this.themeName).length > 0
   }
 
   public onImportThemeHide(): void {
@@ -78,9 +75,17 @@ export class ThemeImportComponent implements OnInit {
     this.themeImportError = false
   }
   public onThemeUpload(): void {
+    if (!this.themeSnapshot?.themes) return
+    let key: string[] = Object.keys(this.themeSnapshot?.themes)
+    if (key[0] !== this.themeName) {
+      // save the theme properties to be reassigned on new key
+      let themeProps = Object.getOwnPropertyDescriptor(this.themeSnapshot.themes, key[0])
+      Object.defineProperty(this.themeSnapshot.themes, this.themeName, themeProps ?? {})
+      delete this.themeSnapshot.themes[key[0]]
+    }
     this.themeApi
       .importThemes({
-        themeSnapshot: this.themeSnapshot as ThemeSnapshot
+        themeSnapshot: this.themeSnapshot
       })
       .subscribe({
         next: (data) => {
@@ -88,7 +93,7 @@ export class ThemeImportComponent implements OnInit {
           this.onImportThemeClear()
           this.displayThemeImport = false
           this.uploadEmitter.emit()
-          this.router.navigate([`./${data.id}`], { relativeTo: this.route })
+          this.router.navigate([`./${this.themeName}`], { relativeTo: this.route })
         },
         error: () => {
           this.msgService.error({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_FAIL' })
@@ -101,12 +106,11 @@ export class ThemeImportComponent implements OnInit {
     return !!(typeof dto === 'object' && dto?.themes)
   }
 
-  private getThemes(emit: boolean): void {
+  private getThemes(): void {
     this.themeApi.getThemes({}).subscribe((themes) => {
       if (themes.stream) {
         this.themes = themes.stream
       }
-      // if (emit) this.uploadEmitter.emit()
     })
   }
 }

@@ -34,6 +34,7 @@
               ></textarea>
               <label for="theme_detail_item_description">{{ 'THEME.DESCRIPTION' | translate }}</label>
             </span>
+
             <div class="flex flex-wrap sm:flex-nowrap align-items-center pb-2 row-gap-2 column-gap-4">
               <app-image-container
                 [imageUrl]="getLogoUrl(theme)"
@@ -71,7 +72,6 @@
   </ocx-page-content>
 
   <p-dialog
-    #portalDelete
     [(visible)]="themeDeleteVisible"
     [header]="('ACTIONS.DELETE.TOOLTIP' | translate).replace('{{TYPE}}', 'Theme')"
     [modal]="true"
