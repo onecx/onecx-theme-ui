@@ -2,7 +2,7 @@
   [id]="id"
   *ngIf="imageUrl && !displayPlaceHolder"
   [class]="'image-object image-' + (small ? 'sm' : 'lg') + ' sm:image-lg'"
-  [src]="imageUrl"
+  [ocxSrc]="imageUrl"
   (error)="onImageError()"
   alt="logo"
 />
