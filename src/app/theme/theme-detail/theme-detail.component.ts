@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core'
 import { DatePipe } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateService } from '@ngx-translate/core'
-import { finalize } from 'rxjs'
+import { Observable, finalize, map } from 'rxjs'
 import FileSaver from 'file-saver'
 
 import { Action, ObjectDetailItem, PortalMessageService, UserService } from '@onecx/portal-integration-angular'
@@ -30,8 +30,8 @@ export class ThemeDetailComponent implements OnInit {
   loading = true
   public dateFormat = 'medium'
   // page header
-  public actions: Action[] = []
-  public objectDetails: ObjectDetailItem[] = []
+  public actions$: Observable<Action[]> | undefined
+  public objectDetails$: Observable<ObjectDetailItem[]> | undefined
   public headerImageUrl?: string
 
   constructor(
@@ -73,7 +73,12 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   private preparePage() {
-    this.translate
+    this.prepareActionButtons()
+    this.prepareObjectDetails()
+  }
+
+  private prepareActionButtons(): void {
+    this.actions$ = this.translate
       .get([
         'ACTIONS.NAVIGATION.CLOSE',
         'ACTIONS.NAVIGATION.CLOSE.TOOLTIP',
@@ -85,88 +90,86 @@ export class ThemeDetailComponent implements OnInit {
         'ACTIONS.DELETE.TOOLTIP',
         'ACTIONS.DELETE.THEME_MESSAGE'
       ])
-      .subscribe((data) => {
-        this.prepareActionButtons(data)
-      })
-    this.translate
-      .get([
-        'DETAIL.CREATION_DATE',
-        'DETAIL.TOOLTIPS.CREATION_DATE',
-        'DETAIL.MODIFICATION_DATE',
-        'DETAIL.TOOLTIPS.MODIFICATION_DATE',
-        'THEME.WORKSPACES',
-        'THEME.TOOLTIPS.WORKSPACES'
-      ])
-      .subscribe((data) => {
-        this.prepareObjectDetails(data)
-      })
+      .pipe(
+        map((data) => {
+          return [
+            {
+              label: data['ACTIONS.NAVIGATION.CLOSE'],
+              title: data['ACTIONS.NAVIGATION.CLOSE.TOOLTIP'],
+              actionCallback: () => this.close(),
+              icon: 'pi pi-times',
+              show: 'always',
+              permission: 'THEME#SEARCH'
+            },
+            {
+              label: data['ACTIONS.EDIT.LABEL'],
+              title: data['ACTIONS.EDIT.TOOLTIP'],
+              actionCallback: () => this.router.navigate(['./edit'], { relativeTo: this.route }),
+              icon: 'pi pi-pencil',
+              show: 'always',
+              permission: 'THEME#EDIT'
+            },
+            {
+              label: data['ACTIONS.EXPORT.LABEL'],
+              title: data['ACTIONS.EXPORT.TOOLTIP'],
+              actionCallback: () => this.onExportTheme(),
+              icon: 'pi pi-download',
+              show: 'always',
+              permission: 'THEME#EXPORT'
+            },
+            {
+              label: data['ACTIONS.DELETE.LABEL'],
+              title: data['ACTIONS.DELETE.TOOLTIP'],
+              actionCallback: () => {
+                this.themeDeleteVisible = true
+                this.themeDeleteMessage = data['ACTIONS.DELETE.THEME_MESSAGE'].replace('{{ITEM}}', this.theme?.name)
+              },
+              icon: 'pi pi-trash',
+              show: 'asOverflow',
+              permission: 'THEME#DELETE'
+            }
+          ]
+        })
+      )
   }
 
-  private prepareActionButtons(data: any): void {
-    this.actions = [] // provoke change event
-    this.actions.push(
-      {
-        label: data['ACTIONS.NAVIGATION.CLOSE'],
-        title: data['ACTIONS.NAVIGATION.CLOSE.TOOLTIP'],
-        actionCallback: () => this.close(),
-        icon: 'pi pi-times',
-        show: 'always',
-        permission: 'THEME#SEARCH'
-      },
-      {
-        label: data['ACTIONS.EDIT.LABEL'],
-        title: data['ACTIONS.EDIT.TOOLTIP'],
-        actionCallback: () => this.router.navigate(['./edit'], { relativeTo: this.route }),
-        icon: 'pi pi-pencil',
-        show: 'always',
-        permission: 'THEME#EDIT'
-      },
-      {
-        label: data['ACTIONS.EXPORT.LABEL'],
-        title: data['ACTIONS.EXPORT.TOOLTIP'],
-        actionCallback: () => this.onExportTheme(),
-        icon: 'pi pi-download',
-        show: 'always',
-        permission: 'THEME#EXPORT'
-      },
-      {
-        label: data['ACTIONS.DELETE.LABEL'],
-        title: data['ACTIONS.DELETE.TOOLTIP'],
-        actionCallback: () => {
-          this.themeDeleteVisible = true
-          this.themeDeleteMessage = data['ACTIONS.DELETE.THEME_MESSAGE'].replace('{{ITEM}}', this.theme?.name)
-        },
-        icon: 'pi pi-trash',
-        show: 'asOverflow',
-        permission: 'THEME#DELETE'
-      }
-    )
-  }
-
-  private prepareObjectDetails(data: any): void {
+  private prepareObjectDetails(): void {
     this.workspaceList = this.prepareWorkspaceList()
     if (this.theme) {
-      this.objectDetails = [
-        {
-          label: data['DETAIL.CREATION_DATE'],
-          tooltip: data['DETAIL.TOOLTIPS.CREATION_DATE'],
-          value: this.theme.creationDate,
-          valuePipe: DatePipe,
-          valuePipeArgs: this.dateFormat
-        },
-        {
-          label: data['DETAIL.MODIFICATION_DATE'],
-          tooltip: data['DETAIL.TOOLTIPS.MODIFICATION_DATE'],
-          value: this.theme.modificationDate,
-          valuePipe: DatePipe,
-          valuePipeArgs: this.dateFormat
-        },
-        {
-          label: data['THEME.WORKSPACES'],
-          value: limitText(this.workspaceList, 100),
-          tooltip: data['THEME.TOOLTIPS.WORKSPACES']
-        }
-      ]
+      this.objectDetails$ = this.translate
+        .get([
+          'DETAIL.CREATION_DATE',
+          'DETAIL.TOOLTIPS.CREATION_DATE',
+          'DETAIL.MODIFICATION_DATE',
+          'DETAIL.TOOLTIPS.MODIFICATION_DATE',
+          'THEME.WORKSPACES',
+          'THEME.TOOLTIPS.WORKSPACES'
+        ])
+        .pipe(
+          map((data) => {
+            return [
+              {
+                label: data['DETAIL.CREATION_DATE'],
+                tooltip: data['DETAIL.TOOLTIPS.CREATION_DATE'],
+                value: this.theme?.creationDate,
+                valuePipe: DatePipe,
+                valuePipeArgs: this.dateFormat
+              },
+              {
+                label: data['DETAIL.MODIFICATION_DATE'],
+                tooltip: data['DETAIL.TOOLTIPS.MODIFICATION_DATE'],
+                value: this.theme?.modificationDate,
+                valuePipe: DatePipe,
+                valuePipeArgs: this.dateFormat
+              },
+              {
+                label: data['THEME.WORKSPACES'],
+                value: limitText(this.workspaceList, 100),
+                tooltip: data['THEME.TOOLTIPS.WORKSPACES']
+              }
+            ]
+          })
+        )
     }
   }
 

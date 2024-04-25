@@ -15,7 +15,6 @@ import { limitText } from 'src/app/shared/utils'
 })
 export class ThemeSearchComponent implements OnInit {
   themes$!: Observable<GetThemesResponse>
-  public actions: Action[] = []
   public actions$: Observable<Action[]> | undefined
   public viewMode = 'grid'
   public filter: string | undefined

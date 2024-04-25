@@ -1,10 +1,10 @@
 <ocx-portal-page permission="THEME#SEARCH" helpArticleId="PAGE_THEME_SEARCH">
-  <ocx-page-header
+  <ocx-search-header
     [header]="'THEME.SEARCH.HEADER' | translate"
     [subheader]="'THEME.SEARCH.SUBHEADER' | translate"
     [actions]="(actions$ | async) ?? []"
   >
-  </ocx-page-header>
+  </ocx-search-header>
 
   <ocx-page-content>
     <ng-container *ngIf="themes$ | async as themes">

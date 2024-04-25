@@ -1,10 +1,10 @@
 <ocx-portal-page permission="THEME#VIEW" helpArticleId="PAGE_THEME_DETAIL">
   <ocx-page-header
     [loading]="loading"
-    [header]="theme?.name"
+    [header]="theme?.name ?? ''"
     [subheader]="'THEME.DETAIL.SUBHEADER' | translate"
-    [objectDetails]="objectDetails"
-    [actions]="actions"
+    [objectDetails]="(objectDetails$ | async) ?? []"
+    [actions]="(actions$ | async) ?? []"
     [figureImage]="headerImageUrl"
     [figureBackground]="!theme?.logoUrl"
   >
