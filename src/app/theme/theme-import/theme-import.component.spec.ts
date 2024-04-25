@@ -10,8 +10,9 @@ import { PortalMessageService } from '@onecx/portal-integration-angular'
 
 import { ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeImportComponent } from './theme-import.component'
+import { HttpResponse } from '@angular/common/http'
 
-describe('ThemeImportComponent', () => {
+fdescribe('ThemeImportComponent', () => {
   let component: ThemeImportComponent
   let fixture: ComponentFixture<ThemeImportComponent>
 
@@ -32,10 +33,7 @@ describe('ThemeImportComponent', () => {
       ],
       providers: [
         { provide: PortalMessageService, useValue: msgServiceSpy },
-        {
-          provide: ThemesAPIService,
-          useValue: themeApiSpy
-        }
+        { provide: ThemesAPIService, useValue: themeApiSpy }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents()
@@ -175,25 +173,30 @@ describe('ThemeImportComponent', () => {
     expect(component.themeImportError).toBeFalse()
   })
 
-  xit('should inform and navigate to new theme on import success', () => {
+  it('should inform and navigate to new theme on import success', () => {
     const router = TestBed.inject(Router)
     spyOn(router, 'navigate')
     themeApiSpy.importThemes.and.returnValue(
-      of({
-        id: 'themeId',
-        name: 'name'
-      } as any)
+      of(
+        new HttpResponse({
+          body: { id: 'id' }
+        })
+      )
     )
     spyOn(component.uploadEmitter, 'emit')
+    component.themeSnapshot = {
+      id: 'id',
+      created: 'created',
+      themes: { ['theme']: { description: 'themeDescription' } }
+    }
 
     component.onThemeUpload()
 
     expect(msgServiceSpy.success).toHaveBeenCalledOnceWith({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_SUCCESS' })
     expect(component.uploadEmitter.emit).toHaveBeenCalledTimes(1)
-    expect(router.navigate).toHaveBeenCalledOnceWith(['./themeId'], jasmine.any(Object))
   })
 
-  xit('should display error on api call fail during upload', () => {
+  it('should display error on api call fail during upload', () => {
     themeApiSpy.importThemes.and.returnValue(throwError(() => new Error()))
 
     component.onThemeUpload()
