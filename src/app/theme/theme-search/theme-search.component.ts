@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateService } from '@ngx-translate/core'
-import { Observable } from 'rxjs'
+import { Observable, map } from 'rxjs'
 import { DataView } from 'primeng/dataview'
 
 import { Action, DataViewControlTranslations } from '@onecx/portal-integration-angular'
@@ -16,6 +16,7 @@ import { limitText } from 'src/app/shared/utils'
 export class ThemeSearchComponent implements OnInit {
   themes$!: Observable<GetThemesResponse>
   public actions: Action[] = []
+  public actions$: Observable<Action[]> | undefined
   public viewMode = 'grid'
   public filter: string | undefined
   public sortField = 'name'
@@ -36,11 +37,15 @@ export class ThemeSearchComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadThemes()
-    this.translate
-      .get(['ACTIONS.CREATE.THEME', 'ACTIONS.CREATE.THEME.TOOLTIP', 'ACTIONS.IMPORT.LABEL', 'ACTIONS.IMPORT.TOOLTIP'])
-      .subscribe((data) => {
-        this.prepareActionButtons(data)
-      })
+    this.prepareTranslations()
+    this.prepareActionButtons()
+  }
+
+  public loadThemes(): void {
+    this.themes$ = this.themeApi.getThemes({})
+  }
+
+  private prepareTranslations() {
     this.translate
       .get([
         'THEME.NAME',
@@ -54,52 +59,52 @@ export class ThemeSearchComponent implements OnInit {
         'GENERAL.TOOLTIP.VIEW_MODE_LIST',
         'GENERAL.TOOLTIP.VIEW_MODE_TABLE'
       ])
-      .subscribe((data) => {
-        this.prepareTranslations(data)
-      })
+      .pipe(
+        map((data) => {
+          this.dataViewControlsTranslations = {
+            sortDropdownPlaceholder: data['SEARCH.SORT_BY'],
+            filterInputPlaceholder: data['SEARCH.FILTER'],
+            filterInputTooltip: data['SEARCH.FILTER_OF'] + data['THEME.NAME'] + ', ' + data['THEME.DESCRIPTION'],
+            viewModeToggleTooltips: {
+              grid: data['GENERAL.TOOLTIP.VIEW_MODE_GRID'],
+              list: data['GENERAL.TOOLTIP.VIEW_MODE_LIST']
+            },
+            sortOrderTooltips: {
+              ascending: data['SEARCH.SORT_DIRECTION_ASC'],
+              descending: data['SEARCH.SORT_DIRECTION_DESC']
+            },
+            sortDropdownTooltip: data['SEARCH.SORT_BY']
+          }
+        })
+      )
+      .subscribe()
   }
 
-  public loadThemes(): void {
-    this.themes$ = this.themeApi.getThemes({})
-  }
-
-  prepareActionButtons(data: any): void {
-    this.actions = [] // provoke change event
-    this.actions.push(
-      {
-        label: data['ACTIONS.CREATE.THEME'],
-        title: data['ACTIONS.CREATE.THEME.TOOLTIP'],
-        actionCallback: () => this.onNewTheme(),
-        permission: 'THEME#CREATE',
-        icon: 'pi pi-plus',
-        show: 'always'
-      },
-      {
-        label: data['ACTIONS.IMPORT.LABEL'],
-        title: data['ACTIONS.IMPORT.TOOLTIP'],
-        actionCallback: () => this.onImportThemeClick(),
-        permission: 'THEME#IMPORT',
-        icon: 'pi pi-upload',
-        show: 'always'
-      }
-    )
-  }
-
-  prepareTranslations(data: any): void {
-    this.dataViewControlsTranslations = {
-      sortDropdownPlaceholder: data['SEARCH.SORT_BY'],
-      filterInputPlaceholder: data['SEARCH.FILTER'],
-      filterInputTooltip: data['SEARCH.FILTER_OF'] + data['THEME.NAME'] + ', ' + data['THEME.DESCRIPTION'],
-      viewModeToggleTooltips: {
-        grid: data['GENERAL.TOOLTIP.VIEW_MODE_GRID'],
-        list: data['GENERAL.TOOLTIP.VIEW_MODE_LIST']
-      },
-      sortOrderTooltips: {
-        ascending: data['SEARCH.SORT_DIRECTION_ASC'],
-        descending: data['SEARCH.SORT_DIRECTION_DESC']
-      },
-      sortDropdownTooltip: data['SEARCH.SORT_BY']
-    }
+  private prepareActionButtons(): void {
+    this.actions$ = this.translate
+      .get(['ACTIONS.CREATE.THEME', 'ACTIONS.CREATE.THEME.TOOLTIP', 'ACTIONS.IMPORT.LABEL', 'ACTIONS.IMPORT.TOOLTIP'])
+      .pipe(
+        map((data) => {
+          return [
+            {
+              label: data['ACTIONS.CREATE.THEME'],
+              title: data['ACTIONS.CREATE.THEME.TOOLTIP'],
+              actionCallback: () => this.onNewTheme(),
+              permission: 'THEME#CREATE',
+              icon: 'pi pi-plus',
+              show: 'always'
+            },
+            {
+              label: data['ACTIONS.IMPORT.LABEL'],
+              title: data['ACTIONS.IMPORT.TOOLTIP'],
+              actionCallback: () => this.onImportThemeClick(),
+              permission: 'THEME#IMPORT',
+              icon: 'pi pi-upload',
+              show: 'always'
+            }
+          ]
+        })
+      )
   }
 
   getLogoUrl(theme: Theme | undefined): string | undefined {

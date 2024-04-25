@@ -2,7 +2,7 @@
   <ocx-page-header
     [header]="'THEME.SEARCH.HEADER' | translate"
     [subheader]="'THEME.SEARCH.SUBHEADER' | translate"
-    [actions]="actions"
+    [actions]="(actions$ | async) ?? []"
   >
   </ocx-page-header>
 
