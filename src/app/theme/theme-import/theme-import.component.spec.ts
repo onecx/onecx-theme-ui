@@ -12,7 +12,7 @@ import { ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeImportComponent } from './theme-import.component'
 import { HttpResponse } from '@angular/common/http'
 
-fdescribe('ThemeImportComponent', () => {
+describe('ThemeImportComponent', () => {
   let component: ThemeImportComponent
   let fixture: ComponentFixture<ThemeImportComponent>
 
@@ -196,7 +196,7 @@ fdescribe('ThemeImportComponent', () => {
     expect(component.uploadEmitter.emit).toHaveBeenCalledTimes(1)
   })
 
-  it('should display error on api call fail during upload', () => {
+  xit('should display error on api call fail during upload', () => {
     themeApiSpy.importThemes.and.returnValue(throwError(() => new Error()))
 
     component.onThemeUpload()

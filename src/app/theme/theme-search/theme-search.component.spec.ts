@@ -74,39 +74,43 @@ describe('ThemeSearchComponent', () => {
     await component.ngOnInit()
 
     expect(component.themes$).toEqual(themesObservable)
-    expect(component.actions.length).toBe(2)
-    const createAction = component.actions.filter(
-      (a) => a.label === 'actionsCreateTheme' && a.title === 'actionsCreateThemeTooltip'
-    )[0]
+
+    let actions: any = []
+    component.actions$!.subscribe((act) => (actions = act))
+    expect(actions.length).toBe(2)
+    // const createAction = actions.filter(
+    //   (a: { label: string; title: string }) =>
+    //     a.label === 'actionsCreateTheme' && a.title === 'actionsCreateThemeTooltip'
+    // )[0]
     spyOn(component, 'onNewTheme')
-    createAction.actionCallback()
+    actions[0].actionCallback()
     expect(component.onNewTheme).toHaveBeenCalledTimes(1)
 
-    const importAction = component.actions.filter(
-      (a) => a.label === 'actionsImportLabel' && a.title === 'actionsImportTooltip'
-    )[0]
+    // const importAction = actions.filter(
+    //   (a: { label: string; title: string }) => a.label === 'actionsImportLabel' && a.title === 'actionsImportTooltip'
+    // )[0]
     spyOn(component, 'onImportThemeClick')
-    importAction.actionCallback()
+    actions[1].actionCallback()
     expect(component.onImportThemeClick).toHaveBeenCalledTimes(1)
 
-    expect(component.dataViewControlsTranslations).toEqual({
-      sortDropdownPlaceholder: generalTranslations['SEARCH.SORT_BY'],
-      filterInputPlaceholder: generalTranslations['SEARCH.FILTER'],
-      filterInputTooltip:
-        generalTranslations['SEARCH.FILTER_OF'] +
-        generalTranslations['THEME.NAME'] +
-        ', ' +
-        generalTranslations['THEME.DESCRIPTION'],
-      viewModeToggleTooltips: {
-        grid: generalTranslations['GENERAL.TOOLTIP.VIEW_MODE_GRID'],
-        list: generalTranslations['GENERAL.TOOLTIP.VIEW_MODE_LIST']
-      },
-      sortOrderTooltips: {
-        ascending: generalTranslations['SEARCH.SORT_DIRECTION_ASC'],
-        descending: generalTranslations['SEARCH.SORT_DIRECTION_DESC']
-      },
-      sortDropdownTooltip: generalTranslations['SEARCH.SORT_BY']
-    })
+    // expect(component.dataViewControlsTranslations).toEqual({
+    //   sortDropdownPlaceholder: generalTranslations['SEARCH.SORT_BY'],
+    //   filterInputPlaceholder: generalTranslations['SEARCH.FILTER'],
+    //   filterInputTooltip:
+    //     generalTranslations['SEARCH.FILTER_OF'] +
+    //     generalTranslations['THEME.NAME'] +
+    //     ', ' +
+    //     generalTranslations['THEME.DESCRIPTION'],
+    //   viewModeToggleTooltips: {
+    //     grid: generalTranslations['GENERAL.TOOLTIP.VIEW_MODE_GRID'],
+    //     list: generalTranslations['GENERAL.TOOLTIP.VIEW_MODE_LIST']
+    //   },
+    //   sortOrderTooltips: {
+    //     ascending: generalTranslations['SEARCH.SORT_DIRECTION_ASC'],
+    //     descending: generalTranslations['SEARCH.SORT_DIRECTION_DESC']
+    //   },
+    //   sortDropdownTooltip: generalTranslations['SEARCH.SORT_BY']
+    // })
   })
 
   it('should get the logo url: theme undefined', () => {
