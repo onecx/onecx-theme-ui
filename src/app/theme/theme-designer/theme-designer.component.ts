@@ -243,6 +243,10 @@ export class ThemeDesignerComponent implements OnInit {
 
   public onThemeTemplateDropdownChange(): void {
     const themeName = dropDownGetLabelByValue(this.themeTemplates, this.themeTemplateSelectedId)
+    this.confirmTemplateTheme(themeName)
+  }
+
+  private confirmTemplateTheme(themeName: string) {
     this.translate
       .get([
         'GENERAL.COPY_OF',
@@ -251,39 +255,38 @@ export class ThemeDesignerComponent implements OnInit {
         'ACTIONS.CONFIRMATION.YES',
         'ACTIONS.CONFIRMATION.NO'
       ])
-      .subscribe((data) => {
-        this.confirmTemplateTheme(themeName, data)
-      })
-  }
-
-  private confirmTemplateTheme(themeName: string, data: any) {
-    this.confirmUseThemeAsTemplate(
-      themeName,
-      data,
-      () => {
-        this.getThemeById(this.themeTemplateSelectedId).subscribe((result) => {
-          if (this.mode === 'NEW') {
-            this.basicForm.controls['name'].setValue(data['GENERAL.COPY_OF'] + result.resource.name)
-            this.basicForm.controls['description'].setValue(result.resource.description)
-            this.basicForm.controls['faviconUrl'].setValue(this.getImageUrl(result.resource, 'favicon'))
-            this.basicForm.controls['logoUrl'].setValue(this.getImageUrl(result.resource, 'logo'))
-            this.fetchingLogoUrl = this.getImageUrl(this.theme, 'logo')
-            this.fetchingFaviconUrl = this.getImageUrl(this.theme, 'favicon')
-          }
-          if (result.resource.properties) {
-            this.propertiesForm.reset()
-            this.propertiesForm.patchValue(result.resource.properties)
-          }
+      .pipe(
+        map((data) => {
+          this.confirmUseThemeAsTemplate(
+            themeName,
+            data,
+            () => {
+              this.getThemeById(this.themeTemplateSelectedId).subscribe((result) => {
+                if (this.mode === 'NEW') {
+                  this.basicForm.controls['name'].setValue(data['GENERAL.COPY_OF'] + result.resource.name)
+                  this.basicForm.controls['description'].setValue(result.resource.description)
+                  this.basicForm.controls['faviconUrl'].setValue(this.getImageUrl(result.resource, 'favicon'))
+                  this.basicForm.controls['logoUrl'].setValue(this.getImageUrl(result.resource, 'logo'))
+                  this.fetchingLogoUrl = this.getImageUrl(this.theme, 'logo')
+                  this.fetchingFaviconUrl = this.getImageUrl(this.theme, 'favicon')
+                }
+                if (result.resource.properties) {
+                  this.propertiesForm.reset()
+                  this.propertiesForm.patchValue(result.resource.properties)
+                }
+              })
+            },
+            () => {
+              // on reject
+              this.themeTemplateSelectedId = ''
+            }
+          )
         })
-      },
-      () => {
-        // on reject
-        this.themeTemplateSelectedId = ''
-      }
-    )
+      )
+      .subscribe()
   }
 
-  public confirmUseThemeAsTemplate(themeName: string, data: any, onConfirm: () => void, onReject: () => void): void {
+  private confirmUseThemeAsTemplate(themeName: string, data: any, onConfirm: () => void, onReject: () => void): void {
     this.confirmation.confirm({
       icon: 'pi pi-question-circle',
       defaultFocus: 'reject',

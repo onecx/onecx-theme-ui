@@ -14,6 +14,7 @@ export class ImageContainerComponent implements OnChanges {
   @Input() public id = ''
   @Input() public imageUrl: string | undefined
   @Input() public small = false
+  @Input() public styleClass: string | undefined
 
   public defaultImageUrl = ''
   public displayPlaceHolder = false
