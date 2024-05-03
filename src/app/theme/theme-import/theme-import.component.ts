@@ -88,7 +88,7 @@ export class ThemeImportComponent implements OnInit {
         themeSnapshot: this.themeSnapshot
       })
       .subscribe({
-        next: (data) => {
+        next: () => {
           this.msgService.success({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_SUCCESS' })
           this.onImportThemeClear()
           this.displayThemeImport = false

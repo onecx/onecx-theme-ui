@@ -156,31 +156,35 @@ describe('ThemeDetailComponent', () => {
     expect(component.theme).toEqual(themeResponse['resource'])
     expect(component.usedInWorkspaces).toEqual(themeResponse['workspaces'])
 
-    expect(component.actions.length).toBe(4)
-    const closeAction = component.actions.filter(
-      (a) => a.label === 'actionNavigationClose' && a.title === 'actionNavigationCloseTooltip'
+    let actions: any = []
+    component.actions$!.subscribe((act) => (actions = act))
+
+    expect(actions.length).toBe(4)
+    const closeAction = actions.filter(
+      (a: { label: string; title: string }) =>
+        a.label === 'actionNavigationClose' && a.title === 'actionNavigationCloseTooltip'
     )[0]
     spyOn(component, 'close')
     closeAction.actionCallback()
     expect(component.close).toHaveBeenCalledTimes(1)
 
-    const editAction = component.actions.filter(
-      (a) => a.label === 'actionEditLabel' && a.title === 'actionEditTooltip'
+    const editAction = actions.filter(
+      (a: { label: string; title: string }) => a.label === 'actionEditLabel' && a.title === 'actionEditTooltip'
     )[0]
     const router = TestBed.inject(Router)
     spyOn(router, 'navigate')
     editAction.actionCallback()
     expect(router.navigate).toHaveBeenCalledOnceWith(['./edit'], jasmine.any(Object))
 
-    const exportAction = component.actions.filter(
-      (a) => a.label === 'actionExportLabel' && a.title === 'actionExportTooltip'
+    const exportAction = actions.filter(
+      (a: { label: string; title: string }) => a.label === 'actionExportLabel' && a.title === 'actionExportTooltip'
     )[0]
     spyOn(component, 'onExportTheme')
     exportAction.actionCallback()
     expect(component.onExportTheme).toHaveBeenCalledTimes(1)
 
-    const deleteAction = component.actions.filter(
-      (a) => a.label === 'actionDeleteLabel' && a.title === 'actionDeleteTooltip'
+    const deleteAction = actions.filter(
+      (a: { label: string; title: string }) => a.label === 'actionDeleteLabel' && a.title === 'actionDeleteTooltip'
     )[0]
     expect(component.themeDeleteVisible).toBe(false)
     expect(component.themeDeleteMessage).toBe('')
@@ -232,19 +236,25 @@ describe('ThemeDetailComponent', () => {
     await component.ngOnInit()
 
     expect(component.workspaceList).toBe('workspace1, workspace2')
-    expect(component.objectDetails.length).toBe(3)
-    const creationDate = component.objectDetails.filter(
-      (detail) => detail.label === 'detailCreationDate' && detail.tooltip === 'detailTooltipsCreationDate'
+    let objectDetails: any = []
+    component.objectDetails$!.subscribe((obj) => (objectDetails = obj))
+
+    expect(objectDetails.length).toBe(3)
+    const creationDate = objectDetails.filter(
+      (detail: { label: string; tooltip: string }) =>
+        detail.label === 'detailCreationDate' && detail.tooltip === 'detailTooltipsCreationDate'
     )[0]
     expect(creationDate.value).toBe('myCreDate')
 
-    const modificationDate = component.objectDetails.filter(
-      (detail) => detail.label === 'detailModificationDate' && detail.tooltip === 'detailTooltipsModificationDate'
+    const modificationDate = objectDetails.filter(
+      (detail: { label: string; tooltip: string }) =>
+        detail.label === 'detailModificationDate' && detail.tooltip === 'detailTooltipsModificationDate'
     )[0]
     expect(modificationDate.value).toBe('myModDate')
 
-    const workspaces = component.objectDetails.filter(
-      (detail) => detail.label === 'themeWorkspaces' && detail.tooltip === 'themeTooltipsWorkspaces'
+    const workspaces = objectDetails.filter(
+      (detail: { label: string; tooltip: string }) =>
+        detail.label === 'themeWorkspaces' && detail.tooltip === 'themeTooltipsWorkspaces'
     )[0]
     expect(workspaces.value).toBe('workspace1, workspace2')
   })
