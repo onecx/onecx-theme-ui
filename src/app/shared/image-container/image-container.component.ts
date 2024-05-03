@@ -1,6 +1,9 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core'
-import { Location } from '@angular/common'
+import { map } from 'rxjs'
+
+import { prepareUrl, prepareUrlPath } from 'src/app/shared/utils'
 import { environment } from 'src/environments/environment'
+import { AppStateService } from '@onecx/portal-integration-angular'
 
 @Component({
   selector: 'app-image-container',
@@ -12,21 +15,31 @@ export class ImageContainerComponent implements OnChanges {
   @Input() public imageUrl: string | undefined
   @Input() public small = false
 
+  public defaultImageUrl = ''
   public displayPlaceHolder = false
-  private apiPrefix = environment.apiPrefix
 
-  public onImageError() {
+  prepareUrl = prepareUrl
+  prepareUrlPath = prepareUrlPath
+
+  constructor(private appState: AppStateService) {
+    appState.currentMfe$
+      .pipe(
+        map((mfe) => {
+          this.defaultImageUrl = this.prepareUrlPath(mfe.remoteBaseUrl, environment.DEFAULT_LOGO_URL)
+        })
+      )
+      .subscribe()
+  }
+
+  public onImageError(): void {
     this.displayPlaceHolder = true
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['imageUrl']) {
       this.displayPlaceHolder = false
-      // if image Url does not start with a http the api-prefix ...
-      //   ...then it stored in the backend. So we need to put prefix in front
-      if (this.imageUrl && !this.imageUrl.match(/^(http|https)/g) && !this.imageUrl.startsWith(this.apiPrefix)) {
-        this.imageUrl = Location.joinWithSlash(this.apiPrefix, this.imageUrl)
-      }
+      this.imageUrl = prepareUrl(this.imageUrl)
+      console.log('IMAGEURL:', this.imageUrl)
     }
   }
 }
