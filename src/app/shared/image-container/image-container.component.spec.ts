@@ -1,27 +1,27 @@
-import { NO_ERRORS_SCHEMA, SimpleChange } from '@angular/core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
-import { TranslateTestingModule } from 'ngx-translate-testing'
-
 import { ImageContainerComponent } from './image-container.component'
 import { prepareUrl } from 'src/app/shared/utils'
 
-describe('ThemeColorBoxComponent', () => {
+import { AppStateService } from '@onecx/portal-integration-angular'
+import { of } from 'rxjs'
+
+class MockAppStateService {
+  currentMfe$ = of({
+    remoteBaseUrl: '/base/'
+  })
+}
+
+describe('ImageContainerComponent', () => {
   let component: ImageContainerComponent
   let fixture: ComponentFixture<ImageContainerComponent>
+  let mockAppStateService: MockAppStateService
 
   beforeEach(waitForAsync(() => {
+    mockAppStateService = new MockAppStateService()
+
     TestBed.configureTestingModule({
       declarations: [ImageContainerComponent],
-      imports: [
-        HttpClientTestingModule,
-        TranslateTestingModule.withTranslations({
-          de: require('src/assets/i18n/de.json'),
-          en: require('src/assets/i18n/en.json')
-        }).withDefaultLanguage('en')
-      ],
-      providers: [],
-      schemas: [NO_ERRORS_SCHEMA]
+      providers: [{ provide: AppStateService, useValue: mockAppStateService }]
     }).compileComponents()
   }))
 
@@ -33,33 +33,46 @@ describe('ThemeColorBoxComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy()
+    expect(component.defaultImageUrl).toEqual('/base/./assets/images/logo.jpg')
   })
 
-  it('should display placeholder on image error', () => {
+  describe('ngOnChanges', () => {
+    it('should prepend apiPrefix to imageUrl if not starting with http/https and not already prefixed', () => {
+      const testUrl = 'path/to/image.jpg'
+      const expectedUrl = prepareUrl(testUrl)
+
+      component.imageUrl = testUrl
+      component.ngOnChanges({
+        imageUrl: {
+          currentValue: testUrl,
+          previousValue: null,
+          firstChange: true,
+          isFirstChange: () => true
+        }
+      })
+
+      expect(component.imageUrl).toBe(expectedUrl ?? '')
+    })
+
+    it('should not modify imageUrl if it starts with http/https', () => {
+      const testUrl = 'http://path/to/image.jpg'
+      component.imageUrl = testUrl
+      component.ngOnChanges({
+        imageUrl: {
+          currentValue: testUrl,
+          previousValue: null,
+          firstChange: true,
+          isFirstChange: () => true
+        }
+      })
+
+      expect(component.imageUrl).toBe(testUrl)
+    })
+  })
+
+  it('onImageError should set displayPlaceHolder to true', () => {
     component.onImageError()
 
     expect(component.displayPlaceHolder).toBeTrue()
-  })
-
-  it('should use imageUrl on backend after change', () => {
-    const changes = {
-      imageUrl: new SimpleChange('', 'imageUrl', false)
-    }
-
-    component.imageUrl = 'imageUrl'
-
-    component.ngOnChanges(changes)
-    expect(component.imageUrl).toBe(prepareUrl('imageUrl') ?? '')
-  })
-
-  it('should use image from external resource after change', () => {
-    const changes = {
-      imageUrl: new SimpleChange('', 'http://web.com/imageUrl', false)
-    }
-
-    component.imageUrl = 'http://web.com/imageUrl'
-    component.ngOnChanges(changes)
-
-    expect(component.imageUrl).toBe('http://web.com/imageUrl')
   })
 })
