@@ -102,6 +102,16 @@
     },
     "UPLOADED": "File uploaded"
   },
+  "FAVICON": {
+    "FAVICON_URL": "External Favicon URL",
+    "TOOLTIPS": {
+      "IMAGE": "Favicon",
+      "PLACEHOLDER": "Image Placeholder",
+      "FAVICON_URL_UPLOAD": "As an alternative to uploading, a URL to an image can be specified here",
+      "UPLOAD": "Select and upload image"
+    },
+    "UPLOADED": "File uploaded"
+  },
   "SEARCH": {
     "FILTER": "Filter",
     "FILTER_OF": "Filter for ",

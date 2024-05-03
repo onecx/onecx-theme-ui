@@ -95,9 +95,19 @@
     "LOGO_URL": "Externe Logo URL",
     "TOOLTIPS": {
       "IMAGE": "Logo",
-      "PLACEHOLDER": "Bild Platzhalter",
+      "PLACEHOLDER": "Platzhalter für ein Bild",
       "LOGO_URL_UPLOAD": "Als Alternative zum Hochladen kann hier eine URL zu einem Bild angegeben werden",
       "LOGO_URL": "URL zu einem externen Bild",
+      "UPLOAD": "Bild auswählen und hochladen"
+    },
+    "UPLOADED": "Datei hochgeladen"
+  },
+  "FAVICON": {
+    "FAVICON_URL": "Externe Favicon URL",
+    "TOOLTIPS": {
+      "IMAGE": "Favicon",
+      "PLACEHOLDER": "Platzhalter für ein Bild",
+      "FAVICON_URL_UPLOAD": "Als Alternative zum Hochladen kann hier eine URL zu einem Bild angegeben werden",
       "UPLOAD": "Bild auswählen und hochladen"
     },
     "UPLOADED": "Datei hochgeladen"

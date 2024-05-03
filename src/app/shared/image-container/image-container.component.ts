@@ -11,6 +11,7 @@ export class ImageContainerComponent implements OnChanges {
   @Input() public id = ''
   @Input() public imageUrl: string | undefined
   @Input() public small = false
+  @Input() public styleClass: string | undefined
 
   public displayPlaceHolder = false
   private apiPrefix = environment.apiPrefix
