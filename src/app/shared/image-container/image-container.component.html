@@ -1,7 +1,7 @@
 <img
   [id]="id"
   *ngIf="imageUrl && !displayPlaceHolder"
-  [class]="'image-object image-' + (small ? 'sm' : 'lg') + ' sm:image-lg  vertical-align-middle ' + (styleClass ? styleClass : '')"
+  [class]="'image-object image-' + (small ? 'sm' : 'lg') + ' sm:image-lg ' + (styleClass ? styleClass : '')"
   [ocxSrc]="imageUrl"
   (error)="onImageError()"
   alt="Logo"
@@ -9,7 +9,7 @@
 <img
   [id]="id"
   *ngIf="!imageUrl || displayPlaceHolder"
-  [class]="'image-object image-' + (small ? 'sm' : 'lg') + ' sm:image-lg vertical-align-middle'"
+  [class]="'image-object image-' + (small ? 'sm' : 'lg') + ' sm:image-lg'"
   [src]="defaultImageUrl"
   alt="Logo"
 />
