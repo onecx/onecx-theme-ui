@@ -39,7 +39,6 @@ export class ImageContainerComponent implements OnChanges {
     if (changes['imageUrl']) {
       this.displayPlaceHolder = false
       this.imageUrl = prepareUrl(this.imageUrl)
-      console.log('IMAGEURL:', this.imageUrl)
     }
   }
 }
