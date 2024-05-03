@@ -37,9 +37,9 @@
 
             <div class="flex flex-wrap sm:flex-nowrap align-items-center pb-2 row-gap-2 column-gap-4">
               <app-image-container
-                [imageUrl]="getLogoUrl(theme)"
+                [imageUrl]="getLogoUrl(theme, 'image')"
                 [small]="true"
-                [title]="'LOGO.TOOLTIPS.' + (getLogoUrl(theme) ? 'IMAGE' : 'PLACEHOLDER') | translate"
+                [title]="'LOGO.TOOLTIPS.' + (getLogoUrl(theme, 'image') ? 'IMAGE' : 'PLACEHOLDER') | translate"
               ></app-image-container>
               <span class="p-float-label flex-grow-1">
                 <input
@@ -48,7 +48,8 @@
                   readonly
                   class="w-full"
                   id="theme_detail_item_logoUrl"
-                  [value]="getLogoUrl(theme)"
+                  [value]="getLogoUrl(theme, 'address') ?? ''"
+                  [title]="'LOGO.TOOLTIPS.LOGO_URL' | translate"
                 />
                 <label for="theme_detail_item_logoUrl">{{ 'LOGO.LOGO_URL' | translate }}</label>
               </span>

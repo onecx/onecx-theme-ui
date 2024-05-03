@@ -92,10 +92,12 @@
     }
   },
   "LOGO": {
-    "LOGO_URL": "Logo URL",
+    "LOGO_URL": "External Logo URL",
     "TOOLTIPS": {
       "IMAGE": "Logo",
       "PLACEHOLDER": "Image Placeholder",
+      "LOGO_URL_UPLOAD": "As an alternative to uploading, a URL to an image can be specified here",
+      "LOGO_URL": "URL to an external image",
       "UPLOAD": "Select and upload image"
     },
     "UPLOADED": "File uploaded"
