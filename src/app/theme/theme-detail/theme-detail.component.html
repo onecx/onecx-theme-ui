@@ -37,16 +37,22 @@
 
             <div class="flex flex-wrap sm:flex-nowrap justify-content-around align-items-center row-gap-1">
               <div class="flex flex-nowrap align-items-center column-gap-2">
-                <label class="flex font-medium text-600">{{ 'LOGO.LABEL' | translate }}</label>
+                <label for="theme_detail_item_logo" class="flex font-medium text-600">
+                  {{ 'LOGO.LABEL' | translate }}</label
+                >
                 <app-image-container
+                  id="theme_detail_item_logo"
                   [imageUrl]="getImageUrl(theme, RefType.Logo)"
                   [small]="true"
                   [title]="'LOGO.TOOLTIPS.' + (getLogoUrl(theme, 'image') ? 'IMAGE' : 'PLACEHOLDER') | translate"
                 ></app-image-container>
               </div>
               <div class="flex flex-nowrap align-items-center column-gap-2">
-                <label class="flex font-medium text-600">{{ 'FAVICON.LABEL' | translate }}</label>
+                <label for="theme_detail_item_favicon" class="flex font-medium text-600">
+                  {{ 'FAVICON.LABEL' | translate }}</label
+                >
                 <app-image-container
+                  id="theme_detail_item_favicon"
                   [imageUrl]="getImageUrl(theme, RefType.Favicon)"
                   [small]="true"
                   [title]="'LOGO.TOOLTIPS.' + (getLogoUrl(theme, 'image') ? 'IMAGE' : 'PLACEHOLDER') | translate"
