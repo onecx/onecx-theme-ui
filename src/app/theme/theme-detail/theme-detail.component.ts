@@ -11,6 +11,7 @@ import { limitText, sortByLocale } from 'src/app/shared/utils'
 import {
   ExportThemeRequest,
   ImagesInternalAPIService,
+  RefType,
   Theme,
   ThemesAPIService,
   Workspace
@@ -28,6 +29,7 @@ export class ThemeDetailComponent implements OnInit {
   themeDeleteMessage = ''
   workspaceList = ''
   loading = true
+  RefType = RefType
   public dateFormat = 'medium'
   // page header
   public actions$: Observable<Action[]> | undefined
@@ -231,5 +233,22 @@ export class ThemeDetailComponent implements OnInit {
     } else {
       return ''
     }
+  }
+
+  public getImageUrl(theme: Theme | undefined, refType: RefType): string | undefined {
+    if (!theme) {
+      return undefined
+    }
+    if (refType === RefType.Logo && theme.logoUrl !== null && theme.logoUrl !== '') {
+      return theme.logoUrl
+    }
+    if (refType === RefType.Favicon && theme.faviconUrl !== null && theme.faviconUrl !== '') {
+      return theme.faviconUrl
+    }
+    return this.bffImageUrl(theme.name, refType)
+  }
+
+  private bffImageUrl(themeName: string | undefined, refType: RefType): string {
+    return !themeName ? '' : this.imageApi.configuration.basePath + '/images/' + themeName + '/' + refType
   }
 }

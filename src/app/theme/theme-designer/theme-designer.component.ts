@@ -434,7 +434,8 @@ export class ThemeDesignerComponent implements OnInit {
       if (files) {
         if (files[0].size > 110000) {
           this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.IMAGE_CONSTRAINT_SIZE' })
-        } else if (!files[0].name.match(/^.*.(jpg|jpeg|png)$/)) {
+          //        } else if (!files[0].name.match(/^.*.(jpg|jpeg|png)$/)) {
+        } else if (!/^.*.(jpg|jpeg|png)$/.exec(files[0].name)) {
           this.displayFileTypeErrorLogo = fieldType === RefType.Logo
           this.displayFileTypeErrorFavicon = fieldType === RefType.Favicon
         } else this.saveImage(currThemeName, fieldType, files)

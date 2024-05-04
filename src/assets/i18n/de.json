@@ -92,6 +92,7 @@
     }
   },
   "LOGO": {
+    "LABEL": "Logo",
     "LOGO_URL": "Externe Logo URL",
     "TOOLTIPS": {
       "IMAGE": "Logo",
@@ -103,6 +104,7 @@
     "UPLOADED": "Datei hochgeladen"
   },
   "FAVICON": {
+    "LABEL": "Favoriten Icon",
     "FAVICON_URL": "Externe Favicon URL",
     "TOOLTIPS": {
       "IMAGE": "Favicon",

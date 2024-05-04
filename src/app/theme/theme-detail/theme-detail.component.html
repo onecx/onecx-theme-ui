@@ -35,25 +35,49 @@
               <label for="theme_detail_item_description">{{ 'THEME.DESCRIPTION' | translate }}</label>
             </span>
 
-            <div class="flex flex-wrap sm:flex-nowrap align-items-center pb-2 row-gap-2 column-gap-4">
-              <app-image-container
-                [imageUrl]="getLogoUrl(theme, 'image')"
-                [small]="true"
-                [title]="'LOGO.TOOLTIPS.' + (getLogoUrl(theme, 'image') ? 'IMAGE' : 'PLACEHOLDER') | translate"
-              ></app-image-container>
-              <span class="p-float-label flex-grow-1">
-                <input
-                  pInputText
-                  type="text"
-                  readonly
-                  class="w-full"
-                  id="theme_detail_item_logoUrl"
-                  [value]="getLogoUrl(theme, 'address') ?? ''"
-                  [title]="'LOGO.TOOLTIPS.LOGO_URL' | translate"
-                />
-                <label for="theme_detail_item_logoUrl">{{ 'LOGO.LOGO_URL' | translate }}</label>
-              </span>
+            <div class="flex flex-wrap sm:flex-nowrap justify-content-around align-items-center row-gap-1">
+              <div class="flex flex-nowrap align-items-center column-gap-2">
+                <label class="flex font-medium text-600">{{ 'LOGO.LABEL' | translate }}</label>
+                <app-image-container
+                  [imageUrl]="getImageUrl(theme, RefType.Logo)"
+                  [small]="true"
+                  [title]="'LOGO.TOOLTIPS.' + (getLogoUrl(theme, 'image') ? 'IMAGE' : 'PLACEHOLDER') | translate"
+                ></app-image-container>
+              </div>
+              <div class="flex flex-nowrap align-items-center column-gap-2">
+                <label class="flex font-medium text-600">{{ 'FAVICON.LABEL' | translate }}</label>
+                <app-image-container
+                  [imageUrl]="getImageUrl(theme, RefType.Favicon)"
+                  [small]="true"
+                  [title]="'LOGO.TOOLTIPS.' + (getLogoUrl(theme, 'image') ? 'IMAGE' : 'PLACEHOLDER') | translate"
+                ></app-image-container>
+              </div>
             </div>
+
+            <span class="p-float-label flex-grow-1">
+              <input
+                pInputText
+                type="text"
+                readonly
+                class="w-full"
+                id="theme_detail_item_logoUrl"
+                [value]="getLogoUrl(theme, 'address') ?? ''"
+                [title]="'LOGO.TOOLTIPS.LOGO_URL' | translate"
+              />
+              <label for="theme_detail_item_logoUrl">{{ 'LOGO.LOGO_URL' | translate }}</label>
+            </span>
+            <span class="p-float-label flex-grow-1">
+              <input
+                pInputText
+                type="text"
+                readonly
+                class="w-full"
+                id="theme_detail_item_faviconUrl"
+                [value]="getLogoUrl(theme, 'address') ?? ''"
+                [title]="'FAVICON.TOOLTIPS.LOGO_URL' | translate"
+              />
+              <label for="theme_detail_item_faviconUrl">{{ 'FAVICON.LOGO_URL' | translate }}</label>
+            </span>
           </div>
         </div>
       </p-tabPanel>
