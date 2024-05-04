@@ -33,12 +33,12 @@ describe('ImageContainerComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy()
-    expect(component.defaultImageUrl).toEqual('/base/./assets/images/logo.jpg')
+    expect(component.defaultImageUrl).toEqual('/base/assets/images/logo.png')
   })
 
   describe('ngOnChanges', () => {
     it('should prepend apiPrefix to imageUrl if not starting with http/https and not already prefixed', () => {
-      const testUrl = 'path/to/image.jpg'
+      const testUrl = 'path/to/image.png'
       const expectedUrl = prepareUrl(testUrl)
 
       component.imageUrl = testUrl
@@ -51,7 +51,7 @@ describe('ImageContainerComponent', () => {
         }
       })
 
-      expect(component.imageUrl).toBe(expectedUrl ?? '')
+      expect(component.displayImageUrl).toBe(expectedUrl ?? '')
     })
 
     it('should not modify imageUrl if it starts with http/https', () => {
@@ -70,9 +70,9 @@ describe('ImageContainerComponent', () => {
     })
   })
 
-  it('onImageError should set displayPlaceHolder to true', () => {
+  it('onImageError should set displayDefaultLogo to true', () => {
     component.onImageError()
 
-    expect(component.displayPlaceHolder).toBeTrue()
+    expect(component.displayDefaultLogo).toBeTrue()
   })
 })

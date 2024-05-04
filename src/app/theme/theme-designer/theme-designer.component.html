@@ -3,9 +3,11 @@
     header="{{ theme ? theme.name : 'Theme Designer' }}"
     [subheader]="'THEME.DESIGNER.' + mode + '.SUBHEADER' | translate"
     [actions]="(actions$ | async) ?? []"
+  ></ocx-page-header>
+  <!--
     [figureImage]="fetchingLogoUrl"
     [figureBackground]="!fetchingLogoUrl"
-  ></ocx-page-header>
+  -->
   <ocx-page-content>
     <div>
       <div class="flex flex-wrap justify-content-between align-items-center my-2 mx-4 p-2 row-gap-2 column-gap-3">
@@ -71,7 +73,7 @@
               type="file"
               hidden
               #selectedFileInputLogo
-              (change)="onFileUpload($event, 'logo')"
+              (change)="onFileUpload($event, RefType.Logo)"
               accept=".png, .jpg, .jpeg"
             />
             <input
@@ -79,11 +81,11 @@
               type="file"
               hidden
               #selectedFileInputFavicon
-              (change)="onFileUpload($event, 'favicon')"
+              (change)="onFileUpload($event, RefType.Favicon)"
               accept=".png, .jpg, .jpeg"
             />
 
-            <div class="field col-12 mb-3" *ngIf="constraintUpload()">
+            <div class="field col-12 mb-3">
               <div class="flex flex-wrap sm:flex-nowrap align-items-center pb-2 row-gap-2 column-gap-4">
                 <app-image-container
                   [styleClass]="'w-5rem'"
@@ -95,6 +97,7 @@
                   pButton
                   id="theme_detail_upload_logo1"
                   icon="pi pi-upload"
+                  [disabled]="mode === 'NEW'"
                   class="action-button p-button-icon-only"
                   [title]="'LOGO.TOOLTIPS.UPLOAD' | translate"
                   (click)="selectedFileInputLogo.click()"
@@ -105,7 +108,7 @@
                     type="text"
                     id="theme_detail_upload_logo"
                     formControlName="logoUrl"
-                    (input)="inputChange(theme, 'logo')"
+                    (input)="inputChange(theme, RefType.Logo)"
                     [title]="'LOGO.TOOLTIPS.LOGO_URL_UPLOAD' | translate"
                   />
                   <label for="theme_detail_upload_logo">{{ 'LOGO.LOGO_URL' | translate }}</label>
@@ -115,7 +118,7 @@
                 </label>
               </div>
             </div>
-            <div class="field col-12 mb-0" *ngIf="constraintUpload()">
+            <div class="field col-12 mb-0">
               <div class="flex flex-wrap sm:flex-nowrap align-items-center pb-2 row-gap-2 column-gap-4">
                 <app-image-container
                   [styleClass]="'w-5rem'"
@@ -127,6 +130,7 @@
                   pButton
                   id="theme_detail_upload_favicon1"
                   icon="pi pi-upload"
+                  [disabled]="mode === 'NEW'"
                   class="action-button p-button-icon-only"
                   [title]="'FAVICON.TOOLTIPS.UPLOAD' | translate"
                   (click)="selectedFileInputFavicon.click()"
@@ -138,7 +142,7 @@
                     id="favicon"
                     id="theme_detail_upload_favicon"
                     formControlName="faviconUrl"
-                    (input)="inputChange(theme, 'favicon')"
+                    (input)="inputChange(theme, RefType.Favicon)"
                     [title]="'FAVICON.TOOLTIPS.FAVICON_URL_UPLOAD' | translate"
                   />
                   <label for="theme_detail_upload_favicon">{{ 'FAVICON.FAVICON_URL' | translate }}</label>

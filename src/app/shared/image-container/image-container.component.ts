@@ -16,8 +16,9 @@ export class ImageContainerComponent implements OnChanges {
   @Input() public small = false
   @Input() public styleClass: string | undefined
 
+  public displayImageUrl: string | undefined
   public defaultImageUrl = ''
-  public displayPlaceHolder = false
+  public displayDefaultLogo = false
 
   prepareUrl = prepareUrl
   prepareUrlPath = prepareUrlPath
@@ -33,13 +34,13 @@ export class ImageContainerComponent implements OnChanges {
   }
 
   public onImageError(): void {
-    this.displayPlaceHolder = true
+    this.displayDefaultLogo = true
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['imageUrl']) {
-      this.displayPlaceHolder = false
-      this.imageUrl = prepareUrl(this.imageUrl)
+    if (changes['imageUrl'] && this.imageUrl) {
+      this.displayDefaultLogo = false
+      this.displayImageUrl = prepareUrl(this.imageUrl)
     }
   }
 }

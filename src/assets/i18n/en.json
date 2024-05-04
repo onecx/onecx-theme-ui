@@ -109,8 +109,7 @@
       "PLACEHOLDER": "Image Placeholder",
       "FAVICON_URL_UPLOAD": "As an alternative to uploading, a URL to an image can be specified here",
       "UPLOAD": "Select and upload image"
-    },
-    "UPLOADED": "File uploaded"
+    }
   },
   "SEARCH": {
     "FILTER": "Filter",
