@@ -10,5 +10,5 @@ export const environment = {
   TKIT_PORTAL_ID: 'ADMIN',
   skipRemoteConfigLoad: true,
   apiPrefix: 'bff',
-  DEFAULT_LOGO_URL: './assets/images/logo.jpg'
+  DEFAULT_LOGO_URL: './assets/images/logo.png'
 }
