@@ -3,11 +3,9 @@
     header="{{ theme ? theme.name : 'Theme Designer' }}"
     [subheader]="'THEME.DESIGNER.' + mode + '.SUBHEADER' | translate"
     [actions]="(actions$ | async) ?? []"
-  ></ocx-page-header>
-  <!--
     [figureImage]="fetchingLogoUrl"
     [figureBackground]="!fetchingLogoUrl"
-  -->
+  ></ocx-page-header>
   <ocx-page-content>
     <div>
       <div class="flex flex-wrap justify-content-between align-items-center my-2 mx-4 p-2 row-gap-2 column-gap-3">
