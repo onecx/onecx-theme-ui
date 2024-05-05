@@ -181,17 +181,17 @@ describe('ThemeDesignerComponent', () => {
       fontFormControlEl.nativeElement.value = 'newFamily'
       fontFormControlEl.nativeElement.dispatchEvent(new Event('input'))
 
-      const generalFormControlEl = fixture.debugElement.query(By.css('#theme_detail_item_color-primary-color'))
+      const generalFormControlEl = fixture.debugElement.query(By.css('#theme_detail_item_color_primary-color'))
       expect(generalFormControlEl).toBeDefined()
       generalFormControlEl.nativeElement.value = 'rgba(0, 0, 0, 0.87)'
       generalFormControlEl.nativeElement.dispatchEvent(new Event('input'))
 
-      const topbarFormControlEl = fixture.debugElement.query(By.css('#theme_detail_item_color-topbar-bg-color'))
+      const topbarFormControlEl = fixture.debugElement.query(By.css('#theme_detail_item_color_topbar-bg-color'))
       expect(topbarFormControlEl).toBeDefined()
       topbarFormControlEl.nativeElement.value = '#000000'
       topbarFormControlEl.nativeElement.dispatchEvent(new Event('input'))
 
-      const sidebarFormControlEl = fixture.debugElement.query(By.css('#theme_detail_item_color-menu-text-color'))
+      const sidebarFormControlEl = fixture.debugElement.query(By.css('#theme_detail_item_color_menu-text-color'))
       expect(sidebarFormControlEl).toBeDefined()
       sidebarFormControlEl.nativeElement.value = '#102030'
       sidebarFormControlEl.nativeElement.dispatchEvent(new Event('input'))
