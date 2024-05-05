@@ -62,7 +62,7 @@ export class ThemeDetailComponent implements OnInit {
           this.theme = data.resource
           this.usedInWorkspaces = data.workspaces
           this.preparePage()
-          this.headerImageUrl = this.getLogoUrl(this.theme, 'image')
+          this.headerImageUrl = this.getImageUrl(this.theme, RefType.Logo)
         },
         error: (err) => {
           this.msgService.error({
@@ -219,20 +219,6 @@ export class ThemeDetailComponent implements OnInit {
   public prepareWorkspaceList(): string {
     const arr = this.usedInWorkspaces?.map((workspace: Workspace) => workspace.name)
     return arr?.sort(sortByLocale).join(', ') ?? ''
-  }
-
-  getLogoUrl(theme: Theme | undefined, usedFor: string): string | undefined {
-    if (!theme) {
-      return undefined
-    }
-    if (theme.logoUrl != null && theme.logoUrl != '') {
-      return theme.logoUrl
-    }
-    if (usedFor === 'image') {
-      return this.imageApi.configuration.basePath + '/images/' + theme.name + '/logo'
-    } else {
-      return ''
-    }
   }
 
   public getImageUrl(theme: Theme | undefined, refType: RefType): string | undefined {

@@ -44,7 +44,6 @@
                   id="theme_detail_item_logo"
                   [imageUrl]="getImageUrl(theme, RefType.Logo)"
                   [small]="true"
-                  [title]="'LOGO.TOOLTIPS.' + (getLogoUrl(theme, 'image') ? 'IMAGE' : 'PLACEHOLDER') | translate"
                 ></app-image-container>
               </div>
               <div class="flex flex-nowrap align-items-center column-gap-2">
@@ -55,35 +54,9 @@
                   id="theme_detail_item_favicon"
                   [imageUrl]="getImageUrl(theme, RefType.Favicon)"
                   [small]="true"
-                  [title]="'LOGO.TOOLTIPS.' + (getLogoUrl(theme, 'image') ? 'IMAGE' : 'PLACEHOLDER') | translate"
                 ></app-image-container>
               </div>
             </div>
-
-            <span class="p-float-label flex-grow-1">
-              <input
-                pInputText
-                type="text"
-                readonly
-                class="w-full"
-                id="theme_detail_item_logoUrl"
-                [value]="getLogoUrl(theme, 'address') ?? ''"
-                [title]="'LOGO.TOOLTIPS.LOGO_URL' | translate"
-              />
-              <label for="theme_detail_item_logoUrl">{{ 'LOGO.LOGO_URL' | translate }}</label>
-            </span>
-            <span class="p-float-label flex-grow-1">
-              <input
-                pInputText
-                type="text"
-                readonly
-                class="w-full"
-                id="theme_detail_item_faviconUrl"
-                [value]="getLogoUrl(theme, 'address') ?? ''"
-                [title]="'FAVICON.TOOLTIPS.LOGO_URL' | translate"
-              />
-              <label for="theme_detail_item_faviconUrl">{{ 'FAVICON.LOGO_URL' | translate }}</label>
-            </span>
           </div>
         </div>
       </p-tabPanel>
