@@ -234,7 +234,7 @@ export class ThemeDetailComponent implements OnInit {
     return this.bffImageUrl(theme.name, refType)
   }
 
-  private bffImageUrl(themeName: string | undefined, refType: RefType): string {
+  public bffImageUrl(themeName: string | undefined, refType: RefType): string {
     return !themeName ? '' : this.imageApi.configuration.basePath + '/images/' + themeName + '/' + refType
   }
 }

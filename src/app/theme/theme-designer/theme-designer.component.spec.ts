@@ -1183,4 +1183,10 @@ describe('ThemeDesignerComponent', () => {
       expect(component.fetchingLogoUrl).toBe('fetchedLogoUrl')
     })
   })
+
+  it('should test utility functions', () => {
+    expect(component.getImageUrl(undefined, RefType.Favicon)).toBeUndefined()
+
+    expect(component.bffImageUrl(undefined, RefType.Favicon)).toBe('')
+  })
 })

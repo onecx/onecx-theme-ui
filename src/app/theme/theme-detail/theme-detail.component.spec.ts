@@ -11,7 +11,7 @@ import FileSaver from 'file-saver'
 
 import { ConfigurationService, PortalMessageService, UserService } from '@onecx/portal-integration-angular'
 
-import { ThemesAPIService } from 'src/app/shared/generated'
+import { RefType, Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeDetailComponent } from './theme-detail.component'
 
 describe('ThemeDetailComponent', () => {
@@ -433,5 +433,17 @@ describe('ThemeDetailComponent', () => {
     }
     component.onExportTheme()
     expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EXPORT.EXPORT_THEME_FAIL' })
+  })
+
+  it('should get correct favicon URL', () => {
+    let theme: Theme = {
+      modificationCount: 0,
+      name: 'themeName',
+      faviconUrl: 'faviconUrl'
+    }
+    expect(component.getImageUrl(theme, RefType.Favicon)).toBe('faviconUrl')
+
+    theme.faviconUrl = ''
+    expect(component.getImageUrl(theme, RefType.Favicon)).toBe(component.bffImageUrl(theme.name, RefType.Favicon))
   })
 })
