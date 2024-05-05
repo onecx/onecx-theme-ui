@@ -98,7 +98,7 @@
                   [disabled]="mode === 'NEW'"
                   class="action-button p-button-icon-only"
                   [title]="'LOGO.TOOLTIPS.UPLOAD' | translate"
-                  (click)="selectedFileInputLogo.click()"
+                  (onClick)="selectedFileInputLogo.click()"
                 ></button>
                 <span class="p-float-label w-full">
                   <input
@@ -131,7 +131,7 @@
                   [disabled]="mode === 'NEW'"
                   class="action-button p-button-icon-only"
                   [title]="'FAVICON.TOOLTIPS.UPLOAD' | translate"
-                  (click)="selectedFileInputFavicon.click()"
+                  (onClick)="selectedFileInputFavicon.click()"
                 ></button>
                 <span class="p-float-label w-full">
                   <input
@@ -199,11 +199,11 @@
                 <span class="p-float-label">
                   <input
                     pInputText
-                    id="theme_detail_item_color-{{ item }}"
+                    id="theme_detail_item_color_{{ item }}"
                     [formControlName]="item"
                     [value]="group.formGroup.value[item]"
                   />
-                  <label for="theme_detail_item_color-{{ item }}">{{ item }}</label>
+                  <label for="theme_detail_item_color_{{ item }}">{{ item }}</label>
                 </span>
                 <p-overlayPanel #op>
                   <ng-template pTemplate>
@@ -213,11 +213,10 @@
                   </ng-template>
                 </p-overlayPanel>
                 <span
-                  class="p-inputgroup-addon"
+                  id="theme_detail_item_color_{{ item }}_toggle"
+                  class="p-inputgroup-addon cursor-pointer"
                   (click)="op.toggle($event)"
-                  [ngStyle]="{
-                    'background-color': group.formGroup.value[item]
-                  }"
+                  [ngStyle]="{ 'background-color': group.formGroup.value[item] }"
                 >
                 </span>
               </div>
@@ -257,14 +256,14 @@
         icon="pi pi-times"
         styleClass="m-0"
         [label]="'ACTIONS.CANCEL' | translate"
-        (click)="saveAsNewPopupDisplay = false"
+        (onClick)="saveAsNewPopupDisplay = false"
       ></p-button>
       <p-button
         icon="pi pi-save"
         styleClass="m-0"
         [disabled]="saveAsThemeName.value === ''"
         [label]="'ACTIONS.SAVE' | translate"
-        (click)="saveTheme(saveAsThemeName.value)"
+        (onClick)="saveTheme(saveAsThemeName.value)"
       ></p-button>
     </div>
   </ng-template>
