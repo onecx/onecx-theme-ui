@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
+import { TranslateTestingModule } from 'ngx-translate-testing'
+
 import { ImageContainerComponent } from './image-container.component'
 import { prepareUrl } from 'src/app/shared/utils'
 
@@ -21,6 +23,12 @@ describe('ImageContainerComponent', () => {
 
     TestBed.configureTestingModule({
       declarations: [ImageContainerComponent],
+      imports: [
+        TranslateTestingModule.withTranslations({
+          de: require('src/assets/i18n/de.json'),
+          en: require('src/assets/i18n/en.json')
+        }).withDefaultLanguage('en')
+      ],
       providers: [{ provide: AppStateService, useValue: mockAppStateService }]
     }).compileComponents()
   }))
