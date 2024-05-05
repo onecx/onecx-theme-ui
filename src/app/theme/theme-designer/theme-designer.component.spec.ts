@@ -20,8 +20,7 @@ import { ConfirmDialog, ConfirmDialogModule } from 'primeng/confirmdialog'
 
 import { PortalMessageService, ThemeService } from '@onecx/portal-integration-angular'
 
-import { ThemesAPIService, ImagesInternalAPIService } from 'src/app/shared/generated'
-import { prepareUrl } from 'src/app/shared/utils'
+import { RefType, ThemesAPIService, ImagesInternalAPIService } from 'src/app/shared/generated'
 import { themeVariables } from './theme-variables'
 import { ThemeDesignerComponent } from './theme-designer.component'
 
@@ -712,7 +711,7 @@ describe('ThemeDesignerComponent', () => {
       }
       component.basicForm.controls['name'].setValue('')
 
-      component.onFileUpload(event as any, 'logo')
+      component.onFileUpload(event as any, RefType.Logo)
 
       expect(msgServiceSpy.error).toHaveBeenCalledWith({
         summaryKey: 'ACTIONS.EDIT.MESSAGE.IMAGE_CONSTRAINT'
@@ -729,7 +728,7 @@ describe('ThemeDesignerComponent', () => {
       }
       component.basicForm.controls['name'].setValue('name')
 
-      component.onFileUpload(event as any, 'logo')
+      component.onFileUpload(event as any, RefType.Logo)
 
       expect(msgServiceSpy.error).toHaveBeenCalledWith({
         summaryKey: 'ACTIONS.EDIT.MESSAGE.IMAGE_CONSTRAINT_SIZE'
@@ -747,7 +746,7 @@ describe('ThemeDesignerComponent', () => {
       }
       component.basicForm.controls['name'].setValue('name')
 
-      component.onFileUpload(event as any, 'logo')
+      component.onFileUpload(event as any, RefType.Logo)
 
       expect(component.displayFileTypeErrorLogo).toBeTrue()
     })
@@ -767,7 +766,7 @@ describe('ThemeDesignerComponent', () => {
       }
       component.basicForm.controls['name'].setValue('name')
 
-      component.onFileUpload(event as any, 'logo')
+      component.onFileUpload(event as any, RefType.Logo)
 
       expect(msgServiceSpy.info).toHaveBeenCalledWith({
         summaryKey: 'LOGO.UPLOADED'
@@ -789,7 +788,7 @@ describe('ThemeDesignerComponent', () => {
       }
       component.basicForm.controls['name'].setValue('name')
 
-      component.onFileUpload(event as any, 'favicon')
+      component.onFileUpload(event as any, RefType.Favicon)
 
       expect(msgServiceSpy.info).toHaveBeenCalledWith({
         summaryKey: 'LOGO.UPLOADED'
@@ -807,7 +806,7 @@ describe('ThemeDesignerComponent', () => {
       }
       component.basicForm.controls['name'].setValue('name')
 
-      component.onFileUpload(event as any, 'logo')
+      component.onFileUpload(event as any, RefType.Logo)
 
       expect(msgServiceSpy.info).toHaveBeenCalledWith({
         summaryKey: 'LOGO.UPLOADED'
@@ -825,7 +824,7 @@ describe('ThemeDesignerComponent', () => {
       }
       component.basicForm.controls['name'].setValue('name')
 
-      component.onFileUpload(event as any, 'favicon')
+      component.onFileUpload(event as any, RefType.Favicon)
 
       expect(msgServiceSpy.info).toHaveBeenCalledWith({
         summaryKey: 'LOGO.UPLOADED'
@@ -849,7 +848,7 @@ describe('ThemeDesignerComponent', () => {
         }
       }
 
-      const result = component.getImageUrl(themeData, 'logo')
+      const result = component.getImageUrl(themeData, RefType.Logo)
 
       expect(result).toBe('path/images/themeName/logo')
     })
@@ -871,7 +870,7 @@ describe('ThemeDesignerComponent', () => {
         }
       }
 
-      const result = component.getImageUrl(themeData, 'favicon')
+      const result = component.getImageUrl(themeData, RefType.Favicon)
 
       expect(result).toBe('path/images/themeName/favicon')
     })
@@ -900,7 +899,7 @@ describe('ThemeDesignerComponent', () => {
       }
       component.basicForm.controls['faviconUrl'].setValue('icon')
 
-      component.inputChange(themeData, 'favicon')
+      component.inputChange(themeData, RefType.Favicon)
 
       tick(1000)
 
@@ -926,7 +925,7 @@ describe('ThemeDesignerComponent', () => {
       component.basicForm.controls['logoUrl'].setValue('')
       component.imageLogoExists = true
 
-      component.inputChange(themeData, 'logo')
+      component.inputChange(themeData, RefType.Logo)
 
       tick(1000)
 
@@ -952,7 +951,7 @@ describe('ThemeDesignerComponent', () => {
       component.basicForm.controls['faviconUrl'].setValue('')
       component.imageFaviconExists = true
 
-      component.inputChange(themeData, 'favicon')
+      component.inputChange(themeData, RefType.Favicon)
 
       tick(1000)
 
@@ -1180,8 +1179,14 @@ describe('ThemeDesignerComponent', () => {
           general: jasmine.objectContaining({ 'primary-color': 'rgb(255,255,255)' })
         })
       )
-      expect(component.fetchingFaviconUrl).toBe(undefined)
-      expect(component.fetchingLogoUrl).toBe(prepareUrl(undefined))
+      expect(component.fetchingFaviconUrl).toBe('fetchedFavUrl')
+      expect(component.fetchingLogoUrl).toBe('fetchedLogoUrl')
     })
+  })
+
+  it('should test utility functions', () => {
+    expect(component.getImageUrl(undefined, RefType.Favicon)).toBeUndefined()
+
+    expect(component.bffImageUrl(undefined, RefType.Favicon)).toBe('')
   })
 })

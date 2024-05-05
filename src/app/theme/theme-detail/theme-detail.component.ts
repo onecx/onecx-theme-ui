@@ -11,6 +11,7 @@ import { limitText, sortByLocale } from 'src/app/shared/utils'
 import {
   ExportThemeRequest,
   ImagesInternalAPIService,
+  RefType,
   Theme,
   ThemesAPIService,
   Workspace
@@ -28,6 +29,7 @@ export class ThemeDetailComponent implements OnInit {
   themeDeleteMessage = ''
   workspaceList = ''
   loading = true
+  RefType = RefType
   public dateFormat = 'medium'
   // page header
   public actions$: Observable<Action[]> | undefined
@@ -60,7 +62,7 @@ export class ThemeDetailComponent implements OnInit {
           this.theme = data.resource
           this.usedInWorkspaces = data.workspaces
           this.preparePage()
-          this.headerImageUrl = this.getLogoUrl(this.theme, 'image')
+          this.headerImageUrl = this.getImageUrl(this.theme, RefType.Logo)
         },
         error: (err) => {
           this.msgService.error({
@@ -219,17 +221,20 @@ export class ThemeDetailComponent implements OnInit {
     return arr?.sort(sortByLocale).join(', ') ?? ''
   }
 
-  getLogoUrl(theme: Theme | undefined, usedFor: string): string | undefined {
+  public getImageUrl(theme: Theme | undefined, refType: RefType): string | undefined {
     if (!theme) {
       return undefined
     }
-    if (theme.logoUrl != null && theme.logoUrl != '') {
+    if (refType === RefType.Logo && theme.logoUrl !== null && theme.logoUrl !== '') {
       return theme.logoUrl
     }
-    if (usedFor === 'image') {
-      return this.imageApi.configuration.basePath + '/images/' + theme.name + '/logo'
-    } else {
-      return ''
+    if (refType === RefType.Favicon && theme.faviconUrl !== null && theme.faviconUrl !== '') {
+      return theme.faviconUrl
     }
+    return this.bffImageUrl(theme.name, refType)
+  }
+
+  public bffImageUrl(themeName: string | undefined, refType: RefType): string {
+    return !themeName ? '' : this.imageApi.configuration.basePath + '/images/' + themeName + '/' + refType
   }
 }

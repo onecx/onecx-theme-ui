@@ -8,15 +8,13 @@ import { ConfirmationService, SelectItem } from 'primeng/api'
 import { Action, AppStateService, PortalMessageService, ThemeService } from '@onecx/portal-integration-angular'
 import { dropDownSortItemsByLabel, dropDownGetLabelByValue } from 'src/app/shared/utils'
 import {
-  GetImageRequestParams,
   GetThemeResponse,
   ImagesInternalAPIService,
   RefType,
   Theme,
   ThemesAPIService,
   ThemeUpdateCreate,
-  UpdateThemeResponse,
-  UploadImageRequestParams
+  UpdateThemeResponse
 } from 'src/app/shared/generated'
 import { themeVariables } from './theme-variables'
 
@@ -31,6 +29,7 @@ export class ThemeDesignerComponent implements OnInit {
   @ViewChild('selectedFileInputLogo') selectedFileInputLogo: ElementRef | undefined
   @ViewChild('selectedFileInputFavicon') selectedFileInputFavicon: ElementRef | undefined
 
+  RefType = RefType
   public actions$: Observable<Action[]> | undefined
   public themes: Theme[] = []
   public theme: Theme | undefined
@@ -159,8 +158,8 @@ export class ThemeDesignerComponent implements OnInit {
         this.basicForm.controls['name'].disable()
         this.propertiesForm.reset()
         this.propertiesForm.patchValue(data.resource.properties || {})
-        this.fetchingLogoUrl = this.getImageUrl(this.theme, 'logo')
-        this.fetchingFaviconUrl = this.getImageUrl(this.theme, 'favicon')
+        this.fetchingLogoUrl = this.getImageUrl(this.theme, RefType.Logo)
+        this.fetchingFaviconUrl = this.getImageUrl(this.theme, RefType.Favicon)
         this.themeId = data.resource.id
         this.themeIsCurrentUsedTheme = this.themeId === this.appStateService.currentPortal$.getValue()?.themeId
         this.imageLogoExists = this.urlExists(data.resource.logoUrl)
@@ -265,10 +264,10 @@ export class ThemeDesignerComponent implements OnInit {
                 if (this.mode === 'NEW') {
                   this.basicForm.controls['name'].setValue(data['GENERAL.COPY_OF'] + result.resource.name)
                   this.basicForm.controls['description'].setValue(result.resource.description)
-                  this.basicForm.controls['faviconUrl'].setValue(this.getImageUrl(result.resource, 'favicon'))
-                  this.basicForm.controls['logoUrl'].setValue(this.getImageUrl(result.resource, 'logo'))
-                  this.fetchingLogoUrl = this.getImageUrl(this.theme, 'logo')
-                  this.fetchingFaviconUrl = this.getImageUrl(this.theme, 'favicon')
+                  this.basicForm.controls['logoUrl'].setValue(result.resource.logoUrl)
+                  this.basicForm.controls['faviconUrl'].setValue(result.resource.faviconUrl)
+                  this.fetchingLogoUrl = this.getImageUrl(result.resource, RefType.Logo)
+                  this.fetchingFaviconUrl = this.getImageUrl(result.resource, RefType.Favicon)
                 }
                 if (result.resource.properties) {
                   this.propertiesForm.reset()
@@ -421,131 +420,90 @@ export class ThemeDesignerComponent implements OnInit {
   }
 
   // Image Files
-  public onFileUpload(ev: Event, fieldType: 'logo' | 'favicon'): void {
+  public onFileUpload(ev: Event, fieldType: RefType): void {
     let currThemeName = this.basicForm.controls['name'].value
+    if (!currThemeName || currThemeName === '') {
+      this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.IMAGE_CONSTRAINT' })
+      return
+    }
     this.displayFileTypeErrorLogo = false
     this.displayFileTypeErrorFavicon = false
     if (ev.target && (ev.target as HTMLInputElement).files) {
       const files = (ev.target as HTMLInputElement).files
 
-      if (files && files[0].size > 110000) {
-        this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.IMAGE_CONSTRAINT_SIZE' })
-      } else if (files && currThemeName) {
-        this.saveImage(currThemeName, fieldType, files)
+      if (files) {
+        if (files[0].size > 110000) {
+          this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.IMAGE_CONSTRAINT_SIZE' })
+        } else if (!/^.*.(jpg|jpeg|png)$/.exec(files[0].name)) {
+          this.displayFileTypeErrorLogo = fieldType === RefType.Logo
+          this.displayFileTypeErrorFavicon = fieldType === RefType.Favicon
+        } else this.saveImage(currThemeName, fieldType, files)
       } else {
         this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.IMAGE_CONSTRAINT' })
       }
     }
   }
 
-  saveImage(currThemeName: string, fieldType: string, files: FileList) {
-    // Set request parameter
-    let requestParameters: UploadImageRequestParams
+  private saveImage(currThemeName: string, fieldType: RefType, files: FileList) {
     const blob = new Blob([files[0]], { type: files[0].type })
-    let imageType: RefType = RefType.Logo
-    if (fieldType === 'logo') {
+    if (fieldType === RefType.Logo) {
       this.fetchingLogoUrl = undefined
     } else {
       this.fetchingFaviconUrl = undefined
-      imageType = RefType.Favicon
     }
-    requestParameters = {
-      contentLength: files.length,
-      refId: currThemeName,
-      refType: imageType,
-      body: blob
-    }
-
-    let requestParametersGet: GetImageRequestParams
-    requestParametersGet = {
-      refId: currThemeName,
-      refType: imageType
-    }
-
-    this.imageApi.getImage(requestParametersGet).subscribe(
-      (res) => {
-        if (files[0].name.match(/^.*.(jpg|jpeg|png)$/)) {
-          this.imageApi.updateImage(requestParameters).subscribe((data) => {
-            if (fieldType === 'logo') {
-              this.imageLogoExists = true
-              this.fetchingLogoUrl = this.imageApi.configuration.basePath + '/images/' + currThemeName + '/' + fieldType
-            } else {
-              this.imageFaviconExists = true
-              this.fetchingFaviconUrl =
-                this.imageApi.configuration.basePath + '/images/' + currThemeName + '/' + fieldType
-            }
-            this.msgService.info({ summaryKey: 'LOGO.UPLOADED' })
-            this.basicForm.controls[fieldType + 'Url'].setValue('')
-          })
-        }
-      },
-      (err) => {
-        if (files[0].name.match(/^.*.(jpg|jpeg|png)$/)) {
-          Array.from(files).forEach((file) => {
-            this.imageApi.uploadImage(requestParameters).subscribe((data) => {
-              if (fieldType === 'logo') {
-                this.imageLogoExists = true
-                this.fetchingLogoUrl =
-                  this.imageApi.configuration.basePath + '/images/' + currThemeName + '/' + fieldType
-              } else {
-                this.imageFaviconExists = true
-                this.fetchingFaviconUrl =
-                  this.imageApi.configuration.basePath + '/images/' + currThemeName + '/' + fieldType
-              }
-              this.msgService.info({ summaryKey: 'LOGO.UPLOADED' })
-              this.basicForm.controls[fieldType + 'Url'].setValue('')
-            })
-          })
+    this.imageApi
+      .uploadImage({
+        contentLength: files.length,
+        refId: currThemeName,
+        refType: fieldType,
+        body: blob
+      })
+      .subscribe(() => {
+        if (fieldType === RefType.Logo) {
+          this.imageLogoExists = true
+          this.fetchingLogoUrl = this.bffImageUrl(currThemeName, fieldType)
         } else {
-          this.displayFileTypeErrorLogo = fieldType === 'logo'
-          this.displayFileTypeErrorFavicon = fieldType === 'favicon'
+          this.imageFaviconExists = true
+          this.fetchingFaviconUrl = this.bffImageUrl(currThemeName, fieldType)
         }
-      }
-    )
+        this.msgService.info({ summaryKey: 'LOGO.UPLOADED' })
+        this.basicForm.controls[fieldType + 'Url'].setValue(null)
+      })
   }
 
-  constraintUpload(): boolean {
-    const currThemeName = this.basicForm.controls['name'].value
-    if (currThemeName === null || currThemeName === '') {
-      return false
-    }
-    return true
-  }
-
-  getImageUrl(theme: Theme | undefined, imageType: string): string | undefined {
+  getImageUrl(theme: Theme | undefined, refType: RefType): string | undefined {
     if (!theme) {
       return undefined
     }
-    if (imageType === 'logo') {
-      if (theme.logoUrl !== null && theme.logoUrl != '') {
-        return theme.logoUrl
-      }
-      return this.imageApi.configuration.basePath + '/images/' + theme.name + '/logo'
-    } else {
-      if (theme.faviconUrl !== null && theme.faviconUrl !== '') {
-        return theme.faviconUrl
-      }
-      return this.imageApi.configuration.basePath + '/images/' + theme.name + '/favicon'
+    if (refType === RefType.Logo && theme.logoUrl !== null && theme.logoUrl !== '') {
+      return theme.logoUrl
     }
+    if (refType === RefType.Favicon && theme.faviconUrl !== null && theme.faviconUrl !== '') {
+      return theme.faviconUrl
+    }
+    return this.bffImageUrl(theme.name, refType)
   }
 
+  public bffImageUrl(themeName: string | undefined, refType: RefType): string {
+    return !themeName ? '' : this.imageApi.configuration.basePath + '/images/' + themeName + '/' + refType
+  }
   urlExists(url: string | undefined): boolean {
     return !url || url === ''
   }
 
-  inputChange(theme: Theme | undefined, fieldType: string) {
+  inputChange(theme: Theme | undefined, fieldType: RefType) {
     setTimeout(() => {
       if (fieldType === 'logo') {
         this.fetchingLogoUrl = this.basicForm.controls['logoUrl'].value
       } else {
         this.fetchingFaviconUrl = this.basicForm.controls['faviconUrl'].value
       }
-
-      if (this.imageLogoExists && this.basicForm.controls['logoUrl'].value === '') {
-        this.fetchingLogoUrl = this.imageApi.configuration.basePath + '/images/' + theme?.name + '/logo'
+      // if there is no value for external URL then use the bff URL
+      if (this.imageLogoExists && this.fetchingLogoUrl === '') {
+        this.fetchingLogoUrl = this.bffImageUrl(theme?.name, RefType.Logo)
       }
-      if (this.imageFaviconExists && this.basicForm.controls['faviconUrl'].value === '') {
-        this.fetchingFaviconUrl = this.imageApi.configuration.basePath + '/images/' + theme?.name + '/favicon'
+      if (this.imageFaviconExists && this.fetchingFaviconUrl === '') {
+        this.fetchingFaviconUrl = this.bffImageUrl(theme?.name, RefType.Favicon)
       }
     }, 1000)
   }

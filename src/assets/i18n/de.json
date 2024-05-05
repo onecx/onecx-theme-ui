@@ -92,6 +92,7 @@
     }
   },
   "LOGO": {
+    "LABEL": "Logo",
     "LOGO_URL": "Externe Logo URL",
     "TOOLTIPS": {
       "IMAGE": "Logo",
@@ -103,14 +104,14 @@
     "UPLOADED": "Datei hochgeladen"
   },
   "FAVICON": {
+    "LABEL": "Favoriten Icon",
     "FAVICON_URL": "Externe Favicon URL",
     "TOOLTIPS": {
-      "IMAGE": "Favicon",
+      "IMAGE": "Favoriten/Lesezeichen Icon",
       "PLACEHOLDER": "Platzhalter für ein Bild",
       "FAVICON_URL_UPLOAD": "Als Alternative zum Hochladen kann hier eine URL zu einem Bild angegeben werden",
       "UPLOAD": "Bild auswählen und hochladen"
-    },
-    "UPLOADED": "Datei hochgeladen"
+    }
   },
   "SEARCH": {
     "FILTER": "Filter",
