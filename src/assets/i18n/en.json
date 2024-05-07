@@ -91,6 +91,16 @@
       "VIEW_MODE_TABLE": "Table view"
     }
   },
+  "IMAGE": {
+    "UPLOADED": "File uploaded",
+    "UPLOAD_FAIL": " The file was not uploaded successfully",
+    "UPLOAD_SUCCESS": "The file was uploaded successfully",
+    "CONSTRAINT_FILE_MISSING": "No file selected.",
+    "CONSTRAINT_FILE_TYPE": "The following image formats are accepted: jpg, jpeg, png",
+    "CONSTRAINT_FAILED": "File upload condition check failed:",
+    "CONSTRAINT_NAME": "Please add a Workspace name before uploading a file.",
+    "CONSTRAINT_SIZE": "The image file size exceeds the maximum length of 100,000 bytes."
+  },
   "LOGO": {
     "LABEL": "Logo",
     "LOGO_URL": "External Logo URL",
@@ -100,8 +110,7 @@
       "LOGO_URL_UPLOAD": "As an alternative to uploading, a URL to an image can be specified here",
       "LOGO_URL": "URL to an external image",
       "UPLOAD": "Select and upload image"
-    },
-    "UPLOADED": "File uploaded"
+    }
   },
   "FAVICON": {
     "LABEL": "Favorite Icon",

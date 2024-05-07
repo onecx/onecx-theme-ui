@@ -1,6 +1,7 @@
 import { SelectItem } from 'primeng/api'
 import { Location } from '@angular/common'
 import { environment } from 'src/environments/environment'
+import { RefType } from 'src/app/shared/generated'
 
 export function limitText(text: string, limit: number): string {
   if (text) {
@@ -8,19 +9,6 @@ export function limitText(text: string, limit: number): string {
   } else {
     return ''
   }
-}
-
-export function prepareUrl(url: string | undefined): string | undefined {
-  if (url && !url.match(/^(http|https)/g)) {
-    return Location.joinWithSlash(environment.apiPrefix, url)
-  } else {
-    return url
-  }
-}
-export function prepareUrlPath(url?: string, path?: string): string {
-  if (url && path) return Location.joinWithSlash(url, path)
-  else if (url) return url
-  else return ''
 }
 
 export function dropDownSortItemsByLabel(a: SelectItem, b: SelectItem): number {
@@ -49,4 +37,23 @@ export function filterObject(obj: any, exProps: string[]): any {
     }
   }
   return pickedObj
+}
+
+/**
+ * URLs
+ */
+export function prepareUrl(url: string | undefined): string | undefined {
+  if (url && !/^(http|https).*/.exec(url)) {
+    return Location.joinWithSlash(environment.apiPrefix, url)
+  } else {
+    return url
+  }
+}
+export function prepareUrlPath(url?: string, path?: string): string {
+  if (url && path) return Location.joinWithSlash(url, path)
+  else if (url) return url
+  else return ''
+}
+export function bffImageUrl(basePath: string | undefined, name: string | undefined, refType: RefType): string {
+  return !name ? '' : basePath + '/images/' + name + '/' + refType
 }
