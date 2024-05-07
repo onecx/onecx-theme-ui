@@ -470,7 +470,6 @@ export class ThemeDesignerComponent implements OnInit {
       this.fetchingFaviconUrl = undefined
     }
     const saveRequestParameter = {
-      contentLength: files.length,
       refId: name,
       refType: refType,
       body: blob
