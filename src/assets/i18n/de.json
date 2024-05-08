@@ -91,27 +91,31 @@
       "VIEW_MODE_TABLE": "Tabellenansicht"
     }
   },
+  "IMAGE": {
+    "UPLOADED": "Datei hochgeladen",
+    "UPLOAD_FAIL": "Die Datei wurde nicht erfolgreich hochgeladen",
+    "UPLOAD_SUCCESS": "Die Datei wurde erfolgreich hochgeladen",
+    "CONSTRAINT_FILE_MISSING": "Keine Datei ausgewählt.",
+    "CONSTRAINT_FILE_TYPE": "Die folgenden Bildformate werden akzeptiert: jpg, jpeg, png",
+    "CONSTRAINT_FAILED": "Bedingung zum Hochladen nicht erfüllt:",
+    "CONSTRAINT_NAME": "Bitte füge einen Namen hinzu bevor das Bild geladen wird.",
+    "CONSTRAINT_SIZE": "Die Größe der Bilddatei übersteigt die maximale Lönge von 100.000 Bytes.",
+    "TOOLTIPS": {
+      "IMAGE": "Bild",
+      "PLACEHOLDER": "Platzhalter",
+      "URL": "Als Alternative zum Hochladen kann hier eine URL zu einem Bild angegeben werden",
+      "UPLOAD": "Bild auswählen und hochladen"
+    }
+  },
   "LOGO": {
     "LABEL": "Logo",
-    "LOGO_URL": "Externe Logo URL",
-    "TOOLTIPS": {
-      "IMAGE": "Logo",
-      "PLACEHOLDER": "Platzhalter für ein Bild",
-      "LOGO_URL_UPLOAD": "Als Alternative zum Hochladen kann hier eine URL zu einem Bild angegeben werden",
-      "LOGO_URL": "URL zu einem externen Bild",
-      "UPLOAD": "Bild auswählen und hochladen"
-    },
-    "UPLOADED": "Datei hochgeladen"
+    "URL": "Externe Logo URL",
+    "IMAGE": "Logo"
   },
   "FAVICON": {
     "LABEL": "Favoriten Icon",
-    "FAVICON_URL": "Externe Favicon URL",
-    "TOOLTIPS": {
-      "IMAGE": "Favoriten/Lesezeichen Icon",
-      "PLACEHOLDER": "Platzhalter für ein Bild",
-      "FAVICON_URL_UPLOAD": "Als Alternative zum Hochladen kann hier eine URL zu einem Bild angegeben werden",
-      "UPLOAD": "Bild auswählen und hochladen"
-    }
+    "URL": "Externe Favicon URL",
+    "IMAGE": "Favoriten/Lesezeichen Icon"
   },
   "SEARCH": {
     "FILTER": "Filter",

@@ -86,32 +86,33 @@
             <div class="field col-12 mb-3">
               <div class="flex flex-wrap sm:flex-nowrap align-items-center pb-2 row-gap-2 column-gap-4">
                 <app-image-container
+                  id="theme_designer_field_logo_url_image"
                   [styleClass]="'w-5rem'"
                   [imageUrl]="fetchingLogoUrl"
                   [small]="true"
-                  [title]="'LOGO.TOOLTIPS.' + (fetchingLogoUrl ? 'IMAGE' : 'PLACEHOLDER') | translate"
+                  [title]="(fetchingLogoUrl ? 'LOGO.IMAGE' : 'IMAGE.TOOLTIPS.PLACEHOLDER') | translate"
                 ></app-image-container>
                 <button
                   pButton
-                  id="theme_detail_upload_logo1"
+                  id="theme_designer_field_logo_upload"
                   icon="pi pi-upload"
                   [disabled]="mode === 'NEW'"
                   class="action-button p-button-icon-only"
-                  [title]="'LOGO.TOOLTIPS.UPLOAD' | translate"
-                  (onClick)="selectedFileInputLogo.click()"
+                  [title]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
+                  (click)="selectedFileInputLogo.click()"
                 ></button>
                 <span class="p-float-label w-full">
                   <input
                     pInputText
                     type="text"
-                    id="theme_detail_upload_logo"
+                    id="theme_designer_field_logo_url"
                     formControlName="logoUrl"
-                    (input)="inputChange(theme, RefType.Logo)"
-                    [title]="'LOGO.TOOLTIPS.LOGO_URL_UPLOAD' | translate"
+                    (input)="onInputChange(RefType.Logo)"
+                    [title]="'IMAGE.TOOLTIPS.URL' | translate"
                   />
-                  <label for="theme_detail_upload_logo">{{ 'LOGO.LOGO_URL' | translate }}</label>
+                  <label for="theme_designer_field_logo_url">{{ 'LOGO.URL' | translate }}</label>
                 </span>
-                <label *ngIf="displayFileTypeErrorLogo" for="theme_detail_upload_logo" class="control-error">
+                <label *ngIf="displayFileTypeErrorLogo" for="theme_designer_field_logo_url" class="control-error">
                   {{ 'VALIDATION.ERRORS.FILETYPE_PATTERN_ERROR' | translate }}
                 </label>
               </div>
@@ -119,33 +120,37 @@
             <div class="field col-12 mb-0">
               <div class="flex flex-wrap sm:flex-nowrap align-items-center pb-2 row-gap-2 column-gap-4">
                 <app-image-container
+                  id="theme_designer_field_favicon_url_image"
                   [styleClass]="'w-5rem'"
                   [imageUrl]="fetchingFaviconUrl"
                   [small]="true"
-                  [title]="'FAVICON.TOOLTIPS.' + (fetchingLogoUrl ? 'IMAGE' : 'PLACEHOLDER') | translate"
+                  [title]="(fetchingLogoUrl ? 'FAVICON.IMAGE' : 'IMAGE.TOOLTIPS.PLACEHOLDER') | translate"
                 ></app-image-container>
                 <button
                   pButton
-                  id="theme_detail_upload_favicon1"
+                  id="theme_designer_field_favicon_upload"
                   icon="pi pi-upload"
                   [disabled]="mode === 'NEW'"
                   class="action-button p-button-icon-only"
-                  [title]="'FAVICON.TOOLTIPS.UPLOAD' | translate"
-                  (onClick)="selectedFileInputFavicon.click()"
+                  [title]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
+                  (click)="selectedFileInputFavicon.click()"
                 ></button>
                 <span class="p-float-label w-full">
                   <input
                     pInputText
                     type="text"
-                    id="favicon"
-                    id="theme_detail_upload_favicon"
+                    id="theme_designer_field_favicon_url"
                     formControlName="faviconUrl"
-                    (input)="inputChange(theme, RefType.Favicon)"
-                    [title]="'FAVICON.TOOLTIPS.FAVICON_URL_UPLOAD' | translate"
+                    (input)="onInputChange(RefType.Favicon)"
+                    [title]="'IMAGE.TOOLTIPS.URL' | translate"
                   />
-                  <label for="theme_detail_upload_favicon">{{ 'FAVICON.FAVICON_URL' | translate }}</label>
+                  <label for="theme_designer_field_favicon_url">{{ 'FAVICON.URL' | translate }}</label>
                 </span>
-                <label *ngIf="this.displayFileTypeErrorFavicon" for="theme_detail_upload_favicon" class="control-error">
+                <label
+                  *ngIf="this.displayFileTypeErrorFavicon"
+                  for="theme_designer_field_favicon_url"
+                  class="control-error"
+                >
                   {{ 'VALIDATION.ERRORS.FILETYPE_PATTERN_ERROR' | translate }}
                 </label>
               </div>

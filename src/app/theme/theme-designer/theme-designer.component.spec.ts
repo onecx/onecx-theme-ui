@@ -42,7 +42,7 @@ describe('ThemeDesignerComponent', () => {
     updateImage: jasmine.createSpy('updateImage').and.returnValue(of({})),
     uploadImage: jasmine.createSpy('uploadImage').and.returnValue(of({})),
     configuration: {
-      basePath: 'path'
+      basePath: 'basePath'
     }
   }
 
@@ -407,8 +407,8 @@ describe('ThemeDesignerComponent', () => {
         faviconUrl: 'updated_favicon_url'
       }
       component.basicForm.patchValue(newBasicData)
-      component.imageFaviconExists = true
-      component.imageLogoExists = true
+      component.imageFaviconUrlExists = true
+      component.imageLogoUrlExists = true
 
       themeApiSpy.updateTheme.and.returnValue(of({}) as any)
 
@@ -596,8 +596,8 @@ describe('ThemeDesignerComponent', () => {
         }) as any
       )
       component.mode = 'EDIT'
-      component.imageFaviconExists = true
-      component.imageLogoExists = true
+      component.imageFaviconUrlExists = true
+      component.imageLogoUrlExists = true
 
       component.saveTheme('myTheme')
 
@@ -714,7 +714,8 @@ describe('ThemeDesignerComponent', () => {
       component.onFileUpload(event as any, RefType.Logo)
 
       expect(msgServiceSpy.error).toHaveBeenCalledWith({
-        summaryKey: 'ACTIONS.EDIT.MESSAGE.IMAGE_CONSTRAINT'
+        summaryKey: 'IMAGE.CONSTRAINT_FAILED',
+        detailKey: 'IMAGE.CONSTRAINT_NAME'
       })
     })
 
@@ -731,7 +732,8 @@ describe('ThemeDesignerComponent', () => {
       component.onFileUpload(event as any, RefType.Logo)
 
       expect(msgServiceSpy.error).toHaveBeenCalledWith({
-        summaryKey: 'ACTIONS.EDIT.MESSAGE.IMAGE_CONSTRAINT_SIZE'
+        summaryKey: 'IMAGE.CONSTRAINT_FAILED',
+        detailKey: 'IMAGE.CONSTRAINT_SIZE'
       })
     })
 
@@ -769,7 +771,7 @@ describe('ThemeDesignerComponent', () => {
       component.onFileUpload(event as any, RefType.Logo)
 
       expect(msgServiceSpy.info).toHaveBeenCalledWith({
-        summaryKey: 'LOGO.UPLOADED'
+        summaryKey: 'IMAGE.UPLOADED'
       })
     })
 
@@ -791,7 +793,7 @@ describe('ThemeDesignerComponent', () => {
       component.onFileUpload(event as any, RefType.Favicon)
 
       expect(msgServiceSpy.info).toHaveBeenCalledWith({
-        summaryKey: 'LOGO.UPLOADED'
+        summaryKey: 'IMAGE.UPLOADED'
       })
     })
 
@@ -809,7 +811,7 @@ describe('ThemeDesignerComponent', () => {
       component.onFileUpload(event as any, RefType.Logo)
 
       expect(msgServiceSpy.info).toHaveBeenCalledWith({
-        summaryKey: 'LOGO.UPLOADED'
+        summaryKey: 'IMAGE.UPLOADED'
       })
     })
 
@@ -827,113 +829,75 @@ describe('ThemeDesignerComponent', () => {
       component.onFileUpload(event as any, RefType.Favicon)
 
       expect(msgServiceSpy.info).toHaveBeenCalledWith({
-        summaryKey: 'LOGO.UPLOADED'
+        summaryKey: 'IMAGE.UPLOADED'
       })
     })
 
     it('should get logo img url: base url on empty logo url', () => {
-      const themeData = {
+      const theme = {
         id: 'id',
         description: 'desc',
         logoUrl: '',
         faviconUrl: 'fav_url',
-        name: 'themeName',
-        properties: {
-          font: {
-            'font-family': 'myFont'
-          },
-          general: {
-            'primary-color': 'rgb(0,0,0)'
-          }
-        }
+        name: 'themeName'
       }
 
-      const result = component.getImageUrl(themeData, RefType.Logo)
+      const result = component.getImageUrl(theme, RefType.Logo)
 
-      expect(result).toBe('path/images/themeName/logo')
+      expect(result).toBe('basePath/images/themeName/logo')
     })
 
     it('should get favicon img url: base url on empty favicon url', () => {
-      const themeData = {
+      const theme = {
         id: 'id',
         description: 'desc',
         logoUrl: 'logo_url',
         faviconUrl: '',
-        name: 'themeName',
-        properties: {
-          font: {
-            'font-family': 'myFont'
-          },
-          general: {
-            'primary-color': 'rgb(0,0,0)'
-          }
-        }
+        name: 'name'
       }
 
-      const result = component.getImageUrl(themeData, RefType.Favicon)
+      const result = component.getImageUrl(theme, RefType.Favicon)
 
-      expect(result).toBe('path/images/themeName/favicon')
+      expect(result).toBe('basePath/images/name/favicon')
     })
 
-    it('should return true if url does not exist', () => {
-      const result = component.urlExists('')
-
-      expect(result).toBeTrue()
-    })
-
-    it('should behave correctly on inputChange: favicon url exists', fakeAsync(() => {
-      const themeData = {
+    it('should behave correctly onInputChange: favicon url exists', fakeAsync(() => {
+      component.theme = {
         id: 'id',
         description: 'desc',
         logoUrl: 'logo_url',
         faviconUrl: 'fav_url',
-        name: 'themeName',
-        properties: {
-          font: {
-            'font-family': 'myFont'
-          },
-          general: {
-            'primary-color': 'rgb(0,0,0)'
-          }
-        }
+        name: 'name'
       }
-      component.basicForm.controls['faviconUrl'].setValue('icon')
+      component.basicForm.controls['faviconUrl'].setValue('http://icon/path')
 
-      component.inputChange(themeData, RefType.Favicon)
+      component.onInputChange(RefType.Favicon)
 
       tick(1000)
 
-      expect(component.fetchingFaviconUrl).toBe('icon')
+      expect(component.fetchingFaviconUrl).toBe('http://icon/path')
     }))
 
-    it('should behave correctly on inputChange: logo url empty', fakeAsync(() => {
-      const themeData = {
+    it('should behave correctly on onInputChange: logo url empty', fakeAsync(() => {
+      component.theme = {
         id: 'id',
         description: 'desc',
         logoUrl: 'logo_url',
         faviconUrl: 'fav_url',
-        name: 'themeName',
-        properties: {
-          font: {
-            'font-family': 'myFont'
-          },
-          general: {
-            'primary-color': 'rgb(0,0,0)'
-          }
-        }
+        name: 'themeName'
       }
       component.basicForm.controls['logoUrl'].setValue('')
-      component.imageLogoExists = true
+      component.imageLogoUrlExists = true
 
-      component.inputChange(themeData, RefType.Logo)
+      component.onInputChange(RefType.Logo)
 
       tick(1000)
 
-      expect(component.fetchingLogoUrl).toBe('path/images/themeName/logo')
+      expect(component.fetchingLogoUrl).toBe('basePath/images/themeName/logo')
     }))
 
-    it('should behave correctly on inputChange: favicon url empty', fakeAsync(() => {
-      const themeData = {
+    it('should behave correctly on onInputChange: favicon url empty', fakeAsync(() => {
+      component.theme = {
         id: 'id',
         description: 'desc',
         logoUrl: 'logo_url',
@@ -949,13 +913,13 @@ describe('ThemeDesignerComponent', () => {
         }
       }
       component.basicForm.controls['faviconUrl'].setValue('')
-      component.imageFaviconExists = true
+      component.imageFaviconUrlExists = true
 
-      component.inputChange(themeData, RefType.Favicon)
+      component.onInputChange(RefType.Favicon)
 
       tick(1000)
 
-      expect(component.fetchingFaviconUrl).toBe('path/images/themeName/favicon')
+      expect(component.fetchingFaviconUrl).toBe('basePath/images/themeName/favicon')
     }))
 
     it('should use translation data on theme template change', () => {
@@ -1185,8 +1149,16 @@ describe('ThemeDesignerComponent', () => {
   })
 
   it('should test utility functions', () => {
+    expect(component.getImageUrl(undefined, RefType.Logo)).toBeUndefined()
     expect(component.getImageUrl(undefined, RefType.Favicon)).toBeUndefined()
 
-    expect(component.bffImageUrl(undefined, RefType.Favicon)).toBe('')
+    const theme = {
+      id: 'id',
+      logoUrl: 'logo_url',
+      faviconUrl: 'fav_url',
+      name: 'name'
+    }
+    expect(component.getImageUrl(theme, RefType.Logo)).toBe(theme.logoUrl)
+    expect(component.getImageUrl(theme, RefType.Favicon)).toBe(theme.faviconUrl)
   })
 })
