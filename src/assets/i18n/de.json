@@ -101,6 +101,7 @@
     "CONSTRAINT_NAME": "Bitte füge einen Namen hinzu bevor das Bild geladen wird.",
     "CONSTRAINT_SIZE": "Die Größe der Bilddatei übersteigt die maximale Lönge von 100.000 Bytes.",
     "TOOLTIPS": {
+      "IMAGE": "Bild",
       "PLACEHOLDER": "Platzhalter",
       "URL": "Als Alternative zum Hochladen kann hier eine URL zu einem Bild angegeben werden",
       "UPLOAD": "Bild auswählen und hochladen"
@@ -108,17 +109,13 @@
   },
   "LOGO": {
     "LABEL": "Logo",
-    "LOGO_URL": "Externe Logo URL",
-    "TOOLTIPS": {
-      "IMAGE": "Logo"
-    }
+    "URL": "Externe Logo URL",
+    "IMAGE": "Logo"
   },
   "FAVICON": {
     "LABEL": "Favoriten Icon",
-    "FAVICON_URL": "Externe Favicon URL",
-    "TOOLTIPS": {
-      "IMAGE": "Favoriten/Lesezeichen Icon"
-    }
+    "URL": "Externe Favicon URL",
+    "IMAGE": "Favoriten/Lesezeichen Icon"
   },
   "SEARCH": {
     "FILTER": "Filter",

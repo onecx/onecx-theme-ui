@@ -4,8 +4,8 @@
   [class]="'image-object image-' + (small ? 'sm' : 'lg') + ' sm:image-lg ' + (styleClass ? styleClass : '')"
   [ocxSrc]="displayImageUrl"
   (error)="onImageError()"
-  [alt]="'LOGO.LABEL' | translate"
-  [title]="'LOGO.TOOLTIPS.IMAGE' | translate"
+  [alt]="title"
+  [title]="title ? title : ('IMAGE.TOOLTIPS.IMAGE' | translate)"
 />
 <img
   [id]="id"
@@ -13,5 +13,5 @@
   [class]="'image-object image-' + (small ? 'sm' : 'lg') + ' sm:image-lg ' + (styleClass ? styleClass : '')"
   [src]="defaultImageUrl"
   [alt]="'LOGO.LABEL' | translate"
-  [title]="'IMAGE.TOOLTIPS.PLACEHOLDER' | translate"
+  [title]="title ? title : ('IMAGE.TOOLTIPS.PLACEHOLDER' | translate)"
 />

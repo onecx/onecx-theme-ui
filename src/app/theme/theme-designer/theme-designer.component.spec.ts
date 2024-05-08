@@ -407,8 +407,8 @@ describe('ThemeDesignerComponent', () => {
         faviconUrl: 'updated_favicon_url'
       }
       component.basicForm.patchValue(newBasicData)
-      component.imageFaviconExists = true
-      component.imageLogoExists = true
+      component.imageFaviconUrlExists = true
+      component.imageLogoUrlExists = true
 
       themeApiSpy.updateTheme.and.returnValue(of({}) as any)
 
@@ -596,8 +596,8 @@ describe('ThemeDesignerComponent', () => {
         }) as any
       )
       component.mode = 'EDIT'
-      component.imageFaviconExists = true
-      component.imageLogoExists = true
+      component.imageFaviconUrlExists = true
+      component.imageLogoUrlExists = true
 
       component.saveTheme('myTheme')
 
@@ -887,7 +887,7 @@ describe('ThemeDesignerComponent', () => {
         name: 'themeName'
       }
       component.basicForm.controls['logoUrl'].setValue('')
-      component.imageLogoExists = true
+      component.imageLogoUrlExists = true
 
       component.onInputChange(RefType.Logo)
 
@@ -913,7 +913,7 @@ describe('ThemeDesignerComponent', () => {
         }
       }
       component.basicForm.controls['faviconUrl'].setValue('')
-      component.imageFaviconExists = true
+      component.imageFaviconUrlExists = true
 
       component.onInputChange(RefType.Favicon)
 

@@ -90,7 +90,7 @@
                   [styleClass]="'w-5rem'"
                   [imageUrl]="fetchingLogoUrl"
                   [small]="true"
-                  [title]="'LOGO.TOOLTIPS.' + (fetchingLogoUrl ? 'IMAGE' : 'PLACEHOLDER') | translate"
+                  [title]="(fetchingLogoUrl ? 'LOGO.IMAGE' : 'IMAGE.TOOLTIPS.PLACEHOLDER') | translate"
                 ></app-image-container>
                 <button
                   pButton
@@ -110,7 +110,7 @@
                     (input)="onInputChange(RefType.Logo)"
                     [title]="'IMAGE.TOOLTIPS.URL' | translate"
                   />
-                  <label for="theme_designer_field_logo_url">{{ 'LOGO.LOGO_URL' | translate }}</label>
+                  <label for="theme_designer_field_logo_url">{{ 'LOGO.URL' | translate }}</label>
                 </span>
                 <label *ngIf="displayFileTypeErrorLogo" for="theme_designer_field_logo_url" class="control-error">
                   {{ 'VALIDATION.ERRORS.FILETYPE_PATTERN_ERROR' | translate }}
@@ -124,7 +124,7 @@
                   [styleClass]="'w-5rem'"
                   [imageUrl]="fetchingFaviconUrl"
                   [small]="true"
-                  [title]="'FAVICON.TOOLTIPS.' + (fetchingLogoUrl ? 'IMAGE' : 'PLACEHOLDER') | translate"
+                  [title]="(fetchingLogoUrl ? 'FAVICON.IMAGE' : 'IMAGE.TOOLTIPS.PLACEHOLDER') | translate"
                 ></app-image-container>
                 <button
                   pButton
@@ -132,7 +132,7 @@
                   icon="pi pi-upload"
                   [disabled]="mode === 'NEW'"
                   class="action-button p-button-icon-only"
-                  [title]="'FAVICON.TOOLTIPS.UPLOAD' | translate"
+                  [title]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
                   (click)="selectedFileInputFavicon.click()"
                 ></button>
                 <span class="p-float-label w-full">
@@ -144,7 +144,7 @@
                     (input)="onInputChange(RefType.Favicon)"
                     [title]="'IMAGE.TOOLTIPS.URL' | translate"
                   />
-                  <label for="theme_designer_field_favicon_url">{{ 'FAVICON.FAVICON_URL' | translate }}</label>
+                  <label for="theme_designer_field_favicon_url">{{ 'FAVICON.URL' | translate }}</label>
                 </span>
                 <label
                   *ngIf="this.displayFileTypeErrorFavicon"

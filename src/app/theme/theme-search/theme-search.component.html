@@ -49,9 +49,10 @@
             <div class="col-12 md:col-2 lg:col-2 xl:col-2 text-center">
               <div class="flex flex-column justify-content-center align-items-center gap-1 md:gap-2 h-full">
                 <app-image-container
+                  id="theme_search_logo"
                   [imageUrl]="getLogoUrl(theme)"
                   [small]="true"
-                  [title]="'LOGO.TOOLTIPS.' + (theme.logoUrl ? 'IMAGE' : 'PLACEHOLDER') | translate"
+                  [title]="(theme.logoUrl ? 'LOGO.IMAGE' : 'IMAGE.TOOLTIPS.PLACEHOLDER') | translate"
                 ></app-image-container>
               </div>
             </div>

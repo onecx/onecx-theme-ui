@@ -101,6 +101,7 @@
     "CONSTRAINT_NAME": "Please add a Workspace name before uploading a file.",
     "CONSTRAINT_SIZE": "The image file size exceeds the maximum length of 100,000 bytes.",
     "TOOLTIPS": {
+      "IMAGE": "Image",
       "PLACEHOLDER": "Image Placeholder",
       "URL": "As an alternative to uploading, a URL to an image can be specified here",
       "UPLOAD": "Select and upload image"
@@ -108,17 +109,13 @@
   },
   "LOGO": {
     "LABEL": "Logo",
-    "LOGO_URL": "External Logo URL",
-    "TOOLTIPS": {
-      "IMAGE": "Logo"
-    }
+    "URL": "External Logo URL",
+    "IMAGE": "Logo"
   },
   "FAVICON": {
     "LABEL": "Favorite Icon",
-    "FAVICON_URL": "External Favicon URL",
-    "TOOLTIPS": {
-      "IMAGE": "Favorite/Bookmark Icon"
-    }
+    "URL": "External Favicon URL",
+    "IMAGE": "Favorite/Bookmark Icon"
   },
   "SEARCH": {
     "FILTER": "Filter",

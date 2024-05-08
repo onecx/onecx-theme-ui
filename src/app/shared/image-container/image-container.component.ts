@@ -19,6 +19,7 @@ import { prepareUrlPath } from 'src/app/shared/utils'
 })
 export class ImageContainerComponent implements OnChanges {
   @Input() public id = ''
+  @Input() public title = ''
   @Input() public small = false
   @Input() public imageUrl: string | undefined
   @Input() public styleClass: string | undefined
@@ -33,7 +34,7 @@ export class ImageContainerComponent implements OnChanges {
     appState.currentMfe$
       .pipe(
         map((mfe) => {
-          this.defaultImageUrl = this.prepareUrlPath(mfe.remoteBaseUrl, environment.DEFAULT_LOGO_URL)
+          this.defaultImageUrl = this.prepareUrlPath(mfe.remoteBaseUrl, environment.DEFAULT_LOGO_PATH)
         })
       )
       .subscribe()
