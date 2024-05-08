@@ -98,7 +98,7 @@
                   icon="pi pi-upload"
                   [disabled]="mode === 'NEW'"
                   class="action-button p-button-icon-only"
-                  [title]="'LOGO.TOOLTIPS.UPLOAD' | translate"
+                  [title]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
                   (click)="selectedFileInputLogo.click()"
                 ></button>
                 <span class="p-float-label w-full">
@@ -108,7 +108,7 @@
                     id="theme_designer_field_logo_url"
                     formControlName="logoUrl"
                     (input)="onInputChange(RefType.Logo)"
-                    [title]="'LOGO.TOOLTIPS.LOGO_URL_UPLOAD' | translate"
+                    [title]="'IMAGE.TOOLTIPS.URL' | translate"
                   />
                   <label for="theme_designer_field_logo_url">{{ 'LOGO.LOGO_URL' | translate }}</label>
                 </span>
@@ -142,7 +142,7 @@
                     id="theme_designer_field_favicon_url"
                     formControlName="faviconUrl"
                     (input)="onInputChange(RefType.Favicon)"
-                    [title]="'FAVICON.TOOLTIPS.FAVICON_URL_UPLOAD' | translate"
+                    [title]="'IMAGE.TOOLTIPS.URL' | translate"
                   />
                   <label for="theme_designer_field_favicon_url">{{ 'FAVICON.FAVICON_URL' | translate }}</label>
                 </span>

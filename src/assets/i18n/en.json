@@ -99,27 +99,25 @@
     "CONSTRAINT_FILE_TYPE": "The following image formats are accepted: jpg, jpeg, png",
     "CONSTRAINT_FAILED": "File upload condition check failed:",
     "CONSTRAINT_NAME": "Please add a Workspace name before uploading a file.",
-    "CONSTRAINT_SIZE": "The image file size exceeds the maximum length of 100,000 bytes."
+    "CONSTRAINT_SIZE": "The image file size exceeds the maximum length of 100,000 bytes.",
+    "TOOLTIPS": {
+      "PLACEHOLDER": "Image Placeholder",
+      "URL": "As an alternative to uploading, a URL to an image can be specified here",
+      "UPLOAD": "Select and upload image"
+    }
   },
   "LOGO": {
     "LABEL": "Logo",
     "LOGO_URL": "External Logo URL",
     "TOOLTIPS": {
-      "IMAGE": "Logo",
-      "PLACEHOLDER": "Image Placeholder",
-      "LOGO_URL_UPLOAD": "As an alternative to uploading, a URL to an image can be specified here",
-      "LOGO_URL": "URL to an external image",
-      "UPLOAD": "Select and upload image"
+      "IMAGE": "Logo"
     }
   },
   "FAVICON": {
     "LABEL": "Favorite Icon",
     "FAVICON_URL": "External Favicon URL",
     "TOOLTIPS": {
-      "IMAGE": "Favorite/Bookmark Icon",
-      "PLACEHOLDER": "Image Placeholder",
-      "FAVICON_URL_UPLOAD": "As an alternative to uploading, a URL to an image can be specified here",
-      "UPLOAD": "Select and upload image"
+      "IMAGE": "Favorite/Bookmark Icon"
     }
   },
   "SEARCH": {

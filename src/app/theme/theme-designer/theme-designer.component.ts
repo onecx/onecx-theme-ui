@@ -42,8 +42,8 @@ export class ThemeDesignerComponent implements OnInit {
   public bffImagePath = ''
   public fetchingLogoUrl?: string
   public fetchingFaviconUrl?: string
-  public imageLogoExists: boolean | undefined
-  public imageFaviconExists: boolean | undefined
+  public imageLogoUrlExists = false
+  public imageFaviconUrlExists = false
 
   public mode: 'EDIT' | 'NEW' = 'NEW'
   public autoApply = false
@@ -85,21 +85,9 @@ export class ThemeDesignerComponent implements OnInit {
     this.generalForm = new FormGroup({})
     this.sidebarForm = new FormGroup({})
     this.groups = [
-      {
-        key: 'general',
-        title: 'General Colors',
-        formGroup: this.generalForm
-      },
-      {
-        key: 'topbar',
-        title: 'Topbar - Workspace Header',
-        formGroup: this.topbarForm
-      },
-      {
-        key: 'sidebar',
-        title: 'Sidebar / Menu',
-        formGroup: this.sidebarForm
-      }
+      { key: 'general', title: 'General Colors', formGroup: this.generalForm },
+      { key: 'topbar', title: 'Topbar - Workspace Header', formGroup: this.topbarForm },
+      { key: 'sidebar', title: 'Sidebar / Menu', formGroup: this.sidebarForm }
     ]
     this.propertiesForm = this.fb.group({
       font: this.fontForm,
@@ -151,8 +139,8 @@ export class ThemeDesignerComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.imageLogoExists = false
-    this.imageFaviconExists = false
+    this.imageLogoUrlExists = false
+    this.imageFaviconUrlExists = false
     if (this.mode === 'EDIT' && this.themeName) {
       this.themeApi.getThemeByName({ name: this.themeName }).subscribe((data) => {
         this.theme = data.resource
@@ -165,8 +153,8 @@ export class ThemeDesignerComponent implements OnInit {
         // images
         this.fetchingLogoUrl = this.getImageUrl(this.theme, RefType.Logo)
         this.fetchingFaviconUrl = this.getImageUrl(this.theme, RefType.Favicon)
-        this.imageLogoExists = !this.theme.logoUrl || this.theme.logoUrl === ''
-        this.imageFaviconExists = !this.theme.faviconUrl || this.theme.faviconUrl === ''
+        this.imageLogoUrlExists = !this.theme.logoUrl || this.theme.logoUrl === ''
+        this.imageFaviconUrlExists = !this.theme.faviconUrl || this.theme.faviconUrl === ''
       })
     } else {
       const currentVars: { [key: string]: { [key: string]: string } } = {}
@@ -179,7 +167,6 @@ export class ThemeDesignerComponent implements OnInit {
       this.propertiesForm.reset()
       this.propertiesForm.patchValue(currentVars)
     }
-
     this.loadThemeTemplates()
   }
 
@@ -316,12 +303,12 @@ export class ThemeDesignerComponent implements OnInit {
         .pipe(
           switchMap((data) => {
             data.resource.properties = this.propertiesForm.value
-            if (this.imageFaviconExists) {
+            if (this.imageFaviconUrlExists) {
               data.resource.faviconUrl = undefined
             } else {
               data.resource.faviconUrl = this.basicForm.controls['faviconUrl'].value
             }
-            if (this.imageLogoExists) {
+            if (this.imageLogoUrlExists) {
               data.resource.logoUrl = undefined
             } else {
               data.resource.logoUrl = this.basicForm.controls['logoUrl'].value
@@ -354,12 +341,8 @@ export class ThemeDesignerComponent implements OnInit {
     const newTheme: ThemeUpdateCreate = { ...this.basicForm.value }
     newTheme.name = newThemename
     newTheme.properties = this.propertiesForm.value
-    if (this.imageFaviconExists) {
-      newTheme.faviconUrl = undefined
-    }
-    if (this.imageLogoExists) {
-      newTheme.logoUrl = undefined
-    }
+    if (this.imageFaviconUrlExists) newTheme.faviconUrl = undefined
+    if (this.imageLogoUrlExists) newTheme.logoUrl = undefined
 
     this.themeApi.createTheme({ createThemeRequest: { resource: newTheme } }).subscribe({
       next: (data) => {
@@ -509,7 +492,6 @@ export class ThemeDesignerComponent implements OnInit {
     } else if (refType === RefType.Favicon && theme.faviconUrl !== null && theme.faviconUrl !== '') {
       url = theme.faviconUrl
     } else url = bffImageUrl(this.bffImagePath, theme.name, refType)
-    console.log('getImageUrl: ' + refType + '  url: ' + url)
     return url
   }
 
