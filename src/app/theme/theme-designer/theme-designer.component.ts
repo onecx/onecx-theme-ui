@@ -147,7 +147,7 @@ export class ThemeDesignerComponent implements OnInit {
         this.basicForm.patchValue(this.theme)
         this.basicForm.controls['name'].disable()
         this.propertiesForm.reset()
-        this.propertiesForm.patchValue(this.theme.properties || {})
+        this.propertiesForm.patchValue(this.theme.properties ?? {})
         this.themeId = this.theme.id
         this.themeIsCurrentUsedTheme = this.themeId === this.appStateService.currentPortal$.getValue()?.themeId
         // images
