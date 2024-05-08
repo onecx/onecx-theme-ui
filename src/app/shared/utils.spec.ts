@@ -46,24 +46,6 @@ describe('utils', () => {
     })
   })
 
-  // describe('prepareUrl', () => {
-  //   it('should build a url with env api prefix if url does not start with http(s)', () => {
-  //     const url = 'http://test url'
-
-  //     const preparedUrl = prepareUrl(url)
-
-  //     expect(preparedUrl).toBe(url)
-  //   })
-
-  //   it('should build a url with env api prefix if url does not start with http(s)', () => {
-  //     const url = 'test url'
-
-  //     const preparedUrl = prepareUrl(url)
-
-  //     expect(preparedUrl).toBe('bff/test url')
-  //   })
-  // })
-
   describe('prepareUrlPath', () => {
     it('should build a url with a path and insert a /', () => {
       const url = 'test url'

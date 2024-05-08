@@ -42,13 +42,6 @@ export function filterObject(obj: any, exProps: string[]): any {
 /**
  * URLs
  */
-// export function prepareUrl(url: string | undefined): string | undefined {
-//   if (url && !/^(http|https).*/.exec(url)) {
-//     return Location.joinWithSlash(environment.apiPrefix, url)
-//   } else {
-//     return url
-//   }
-// }
 export function prepareUrlPath(url?: string, path?: string): string {
   if (url && path) return Location.joinWithSlash(url, path)
   else if (url) return url

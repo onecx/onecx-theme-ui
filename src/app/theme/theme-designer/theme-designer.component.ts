@@ -436,12 +436,12 @@ export class ThemeDesignerComponent implements OnInit {
         } else {
           this.saveImage(currThemeName, fieldType, files) // store image
         }
-      } else {
-        this.msgService.error({
-          summaryKey: 'IMAGE.CONSTRAINT_FAILED',
-          detailKey: 'IMAGE.CONSTRAINT_FILE_MISSING'
-        })
       }
+    } else {
+      this.msgService.error({
+        summaryKey: 'IMAGE.CONSTRAINT_FAILED',
+        detailKey: 'IMAGE.CONSTRAINT_FILE_MISSING'
+      })
     }
   }
 

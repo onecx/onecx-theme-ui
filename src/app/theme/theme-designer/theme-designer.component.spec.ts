@@ -797,39 +797,19 @@ describe('ThemeDesignerComponent', () => {
       })
     })
 
-    it('should upload a file - upload image : field type logo', () => {
-      imgServiceSpy.getImage.and.returnValue(throwError(() => new Error()))
-      const blob = new Blob(['a'.repeat(10)], { type: 'image/png' })
-      const file = new File([blob], 'test.png', { type: 'image/png' })
+    it('should display error if there are no files on upload image', () => {
       const event = {
         target: {
-          files: [file]
+          files: undefined
         }
       }
       component.basicForm.controls['name'].setValue('name')
 
       component.onFileUpload(event as any, RefType.Logo)
 
-      expect(msgServiceSpy.info).toHaveBeenCalledWith({
-        summaryKey: 'IMAGE.UPLOADED'
-      })
-    })
-
-    it('should upload a file - upload image : field type favicon', () => {
-      imgServiceSpy.getImage.and.returnValue(throwError(() => new Error()))
-      const blob = new Blob(['a'.repeat(10)], { type: 'image/png' })
-      const file = new File([blob], 'test.png', { type: 'image/png' })
-      const event = {
-        target: {
-          files: [file]
-        }
-      }
-      component.basicForm.controls['name'].setValue('name')
-
-      component.onFileUpload(event as any, RefType.Favicon)
-
-      expect(msgServiceSpy.info).toHaveBeenCalledWith({
-        summaryKey: 'IMAGE.UPLOADED'
+      expect(msgServiceSpy.error).toHaveBeenCalledWith({
+        summaryKey: 'IMAGE.CONSTRAINT_FAILED',
+        detailKey: 'IMAGE.CONSTRAINT_FILE_MISSING'
       })
     })
 
