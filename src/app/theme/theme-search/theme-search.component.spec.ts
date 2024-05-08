@@ -78,39 +78,14 @@ describe('ThemeSearchComponent', () => {
     let actions: any = []
     component.actions$!.subscribe((act) => (actions = act))
     expect(actions.length).toBe(2)
-    // const createAction = actions.filter(
-    //   (a: { label: string; title: string }) =>
-    //     a.label === 'actionsCreateTheme' && a.title === 'actionsCreateThemeTooltip'
-    // )[0]
+
     spyOn(component, 'onNewTheme')
     actions[0].actionCallback()
     expect(component.onNewTheme).toHaveBeenCalledTimes(1)
 
-    // const importAction = actions.filter(
-    //   (a: { label: string; title: string }) => a.label === 'actionsImportLabel' && a.title === 'actionsImportTooltip'
-    // )[0]
     spyOn(component, 'onImportThemeClick')
     actions[1].actionCallback()
     expect(component.onImportThemeClick).toHaveBeenCalledTimes(1)
-
-    // expect(component.dataViewControlsTranslations).toEqual({
-    //   sortDropdownPlaceholder: generalTranslations['SEARCH.SORT_BY'],
-    //   filterInputPlaceholder: generalTranslations['SEARCH.FILTER'],
-    //   filterInputTooltip:
-    //     generalTranslations['SEARCH.FILTER_OF'] +
-    //     generalTranslations['THEME.NAME'] +
-    //     ', ' +
-    //     generalTranslations['THEME.DESCRIPTION'],
-    //   viewModeToggleTooltips: {
-    //     grid: generalTranslations['GENERAL.TOOLTIP.VIEW_MODE_GRID'],
-    //     list: generalTranslations['GENERAL.TOOLTIP.VIEW_MODE_LIST']
-    //   },
-    //   sortOrderTooltips: {
-    //     ascending: generalTranslations['SEARCH.SORT_DIRECTION_ASC'],
-    //     descending: generalTranslations['SEARCH.SORT_DIRECTION_DESC']
-    //   },
-    //   sortDropdownTooltip: generalTranslations['SEARCH.SORT_BY']
-    // })
   })
 
   it('should get the logo url: theme undefined', () => {
@@ -128,7 +103,7 @@ describe('ThemeSearchComponent', () => {
   it('should get the logo url: logoUrl empty', () => {
     const result = component.getLogoUrl({ logoUrl: '' })
 
-    expect(result).toBe('http://onecx-theme-bff:8080/images/undefined/logo')
+    expect(result).toBe('')
   })
 
   it('should navigate to theme detail on new theme callback', () => {

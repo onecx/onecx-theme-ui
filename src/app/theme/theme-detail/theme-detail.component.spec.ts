@@ -444,6 +444,8 @@ describe('ThemeDetailComponent', () => {
     expect(component.getImageUrl(theme, RefType.Favicon)).toBe('faviconUrl')
 
     theme.faviconUrl = ''
-    expect(component.getImageUrl(theme, RefType.Favicon)).toBe(component.bffImageUrl(theme.name, RefType.Favicon))
+    expect(component.getImageUrl(theme, RefType.Favicon)).toBe(
+      'http://onecx-theme-bff:8080' + '/images/' + theme.name + '/favicon'
+    )
   })
 })
