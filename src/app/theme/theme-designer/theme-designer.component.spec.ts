@@ -797,6 +797,24 @@ describe('ThemeDesignerComponent', () => {
       })
     })
 
+    it('should upload image if getImage call fails', () => {
+      imgServiceSpy.getImage.and.returnValue(throwError(() => new Error()))
+      const blob = new Blob(['a'.repeat(10)], { type: 'image/png' })
+      const file = new File([blob], 'test.png', { type: 'image/png' })
+      const event = {
+        target: {
+          files: [file]
+        }
+      }
+      component.basicForm.controls['name'].setValue('name')
+
+      component.onFileUpload(event as any, RefType.Favicon)
+
+      expect(msgServiceSpy.info).toHaveBeenCalledWith({
+        summaryKey: 'IMAGE.UPLOADED'
+      })
+    })
+
     it('should display error if there are no files on upload image', () => {
       const event = {
         target: {
@@ -840,6 +858,23 @@ describe('ThemeDesignerComponent', () => {
 
       expect(result).toBe('basePath/images/name/favicon')
     })
+
+    it('should behave correctly onInputChange: logo url exists', fakeAsync(() => {
+      component.theme = {
+        id: 'id',
+        description: 'desc',
+        logoUrl: 'logo_url',
+        faviconUrl: 'fav_url',
+        name: 'name'
+      }
+      component.basicForm.controls['logoUrl'].setValue('http://icon/path')
+
+      component.onInputChange(RefType.Logo)
+
+      tick(1000)
+
+      expect(component.fetchingLogoUrl).toBe('http://icon/path')
+    }))
 
     it('should behave correctly onInputChange: favicon url exists', fakeAsync(() => {
       component.theme = {

@@ -196,8 +196,28 @@ describe('ThemeImportComponent', () => {
     expect(component.uploadEmitter.emit).toHaveBeenCalledTimes(1)
   })
 
-  xit('should display error on api call fail during upload', () => {
+  it('should return if no themes available', () => {
+    themeApiSpy.importThemes.and.returnValue(
+      of(
+        new HttpResponse({
+          body: { id: 'id' }
+        })
+      )
+    )
+    spyOn(component.uploadEmitter, 'emit')
+
+    component.onThemeUpload()
+
+    expect(component.uploadEmitter.emit).not.toHaveBeenCalled()
+  })
+
+  it('should display error on api call fail during upload', () => {
     themeApiSpy.importThemes.and.returnValue(throwError(() => new Error()))
+    component.themeSnapshot = {
+      id: 'id',
+      created: 'created',
+      themes: { ['theme']: { description: 'themeDescription' } }
+    }
 
     component.onThemeUpload()
 
