@@ -101,6 +101,7 @@ export function apiConfigProvider(configService: ConfigurationService, appStateS
     AutoCompleteModule,
     CheckboxModule,
     CommonModule,
+    ColorSketchModule,
     ConfirmDialogModule,
     ConfirmPopupModule,
     DataViewModule,
