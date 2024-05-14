@@ -7,7 +7,7 @@ import FileSaver from 'file-saver'
 
 import { Action, ObjectDetailItem, PortalMessageService, UserService } from '@onecx/portal-integration-angular'
 
-import { limitText, sortByLocale } from 'src/app/shared/utils'
+import { limitText, sortByLocale, bffImageUrl } from 'src/app/shared/utils'
 import {
   ExportThemeRequest,
   ImagesInternalAPIService,
@@ -231,10 +231,6 @@ export class ThemeDetailComponent implements OnInit {
     if (refType === RefType.Favicon && theme.faviconUrl !== null && theme.faviconUrl !== '') {
       return theme.faviconUrl
     }
-    return this.bffImageUrl(theme.name, refType)
-  }
-
-  public bffImageUrl(themeName: string | undefined, refType: RefType): string {
-    return !themeName ? '' : this.imageApi.configuration.basePath + '/images/' + themeName + '/' + refType
+    return bffImageUrl(this.imageApi.configuration.basePath, theme.name, refType)
   }
 }

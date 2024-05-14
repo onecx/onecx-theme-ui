@@ -23,13 +23,21 @@ import { PortalMessageService, ThemeService } from '@onecx/portal-integration-an
 import { RefType, ThemesAPIService, ImagesInternalAPIService } from 'src/app/shared/generated'
 import { themeVariables } from './theme-variables'
 import { ThemeDesignerComponent } from './theme-designer.component'
+import { CurrentThemeTopic } from '@onecx/integration-interface'
 
 describe('ThemeDesignerComponent', () => {
   let component: ThemeDesignerComponent
   let fixture: ComponentFixture<ThemeDesignerComponent>
 
   const msgServiceSpy = jasmine.createSpyObj<PortalMessageService>('PortalMessageService', ['success', 'error', 'info'])
-  const themeServiceSpy = jasmine.createSpyObj<ThemeService>('ThemeService', ['apply'])
+  const themeServiceSpy = jasmine.createSpyObj<ThemeService>('ThemeService', ['apply'], {
+    currentTheme$: of({
+      isInitializedPromise: Promise.resolve(true),
+      data: {},
+      isInit: true,
+      resolveInitPromise: () => {}
+    }) as unknown as CurrentThemeTopic
+  })
   const themeApiSpy = jasmine.createSpyObj<ThemesAPIService>('ThemesAPIService', [
     'getThemes',
     'updateTheme',
@@ -797,25 +805,7 @@ describe('ThemeDesignerComponent', () => {
       })
     })
 
-    it('should upload a file - upload image : field type logo', () => {
-      imgServiceSpy.getImage.and.returnValue(throwError(() => new Error()))
-      const blob = new Blob(['a'.repeat(10)], { type: 'image/png' })
-      const file = new File([blob], 'test.png', { type: 'image/png' })
-      const event = {
-        target: {
-          files: [file]
-        }
-      }
-      component.basicForm.controls['name'].setValue('name')
-
-      component.onFileUpload(event as any, RefType.Logo)
-
-      expect(msgServiceSpy.info).toHaveBeenCalledWith({
-        summaryKey: 'IMAGE.UPLOADED'
-      })
-    })
-
-    it('should upload a file - upload image : field type favicon', () => {
+    it('should upload image if getImage call fails', () => {
       imgServiceSpy.getImage.and.returnValue(throwError(() => new Error()))
       const blob = new Blob(['a'.repeat(10)], { type: 'image/png' })
       const file = new File([blob], 'test.png', { type: 'image/png' })
@@ -830,6 +820,22 @@ describe('ThemeDesignerComponent', () => {
 
       expect(msgServiceSpy.info).toHaveBeenCalledWith({
         summaryKey: 'IMAGE.UPLOADED'
+      })
+    })
+
+    it('should display error if there are no files on upload image', () => {
+      const event = {
+        target: {
+          files: undefined
+        }
+      }
+      component.basicForm.controls['name'].setValue('name')
+
+      component.onFileUpload(event as any, RefType.Logo)
+
+      expect(msgServiceSpy.error).toHaveBeenCalledWith({
+        summaryKey: 'IMAGE.CONSTRAINT_FAILED',
+        detailKey: 'IMAGE.CONSTRAINT_FILE_MISSING'
       })
     })
 
@@ -860,6 +866,23 @@ describe('ThemeDesignerComponent', () => {
 
       expect(result).toBe('basePath/images/name/favicon')
     })
+
+    it('should behave correctly onInputChange: logo url exists', fakeAsync(() => {
+      component.theme = {
+        id: 'id',
+        description: 'desc',
+        logoUrl: 'logo_url',
+        faviconUrl: 'fav_url',
+        name: 'name'
+      }
+      component.basicForm.controls['logoUrl'].setValue('http://icon/path')
+
+      component.onInputChange(RefType.Logo)
+
+      tick(1000)
+
+      expect(component.fetchingLogoUrl).toBe('http://icon/path')
+    }))
 
     it('should behave correctly onInputChange: favicon url exists', fakeAsync(() => {
       component.theme = {

@@ -1,5 +1,6 @@
 import { SelectItem } from 'primeng/api'
-import { dropDownSortItemsByLabel, filterObject, limitText } from './utils'
+import { dropDownSortItemsByLabel, filterObject, limitText, prepareUrlPath, bffImageUrl } from './utils'
+import { RefType } from './generated'
 
 describe('utils', () => {
   it('should limit text if text too long', () => {
@@ -31,6 +32,7 @@ describe('utils', () => {
 
       expect(sortedItems[0].label).toEqual('label1')
     })
+
     it("should treat falsy values for SelectItem.label as ''", () => {
       const items: SelectItem[] = [
         { label: undefined, value: 1 },
@@ -41,6 +43,42 @@ describe('utils', () => {
       const sortedItems = items.sort(dropDownSortItemsByLabel)
 
       expect(sortedItems[0].label).toEqual(undefined)
+    })
+  })
+
+  describe('prepareUrlPath', () => {
+    it('should build a url with a path and insert a /', () => {
+      const url = 'test url'
+      const path = 'test path'
+
+      const preparedUrl = prepareUrlPath(url, path)
+
+      expect(preparedUrl).toBe('test url/test path')
+    })
+
+    it('should build a url', () => {
+      const url = 'http://test url'
+
+      const preparedUrl = prepareUrlPath(url)
+
+      expect(preparedUrl).toBe(url)
+    })
+
+    it('should return empty string if there is no input', () => {
+      const preparedUrl = prepareUrlPath()
+
+      expect(preparedUrl).toBe('')
+    })
+  })
+
+  describe('bffImageUrl', () => {
+    it('should return empty string if no name is provided', () => {
+      const basePath = 'base'
+      const name = undefined
+
+      const preparedUrl = bffImageUrl(basePath, name, RefType.Favicon)
+
+      expect(preparedUrl).toBe('')
     })
   })
 })
