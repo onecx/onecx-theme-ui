@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
-import { Observable, debounceTime, map, switchMap } from 'rxjs'
+import { Observable, combineLatest, debounceTime, first, map, switchMap } from 'rxjs'
 import { TranslateService } from '@ngx-translate/core'
 import { ConfirmationService, SelectItem } from 'primeng/api'
 
@@ -142,14 +142,17 @@ export class ThemeDesignerComponent implements OnInit {
     this.imageLogoUrlExists = false
     this.imageFaviconUrlExists = false
     if (this.mode === 'EDIT' && this.themeName) {
-      this.themeApi.getThemeByName({ name: this.themeName }).subscribe((data) => {
+      combineLatest([
+        this.themeService.currentTheme$.pipe(first()),
+        this.themeApi.getThemeByName({ name: this.themeName })
+      ]).subscribe(([currentTheme, data]) => {
         this.theme = data.resource
         this.basicForm.patchValue(this.theme)
         this.basicForm.controls['name'].disable()
         this.propertiesForm.reset()
         this.propertiesForm.patchValue(this.theme.properties ?? {})
         this.themeId = this.theme.id
-        this.themeIsCurrentUsedTheme = this.themeId === this.appStateService.currentPortal$.getValue()?.themeId
+        this.themeIsCurrentUsedTheme = this.theme.name === currentTheme.name
         // images
         this.fetchingLogoUrl = this.getImageUrl(this.theme, RefType.Logo)
         this.fetchingFaviconUrl = this.getImageUrl(this.theme, RefType.Favicon)
@@ -326,6 +329,7 @@ export class ThemeDesignerComponent implements OnInit {
             this.msgService.success({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_OK' })
             // apply theme changes immediately if it is the theme of the current portal
             if (this.themeIsCurrentUsedTheme) {
+              console.log('IS TRUE')
               this.themeService.apply(data as object)
             }
           },

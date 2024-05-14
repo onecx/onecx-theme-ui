@@ -1,6 +1,5 @@
 import { SelectItem } from 'primeng/api'
 import { Location } from '@angular/common'
-// import { environment } from 'src/environments/environment'
 import { RefType } from 'src/app/shared/generated'
 
 export function limitText(text: string, limit: number): string {

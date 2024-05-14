@@ -13,6 +13,7 @@ import { ConfigurationService, PortalMessageService, UserService } from '@onecx/
 
 import { RefType, Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeDetailComponent } from './theme-detail.component'
+import { bffImageUrl } from 'src/app/shared/utils'
 
 describe('ThemeDetailComponent', () => {
   let component: ThemeDetailComponent
@@ -443,9 +444,8 @@ describe('ThemeDetailComponent', () => {
     }
     expect(component.getImageUrl(theme, RefType.Favicon)).toBe('faviconUrl')
 
+    const configBasePath = 'http://onecx-theme-bff:8080'
     theme.faviconUrl = ''
-    expect(component.getImageUrl(theme, RefType.Favicon)).toBe(
-      'http://onecx-theme-bff:8080' + '/images/' + theme.name + '/favicon'
-    )
+    expect(component.getImageUrl(theme, RefType.Favicon)).toBe(bffImageUrl(configBasePath, theme.name, RefType.Favicon))
   })
 })

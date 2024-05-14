@@ -23,13 +23,21 @@ import { PortalMessageService, ThemeService } from '@onecx/portal-integration-an
 import { RefType, ThemesAPIService, ImagesInternalAPIService } from 'src/app/shared/generated'
 import { themeVariables } from './theme-variables'
 import { ThemeDesignerComponent } from './theme-designer.component'
+import { CurrentThemeTopic } from '@onecx/integration-interface'
 
 describe('ThemeDesignerComponent', () => {
   let component: ThemeDesignerComponent
   let fixture: ComponentFixture<ThemeDesignerComponent>
 
   const msgServiceSpy = jasmine.createSpyObj<PortalMessageService>('PortalMessageService', ['success', 'error', 'info'])
-  const themeServiceSpy = jasmine.createSpyObj<ThemeService>('ThemeService', ['apply'])
+  const themeServiceSpy = jasmine.createSpyObj<ThemeService>('ThemeService', ['apply'], {
+    currentTheme$: of({
+      isInitializedPromise: Promise.resolve(true),
+      data: {},
+      isInit: true,
+      resolveInitPromise: () => {}
+    }) as unknown as CurrentThemeTopic
+  })
   const themeApiSpy = jasmine.createSpyObj<ThemesAPIService>('ThemesAPIService', [
     'getThemes',
     'updateTheme',
