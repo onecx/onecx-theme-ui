@@ -329,7 +329,6 @@ export class ThemeDesignerComponent implements OnInit {
             this.msgService.success({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_OK' })
             // apply theme changes immediately if it is the theme of the current portal
             if (this.themeIsCurrentUsedTheme) {
-              console.log('IS TRUE')
               this.themeService.apply(data as object)
             }
           },
