@@ -326,14 +326,16 @@ describe('ThemeDesignerComponent', () => {
 
     it('should navigate back on close', (done: DoneFn) => {
       const router = TestBed.inject(Router)
-      spyOn(router, 'navigate')
+      spyOn(router, 'navigate').and.returnValue(Promise.resolve(true))
+      component.reloadPage = function () {}
 
       component.actions$?.subscribe((actions) => {
         const closeAction = actions[0]
         closeAction.actionCallback()
-        expect(router.navigate).toHaveBeenCalledOnceWith(['./..'], jasmine.any(Object))
-
-        done()
+        setTimeout(() => {
+          expect(router.navigate).toHaveBeenCalledOnceWith(['./..'], jasmine.any(Object))
+          done()
+        }, 0)
       })
     })
 
