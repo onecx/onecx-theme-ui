@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core'
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { Observable, combineLatest, debounceTime, first, map, switchMap } from 'rxjs'
@@ -24,7 +24,7 @@ import { themeVariables } from './theme-variables'
   styleUrls: ['./theme-designer.component.scss'],
   providers: [ConfirmationService]
 })
-export class ThemeDesignerComponent implements OnInit, OnDestroy {
+export class ThemeDesignerComponent implements OnInit {
   @ViewChild('saveAsThemeName') saveAsThemeName: ElementRef | undefined
   @ViewChild('selectedFileInputLogo') selectedFileInputLogo: ElementRef | undefined
   @ViewChild('selectedFileInputFavicon') selectedFileInputFavicon: ElementRef | undefined
@@ -294,7 +294,9 @@ export class ThemeDesignerComponent implements OnInit, OnDestroy {
   }
 
   private close(): void {
-    this.router.navigate(['./..'], { relativeTo: this.route })
+    this.router.navigate(['./..'], { relativeTo: this.route }).then(() => {
+      window.location.reload()
+    })
   }
 
   private updateTheme(): void {
@@ -515,9 +517,5 @@ export class ThemeDesignerComponent implements OnInit, OnDestroy {
       // internal
       else this.fetchingFaviconUrl = bffImageUrl(this.bffImagePath, this.theme?.name, refType)
     }
-  }
-
-  ngOnDestroy(): void {
-    window.location.reload()
   }
 }
