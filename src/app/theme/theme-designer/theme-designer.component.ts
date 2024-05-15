@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core'
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { Observable, combineLatest, debounceTime, first, map, switchMap } from 'rxjs'
@@ -24,7 +24,7 @@ import { themeVariables } from './theme-variables'
   styleUrls: ['./theme-designer.component.scss'],
   providers: [ConfirmationService]
 })
-export class ThemeDesignerComponent implements OnInit {
+export class ThemeDesignerComponent implements OnInit, OnDestroy {
   @ViewChild('saveAsThemeName') saveAsThemeName: ElementRef | undefined
   @ViewChild('selectedFileInputLogo') selectedFileInputLogo: ElementRef | undefined
   @ViewChild('selectedFileInputFavicon') selectedFileInputFavicon: ElementRef | undefined
@@ -153,6 +153,7 @@ export class ThemeDesignerComponent implements OnInit {
         this.propertiesForm.patchValue(this.theme.properties ?? {})
         this.themeId = this.theme.id
         this.themeIsCurrentUsedTheme = this.theme.name === currentTheme.name
+        this.autoApply = this.themeIsCurrentUsedTheme
         // images
         this.fetchingLogoUrl = this.getImageUrl(this.theme, RefType.Logo)
         this.fetchingFaviconUrl = this.getImageUrl(this.theme, RefType.Favicon)
@@ -514,5 +515,9 @@ export class ThemeDesignerComponent implements OnInit {
       // internal
       else this.fetchingFaviconUrl = bffImageUrl(this.bffImagePath, this.theme?.name, refType)
     }
+  }
+
+  ngOnDestroy(): void {
+    window.location.reload()
   }
 }
