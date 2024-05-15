@@ -153,6 +153,7 @@ export class ThemeDesignerComponent implements OnInit {
         this.propertiesForm.patchValue(this.theme.properties ?? {})
         this.themeId = this.theme.id
         this.themeIsCurrentUsedTheme = this.theme.name === currentTheme.name
+        this.autoApply = this.themeIsCurrentUsedTheme
         // images
         this.fetchingLogoUrl = this.getImageUrl(this.theme, RefType.Logo)
         this.fetchingFaviconUrl = this.getImageUrl(this.theme, RefType.Favicon)
@@ -293,7 +294,12 @@ export class ThemeDesignerComponent implements OnInit {
   }
 
   private close(): void {
-    this.router.navigate(['./..'], { relativeTo: this.route })
+    this.router.navigate(['./..'], { relativeTo: this.route }).then(() => {
+      this.reloadPage()
+    })
+  }
+  reloadPage() {
+    window.location.reload() // to avoid reloading in the tests
   }
 
   private updateTheme(): void {
