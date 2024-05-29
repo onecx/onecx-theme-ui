@@ -27,5 +27,6 @@ export interface Theme {
     previewImageUrl?: string;
     assetsUpdateDate?: string;
     properties?: object;
+    operator?: boolean;
 }
 

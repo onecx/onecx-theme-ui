@@ -9,6 +9,7 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { Image } from './image';
 
 
 export interface EximTheme { 
@@ -20,5 +21,6 @@ export interface EximTheme {
     previewImageUrl?: string;
     assetsUpdateDate?: string;
     properties?: object;
+    images?: { [key: string]: Image; };
 }
 

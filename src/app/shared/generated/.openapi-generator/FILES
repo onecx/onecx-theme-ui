@@ -15,6 +15,7 @@ model/eximTheme.ts
 model/exportThemeRequest.ts
 model/getThemeResponse.ts
 model/getThemesResponse.ts
+model/image.ts
 model/imageInfo.ts
 model/importThemeResponse.ts
 model/importThemeResponseStatus.ts

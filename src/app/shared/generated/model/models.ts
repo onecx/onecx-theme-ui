@@ -4,6 +4,7 @@ export * from './eximTheme';
 export * from './exportThemeRequest';
 export * from './getThemeResponse';
 export * from './getThemesResponse';
+export * from './image';
 export * from './imageInfo';
 export * from './importThemeResponse';
 export * from './importThemeResponseStatus';

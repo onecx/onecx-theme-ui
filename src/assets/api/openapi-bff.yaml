@@ -414,6 +414,8 @@ components:
           type: string
         properties:
           type: object
+        operator:
+          type: boolean
     ThemeUpdateCreate:
       type: object
       properties:
@@ -629,6 +631,21 @@ components:
           type: string
         properties:
           type: object
+        images:
+          $ref: '#/components/schemas/Images'
+    Images:
+      type: object
+      nullable: false
+      additionalProperties:
+        $ref: '#/components/schemas/Image'
+    Image:
+      type: object
+      properties:
+        imageData:
+          type: string
+          format: byte
+        mimeType:
+          type: string
     ImageInfo:
       type: object
       properties:
