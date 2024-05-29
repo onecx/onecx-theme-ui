@@ -128,7 +128,9 @@ export class ThemeDetailComponent implements OnInit {
               },
               icon: 'pi pi-trash',
               show: 'asOverflow',
-              permission: 'THEME#DELETE'
+              permission: 'THEME#DELETE',
+              conditional: true,
+              showCondition: !this.theme?.operator
             }
           ]
         })
