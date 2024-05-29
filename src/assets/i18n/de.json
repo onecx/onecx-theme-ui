@@ -76,11 +76,14 @@
     "CREATION_USER": "Erstellt von",
     "MODIFICATION_DATE": "Geändert am",
     "MODIFICATION_USER": "Geändert von",
+    "OPERATOR": "Erstellt durch Operator",
+    "OPERATOR_MESSAGE": "Dieses Theme wurde durch den Operator erstellt. Alle Änderungen gehen beim nächsten Deployment verloren.",
     "TOOLTIPS": {
       "CREATION_DATE": "Zeitpunkt der Erstellung",
       "CREATION_USER": "Name des Benutzers der Erstellung",
       "MODIFICATION_DATE": "Zeitpunkt der letzten Änderung",
-      "MODIFICATION_USER": "Name des Benutzers der letzten Änderung"
+      "MODIFICATION_USER": "Name des Benutzers der letzten Änderung",
+      "OPERATOR": "Wenn gesetzt, dann kann das Theme nicht gelöscht werden und alle Änderungen gehen beim beim nächsten Deployment verloren."
     }
   },
   "GENERAL": {

@@ -47,6 +47,15 @@
         </div>
       </div>
 
+      <div class="my-2 mx-4 text-center">
+        <p-message
+          *ngIf="theme?.operator"
+          id="theme_designer_operator_message"
+          severity="warn"
+          [text]="'DETAIL.OPERATOR_MESSAGE' | translate"
+        ></p-message>
+      </div>
+
       <form [formGroup]="propertiesForm" class="mx-3 mb-3">
         <p-fieldset [toggleable]="false" [collapsed]="false" styleClass="py-0 px-3">
           <ng-template pTemplate="header">
