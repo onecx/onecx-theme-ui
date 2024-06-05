@@ -294,12 +294,7 @@ export class ThemeDesignerComponent implements OnInit {
   }
 
   private close(): void {
-    this.router.navigate(['./..'], { relativeTo: this.route }).then(() => {
-      this.reloadPage()
-    })
-  }
-  reloadPage() {
-    window.location.reload() // to avoid reloading in the tests
+    this.router.navigate(['./..'], { relativeTo: this.route })
   }
 
   private updateTheme(): void {

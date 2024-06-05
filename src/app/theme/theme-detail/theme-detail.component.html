@@ -3,12 +3,18 @@
     [loading]="loading"
     [header]="theme?.name ?? ''"
     [subheader]="'THEME.DETAIL.SUBHEADER' | translate"
-    [objectDetails]="(objectDetails$ | async) ?? []"
     [actions]="(actions$ | async) ?? []"
     [figureImage]="headerImageUrl"
     [figureBackground]="!theme?.logoUrl"
   >
+    <p-message
+      *ngIf="theme?.operator"
+      id="theme_designer_operator_message"
+      severity="warn"
+      [text]="'DETAIL.OPERATOR_MESSAGE' | translate"
+    ></p-message>
   </ocx-page-header>
+
   <ocx-page-content>
     <p-tabView>
       <p-tabPanel id="theme_detail_panel_props" [header]="'THEME.TABS.PROPERTIES' | translate">
@@ -62,7 +68,7 @@
       </p-tabPanel>
 
       <p-tabPanel [header]="'THEME.TABS.INTERN' | translate">
-        <app-theme-intern [theme]="theme" [dateFormat]="dateFormat"></app-theme-intern>
+        <app-theme-intern [theme]="theme" [dateFormat]="dateFormat" [workspaceList]="workspaceList"></app-theme-intern>
       </p-tabPanel>
 
       <p-tabPanel id="theme_detail_panel_variables" [header]="'THEME.TABS.VARIABLES' | translate">

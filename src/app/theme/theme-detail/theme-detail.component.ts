@@ -1,13 +1,12 @@
 import { Component, OnInit } from '@angular/core'
-import { DatePipe } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateService } from '@ngx-translate/core'
 import { Observable, finalize, map } from 'rxjs'
 import FileSaver from 'file-saver'
 
-import { Action, ObjectDetailItem, PortalMessageService, UserService } from '@onecx/portal-integration-angular'
+import { Action, PortalMessageService, UserService } from '@onecx/portal-integration-angular'
 
-import { limitText, sortByLocale, bffImageUrl } from 'src/app/shared/utils'
+import { sortByLocale, bffImageUrl } from 'src/app/shared/utils'
 import {
   ExportThemeRequest,
   ImagesInternalAPIService,
@@ -23,17 +22,15 @@ import {
 })
 export class ThemeDetailComponent implements OnInit {
   theme: Theme | undefined
-  usedInWorkspaces: Workspace[] | undefined
+  workspaceList: string | undefined
   themeName!: string
   themeDeleteVisible = false
   themeDeleteMessage = ''
-  workspaceList = ''
   loading = true
   RefType = RefType
   public dateFormat = 'medium'
   // page header
   public actions$: Observable<Action[]> | undefined
-  public objectDetails$: Observable<ObjectDetailItem[]> | undefined
   public headerImageUrl?: string
 
   constructor(
@@ -60,7 +57,7 @@ export class ThemeDetailComponent implements OnInit {
       .subscribe({
         next: (data) => {
           this.theme = data.resource
-          this.usedInWorkspaces = data.workspaces
+          this.workspaceList = this.prepareWorkspaceList(data.workspaces)
           this.preparePage()
           this.headerImageUrl = this.getImageUrl(this.theme, RefType.Logo)
         },
@@ -76,7 +73,6 @@ export class ThemeDetailComponent implements OnInit {
 
   private preparePage() {
     this.prepareActionButtons()
-    this.prepareObjectDetails()
   }
 
   private prepareActionButtons(): void {
@@ -137,46 +133,6 @@ export class ThemeDetailComponent implements OnInit {
       )
   }
 
-  private prepareObjectDetails(): void {
-    this.workspaceList = this.prepareWorkspaceList()
-    if (this.theme) {
-      this.objectDetails$ = this.translate
-        .get([
-          'DETAIL.CREATION_DATE',
-          'DETAIL.TOOLTIPS.CREATION_DATE',
-          'DETAIL.MODIFICATION_DATE',
-          'DETAIL.TOOLTIPS.MODIFICATION_DATE',
-          'THEME.WORKSPACES',
-          'THEME.TOOLTIPS.WORKSPACES'
-        ])
-        .pipe(
-          map((data) => {
-            return [
-              {
-                label: data['DETAIL.CREATION_DATE'],
-                tooltip: data['DETAIL.TOOLTIPS.CREATION_DATE'],
-                value: this.theme?.creationDate,
-                valuePipe: DatePipe,
-                valuePipeArgs: this.dateFormat
-              },
-              {
-                label: data['DETAIL.MODIFICATION_DATE'],
-                tooltip: data['DETAIL.TOOLTIPS.MODIFICATION_DATE'],
-                value: this.theme?.modificationDate,
-                valuePipe: DatePipe,
-                valuePipeArgs: this.dateFormat
-              },
-              {
-                label: data['THEME.WORKSPACES'],
-                value: limitText(this.workspaceList, 100),
-                tooltip: data['THEME.TOOLTIPS.WORKSPACES']
-              }
-            ]
-          })
-        )
-    }
-  }
-
   public close(): void {
     this.router.navigate(['./..'], { relativeTo: this.route })
   }
@@ -218,9 +174,9 @@ export class ThemeDetailComponent implements OnInit {
     }
   }
 
-  public prepareWorkspaceList(): string {
-    const arr = this.usedInWorkspaces?.map((workspace: Workspace) => workspace.name)
-    return arr?.sort(sortByLocale).join(', ') ?? ''
+  public prepareWorkspaceList(workspace?: Workspace[]): string {
+    const arr = workspace?.map((workspace: Workspace) => workspace.name)
+    return arr ? arr.sort(sortByLocale).join(', ') : ''
   }
 
   public getImageUrl(theme: Theme | undefined, refType: RefType): string | undefined {
