@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges } from '@angular/core'
+import { Component, ElementRef, Input, OnChanges, ViewChild } from '@angular/core'
 import { TranslateService } from '@ngx-translate/core'
 
 import { Theme } from 'src/app/shared/generated'
@@ -10,6 +10,9 @@ import { Theme } from 'src/app/shared/generated'
 export class ThemeInternComponent implements OnChanges {
   @Input() theme: Theme | undefined
   @Input() dateFormat = 'medium'
+  @Input() workspaceList: string | undefined
+
+  @ViewChild('usedInWorkspaces') usedInWorkspaces: ElementRef = {} as ElementRef
 
   public operator = false
 
@@ -17,5 +20,8 @@ export class ThemeInternComponent implements OnChanges {
 
   public ngOnChanges(): void {
     if (this.theme) this.operator = this.theme.operator ?? false
+    setTimeout(() => {
+      if (this.usedInWorkspaces?.nativeElement) this.usedInWorkspaces.nativeElement.innerHTML = this.workspaceList
+    }, 2)
   }
 }

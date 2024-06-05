@@ -64,19 +64,33 @@
       </div>
     </div>
 
-    <div class="flex flex-wrap row-gap-4">
-      <div class="w-12 sm:w-6 px-3 flex align-items-center">
-        <p-checkbox
-          type="text"
-          [readonly]="true"
-          inputId="theme_detail_item_operator"
-          [(ngModel)]="operator"
-          [binary]="true"
-          [styleClass]="'cursor-auto shadow-none'"
-          [label]="'DETAIL.OPERATOR' | translate"
-          [title]="'DETAIL.TOOLTIPS.OPERATOR' | translate"
-        ></p-checkbox>
-      </div>
+    <div class="w-12 sm:w-6 px-3 flex align-items-center">
+      <p-checkbox
+        type="text"
+        [readonly]="true"
+        inputId="theme_detail_item_operator"
+        [(ngModel)]="operator"
+        [binary]="true"
+        [styleClass]="'cursor-auto shadow-none'"
+        [label]="'DETAIL.OPERATOR' | translate"
+        [title]="'DETAIL.TOOLTIPS.OPERATOR' | translate"
+      ></p-checkbox>
+    </div>
+    <div class="w-12 px-3">
+      <span class="p-float-label">
+        <textarea
+          #usedInWorkspaces
+          pInputTextarea
+          readonly
+          class="w-full"
+          autoresize="true"
+          rows="3"
+          id="theme_detail_intern_item_workspaces"
+          [title]="'THEME.TOOLTIPS.WORKSPACES' | translate"
+        >
+        </textarea>
+        <label for="theme_detail_intern_item_workspaces">{{ 'THEME.WORKSPACES' | translate }}</label>
+      </span>
     </div>
   </div>
 </div>

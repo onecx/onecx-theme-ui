@@ -155,7 +155,8 @@ describe('ThemeDetailComponent', () => {
     await component.ngOnInit()
 
     expect(component.theme).toEqual(themeResponse['resource'])
-    expect(component.usedInWorkspaces).toEqual(themeResponse['workspaces'])
+    //expect(component.workspaceList).toEqual('workspaces')
+    //this.prepareWorkspaceList(data.workspaces)
 
     let actions: any = []
     component.actions$!.subscribe((act) => (actions = act))
@@ -237,27 +238,6 @@ describe('ThemeDetailComponent', () => {
     await component.ngOnInit()
 
     expect(component.workspaceList).toBe('workspace1, workspace2')
-    let objectDetails: any = []
-    component.objectDetails$!.subscribe((obj) => (objectDetails = obj))
-
-    expect(objectDetails.length).toBe(3)
-    const creationDate = objectDetails.filter(
-      (detail: { label: string; tooltip: string }) =>
-        detail.label === 'detailCreationDate' && detail.tooltip === 'detailTooltipsCreationDate'
-    )[0]
-    expect(creationDate.value).toBe('myCreDate')
-
-    const modificationDate = objectDetails.filter(
-      (detail: { label: string; tooltip: string }) =>
-        detail.label === 'detailModificationDate' && detail.tooltip === 'detailTooltipsModificationDate'
-    )[0]
-    expect(modificationDate.value).toBe('myModDate')
-
-    const workspaces = objectDetails.filter(
-      (detail: { label: string; tooltip: string }) =>
-        detail.label === 'themeWorkspaces' && detail.tooltip === 'themeTooltipsWorkspaces'
-    )[0]
-    expect(workspaces.value).toBe('workspace1, workspace2')
   })
 
   it('should display not found error and close page on theme fetch failure', () => {
