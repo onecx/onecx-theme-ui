@@ -92,7 +92,7 @@
     "@openapitools/openapi-generator-cli": "^2.9.0",
     "@schematics/angular": "15.2.6",
     "@storybook/addon-essentials": "8.0.5",
-    "@storybook/angular": "7.6.16",
+    "@storybook/angular": "8.1.6",
     "@storybook/core-server": "7.6.16",
     "@svgr/webpack": "^7.0.0",
     "@swc-node/register": "^1.6.5",
