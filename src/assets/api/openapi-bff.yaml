@@ -543,6 +543,8 @@ components:
         pageSize:
           type: integer
           format: int32
+          default: 100
+          maximum: 1000
     SearchThemeResponse:
       allOf:
         - $ref: '#/components/schemas/PagingResponse'
@@ -668,6 +670,7 @@ components:
         type: integer
         format: int32
         default: 100
+        maximum: 1000
     id:
       in: path
       name: id
