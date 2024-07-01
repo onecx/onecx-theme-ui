@@ -176,7 +176,8 @@ export class ThemeDetailComponent implements OnInit {
 
   public prepareWorkspaceList(workspace?: Workspace[]): string {
     const arr = workspace?.map((workspace: Workspace) => workspace.name)
-    return arr ? arr.sort(sortByLocale).join(', ') : ''
+    arr?.sort(sortByLocale)
+    return arr ? arr.join(', ') : ''
   }
 
   public getImageUrl(theme: Theme | undefined, refType: RefType): string | undefined {
