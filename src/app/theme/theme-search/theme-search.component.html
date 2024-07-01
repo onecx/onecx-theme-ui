@@ -16,7 +16,7 @@
         [rowsPerPageOptions]="viewMode === 'grid' ? [12, 24, 60] : [10, 20, 50]"
         [rows]="viewMode === 'grid' ? 12 : 10"
         [layout]="viewMode"
-        filterBy="name,description"
+        filterBy="name"
         [sortField]="sortField"
         [sortOrder]="sortOrder"
       >
@@ -26,15 +26,12 @@
             [enableSorting]="true"
             [supportedViews]="['grid', 'list']"
             [initialViewMode]="viewMode"
-            [sortingOptions]="[
-              { label: 'THEME.NAME' | translate, value: 'name' },
-              { label: 'THEME.DESCRIPTION' | translate, value: 'description' }
-            ]"
+            [sortingOptions]="[{ label: 'THEME.NAME' | translate, value: 'name' }]"
             [defaultSortOption]="sortField"
             [defaultSortDirection]="sortOrder === 1"
             (dataViewChange)="onLayoutChange($event)"
             (filterChange)="onFilterChange($event)"
-            [filterColumns]="['THEME.NAME' | translate, 'THEME.DESCRIPTION' | translate]"
+            [filterColumns]="['THEME.NAME' | translate]"
             (sortChange)="onSortChange($event)"
             (sortDirectionChange)="onSortDirChange($event)"
             [translations]="dataViewControlsTranslations"

@@ -48,7 +48,6 @@ export class ThemeSearchComponent implements OnInit {
     this.translate
       .get([
         'THEME.NAME',
-        'THEME.DESCRIPTION',
         'SEARCH.SORT_BY',
         'SEARCH.FILTER',
         'SEARCH.FILTER_OF',
@@ -63,7 +62,7 @@ export class ThemeSearchComponent implements OnInit {
           this.dataViewControlsTranslations = {
             sortDropdownPlaceholder: data['SEARCH.SORT_BY'],
             filterInputPlaceholder: data['SEARCH.FILTER'],
-            filterInputTooltip: data['SEARCH.FILTER_OF'] + data['THEME.NAME'] + ', ' + data['THEME.DESCRIPTION'],
+            filterInputTooltip: data['SEARCH.FILTER_OF'] + data['THEME.NAME'],
             viewModeToggleTooltips: {
               grid: data['GENERAL.TOOLTIP.VIEW_MODE_GRID'],
               list: data['GENERAL.TOOLTIP.VIEW_MODE_LIST']
