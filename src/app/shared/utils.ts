@@ -2,7 +2,7 @@ import { SelectItem } from 'primeng/api'
 import { Location } from '@angular/common'
 import { RefType } from 'src/app/shared/generated'
 
-export function limitText(text: string, limit: number): string {
+export function limitText(text: string | null, limit: number): string {
   if (text) {
     return text.length < limit ? text : text.substring(0, limit) + '...'
   } else {

@@ -8,6 +8,11 @@ describe('utils', () => {
     expect(result).toBe('text...')
   })
 
+  it('should handle zero length text', () => {
+    const result = limitText(null, 4)
+    expect(result).toBe('')
+  })
+
   it('should exclude props', () => {
     const obj = {
       name: 'John',
