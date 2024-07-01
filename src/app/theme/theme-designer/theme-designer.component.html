@@ -217,13 +217,15 @@
                     </div>
                   </ng-template>
                 </p-overlayPanel>
-                <span
+                <a
+                  tabindex="0"
                   id="theme_detail_item_color_{{ item }}_toggle"
                   class="p-inputgroup-addon cursor-pointer"
                   (click)="op.toggle($event)"
+                  (keyup)="op.toggle($event)"
                   [ngStyle]="{ 'background-color': group.formGroup.value[item] }"
                 >
-                </span>
+                </a>
               </div>
             </div>
           </div>

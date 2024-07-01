@@ -77,7 +77,7 @@
     "MODIFICATION_DATE": "Changed on",
     "MODIFICATION_USER": "Changed by",
     "OPERATOR": "Created by Operator",
-    "OPERATOR_MESSAGE": "This theme was created by the operator. All changes will be lost on the next deployment.",
+    "OPERATOR_MESSAGE": "This theme was created by the operator. All changes will be lost during the next deployment.",
     "TOOLTIPS": {
       "CREATION_DATE": "Timestamp of the creation",
       "CREATION_USER": "Name of the user of the creation",
