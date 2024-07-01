@@ -2,7 +2,7 @@ import { SelectItem } from 'primeng/api'
 import { Location } from '@angular/common'
 import { RefType } from 'src/app/shared/generated'
 
-export function limitText(text: string, limit: number): string {
+export function limitText(text: string | null, limit: number): string {
   if (text) {
     return text.length < limit ? text : text.substring(0, limit) + '...'
   } else {
@@ -11,9 +11,7 @@ export function limitText(text: string, limit: number): string {
 }
 
 export function dropDownSortItemsByLabel(a: SelectItem, b: SelectItem): number {
-  return (a.label ? (a.label as string).toUpperCase() : '').localeCompare(
-    b.label ? (b.label as string).toUpperCase() : ''
-  )
+  return (a.label ? a.label.toUpperCase() : '').localeCompare(b.label ? b.label.toUpperCase() : '')
 }
 export function dropDownGetLabelByValue(ddArray: SelectItem[], val: string): string {
   const a: any = ddArray.find((item: SelectItem) => {
