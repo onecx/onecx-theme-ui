@@ -56,7 +56,7 @@
     "@onecx/angular-accelerator": "^4.36.0",
     "@onecx/angular-integration-interface": "^4.36.0",
     "@onecx/angular-remote-components": "^4.36.0",
-    "@onecx/angular-testing": "^4.36.0",
+    "@onecx/angular-testing": "^4.39.0",
     "@onecx/integration-interface": "^4.36.0",
     "@onecx/keycloak-auth": "^4.36.0",
     "@onecx/portal-integration-angular": "^4.36.0",
