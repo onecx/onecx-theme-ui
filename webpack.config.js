@@ -5,7 +5,7 @@ const config = withModuleFederationPlugin({
   name: 'onecx-theme-ui',
   filename: 'remoteEntry.js',
   exposes: {
-    './OneCXThemeModule': 'src/app/onecx-theme-remote.module.ts'
+    './OneCXThemeModule': 'src/bootstrap.ts'
   },
   shared: share({
     '@angular/core': { singleton: true, requiredVersion: 'auto' },
@@ -47,5 +47,17 @@ const plugins = config.plugins.filter((plugin) => !(plugin instanceof ModifyEntr
 
 module.exports = {
   ...config,
-  plugins
+  plugins,
+  output: {
+    uniqueName: 'onecx-help-ui',
+    publicPath: 'auto'
+  },
+  experiments: {
+    ...config.experiments,
+    topLevelAwait: true
+  },
+  optimization: {
+    runtimeChunk: false,
+    splitChunks: false
+  }
 }
