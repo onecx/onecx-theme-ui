@@ -1,7 +1,7 @@
 <ocx-portal-page permission="THEME#VIEW" helpArticleId="PAGE_THEME_DETAIL">
   <ocx-page-header
     [loading]="loading"
-    [header]="theme?.name ?? ''"
+    [header]="theme?.displayName ?? ''"
     [subheader]="'THEME.DETAIL.SUBHEADER' | translate"
     [actions]="(actions$ | async) ?? []"
     [figureImage]="headerImageUrl"
