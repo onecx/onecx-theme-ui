@@ -398,6 +398,9 @@ components:
         name:
           minLength: 2
           type: string
+        displayName:
+          minLength: 2
+          type: string
         cssFile:
           type: string
         description:
@@ -431,6 +434,9 @@ components:
         modificationUser:
           type: string
         name:
+          minLength: 2
+          type: string
+        displayName:
           minLength: 2
           type: string
         cssFile:
@@ -535,6 +541,8 @@ components:
       type: object
       properties:
         name:
+          type: string
+        displayName:
           type: string
         pageNumber:
           type: integer

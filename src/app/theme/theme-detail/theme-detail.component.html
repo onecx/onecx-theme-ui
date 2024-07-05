@@ -24,6 +24,17 @@
               <input pInputText type="text" readonly class="w-full" id="theme_detail_item_name" [value]="theme?.name" />
               <label for="theme_detail_item_name">{{ 'THEME.NAME' | translate }}</label>
             </span>
+            <span class="p-float-label" [title]="'THEME.TOOLTIPS.DISPLAY_NAME' | translate">
+              <input
+                pInputText
+                type="text"
+                readonly
+                class="w-full"
+                id="theme_detail_item_display_name"
+                [value]="theme?.displayName"
+              />
+              <label for="theme_detail_item_display_name">{{ 'THEME.DISPLAY_NAME' | translate }}</label>
+            </span>
 
             <span class="p-float-label" [title]="'THEME.TOOLTIPS.DESCRIPTION' | translate">
               <textarea

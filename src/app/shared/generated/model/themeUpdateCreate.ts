@@ -18,6 +18,7 @@ export interface ThemeUpdateCreate {
     modificationDate?: string;
     modificationUser?: string;
     name?: string;
+    displayName?: string;
     cssFile?: string;
     description?: string;
     assetsUrl?: string;

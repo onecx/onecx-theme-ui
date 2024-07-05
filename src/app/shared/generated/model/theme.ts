@@ -19,6 +19,7 @@ export interface Theme {
     modificationUser?: string;
     id?: string;
     name?: string;
+    displayName?: string;
     cssFile?: string;
     description?: string;
     assetsUrl?: string;

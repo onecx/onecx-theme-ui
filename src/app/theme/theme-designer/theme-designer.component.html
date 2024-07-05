@@ -60,9 +60,17 @@
               </span>
             </div>
             <div class="field col-12 mb-4">
+              <span class="p-float-label" controlErrorAnchor>
+                <input pInputText type="text" id="theme_designer_field_display_name" formControlName="displayName" />
+                <label class="ocx-required-label" for="theme_designer_field_display_name">
+                  {{ 'THEME.DISPLAY_NAME' | translate }}
+                </label>
+              </span>
+            </div>
+            <div class="field col-12 mb-4">
               <span class="p-float-label">
                 <input pInputText type="text" id="theme_designer_field_description" formControlName="description" />
-                <label for="theme_designer_field_description">{{ 'THEME.DESCRIPTION' | translate }}</label>
+                <label for="theme_designer_field_description"> {{ 'THEME.DESCRIPTION' | translate }} </label>
               </span>
             </div>
             <!-- helper inputs because p-fileupload does not work inside inputgroup -->
