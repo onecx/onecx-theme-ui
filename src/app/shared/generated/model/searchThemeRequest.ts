@@ -13,6 +13,7 @@
 
 export interface SearchThemeRequest { 
     name?: string;
+    displayName?: string;
     pageNumber?: number;
     pageSize?: number;
 }

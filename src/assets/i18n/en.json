@@ -168,6 +168,7 @@
     },
     "ID": "ID",
     "NAME": "Name",
+    "DISPLAY_NAME": "Display Name",
     "THEME_NAME": "Theme Name",
     "VERSION": "Version",
     "DESCRIPTION": "Description",
@@ -180,6 +181,7 @@
     "TOOLTIPS": {
       "ID": "Unique technical ID of the Theme",
       "NAME": "Unique Name of the Theme",
+      "DISPLAY_NAME": "Display Name",
       "VERSION": "Version of the Theme",
       "DESCRIPTION": "Description of the Theme",
       "WORKSPACES": "Workspaces using the Theme",
