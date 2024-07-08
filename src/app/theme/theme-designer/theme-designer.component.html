@@ -53,6 +53,21 @@
             <span>{{ 'THEME.GROUPS.BASE' | translate }}</span>
           </ng-template>
           <div [formGroup]="basicForm" class="grid grid-nogutter formgrid p-fluid mx-1">
+            <div *ngIf="mode === 'NEW'" class="field col-12 mb-4">
+              <span class="p-float-label" controlErrorAnchor>
+                <input
+                  pInputText
+                  minlength="2"
+                  maxlength="255"
+                  type="text"
+                  id="theme_designer_field_name"
+                  formControlName="name"
+                />
+                <label class="ocx-required-label" for="theme_designer_field_name">
+                  {{ 'THEME.NAME' | translate }}
+                </label>
+              </span>
+            </div>
             <div class="field col-12 mb-4">
               <span class="p-float-label" controlErrorAnchor>
                 <input
