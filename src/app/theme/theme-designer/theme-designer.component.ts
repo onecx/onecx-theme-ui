@@ -98,6 +98,7 @@ export class ThemeDesignerComponent implements OnInit {
 
     this.basicForm = this.fb.group({
       name: new FormControl<string>('', [Validators.required]),
+      displayName: new FormControl<string>('', [Validators.required]),
       description: new FormControl<string | null>(null),
       logoUrl: new FormControl<string | null>(null),
       faviconUrl: new FormControl<string | null>(null)
@@ -257,6 +258,7 @@ export class ThemeDesignerComponent implements OnInit {
               this.getThemeById(this.themeTemplateSelectedId).subscribe((result) => {
                 if (this.mode === 'NEW') {
                   this.basicForm.controls['name'].setValue(data['GENERAL.COPY_OF'] + result.resource.name)
+                  this.basicForm.controls['displayName'].setValue(result.resource.displayName)
                   this.basicForm.controls['description'].setValue(result.resource.description)
                   this.basicForm.controls['logoUrl'].setValue(result.resource.logoUrl)
                   this.basicForm.controls['faviconUrl'].setValue(result.resource.faviconUrl)

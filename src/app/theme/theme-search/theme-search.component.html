@@ -55,7 +55,7 @@
             </div>
             <div class="col-12 md:col-5 lg:col-5 xl:col-6">
               <div class="flex flex-column justify-content-center gap-1 text-center md:text-left">
-                <div class="font-bold">{{ theme.name }}</div>
+                <div class="font-bold">{{ theme.displayName }}</div>
                 <div>{{ limitText(theme.description, 75) }}</div>
               </div>
             </div>
@@ -78,8 +78,8 @@
                 [imageUrl]="getLogoUrl(theme)"
               ></app-image-container>
               <app-theme-color-box [properties]="theme.properties" styleClass="h-1rem text-center" />
-              <div class="font-bold text-lg lg:text-xl" [title]="'Theme: ' + limitText(theme.name, 100)">
-                {{ limitText(theme.name, 20) }}
+              <div class="font-bold text-lg lg:text-xl" [title]="'Theme: ' + limitText(theme.displayName, 100)">
+                {{ limitText(theme.displayName, 20) }}
               </div>
             </div>
           </div>

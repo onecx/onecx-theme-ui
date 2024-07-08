@@ -297,11 +297,13 @@ describe('ThemeDesignerComponent', () => {
         {
           id: 'id1',
           name: 'theme1',
+          displayName: 'theme1display',
           description: 'desc1'
         },
         {
           id: 'id2',
           name: 'myTheme',
+          displayName: 'theme1display',
           description: 'desc2'
         }
       ]
@@ -1042,6 +1044,7 @@ describe('ThemeDesignerComponent', () => {
       component.mode = 'EDIT'
       const basicFormBeforeFetch = {
         name: 'n',
+        displayName: 'ndisplay',
         description: 'd',
         faviconUrl: 'f',
         logoUrl: 'l'
@@ -1050,6 +1053,7 @@ describe('ThemeDesignerComponent', () => {
 
       const fetchedTheme = {
         name: 'fetchedName',
+        displayName: 'fetchedNamedisplay',
         description: 'fetchedDesc',
         faviconUrl: 'fetchedFavUrl',
         logoUrl: 'fetchedLogoUrl',
@@ -1119,6 +1123,7 @@ describe('ThemeDesignerComponent', () => {
       component.mode = 'NEW'
       const basicFormBeforeFetch = {
         name: 'n',
+        displayName: 'n',
         description: 'd',
         faviconUrl: 'f',
         logoUrl: 'l'
@@ -1127,6 +1132,7 @@ describe('ThemeDesignerComponent', () => {
 
       const fetchedTheme = {
         name: 'fetchedName',
+        displayName: 'fetchedNamedisplay',
         description: 'fetchedDesc',
         faviconUrl: 'fetchedFavUrl',
         logoUrl: 'fetchedLogoUrl',
@@ -1157,6 +1163,7 @@ describe('ThemeDesignerComponent', () => {
       expect(accept).toHaveBeenCalled()
       expect(component.basicForm.value).toEqual({
         name: 'generalCopyOf: fetchedName',
+        displayName: 'fetchedNamedisplay',
         description: 'fetchedDesc',
         faviconUrl: 'fetchedFavUrl',
         logoUrl: 'fetchedLogoUrl'
