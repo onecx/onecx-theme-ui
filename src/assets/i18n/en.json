@@ -180,7 +180,7 @@
     "WORKSPACES": "Used in Workspaces",
     "TOOLTIPS": {
       "ID": "Unique technical ID of the Theme",
-      "NAME": "Unique name of the Theme, cannot be changed. Use as reference to the Theme.",
+      "NAME": "Unique name of the Theme, cannot be changed. Used as reference to the Theme.",
       "DISPLAY_NAME": "Display Name",
       "VERSION": "Version of the Theme",
       "DESCRIPTION": "Description of the Theme",
