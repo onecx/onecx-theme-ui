@@ -10,9 +10,9 @@
             id="theme_detail_item_creationDate"
             class="w-full pt-3 pb-2"
             [value]="theme?.creationDate | date : dateFormat"
-            [title]="'DETAIL.TOOLTIPS.CREATION_DATE' | translate"
+            [title]="'INTERNAL.TOOLTIPS.CREATION_DATE' | translate"
           />
-          <label for="theme_detail_item_creationDate">{{ 'DETAIL.CREATION_DATE' | translate }}</label>
+          <label for="theme_detail_item_creationDate">{{ 'INTERNAL.CREATION_DATE' | translate }}</label>
         </span>
       </div>
 
@@ -25,9 +25,9 @@
             id="theme_detail_item_creationUser"
             class="w-full pt-3 pb-2"
             [value]="theme?.creationUser"
-            [title]="'DETAIL.TOOLTIPS.CREATION_USER' | translate"
+            [title]="'INTERNAL.TOOLTIPS.CREATION_USER' | translate"
           />
-          <label for="theme_detail_item_creationUser">{{ 'DETAIL.CREATION_USER' | translate }}</label>
+          <label for="theme_detail_item_creationUser">{{ 'INTERNAL.CREATION_USER' | translate }}</label>
         </span>
       </div>
     </div>
@@ -42,9 +42,9 @@
             id="theme_detail_item_modificationDate"
             class="w-full pt-3 pb-2"
             [value]="theme?.modificationDate | date : dateFormat"
-            [title]="'DETAIL.TOOLTIPS.MODIFICATION_DATE' | translate"
+            [title]="'INTERNAL.TOOLTIPS.MODIFICATION_DATE' | translate"
           />
-          <label for="theme_detail_item_modificationDate">{{ 'DETAIL.MODIFICATION_DATE' | translate }}</label>
+          <label for="theme_detail_item_modificationDate">{{ 'INTERNAL.MODIFICATION_DATE' | translate }}</label>
         </span>
       </div>
 
@@ -57,9 +57,9 @@
             id="theme_detail_item_modificationUser"
             class="w-full pt-3 pb-2"
             [value]="theme?.modificationUser"
-            [title]="'DETAIL.TOOLTIPS.MODIFICATION_USER' | translate"
+            [title]="'INTERNAL.TOOLTIPS.MODIFICATION_USER' | translate"
           />
-          <label for="theme_detail_item_modificationUser">{{ 'DETAIL.MODIFICATION_USER' | translate }}</label>
+          <label for="theme_detail_item_modificationUser">{{ 'INTERNAL.MODIFICATION_USER' | translate }}</label>
         </span>
       </div>
     </div>
@@ -72,8 +72,8 @@
         [(ngModel)]="operator"
         [binary]="true"
         [styleClass]="'cursor-auto shadow-none'"
-        [label]="'DETAIL.OPERATOR' | translate"
-        [title]="'DETAIL.TOOLTIPS.OPERATOR' | translate"
+        [label]="'INTERNAL.OPERATOR' | translate"
+        [title]="'INTERNAL.TOOLTIPS.OPERATOR' | translate"
       ></p-checkbox>
     </div>
     <div class="w-12 px-3">
