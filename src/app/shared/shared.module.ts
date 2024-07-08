@@ -27,23 +27,11 @@ import { TabViewModule } from 'primeng/tabview'
 import { TableModule } from 'primeng/table'
 import { ToastModule } from 'primeng/toast'
 
-import {
-  AppStateService,
-  ConfigurationService,
-  PortalDialogService,
-  PortalApiConfiguration,
-  PortalCoreModule
-} from '@onecx/portal-integration-angular'
+import { PortalDialogService, PortalCoreModule } from '@onecx/portal-integration-angular'
 
-import { Configuration } from 'src/app/shared/generated'
 import { LabelResolver } from './label.resolver'
-import { environment } from 'src/environments/environment'
 import { ImageContainerComponent } from './image-container/image-container.component'
 import { ThemeColorBoxComponent } from './theme-color-box/theme-color-box.component'
-
-export function apiConfigProvider(configService: ConfigurationService, appStateService: AppStateService) {
-  return new PortalApiConfiguration(Configuration, environment.apiPrefix, configService, appStateService)
-}
 
 @NgModule({
   declarations: [ImageContainerComponent, ThemeColorBoxComponent],
@@ -128,12 +116,7 @@ export function apiConfigProvider(configService: ConfigurationService, appStateS
     TranslateModule
   ],
   //this is not elegant, for some reason the injection token from primeng does not work across federated module
-  providers: [
-    ConfirmationService,
-    LabelResolver,
-    { provide: DialogService, useClass: PortalDialogService },
-    { provide: Configuration, useFactory: apiConfigProvider, deps: [ConfigurationService, AppStateService] }
-  ],
+  providers: [ConfirmationService, LabelResolver, { provide: DialogService, useClass: PortalDialogService }],
   schemas: [NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA]
 })
 export class SharedModule {}

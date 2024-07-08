@@ -49,7 +49,7 @@ module.exports = {
   ...config,
   plugins,
   output: {
-    uniqueName: 'onecx-help-ui',
+    uniqueName: 'onecx-theme-ui',
     publicPath: 'auto'
   },
   experiments: {
