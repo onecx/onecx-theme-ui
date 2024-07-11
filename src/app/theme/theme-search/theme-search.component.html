@@ -78,8 +78,11 @@
                 [imageUrl]="getLogoUrl(theme)"
               ></app-image-container>
               <app-theme-color-box [properties]="theme.properties" styleClass="h-1rem text-center" />
-              <div class="font-bold text-lg lg:text-xl" [title]="'Theme: ' + limitText(theme.displayName, 100)">
-                {{ limitText(theme.displayName, 20) }}
+              <div class="text-center">
+                <div class="font-bold text-lg lg:text-xl" [title]="'Theme: ' + limitText(theme.displayName, 100)">
+                  {{ limitText(theme.displayName, 20) }}
+                </div>
+                <div class="text-xs" [title]="'THEME.TOOLTIPS.NAME' | translate">{{ limitText(theme.name, 20) }}</div>
               </div>
             </div>
           </div>

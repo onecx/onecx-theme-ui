@@ -3,8 +3,8 @@
     "CONFIRMATION": {
       "NO": "No",
       "YES": "Yes",
-      "NO.TOOLTIP": "Cancel the action",
-      "YES.TOOLTIP": "Proceed with the action"
+      "NO.TOOLTIP": "Cancel without change",
+      "YES.TOOLTIP": "Confirm and execute"
     },
     "CREATE": {
       "THEME": "Create Theme",
@@ -71,7 +71,7 @@
     "DETAIL": "Details",
     "EDIT": "Edit"
   },
-  "DETAIL": {
+  "INTERNAL": {
     "CREATION_DATE": "Created on",
     "CREATION_USER": "Created by",
     "MODIFICATION_DATE": "Changed on",
@@ -180,7 +180,7 @@
     "WORKSPACES": "Used in Workspaces",
     "TOOLTIPS": {
       "ID": "Unique technical ID of the Theme",
-      "NAME": "Unique Name of the Theme",
+      "NAME": "Unique name of the Theme, cannot be changed. Used as reference to the Theme.",
       "DISPLAY_NAME": "Display Name",
       "VERSION": "Version of the Theme",
       "DESCRIPTION": "Description of the Theme",
