@@ -83,6 +83,9 @@ export class ThemeImportComponent implements OnInit {
       Object.defineProperty(this.themeSnapshot.themes, this.themeName, themeProps ?? {})
       delete this.themeSnapshot.themes[key[0]]
     }
+    if (!this.themeSnapshot?.themes['displayName']) {
+      this.themeSnapshot.themes[key[0]] = { ...this.themeSnapshot.themes[key[0]], displayName: this.themeName }
+    }
     this.themeApi
       .importThemes({
         themeSnapshot: this.themeSnapshot

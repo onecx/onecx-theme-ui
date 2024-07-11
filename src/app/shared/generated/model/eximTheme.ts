@@ -13,6 +13,7 @@ import { Image } from './image';
 
 
 export interface EximTheme { 
+    displayName?: string;
     cssFile?: string;
     description?: string;
     assetsUrl?: string;
