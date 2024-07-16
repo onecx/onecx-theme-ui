@@ -625,6 +625,8 @@ components:
     EximTheme:
       type: object
       properties:
+        displayName:
+          type: string
         cssFile:
           type: string
         description:
