@@ -16,6 +16,9 @@ app:
           description: "OneCX Theme UI"
           note: "OneCX Theme UI auto import via MF operator"
           type: MODULE
+          technology: WEBCOMPONENTMODULE
+          remoteName: onecx-theme
+          tagName: ocx-theme-component
     # Permission
     permission:
       enabled: true
