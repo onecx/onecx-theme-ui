@@ -33,12 +33,5 @@ app:
             VIEW: View mode for theme
             IMPORT: Import theme
             EXPORT: Export theme
-    # Keycloak
-    keycloak:
-      client:
-        enabled: true
-        spec:
-          kcConfig:
-            clientId: "onecx-theme-ui"
 
 # PIPE Config
