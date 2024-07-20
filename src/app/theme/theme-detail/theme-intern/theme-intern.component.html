@@ -1,5 +1,22 @@
-<div class="surface-section w-full my-3 sm:my-5">
-  <div class="flex flex-wrap flex-column row-gap-4 my-3 w-12 sm:w-10 md:w-8 lg:w-6 xl:w-6">
+<div class="surface-section w-full my-3">
+  <div class="flex flex-wrap flex-column row-gap-4 w-12 sm:w-10 md:w-8 lg:w-6 xl:w-6">
+    <div class="w-12 px-3">
+      <span class="p-float-label">
+        <input
+          pInputText
+          type="text"
+          readonly
+          class="w-full"
+          id="theme_detail_item_name"
+          [value]="theme?.name"
+          [pTooltip]="'THEME.TOOLTIPS.NAME' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
+        />
+        <label for="theme_detail_item_name">{{ 'THEME.NAME' | translate }}</label>
+      </span>
+    </div>
+
     <div class="flex flex-wrap row-gap-4">
       <div class="w-12 sm:w-6 px-3">
         <span class="p-float-label mb-1">
@@ -10,7 +27,9 @@
             id="theme_detail_item_creationDate"
             class="w-full pt-3 pb-2"
             [value]="theme?.creationDate | date : dateFormat"
-            [title]="'INTERNAL.TOOLTIPS.CREATION_DATE' | translate"
+            [pTooltip]="'INTERNAL.TOOLTIPS.CREATION_DATE' | translate"
+            tooltipPosition="top"
+            tooltipEvent="hover"
           />
           <label for="theme_detail_item_creationDate">{{ 'INTERNAL.CREATION_DATE' | translate }}</label>
         </span>
@@ -25,7 +44,9 @@
             id="theme_detail_item_creationUser"
             class="w-full pt-3 pb-2"
             [value]="theme?.creationUser"
-            [title]="'INTERNAL.TOOLTIPS.CREATION_USER' | translate"
+            [pTooltip]="'INTERNAL.TOOLTIPS.CREATION_USER' | translate"
+            tooltipPosition="top"
+            tooltipEvent="hover"
           />
           <label for="theme_detail_item_creationUser">{{ 'INTERNAL.CREATION_USER' | translate }}</label>
         </span>
@@ -42,7 +63,9 @@
             id="theme_detail_item_modificationDate"
             class="w-full pt-3 pb-2"
             [value]="theme?.modificationDate | date : dateFormat"
-            [title]="'INTERNAL.TOOLTIPS.MODIFICATION_DATE' | translate"
+            [pTooltip]="'THEME.TOOLTIPS.NAME' | translate"
+            tooltipPosition="top"
+            tooltipEvent="hover"
           />
           <label for="theme_detail_item_modificationDate">{{ 'INTERNAL.MODIFICATION_DATE' | translate }}</label>
         </span>
@@ -57,7 +80,9 @@
             id="theme_detail_item_modificationUser"
             class="w-full pt-3 pb-2"
             [value]="theme?.modificationUser"
-            [title]="'INTERNAL.TOOLTIPS.MODIFICATION_USER' | translate"
+            [pTooltip]="'INTERNAL.TOOLTIPS.MODIFICATION_USER' | translate"
+            tooltipPosition="top"
+            tooltipEvent="hover"
           />
           <label for="theme_detail_item_modificationUser">{{ 'INTERNAL.MODIFICATION_USER' | translate }}</label>
         </span>
@@ -73,7 +98,9 @@
         [binary]="true"
         [styleClass]="'cursor-auto shadow-none'"
         [label]="'INTERNAL.OPERATOR' | translate"
-        [title]="'INTERNAL.TOOLTIPS.OPERATOR' | translate"
+        [pTooltip]="'INTERNAL.TOOLTIPS.OPERATOR' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
       ></p-checkbox>
     </div>
     <div class="w-12 px-3">
@@ -86,7 +113,9 @@
           autoresize="true"
           rows="3"
           id="theme_detail_intern_item_workspaces"
-          [title]="'THEME.TOOLTIPS.WORKSPACES' | translate"
+          [pTooltip]="'THEME.TOOLTIPS.WORKSPACES' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
         >
         </textarea>
         <label for="theme_detail_intern_item_workspaces">{{ 'THEME.WORKSPACES' | translate }}</label>

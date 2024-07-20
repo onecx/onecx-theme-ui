@@ -8,7 +8,7 @@ import { TranslateTestingModule } from 'ngx-translate-testing'
 import { DataViewModule } from 'primeng/dataview'
 import { of } from 'rxjs'
 
-import { ThemesAPIService } from 'src/app/shared/generated'
+import { Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeSearchComponent } from './theme-search.component'
 
 describe('ThemeSearchComponent', () => {
@@ -146,5 +146,25 @@ describe('ThemeSearchComponent', () => {
     component.themeImportDialogVisible = false
     component.onImportThemeClick()
     expect(component.themeImportDialogVisible).toBe(true)
+  })
+
+  it('should sort themes by display name ', () => {
+    let a: Theme = {
+      name: 'a',
+      displayName: 'a'
+    }
+    let b: Theme = {
+      name: 'b',
+      displayName: 'b'
+    }
+    let c: Theme = {
+      name: 'c',
+      displayName: 'c'
+    }
+    const themes = [b, c, a]
+
+    themes.sort((x, y) => component.sortThemesByName(x, y))
+
+    expect(themes).toEqual([a, b, c])
   })
 })

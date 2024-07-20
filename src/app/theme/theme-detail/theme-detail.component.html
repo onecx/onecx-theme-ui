@@ -20,11 +20,7 @@
       <p-tabPanel id="theme_detail_panel_props" [header]="'THEME.TABS.PROPERTIES' | translate">
         <div class="grid grid-nogutter m-3">
           <div class="col-12 md:col-10 lg:col-10 xl:col-6 flex flex-column row-gap-4">
-            <span class="p-float-label" [title]="'THEME.TOOLTIPS.NAME' | translate">
-              <input pInputText type="text" readonly class="w-full" id="theme_detail_item_name" [value]="theme?.name" />
-              <label for="theme_detail_item_name">{{ 'THEME.NAME' | translate }}</label>
-            </span>
-            <span class="p-float-label" [title]="'THEME.TOOLTIPS.DISPLAY_NAME' | translate">
+            <span class="p-float-label">
               <input
                 pInputText
                 type="text"
@@ -32,11 +28,14 @@
                 class="w-full"
                 id="theme_detail_item_display_name"
                 [value]="theme?.displayName"
+                [pTooltip]="'THEME.TOOLTIPS.DISPLAY_NAME' | translate"
+                tooltipPosition="top"
+                tooltipEvent="hover"
               />
               <label for="theme_detail_item_display_name">{{ 'THEME.DISPLAY_NAME' | translate }}</label>
             </span>
 
-            <span class="p-float-label" [title]="'THEME.TOOLTIPS.DESCRIPTION' | translate">
+            <span class="p-float-label">
               <textarea
                 pInputTextarea
                 readonly
@@ -47,7 +46,7 @@
                 [ngModel]="theme?.description"
                 [pTooltip]="'THEME.DESCRIPTION' | translate"
                 tooltipPosition="top"
-                tooltipEvent="focus"
+                tooltipEvent="hover"
               ></textarea>
               <label for="theme_detail_item_description">{{ 'THEME.DESCRIPTION' | translate }}</label>
             </span>

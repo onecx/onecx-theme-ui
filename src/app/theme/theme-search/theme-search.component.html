@@ -10,13 +10,13 @@
     <ng-container *ngIf="themes$ | async as themes">
       <p-dataView
         id="theme_search_dataview"
-        [value]="themes.stream || []"
+        [value]="(themes.stream || []).sort(sortThemesByName)"
         [paginator]="true"
         [alwaysShowPaginator]="true"
         [rowsPerPageOptions]="viewMode === 'grid' ? [12, 24, 60] : [10, 20, 50]"
         [rows]="viewMode === 'grid' ? 12 : 10"
         [layout]="viewMode"
-        filterBy="name"
+        filterBy="displayName,name"
         [sortField]="sortField"
         [sortOrder]="sortOrder"
       >
@@ -26,18 +26,22 @@
             [enableSorting]="true"
             [supportedViews]="['grid', 'list']"
             [initialViewMode]="viewMode"
-            [sortingOptions]="[{ label: 'THEME.NAME' | translate, value: 'name' }]"
+            [sortingOptions]="[
+              { label: 'THEME.DISPLAY_NAME' | translate, value: 'displayName' },
+              { label: 'THEME.NAME' | translate, value: 'name' }
+            ]"
             [defaultSortOption]="sortField"
             [defaultSortDirection]="sortOrder === 1"
             (dataViewChange)="onLayoutChange($event)"
             (filterChange)="onFilterChange($event)"
-            [filterColumns]="['THEME.NAME' | translate]"
+            [filterColumns]="['THEME.DISPLAY_NAME' | translate, 'THEME.NAME' | translate]"
             (sortChange)="onSortChange($event)"
             (sortDirectionChange)="onSortDirChange($event)"
             [translations]="dataViewControlsTranslations"
           >
           </ocx-data-view-controls
         ></ng-template>
+        <!-- LIST -->
         <ng-template let-theme pTemplate="listItem">
           <div
             class="col-12 grid grid-nogutter align-items-center row-gap-1 listview-row p-1 hover:bg-gray-200 cursor-pointer"
@@ -49,7 +53,6 @@
                   id="theme_search_logo"
                   [imageUrl]="getLogoUrl(theme)"
                   [small]="true"
-                  [title]="(theme.logoUrl ? 'LOGO.IMAGE' : 'IMAGE.TOOLTIPS.PLACEHOLDER') | translate"
                 ></app-image-container>
               </div>
             </div>
@@ -66,6 +69,7 @@
             </div>
           </div>
         </ng-template>
+        <!-- GRID -->
         <ng-template let-theme let-row="rowIndex" pTemplate="gridItem">
           <div class="col-12 sm:col-6 md:col-4 lg:col-4 xl:col-3 p-3" [routerLink]="['./', theme.name]">
             <div
@@ -79,10 +83,22 @@
               ></app-image-container>
               <app-theme-color-box [properties]="theme.properties" styleClass="h-1rem text-center" />
               <div class="text-center">
-                <div class="font-bold text-lg lg:text-xl" [title]="'Theme: ' + limitText(theme.displayName, 100)">
+                <div
+                  class="font-bold text-lg lg:text-xl"
+                  [pTooltip]="'Theme: ' + theme.displayName"
+                  tooltipPosition="top"
+                  tooltipEvent="hover"
+                >
                   {{ limitText(theme.displayName, 20) }}
                 </div>
-                <div class="text-xs" [title]="'THEME.TOOLTIPS.NAME' | translate">{{ limitText(theme.name, 20) }}</div>
+                <div
+                  class="text-xs"
+                  [pTooltip]="'THEME.TOOLTIPS.NAME' | translate"
+                  tooltipPosition="top"
+                  tooltipEvent="hover"
+                >
+                  {{ limitText(theme.name, 30) }}
+                </div>
               </div>
             </div>
           </div>

@@ -17,7 +17,7 @@
     },
     "DELETE": {
       "LABEL": "Delete",
-      "TOOLTIP": "Delete theme",
+      "TOOLTIP": "Delete Theme",
       "THEME_MESSAGE": "Do you want to delete \"{{ITEM}}\"?",
       "MESSAGE_INFO": "This action cannot be undone!",
       "THEME_NOK": "Theme could not be deleted",
@@ -29,7 +29,7 @@
       "MESSAGE": {
         "CHANGE_OK": "The Theme was changed successfully",
         "CHANGE_NOK": "An error has occurred. The Theme was not changed.",
-        "IMAGE_CONSTRAINT": "An error has occurred. Please add a theme name before uploading a file.",
+        "IMAGE_CONSTRAINT": "An error has occurred. Please add a Theme name before uploading a file.",
         "IMAGE_CONSTRAINT_SIZE": "An error has occurred. The image is too large."
       }
     },
@@ -63,7 +63,7 @@
     "TOOLTIPS": {
       "CANCEL_AND_CLOSE": "Cancel and close dialog",
       "SAVE": "Save changes",
-      "SAVE_AS": "Save as new theme"
+      "SAVE_AS": "Save as new Theme"
     }
   },
   "BREADCRUMBS": {
@@ -76,14 +76,14 @@
     "CREATION_USER": "Created by",
     "MODIFICATION_DATE": "Changed on",
     "MODIFICATION_USER": "Changed by",
-    "OPERATOR": "Created by Operator",
-    "OPERATOR_MESSAGE": "This theme was created by the operator. All changes will be lost during the next deployment.",
+    "OPERATOR": "Automated created",
+    "OPERATOR_MESSAGE": "This Theme was automated created. All changes will be lost during the next deployment.",
     "TOOLTIPS": {
       "CREATION_DATE": "Timestamp of the creation",
       "CREATION_USER": "Name of the user of the creation",
       "MODIFICATION_DATE": "Timestamp of the last change",
       "MODIFICATION_USER": "Name of the user of the last change",
-      "OPERATOR": "If set, the theme cannot be deleted and all changes will be lost during the next deployment."
+      "OPERATOR": "If set, the Theme cannot be deleted and all changes will be lost during the next deployment."
     }
   },
   "GENERAL": {
