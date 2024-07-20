@@ -18,7 +18,7 @@ export class ThemeSearchComponent implements OnInit {
   public actions$: Observable<Action[]> | undefined
   public viewMode = 'grid'
   public filter: string | undefined
-  public sortField = 'name'
+  public sortField = 'displayName'
   public sortOrder = 1
   public limitText = limitText
 
@@ -43,11 +43,15 @@ export class ThemeSearchComponent implements OnInit {
   public loadThemes(): void {
     this.themes$ = this.themeApi.getThemes({})
   }
+  public sortThemesByName(a: Theme, b: Theme): number {
+    return (a.displayName ?? '').toUpperCase().localeCompare((b.displayName ?? '').toUpperCase())
+  }
 
   private prepareTranslations() {
     this.translate
       .get([
         'THEME.NAME',
+        'THEME.DISPLAY_NAME',
         'SEARCH.SORT_BY',
         'SEARCH.FILTER',
         'SEARCH.FILTER_OF',
@@ -62,7 +66,7 @@ export class ThemeSearchComponent implements OnInit {
           this.dataViewControlsTranslations = {
             sortDropdownPlaceholder: data['SEARCH.SORT_BY'],
             filterInputPlaceholder: data['SEARCH.FILTER'],
-            filterInputTooltip: data['SEARCH.FILTER_OF'] + data['THEME.NAME'],
+            filterInputTooltip: data['SEARCH.FILTER_OF'] + data['THEME.DISPLAY_NAME'] + ', ' + data['THEME.NAME'],
             viewModeToggleTooltips: {
               grid: data['GENERAL.TOOLTIP.VIEW_MODE_GRID'],
               list: data['GENERAL.TOOLTIP.VIEW_MODE_LIST']

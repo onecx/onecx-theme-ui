@@ -76,8 +76,8 @@
     "CREATION_USER": "Erstellt von",
     "MODIFICATION_DATE": "Geändert am",
     "MODIFICATION_USER": "Geändert von",
-    "OPERATOR": "Erstellt durch Operator",
-    "OPERATOR_MESSAGE": "Dieses Theme wurde durch den Operator erstellt. Alle Änderungen gehen beim nächsten Deployment verloren.",
+    "OPERATOR": "Automatisiert erstellt",
+    "OPERATOR_MESSAGE": "Dieses Theme wurde automatisiert erstellt. Alle Änderungen gehen beim nächsten Deployment verloren.",
     "TOOLTIPS": {
       "CREATION_DATE": "Zeitpunkt der Erstellung",
       "CREATION_USER": "Name des Benutzers der Erstellung",
