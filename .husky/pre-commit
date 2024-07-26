@@ -1,6 +1,3 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 echo "[Husky] Running lint check:"
 npm run lint
 echo "[Husky] Running prettier check:"

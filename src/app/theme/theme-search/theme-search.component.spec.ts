@@ -149,15 +149,15 @@ describe('ThemeSearchComponent', () => {
   })
 
   it('should sort themes by display name ', () => {
-    let a: Theme = {
+    const a: Theme = {
       name: 'a',
       displayName: 'a'
     }
-    let b: Theme = {
+    const b: Theme = {
       name: 'b',
       displayName: 'b'
     }
-    let c: Theme = {
+    const c: Theme = {
       name: 'c',
       displayName: 'c'
     }

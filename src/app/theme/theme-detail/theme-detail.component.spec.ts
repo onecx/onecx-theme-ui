@@ -417,7 +417,7 @@ describe('ThemeDetailComponent', () => {
   })
 
   it('should get correct favicon URL', () => {
-    let theme: Theme = {
+    const theme: Theme = {
       modificationCount: 0,
       name: 'themeName',
       faviconUrl: 'faviconUrl'

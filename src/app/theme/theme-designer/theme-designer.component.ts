@@ -413,7 +413,7 @@ export class ThemeDesignerComponent implements OnInit {
 
   // Image Files
   public onFileUpload(ev: Event, fieldType: RefType): void {
-    let currThemeName = this.basicForm.controls['name'].value
+    const currThemeName = this.basicForm.controls['name'].value
     if (!currThemeName || currThemeName === '') {
       this.msgService.error({
         summaryKey: 'IMAGE.CONSTRAINT_FAILED',

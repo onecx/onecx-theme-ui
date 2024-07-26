@@ -16,7 +16,7 @@ import { limitText, bffImageUrl } from 'src/app/shared/utils'
 export class ThemeSearchComponent implements OnInit {
   themes$!: Observable<GetThemesResponse>
   public actions$: Observable<Action[]> | undefined
-  public viewMode = 'grid'
+  public viewMode: 'list' | 'grid' = 'grid'
   public filter: string | undefined
   public sortField = 'displayName'
   public sortOrder = 1
@@ -122,7 +122,7 @@ export class ThemeSearchComponent implements OnInit {
   public onNewTheme(): void {
     this.router.navigate(['./new'], { relativeTo: this.route })
   }
-  public onLayoutChange(viewMode: string): void {
+  public onLayoutChange(viewMode: 'list' | 'grid'): void {
     this.viewMode = viewMode
   }
   public onFilterChange(filter: string): void {

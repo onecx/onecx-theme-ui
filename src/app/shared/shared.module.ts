@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { ColorSketchModule } from 'ngx-color/sketch'
-import { ErrorTailorModule } from '@ngneat/error-tailor'
+import { provideErrorTailorConfig } from '@ngneat/error-tailor'
 
 import { AutoCompleteModule } from 'primeng/autocomplete'
 import { CheckboxModule } from 'primeng/checkbox'
@@ -61,8 +61,42 @@ import { ThemeColorBoxComponent } from './theme-color-box/theme-color-box.compon
     TabViewModule,
     TableModule,
     ToastModule,
-    TranslateModule,
-    ErrorTailorModule.forRoot({
+    TranslateModule
+  ],
+  exports: [
+    AutoCompleteModule,
+    CheckboxModule,
+    CommonModule,
+    ColorSketchModule,
+    ConfirmDialogModule,
+    ConfirmPopupModule,
+    DataViewModule,
+    DialogModule,
+    DropdownModule,
+    DynamicDialogModule,
+    FileUploadModule,
+    FormsModule,
+    ImageContainerComponent,
+    InputTextModule,
+    InputTextareaModule,
+    KeyFilterModule,
+    ListboxModule,
+    MultiSelectModule,
+    OverlayPanelModule,
+    PanelModule,
+    ReactiveFormsModule,
+    SelectButtonModule,
+    TabViewModule,
+    TableModule,
+    ThemeColorBoxComponent,
+    ToastModule,
+    TranslateModule
+  ],
+  //this is not elegant, for some reason the injection token from primeng does not work across federated module
+  providers: [
+    ConfirmationService,
+    LabelResolver,
+    provideErrorTailorConfig({
       controlErrorsOn: { async: true, blur: true, change: true },
       errors: {
         useFactory: (i18n: TranslateService) => {
@@ -85,38 +119,6 @@ import { ThemeColorBoxComponent } from './theme-color-box/theme-color-box.compon
       }
     })
   ],
-  exports: [
-    AutoCompleteModule,
-    CheckboxModule,
-    CommonModule,
-    ColorSketchModule,
-    ConfirmDialogModule,
-    ConfirmPopupModule,
-    DataViewModule,
-    DialogModule,
-    DropdownModule,
-    DynamicDialogModule,
-    ErrorTailorModule,
-    FileUploadModule,
-    FormsModule,
-    ImageContainerComponent,
-    InputTextModule,
-    InputTextareaModule,
-    KeyFilterModule,
-    ListboxModule,
-    MultiSelectModule,
-    OverlayPanelModule,
-    PanelModule,
-    ReactiveFormsModule,
-    SelectButtonModule,
-    TabViewModule,
-    TableModule,
-    ThemeColorBoxComponent,
-    ToastModule,
-    TranslateModule
-  ],
-  //this is not elegant, for some reason the injection token from primeng does not work across federated module
-  providers: [ConfirmationService, LabelResolver],
   schemas: [NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA]
 })
 export class SharedModule {}
