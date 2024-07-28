@@ -1,4 +1,4 @@
-import { HttpClient, HttpClientModule } from '@angular/common/http'
+import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { BrowserModule } from '@angular/platform-browser'
 import { APP_INITIALIZER, DoBootstrap, Injector, NgModule } from '@angular/core'
 import { Router, RouterModule, Routes } from '@angular/router'
@@ -36,7 +36,6 @@ const routes: Routes = [
     AngularAuthModule,
     BrowserAnimationsModule,
     BrowserModule,
-    HttpClientModule,
     PortalCoreModule.forMicroFrontend(),
     RouterModule.forRoot(addInitializeModuleGuard(routes)),
     TranslateModule.forRoot({
@@ -58,7 +57,8 @@ const routes: Routes = [
       multi: true,
       deps: [Router, AppStateService]
     },
-    { provide: Configuration, useFactory: apiConfigProvider, deps: [ConfigurationService, AppStateService] }
+    { provide: Configuration, useFactory: apiConfigProvider, deps: [ConfigurationService, AppStateService] },
+    provideHttpClient(withInterceptorsFromDi())
   ],
   schemas: []
 })
