@@ -143,7 +143,7 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   private deleteTheme(): void {
-    this.themeApi.deleteTheme({ id: this.theme?.id! }).subscribe({
+    this.themeApi.deleteTheme({ id: this.theme?.id ?? '' }).subscribe({
       next: () => {
         this.router.navigate(['..'], { relativeTo: this.route })
         this.msgService.success({ summaryKey: 'ACTIONS.DELETE.THEME_OK' })

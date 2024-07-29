@@ -972,8 +972,7 @@ describe('ThemeDesignerComponent', () => {
       const translateService = TestBed.inject(TranslateService)
       spyOn(translateService, 'get').and.returnValue(of(translationData))
 
-      let confirmdialog: ConfirmDialog
-      confirmdialog = fixture.debugElement.query(By.css('p-confirmdialog')).componentInstance
+      const confirmdialog: ConfirmDialog = fixture.debugElement.query(By.css('p-confirmdialog')).componentInstance
 
       component.onThemeTemplateDropdownChange()
       fixture.detectChanges()
@@ -1002,15 +1001,14 @@ describe('ThemeDesignerComponent', () => {
 
       component.themeTemplateSelectedId = 'id2'
 
-      let confirmdialog: ConfirmDialog
-      confirmdialog = fixture.debugElement.query(By.css('p-confirmdialog')).componentInstance
-      let reject = spyOn(confirmdialog, 'reject').and.callThrough()
+      const confirmdialog: ConfirmDialog = fixture.debugElement.query(By.css('p-confirmdialog')).componentInstance
+      const reject = spyOn(confirmdialog, 'reject').and.callThrough()
 
       component.onThemeTemplateDropdownChange()
       fixture.detectChanges()
       component = fixture.componentInstance
 
-      let cancelBtn = fixture.debugElement.nativeElement.querySelector('.p-confirm-dialog-reject')
+      const cancelBtn = fixture.debugElement.nativeElement.querySelector('.p-confirm-dialog-reject')
       cancelBtn.click()
 
       expect(reject).toHaveBeenCalled()
@@ -1074,14 +1072,13 @@ describe('ThemeDesignerComponent', () => {
       component.fetchingFaviconUrl = 'ffu'
       component.fetchingLogoUrl = 'flu'
 
-      let confirmdialog: ConfirmDialog
-      confirmdialog = fixture.debugElement.query(By.css('p-confirmdialog')).componentInstance
-      let accept = spyOn(confirmdialog, 'accept').and.callThrough()
+      const confirmdialog: ConfirmDialog = fixture.debugElement.query(By.css('p-confirmdialog')).componentInstance
+      const accept = spyOn(confirmdialog, 'accept').and.callThrough()
 
       component.onThemeTemplateDropdownChange()
       fixture.detectChanges()
 
-      let acceptBtn = fixture.debugElement.nativeElement.querySelector('.p-confirm-dialog-accept')
+      const acceptBtn = fixture.debugElement.nativeElement.querySelector('.p-confirm-dialog-accept')
       acceptBtn.click()
 
       expect(accept).toHaveBeenCalled()
@@ -1150,14 +1147,13 @@ describe('ThemeDesignerComponent', () => {
       }
       themeApiSpy.getThemeById.and.returnValue(of(fetchedThemeResponse) as any)
 
-      let confirmdialog: ConfirmDialog
-      confirmdialog = fixture.debugElement.query(By.css('p-confirmdialog')).componentInstance
-      let accept = spyOn(confirmdialog, 'accept').and.callThrough()
+      const confirmdialog: ConfirmDialog = fixture.debugElement.query(By.css('p-confirmdialog')).componentInstance
+      const accept = spyOn(confirmdialog, 'accept').and.callThrough()
 
       component.onThemeTemplateDropdownChange()
       fixture.detectChanges()
 
-      let acceptBtn = fixture.debugElement.nativeElement.querySelector('.p-confirm-dialog-accept')
+      const acceptBtn = fixture.debugElement.nativeElement.querySelector('.p-confirm-dialog-accept')
       acceptBtn.click()
 
       expect(accept).toHaveBeenCalled()

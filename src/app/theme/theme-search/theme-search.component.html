@@ -42,62 +42,71 @@
           </ocx-data-view-controls
         ></ng-template>
         <!-- LIST -->
-        <ng-template let-theme pTemplate="listItem">
-          <div
-            class="col-12 grid grid-nogutter align-items-center row-gap-1 listview-row p-1 hover:bg-gray-200 cursor-pointer"
-            [routerLink]="['./', theme.name]"
-          >
-            <div class="col-12 md:col-2 lg:col-2 xl:col-2 text-center">
-              <div class="flex flex-column justify-content-center align-items-center gap-1 md:gap-2 h-full">
-                <app-image-container
-                  id="theme_search_logo"
-                  [imageUrl]="getLogoUrl(theme)"
-                  [small]="true"
-                ></app-image-container>
+        <ng-template let-themes pTemplate="listItem">
+          <div class="p-grid p-nogutter grid grid-nogutter">
+            <div
+              *ngFor="let theme of themes"
+              class="col-12 grid grid-nogutter align-items-center row-gap-1 listview-row p-1 hover:bg-gray-200 cursor-pointer"
+              [routerLink]="['./', theme.name]"
+            >
+              <div class="col-12 md:col-2 lg:col-2 xl:col-2 text-center">
+                <div class="flex flex-column justify-content-center align-items-center gap-1 md:gap-2 h-full">
+                  <app-image-container
+                    id="theme_search_logo"
+                    [imageUrl]="getLogoUrl(theme)"
+                    [small]="true"
+                  ></app-image-container>
+                </div>
               </div>
-            </div>
-            <div class="col-12 md:col-5 lg:col-5 xl:col-6">
-              <div class="flex flex-column justify-content-center gap-1 text-center md:text-left">
-                <div class="font-bold">{{ theme.displayName }}</div>
-                <div>{{ limitText(theme.description, 75) }}</div>
+              <div class="col-12 md:col-5 lg:col-5 xl:col-6">
+                <div class="flex flex-column justify-content-center gap-1 text-center md:text-left">
+                  <div class="font-bold">{{ theme.displayName }}</div>
+                  <div>{{ limitText(theme.description, 75) }}</div>
+                </div>
               </div>
-            </div>
-            <div class="col-12 md:col-5 lg:col-5 xl:col-4 text-center">
-              <div class="flex flex-column justify-content-center align-items-center h-full">
-                <app-theme-color-box [properties]="theme.properties" styleClass="h-1rem md:h-2rem" />
+              <div class="col-12 md:col-5 lg:col-5 xl:col-4 text-center">
+                <div class="flex flex-column justify-content-center align-items-center h-full">
+                  <app-theme-color-box [properties]="theme.properties" styleClass="h-1rem md:h-2rem" />
+                </div>
               </div>
             </div>
           </div>
         </ng-template>
         <!-- GRID -->
-        <ng-template let-theme let-row="rowIndex" pTemplate="gridItem">
-          <div class="col-12 sm:col-6 md:col-4 lg:col-4 xl:col-3 p-3" [routerLink]="['./', theme.name]">
+        <ng-template let-themes let-row="rowIndex" pTemplate="gridItem">
+          <div class="p-grid p-nogutter grid grid-nogutter">
             <div
-              class="card p-2 flex flex-column gap-2 justify-content-center align-items-center hover:bg-gray-200 cursor-pointer"
+              *ngFor="let theme of themes"
+              class="col-12 sm:col-6 md:col-4 lg:col-4 xl:col-3 p-3"
+              [routerLink]="['./', theme.name]"
             >
-              <app-image-container
-                [id]="'theme_search_data_row_' + row + '_logo'"
-                [small]="false"
-                styleClass="h-3rem md:h-4rem max-h-3rem md:max-h-4rem max-w-10rem"
-                [imageUrl]="getLogoUrl(theme)"
-              ></app-image-container>
-              <app-theme-color-box [properties]="theme.properties" styleClass="h-1rem text-center" />
-              <div class="text-center">
-                <div
-                  class="font-bold text-lg lg:text-xl"
-                  [pTooltip]="'Theme: ' + theme.displayName"
-                  tooltipPosition="top"
-                  tooltipEvent="hover"
-                >
-                  {{ limitText(theme.displayName, 20) }}
-                </div>
-                <div
-                  class="text-xs"
-                  [pTooltip]="'THEME.TOOLTIPS.NAME' | translate"
-                  tooltipPosition="top"
-                  tooltipEvent="hover"
-                >
-                  {{ limitText(theme.name, 30) }}
+              <div
+                class="card p-2 flex flex-column gap-2 justify-content-center align-items-center hover:bg-gray-200 cursor-pointer"
+              >
+                <app-image-container
+                  [id]="'theme_search_data_row_' + row + '_logo'"
+                  [small]="false"
+                  styleClass="h-3rem md:h-4rem max-h-3rem md:max-h-4rem max-w-10rem"
+                  [imageUrl]="getLogoUrl(theme)"
+                ></app-image-container>
+                <app-theme-color-box [properties]="theme.properties" styleClass="h-1rem text-center" />
+                <div class="text-center">
+                  <div
+                    class="font-bold text-lg lg:text-xl"
+                    [pTooltip]="'Theme: ' + theme.displayName"
+                    tooltipPosition="top"
+                    tooltipEvent="hover"
+                  >
+                    {{ limitText(theme.displayName, 20) }}
+                  </div>
+                  <div
+                    class="text-xs"
+                    [pTooltip]="'THEME.TOOLTIPS.NAME' | translate"
+                    tooltipPosition="top"
+                    tooltipEvent="hover"
+                  >
+                    {{ limitText(theme.name, 30) }}
+                  </div>
                 </div>
               </div>
             </div>

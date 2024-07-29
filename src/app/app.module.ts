@@ -1,6 +1,6 @@
 import { APP_INITIALIZER, CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA, NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { HttpClient, HttpClientModule } from '@angular/common/http'
+import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { RouterModule, Routes } from '@angular/router'
 import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
@@ -26,7 +26,6 @@ const routes: Routes = [{ path: '', pathMatch: 'full' }]
   imports: [
     CommonModule,
     BrowserModule,
-    HttpClientModule,
     KeycloakAuthModule,
     BrowserAnimationsModule,
     RouterModule.forRoot(routes, {
@@ -50,7 +49,8 @@ const routes: Routes = [{ path: '', pathMatch: 'full' }]
       useFactory: translateServiceInitializer,
       multi: true,
       deps: [UserService, TranslateService]
-    }
+    },
+    provideHttpClient(withInterceptorsFromDi())
   ],
   schemas: [NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA]
 })

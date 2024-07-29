@@ -6,6 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { PortalMessageService } from '@onecx/portal-integration-angular'
 
 import { Theme, ThemesAPIService, ThemeSnapshot } from 'src/app/shared/generated'
+import { FileSelectEvent } from 'primeng/fileupload'
 
 @Component({
   selector: 'app-theme-import',
@@ -39,7 +40,7 @@ export class ThemeImportComponent implements OnInit {
     this.getThemes()
   }
 
-  public async onImportThemeSelect(event: { files: FileList }): Promise<void> {
+  public async onImportThemeSelect(event: FileSelectEvent): Promise<void> {
     return event.files[0].text().then((text) => {
       this.themeSnapshot = null
       try {
@@ -48,7 +49,7 @@ export class ThemeImportComponent implements OnInit {
           this.themeSnapshot = themeSnapshot
           this.themeImportError = false
           if (themeSnapshot.themes) {
-            let key: string[] = Object.keys(themeSnapshot.themes)
+            const key: string[] = Object.keys(themeSnapshot.themes)
             this.themeName = key[0]
             this.properties = themeSnapshot.themes[key[0]].properties
           }
@@ -76,10 +77,10 @@ export class ThemeImportComponent implements OnInit {
   }
   public onThemeUpload(): void {
     if (!this.themeSnapshot?.themes) return
-    let key: string[] = Object.keys(this.themeSnapshot?.themes)
+    const key: string[] = Object.keys(this.themeSnapshot?.themes)
     if (key[0] !== this.themeName) {
       // save the theme properties to be reassigned on new key
-      let themeProps = Object.getOwnPropertyDescriptor(this.themeSnapshot.themes, key[0])
+      const themeProps = Object.getOwnPropertyDescriptor(this.themeSnapshot.themes, key[0])
       Object.defineProperty(this.themeSnapshot.themes, this.themeName, themeProps ?? {})
       delete this.themeSnapshot.themes[key[0]]
     }
