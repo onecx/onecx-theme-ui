@@ -57,7 +57,7 @@
     "@onecx/angular-accelerator": "^5.1.5",
     "@onecx/angular-auth": "^5.1.5",
     "@onecx/angular-integration-interface": "^5.1.5",
-    "@onecx/angular-remote-components": "^5.1.5",
+    "@onecx/angular-remote-components": "^5.2.0",
     "@onecx/angular-webcomponents": "^5.1.5",
     "@onecx/angular-testing": "^5.1.5",
     "@onecx/integration-interface": "^5.1.5",
