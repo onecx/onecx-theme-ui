@@ -14,7 +14,7 @@
           [title]="'THEME.DETAIL.AUTO_APPLY.TOOLTIP' | translate"
         >
           <p-inputSwitch
-            id="theme_designer_header_is_current_theme"
+            inputId="theme_designer_header_is_current_theme"
             name="autoApplyToggle"
             [disabled]="themeIsCurrentUsedTheme"
             [(ngModel)]="autoApply"
@@ -31,14 +31,16 @@
           <span class="p-float-label">
             <p-dropdown
               #themeTemplate
-              id="theme_designer_fields_selected_theme"
+              inputId="theme_designer_fields_selected_theme"
               [options]="themeTemplates"
               styleClass="w-full"
               [(ngModel)]="themeTemplateSelectedId"
               (onChange)="onThemeTemplateDropdownChange()"
               [showClear]="false"
               [autoDisplayFirst]="false"
-              [title]="'THEME.TEMPLATE.SELECTOR.TOOLTIP' | translate"
+              [pTooltip]="'THEME.TEMPLATE.SELECTOR.TOOLTIP' | translate"
+              tooltipPosition="top"
+              tooltipEvent="hover"
             ></p-dropdown>
             <label for="theme_designer_fields_selected_theme" class="white-space-nowrap">
               {{ 'THEME.TEMPLATE.SELECTOR' | translate }}</label
@@ -122,8 +124,10 @@
                   icon="pi pi-upload"
                   [disabled]="mode === 'NEW'"
                   class="action-button p-button-icon-only"
-                  [title]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
                   (click)="selectedFileInputLogo.click()"
+                  [pTooltip]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
+                  tooltipPosition="top"
+                  tooltipEvent="hover"
                 ></button>
                 <span class="p-float-label w-full">
                   <input
@@ -132,7 +136,9 @@
                     id="theme_designer_field_logo_url"
                     formControlName="logoUrl"
                     (input)="onInputChange(RefType.Logo)"
-                    [title]="'IMAGE.TOOLTIPS.URL' | translate"
+                    [pTooltip]="'IMAGE.TOOLTIPS.URL' | translate"
+                    tooltipPosition="top"
+                    tooltipEvent="hover"
                   />
                   <label for="theme_designer_field_logo_url">{{ 'LOGO.URL' | translate }}</label>
                 </span>
@@ -156,8 +162,10 @@
                   icon="pi pi-upload"
                   [disabled]="mode === 'NEW'"
                   class="action-button p-button-icon-only"
-                  [title]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
                   (click)="selectedFileInputFavicon.click()"
+                  [pTooltip]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
+                  tooltipPosition="top"
+                  tooltipEvent="hover"
                 ></button>
                 <span class="p-float-label w-full">
                   <input
@@ -166,7 +174,9 @@
                     id="theme_designer_field_favicon_url"
                     formControlName="faviconUrl"
                     (input)="onInputChange(RefType.Favicon)"
-                    [title]="'IMAGE.TOOLTIPS.URL' | translate"
+                    [pTooltip]="'IMAGE.TOOLTIPS.URL' | translate"
+                    tooltipPosition="top"
+                    tooltipEvent="hover"
                   />
                   <label for="theme_designer_field_favicon_url">{{ 'FAVICON.URL' | translate }}</label>
                 </span>
@@ -270,7 +280,7 @@
   [baseZIndex]="10000"
   (onShow)="onShowSaveAsDialog()"
 >
-  <span class="p-float-label block mt-1">
+  <span class="p-float-label block mt-3">
     <input
       #saveAsThemeName
       pInputText
@@ -280,6 +290,17 @@
       [placeholder]="'THEME.NAME' | translate"
     />
     <label for="theme_detail_new_theme_name"> {{ 'THEME.NAME' | translate }} </label>
+  </span>
+  <span class="p-float-label block mt-3">
+    <input
+      #saveAsThemeDisplayName
+      pInputText
+      id="theme_detail_new_theme_display_name"
+      class="w-full"
+      type="text"
+      [placeholder]="'THEME.DISPLAY_NAME' | translate"
+    />
+    <label for="theme_detail_new_theme_display_name"> {{ 'THEME.DISPLAY_NAME' | translate }} </label>
   </span>
   <ng-template pTemplate="footer">
     <div class="flex flex-wrap gap-2 justify-content-end">
@@ -292,9 +313,9 @@
       <p-button
         icon="pi pi-save"
         styleClass="m-0"
-        [disabled]="saveAsThemeName.value === ''"
+        [disabled]="saveAsThemeName.value === '' || saveAsThemeDisplayName.value === ''"
         [label]="'ACTIONS.SAVE' | translate"
-        (onClick)="saveTheme(saveAsThemeName.value)"
+        (onClick)="saveTheme(saveAsThemeName.value, saveAsThemeDisplayName.value)"
       ></p-button>
     </div>
   </ng-template>

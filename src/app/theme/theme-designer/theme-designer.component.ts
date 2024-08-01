@@ -26,6 +26,7 @@ import { themeVariables } from './theme-variables'
 })
 export class ThemeDesignerComponent implements OnInit {
   @ViewChild('saveAsThemeName') saveAsThemeName: ElementRef | undefined
+  @ViewChild('saveAsThemeDisplayName') saveAsThemeDisplayName: ElementRef | undefined
   @ViewChild('selectedFileInputLogo') selectedFileInputLogo: ElementRef | undefined
   @ViewChild('selectedFileInputFavicon') selectedFileInputFavicon: ElementRef | undefined
 
@@ -343,9 +344,10 @@ export class ThemeDesignerComponent implements OnInit {
     }
   }
 
-  public saveTheme(newThemename: string): void {
+  public saveTheme(newThemename: string, newDisplayName: string): void {
     const newTheme: ThemeUpdateCreate = { ...this.basicForm.value }
     newTheme.name = newThemename
+    newTheme.displayName = newDisplayName
     newTheme.properties = this.propertiesForm.value
     if (this.imageFaviconUrlExists) newTheme.faviconUrl = undefined
     if (this.imageLogoUrlExists) newTheme.logoUrl = undefined
@@ -379,16 +381,35 @@ export class ThemeDesignerComponent implements OnInit {
     this.saveAsNewPopupDisplay = true
   }
   public onShowSaveAsDialog(): void {
-    if (this.saveAsThemeName) {
-      if (this.mode === 'NEW') this.saveAsThemeName.nativeElement.value = this.basicForm.controls['name'].value
-      if (this.mode === 'EDIT')
-        this.saveAsThemeName.nativeElement.value =
-          this.translate.instant('GENERAL.COPY_OF') + this.basicForm.controls['name'].value
+    const basicFormName = this.basicForm.controls['name'].value
+    const basicFormDisplayName = this.basicForm.controls['displayName'].value
+    const translatedCopyOf = this.translate.instant('GENERAL.COPY_OF')
+
+    if (this.saveAsThemeName || this.saveAsThemeDisplayName) {
+      if (this.mode === 'NEW') {
+        const newValue = basicFormName
+        this.updateSaveAsElement(this.saveAsThemeName, newValue)
+        this.updateSaveAsElement(this.saveAsThemeDisplayName, newValue)
+      } else if (this.mode === 'EDIT') {
+        const newValue = `${translatedCopyOf}${basicFormName}`
+        this.updateSaveAsElement(this.saveAsThemeName, newValue)
+        this.updateSaveAsElement(this.saveAsThemeDisplayName, basicFormDisplayName)
+      }
+    }
+  }
+
+  private updateSaveAsElement(saveAsElement: ElementRef | undefined, newValue: string): void {
+    if (saveAsElement) {
+      saveAsElement.nativeElement.value = newValue
     }
   }
 
   private getThemeById(id: string): Observable<GetThemeResponse> {
     return this.themeApi.getThemeById({ id: id })
+  }
+
+  getDisplayName() {
+    return this.basicForm.controls['name'].value
   }
 
   // Applying Styles
