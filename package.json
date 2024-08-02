@@ -63,7 +63,7 @@
     "@onecx/integration-interface": "^5.2.0",
     "@onecx/keycloak-auth": "^5.2.0",
     "@onecx/portal-integration-angular": "^5.2.0",
-    "@onecx/portal-layout-styles": "^5.2.0",
+    "@onecx/portal-layout-styles": "^5.3.0",
     "@webcomponents/webcomponentsjs": "^2.8.0",
     "file-saver": "^2.0.5",
     "i18n-iso-countries": "^7.11.3",
