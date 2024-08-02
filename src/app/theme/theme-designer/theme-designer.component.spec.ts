@@ -500,7 +500,7 @@ describe('ThemeDesignerComponent', () => {
         )
       )
 
-      component.saveTheme('myTheme')
+      component.saveTheme('myTheme', 'myDisplayName')
 
       expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({
         summaryKey: 'ACTIONS.CREATE.MESSAGE.CREATE_NOK',
@@ -519,7 +519,7 @@ describe('ThemeDesignerComponent', () => {
         )
       )
 
-      component.saveTheme('myTheme')
+      component.saveTheme('myTheme', 'myDisplayName')
 
       expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({
         summaryKey: 'ACTIONS.CREATE.MESSAGE.CREATE_NOK',
@@ -555,12 +555,13 @@ describe('ThemeDesignerComponent', () => {
       )
       component.mode = 'EDIT'
 
-      component.saveTheme('myTheme')
+      component.saveTheme('myTheme', 'myDisplayName')
 
       const createArgs = themeApiSpy.createTheme.calls.mostRecent().args[0]
       expect(createArgs.createThemeRequest?.resource).toEqual(
         jasmine.objectContaining({
           name: 'myTheme',
+          displayName: 'myDisplayName',
           description: newBasicData.description,
           logoUrl: newBasicData.logoUrl,
           faviconUrl: newBasicData.faviconUrl,
@@ -610,12 +611,13 @@ describe('ThemeDesignerComponent', () => {
       component.imageFaviconUrlExists = true
       component.imageLogoUrlExists = true
 
-      component.saveTheme('myTheme')
+      component.saveTheme('myTheme', 'myDisplayName')
 
       const createArgs = themeApiSpy.createTheme.calls.mostRecent().args[0]
       expect(createArgs.createThemeRequest?.resource).toEqual(
         jasmine.objectContaining({
           name: 'myTheme',
+          displayName: 'myDisplayName',
           description: newBasicData.description,
           logoUrl: undefined,
           faviconUrl: undefined,
@@ -663,7 +665,7 @@ describe('ThemeDesignerComponent', () => {
       )
       component.mode = 'NEW'
 
-      component.saveTheme('myTheme')
+      component.saveTheme('myTheme', 'myDisplayName')
 
       expect(router.navigate).toHaveBeenCalledOnceWith([`../myTheme`], jasmine.objectContaining({ relativeTo: route }))
     })

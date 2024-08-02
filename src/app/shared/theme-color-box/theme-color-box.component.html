@@ -6,7 +6,9 @@
       'background-color': properties.general['primary-color'],
       color: properties.topbar['topbar-text-color']
     }"
-    [title]="'THEME.IMPORT.THEME_COLOR_PRIMARY' | translate"
+    [pTooltip]="'THEME.IMPORT.THEME_COLOR_PRIMARY' | translate"
+    tooltipPosition="top"
+    tooltipEvent="hover"
   ></div>
   <div
     *ngIf="properties.general && properties.topbar"
@@ -15,7 +17,9 @@
       'background-color': properties.general['secondary-color'],
       color: properties.topbar['topbar-text-color']
     }"
-    [title]="'THEME.IMPORT.THEME_COLOR_SECONDARY' | translate"
+    [pTooltip]="'THEME.IMPORT.THEME_COLOR_SECONDARY' | translate"
+    tooltipPosition="top"
+    tooltipEvent="hover"
   ></div>
   <div
     *ngIf="properties.general && properties.topbar"
@@ -24,7 +28,9 @@
       'background-color': properties.general['text-color'],
       color: properties.topbar['topbar-text-color']
     }"
-    [title]="'THEME.IMPORT.THEME_COLOR_TEXT' | translate"
+    [pTooltip]="'THEME.IMPORT.THEME_COLOR_TEXT' | translate"
+    tooltipPosition="top"
+    tooltipEvent="hover"
   ></div>
   <div
     *ngIf="properties.topbar"
@@ -32,7 +38,9 @@
     [ngStyle]="{
       'background-color': properties.topbar['topbar-menu-button-bg-color']
     }"
-    [title]="'THEME.IMPORT.THEME_COLOR_TOP_MENU' | translate"
+    [pTooltip]="'THEME.IMPORT.THEME_COLOR_TOP_MENU' | translate"
+    tooltipPosition="top"
+    tooltipEvent="hover"
   ></div>
   <div
     *ngIf="properties.topbar"
@@ -41,6 +49,8 @@
       'background-color': properties.topbar['topbar-left-bg-color'],
       color: properties.topbar['topbar-text-color']
     }"
-    [title]="'THEME.IMPORT.THEME_COLOR_TOP_LEFT' | translate"
+    [pTooltip]="'THEME.IMPORT.THEME_COLOR_TOP_LEFT' | translate"
+    tooltipPosition="top"
+    tooltipEvent="hover"
   ></div>
 </div>
