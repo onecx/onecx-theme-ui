@@ -11,20 +11,27 @@
       <div class="flex flex-wrap justify-content-between align-items-center my-2 mx-4 p-2 row-gap-2 column-gap-3">
         <div
           class="field mb-0 flex flex-wrap sm:flex-nowrap align-items-center row-gap-1 column-gap-3"
-          [title]="'THEME.DETAIL.AUTO_APPLY.TOOLTIP' | translate"
+          [pTooltip]="'THEME.DETAIL.AUTO_APPLY.TOOLTIP' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
         >
           <p-inputSwitch
             inputId="theme_designer_header_is_current_theme"
             name="autoApplyToggle"
             [disabled]="themeIsCurrentUsedTheme"
             [(ngModel)]="autoApply"
+            [pTooltip]="'THEME.DETAIL.AUTO_APPLY' | translate"
+            tooltipPosition="top"
+            tooltipEvent="hover"
           ></p-inputSwitch>
           <label for="theme_designer_header_is_current_theme">{{ 'THEME.DETAIL.AUTO_APPLY' | translate }}</label>
         </div>
         <span
           *ngIf="themeIsCurrentUsedTheme"
           class="pi pi-bolt text-primary font-medium"
-          [title]="'THEME.DETAIL.AUTO_APPLY_CURRENT_THEME' | translate"
+          [pTooltip]="'THEME.DETAIL.AUTO_APPLY_CURRENT_THEME' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
         >
         </span>
         <div class="field mb-0 w-20rem">
@@ -64,6 +71,9 @@
                   type="text"
                   id="theme_designer_field_name"
                   formControlName="name"
+                  [pTooltip]="'THEME.TOOLTIPS.NAME' | translate"
+                  tooltipPosition="top"
+                  tooltipEvent="hover"
                 />
                 <label class="ocx-required-label" for="theme_designer_field_name">
                   {{ 'THEME.NAME' | translate }}
@@ -79,6 +89,9 @@
                   type="text"
                   id="theme_designer_field_display_name"
                   formControlName="displayName"
+                  [pTooltip]="'THEME.TOOLTIPS.DISPLAY_NAME' | translate"
+                  tooltipPosition="top"
+                  tooltipEvent="hover"
                 />
                 <label class="ocx-required-label" for="theme_designer_field_display_name">
                   {{ 'THEME.DISPLAY_NAME' | translate }}
@@ -87,7 +100,15 @@
             </div>
             <div class="field col-12 mb-4">
               <span class="p-float-label">
-                <input pInputText type="text" id="theme_designer_field_description" formControlName="description" />
+                <input
+                  pInputText
+                  type="text"
+                  id="theme_designer_field_description"
+                  formControlName="description"
+                  [pTooltip]="'THEME.TOOLTIPS.DESCRIPTION' | translate"
+                  tooltipPosition="top"
+                  tooltipEvent="hover"
+                />
                 <label for="theme_designer_field_description"> {{ 'THEME.DESCRIPTION' | translate }} </label>
               </span>
             </div>
@@ -206,6 +227,9 @@
                     id="theme_detail_font-family"
                     formControlName="font-family"
                     class="w-full"
+                    [pTooltip]="'THEME.TOOLTIPS.FONT_FAMILY' | translate"
+                    tooltipPosition="top"
+                    tooltipEvent="hover"
                   />
                   <label for="theme_detail_font-family">font-family</label>
                 </span>
@@ -220,6 +244,9 @@
                     id="theme_detail_font-size"
                     formControlName="font-size"
                     class="w-full"
+                    [pTooltip]="'THEME.TOOLTIPS.FONT_SIZE' | translate"
+                    tooltipPosition="top"
+                    tooltipEvent="hover"
                   />
                   <label for="theme_detail_font-size">font-size</label>
                 </span>
@@ -241,13 +268,16 @@
                     id="theme_detail_item_color_{{ item }}"
                     [formControlName]="item"
                     [value]="group.formGroup.value[item]"
+                    [pTooltip]="'THEME.TOOLTIPS.ITEM_COLOR' | translate"
+                    tooltipPosition="top"
+                    tooltipEvent="hover"
                   />
                   <label for="theme_detail_item_color_{{ item }}">{{ item }}</label>
                 </span>
                 <p-overlayPanel #op>
                   <ng-template pTemplate>
                     <div style="width: 240px; display: inline-block">
-                      <color-sketch [width]="220" [formControlName]="item"></color-sketch>
+                      <color-sketch [width]="220" [formControlName]="item"> </color-sketch>
                     </div>
                   </ng-template>
                 </p-overlayPanel>
@@ -258,6 +288,9 @@
                   (click)="op.toggle($event)"
                   (keyup)="op.toggle($event)"
                   [ngStyle]="{ 'background-color': group.formGroup.value[item] }"
+                  [pTooltip]="'THEME.TOOLTIPS.ITEM_COLOR_PICKER' | translate"
+                  tooltipPosition="top"
+                  tooltipEvent="hover"
                 >
                 </a>
               </div>
@@ -288,6 +321,9 @@
       class="w-full"
       type="text"
       [placeholder]="'THEME.NAME' | translate"
+      [pTooltip]="'THEME.TOOLTIPS.NAME' | translate"
+      tooltipPosition="top"
+      tooltipEvent="hover"
     />
     <label for="theme_detail_new_theme_name"> {{ 'THEME.NAME' | translate }} </label>
   </span>
@@ -299,6 +335,9 @@
       class="w-full"
       type="text"
       [placeholder]="'THEME.DISPLAY_NAME' | translate"
+      [pTooltip]="'THEME.TOOLTIPS.DISPLAY_NAME' | translate"
+      tooltipPosition="top"
+      tooltipEvent="hover"
     />
     <label for="theme_detail_new_theme_display_name"> {{ 'THEME.DISPLAY_NAME' | translate }} </label>
   </span>
@@ -309,6 +348,9 @@
         styleClass="m-0"
         [label]="'ACTIONS.CANCEL' | translate"
         (onClick)="saveAsNewPopupDisplay = false"
+        [pTooltip]="'ACTIONS.CANCEL' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
       ></p-button>
       <p-button
         icon="pi pi-save"
@@ -316,6 +358,9 @@
         [disabled]="saveAsThemeName.value === '' || saveAsThemeDisplayName.value === ''"
         [label]="'ACTIONS.SAVE' | translate"
         (onClick)="saveTheme(saveAsThemeName.value, saveAsThemeDisplayName.value)"
+        [pTooltip]="'ACTIONS.SAVE' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
       ></p-button>
     </div>
   </ng-template>
