@@ -13,7 +13,7 @@ import { ConfigurationService, PortalMessageService, UserService } from '@onecx/
 
 import { RefType, Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeDetailComponent } from './theme-detail.component'
-import { bffImageUrl } from 'src/app/shared/utils'
+import { bffImageUrl, getCurrentDateTime } from 'src/app/shared/utils'
 
 describe('ThemeDetailComponent', () => {
   let component: ThemeDetailComponent
@@ -404,7 +404,10 @@ describe('ThemeDetailComponent', () => {
       null,
       2
     )
-    expect(FileSaver.saveAs).toHaveBeenCalledOnceWith(jasmine.any(Blob), 'themeName_Theme.json')
+    expect(FileSaver.saveAs).toHaveBeenCalledOnceWith(
+      jasmine.any(Blob),
+      `onecx-theme_themeName_${getCurrentDateTime()}.json`
+    )
   })
 
   it('should display error on theme export fail', () => {

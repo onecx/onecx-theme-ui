@@ -6,7 +6,7 @@ import FileSaver from 'file-saver'
 
 import { Action, PortalMessageService, UserService } from '@onecx/portal-integration-angular'
 
-import { sortByLocale, bffImageUrl } from 'src/app/shared/utils'
+import { sortByLocale, bffImageUrl, getCurrentDateTime } from 'src/app/shared/utils'
 import {
   ExportThemeRequest,
   ImagesInternalAPIService,
@@ -164,7 +164,10 @@ export class ThemeDetailComponent implements OnInit {
         .subscribe({
           next: (data) => {
             const themeJSON = JSON.stringify(data, null, 2)
-            FileSaver.saveAs(new Blob([themeJSON], { type: 'text/json' }), `${this.theme?.name + '_Theme'}.json`)
+            FileSaver.saveAs(
+              new Blob([themeJSON], { type: 'text/json' }),
+              `onecx-theme_${this.theme?.name}_${getCurrentDateTime()}.json`
+            )
           },
           error: (err) => {
             console.log(err)
