@@ -41,6 +41,7 @@
           >
           </ocx-data-view-controls
         ></ng-template>
+
         <!-- LIST -->
         <ng-template let-themes pTemplate="listItem">
           <div class="p-grid p-nogutter grid grid-nogutter">
@@ -72,16 +73,14 @@
             </div>
           </div>
         </ng-template>
+
         <!-- GRID -->
         <ng-template let-themes let-row="rowIndex" pTemplate="gridItem">
           <div class="p-grid p-nogutter grid grid-nogutter">
-            <div
-              *ngFor="let theme of themes"
-              class="col-12 sm:col-6 md:col-4 lg:col-4 xl:col-3 p-3"
-              [routerLink]="['./', theme.name]"
-            >
+            <div *ngFor="let theme of themes" class="col-12 sm:col-6 md:col-4 lg:col-4 xl:col-3 p-3">
               <div
-                class="card p-2 flex flex-column gap-2 justify-content-center align-items-center hover:bg-gray-200 cursor-pointer"
+                class="card p-2 flex flex-column gap-2 justify-content-between text-center hover:bg-gray-200 cursor-pointer"
+                [routerLink]="['./', theme.name]"
               >
                 <app-image-container
                   [id]="'theme_search_data_row_' + row + '_logo'"
@@ -89,23 +88,23 @@
                   styleClass="h-3rem md:h-4rem max-h-3rem md:max-h-4rem max-w-10rem"
                   [imageUrl]="getLogoUrl(theme)"
                 ></app-image-container>
-                <app-theme-color-box [properties]="theme.properties" styleClass="h-1rem text-center" />
-                <div class="text-center">
+                <app-theme-color-box [properties]="theme.properties" styleClass="h-1rem m-auto" />
+                <div>
                   <div
-                    class="font-bold text-lg lg:text-xl"
-                    [pTooltip]="'Theme: ' + theme.displayName"
+                    class="text-lg lg:text-xl font-bold text-responsive"
+                    [pTooltip]="theme.displayName.length < 20 ? '' : theme.displayName"
                     tooltipPosition="top"
                     tooltipEvent="hover"
                   >
-                    {{ limitText(theme.displayName, 20) }}
+                    {{ theme.displayName }}
                   </div>
                   <div
-                    class="text-xs"
-                    [pTooltip]="'THEME.TOOLTIPS.NAME' | translate"
+                    class="text-xs text-responsive"
+                    [pTooltip]="theme.name.length < 30 ? '' : theme.displayName"
                     tooltipPosition="top"
                     tooltipEvent="hover"
                   >
-                    {{ limitText(theme.name, 30) }}
+                    {{ theme.name }}
                   </div>
                 </div>
               </div>
