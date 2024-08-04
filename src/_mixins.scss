@@ -1,0 +1,263 @@
+// disable preset of opacity in form: not readable
+@mixin make-disabled-form-readable-input {
+  :host ::ng-deep {
+    .p-inputtext.p-component:disabled {
+      opacity: unset;
+    }
+  }
+}
+
+@mixin make-disabled-form-readable-dropdown {
+  :host ::ng-deep {
+    .p-dropdown.p-component.p-disabled {
+      opacity: unset;
+    }
+  }
+}
+
+@mixin prepare-inputgroup {
+  :host ::ng-deep {
+    .inputgroup-dropdown-with-link {
+      border-right: none;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+    .input-field-correction .p-inputtext {
+      padding-top: 1rem !important;
+      padding-bottom: 0.5rem !important;
+    }
+    .pseudo-button:hover {
+      background: var(--button-hover-bg) !important;
+      cursor: pointer;
+      * {
+        background: var(--button-hover-bg) !important;
+      }
+    }
+  }
+}
+
+@mixin card-badges {
+  :host ::ng-deep {
+    .card-badge-right {
+      display: inline-block;
+      position: absolute;
+      right: 3px;
+      &.badge-1 {
+        top: 3px;
+      }
+      &.badge-2 {
+        top: 35px;
+      }
+    }
+    .card-badge-left {
+      display: inline-block;
+      position: absolute;
+      left: 3px;
+      &.badge-1 {
+        top: 3px;
+      }
+      &.badge-2 {
+        top: 35px;
+      }
+    }
+    .pseudo-button-link {
+      border-radius: var(--border-radius);
+      &:hover {
+        color: var(--primary-color-text);
+        background: var(--button-hover-bg);
+        cursor: pointer;
+        padding: 5px !important;
+      }
+    }
+  }
+}
+
+@mixin correct-data-view-control {
+  :host ::ng-deep {
+    .data-view-control,
+    .data-view-control * {
+      color: var(--emphasis-medium);
+    }
+    // correction for data-view-control component
+    .data-view-control-border {
+      border: var(--toggle-button-border);
+      &.p-dropdown {
+        .p-inputtext {
+          color: var(--emphasis-medium);
+          opacity: 0.9;
+        }
+        &:last-of-type {
+          border-top-left-radius: var(--border-radius);
+          border-bottom-left-radius: var(--border-radius);
+        }
+      }
+      &.p-inputtext:hover,
+      &.p-dropdown:hover {
+        border-color: rgb(0 0 0 / 30%) !important;
+      }
+    }
+  }
+}
+
+@mixin dataview-list-zebra-rows {
+  :host ::ng-deep {
+    .p-dataview-list .p-dataview-content .p-grid > div {
+      &:nth-child(odd) {
+        background-color: #f8f9fa;
+      }
+    }
+  }
+}
+@mixin dataview-list-zebra-rows-4 {
+  :host ::ng-deep {
+    .p-dataview-list .p-dataview-content .p-grid > div {
+      &:nth-child(4n + 1),
+      &:nth-child(4n + 2) {
+        background-color: #f8f9fa;
+      }
+    }
+  }
+}
+
+@mixin correct-search-criteria {
+  :host ::ng-deep {
+    .search-criteria-container > div {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: center;
+      row-gap: 1rem;
+      column-gap: 3rem;
+      .search-criteria-buttons {
+        flex-wrap: wrap;
+        align-content: center;
+        margin-top: unset;
+      }
+    }
+  }
+}
+
+@mixin correct-select-button {
+  :host ::ng-deep {
+    .p-selectbutton.p-buttonset {
+      .p-button:first-of-type:not(:only-of-type) {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+      .p-button:not(:last-child),
+      .p-button:not(:last-child):hover {
+        border-right: 0 none;
+      }
+      .p-button:last-of-type:not(:only-of-type) {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+      .p-button:not(:first-of-type):not(:last-of-type) {
+        border-radius: 0;
+      }
+    }
+  }
+}
+
+@mixin search-criteria-select-button-slim {
+  :host ::ng-deep {
+    .slim-selectbutton {
+      display: flex;
+      flex-wrap: wrap;
+      flex-direction: column;
+      row-gap: 0.1rem;
+      align-items: center;
+
+      .p-selectbutton .p-button {
+        text-align: center;
+        display: inline-block;
+        color: var(--emphasis-medium);
+        font-weight: var(--font-weight);
+        padding: 0.3rem 0.8rem;
+        border: var(--input-border);
+      }
+      .p-selectbutton-subtitle {
+        color: var(--emphasis-medium);
+        font-size: 0.8rem;
+      }
+    }
+  }
+}
+@mixin search-criteria-select-button-filter {
+  :host ::ng-deep {
+    .filter-selectbutton {
+      .p-selectbutton .p-button {
+        opacity: 0.9 !important;
+        border: var(--toggle-button-border);
+        &.p-highlight {
+          background: var(--toggle-button-active-bg);
+          border-color: var(--toggle-button-active-border-color);
+        }
+        &:not(.p-disabled):not(.p-highlight):hover {
+          color: var(--text-color);
+          border-color: var(--toggle-button-hover-border-color);
+          background-color: var(--toggle-button-hover-bg);
+        }
+      }
+    }
+  }
+}
+@mixin search-criteria-select-button {
+  :host ::ng-deep {
+    .p-selectbutton-title {
+      width: 2rem;
+      text-align: right;
+    }
+    .search-criteria-selectbutton {
+      .p-selectbutton .p-button {
+        &.p-highlight {
+          color: var(--primary-text-color);
+          border-color: var(--toggle-button-hover-border-color);
+          background-color: var(--primary-color);
+        }
+        &:not(.p-disabled):not(.p-highlight):hover {
+          color: var(--primary-text-color);
+          border-color: var(--toggle-button-hover-border-color);
+          background-color: var(--button-hover-bg);
+        }
+      }
+    }
+  }
+}
+
+@mixin table-inline-buttons {
+  :host ::ng-deep {
+    // reduce the size of buttons used inside a table row
+    th button.p-button,
+    td button.p-button {
+      &.p-button-icon-only {
+        width: unset !important;
+      }
+      &.p-button-rounded {
+        height: unset !important;
+      }
+      &:disabled {
+        opacity: 0.38 !important;
+      }
+    }
+  }
+}
+
+@mixin displaying-text-responsive {
+  :host ::ng-deep {
+    .text-responsive {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+@mixin media-md-h-3-5 {
+  :host ::ng-deep {
+    @media screen and (min-width: 768px) {
+      .md\:h-3-5rem {
+        height: 3.5rem !important;
+      }
+    }
+  }
+}
