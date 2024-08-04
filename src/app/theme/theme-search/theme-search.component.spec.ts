@@ -66,7 +66,10 @@ describe('ThemeSearchComponent', () => {
     }
     spyOn(translateService, 'get').and.returnValues(of(actionsTranslations), of(generalTranslations))
     const themesResponse = {
-      stream: [{ name: 'theme1' }, { name: 'theme2' }]
+      stream: [
+        { name: 'theme1', displayName: 'Theme 1' },
+        { name: 'theme2', displayName: 'Theme 2' }
+      ]
     }
     const themesObservable = of(themesResponse as any)
     themeApiSpy.getThemes.and.returnValue(themesObservable)
