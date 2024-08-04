@@ -252,7 +252,7 @@
   }
 }
 
-@mixin media-md-h-3-5 {
+@mixin media-queries {
   :host ::ng-deep {
     @media screen and (min-width: 768px) {
       .md\:h-3-5rem {

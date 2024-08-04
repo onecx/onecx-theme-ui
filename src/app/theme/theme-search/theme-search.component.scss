@@ -3,6 +3,7 @@
 @include correct-select-button;
 @include displaying-text-responsive;
 @include dataview-list-zebra-rows;
+@include media-queries;
 
 :host ::ng-deep {
   .h-05rem {
