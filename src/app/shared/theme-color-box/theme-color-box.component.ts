@@ -6,7 +6,7 @@ import { Component, Input } from '@angular/core'
   templateUrl: './theme-color-box.component.html'
 })
 export class ThemeColorBoxComponent {
-  @Input() public styleClass = 'h-1rem'
+  @Input() public styleClass = 'h-1rem w-14rem '
   @Input() public properties = {
     general: {
       'primary-color': 'lightgray',
