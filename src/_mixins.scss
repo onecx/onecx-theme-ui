@@ -101,7 +101,7 @@
 
 @mixin dataview-list-zebra-rows {
   :host ::ng-deep {
-    .p-dataview-list .p-dataview-content .p-grid > div {
+    .p-dataview-list .p-dataview-content > div {
       &:nth-child(odd) {
         background-color: #f8f9fa;
       }
