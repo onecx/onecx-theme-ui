@@ -7,7 +7,7 @@
   (onHide)="onImportThemeHide()"
 >
   <p-fileUpload
-    inputId="portal_detail_item_upload"
+    inputId="theme_import_upload"
     mode="advanced"
     name="file"
     accept=".json"
@@ -24,13 +24,12 @@
     [cancelLabel]="'ACTIONS.CANCEL' | translate"
     [chooseLabel]="'ACTIONS.CHOOSE' | translate"
   ></p-fileUpload>
-  <label class="ocx-required-label" for="portal_detail_item_upload">{{ 'THEME.THEME_NAME' | translate }}</label>
   <div *ngIf="themeSnapshot" class="flex flex-wrap justify-content-between align-items-center gap-2 mt-4">
     <span class="p-float-label" controlErrorAnchor>
       <input
         pInputText
         type="text"
-        id="theme_import_themeName"
+        id="theme_import_theme_name"
         class="w-full pt-3 pb-2"
         [(ngModel)]="themeName"
         (ngModelChange)="checkThemeExistence()"
@@ -39,7 +38,7 @@
         tooltipPosition="top"
         tooltipEvent="focus"
       />
-      <label class="ocx-required-label" for="portal_detail_item_portalName">{{ 'THEME.THEME_NAME' | translate }}</label>
+      <label class="ocx-required-label" for="theme_import_theme_name">{{ 'THEME.THEME_NAME' | translate }}</label>
     </span>
     <app-theme-color-box *ngIf="properties" [properties]="properties" styleClass="h-inputtext" />
     <div *ngIf="!properties">{{ 'THEME.NO_PROPERTIES' | translate }}</div>
@@ -62,10 +61,12 @@
       pButton
       type="button"
       icon="pi pi-times"
-      id="portal_import_button_close"
-      [label]="'ACTIONS.NAVIGATION.CLOSE' | translate"
-      [title]="'ACTIONS.NAVIGATION.CLOSE_WITHOUT_SAVE' | translate"
+      id="theme_import_button_close"
       (click)="onImportThemeHide()"
+      [label]="'ACTIONS.NAVIGATION.CLOSE' | translate"
+      [pTooltip]="'ACTIONS.NAVIGATION.CLOSE_WITHOUT_SAVE' | translate"
+      tooltipPosition="top"
+      tooltipEvent="focus"
     ></button>
   </div>
 </p-dialog>
