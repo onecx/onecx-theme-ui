@@ -62,9 +62,11 @@
       type="button"
       icon="pi pi-times"
       id="theme_import_button_close"
-      [label]="'ACTIONS.NAVIGATION.CLOSE' | translate"
-      [title]="'ACTIONS.NAVIGATION.CLOSE_WITHOUT_SAVE' | translate"
       (click)="onImportThemeHide()"
+      [label]="'ACTIONS.NAVIGATION.CLOSE' | translate"
+      [pTooltip]="'ACTIONS.NAVIGATION.CLOSE_WITHOUT_SAVE' | translate"
+      tooltipPosition="top"
+      tooltipEvent="focus"
     ></button>
   </div>
 </p-dialog>
