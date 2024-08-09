@@ -20,6 +20,7 @@ export class ThemeImportComponent implements OnInit {
 
   public themes!: Theme[]
   public themeName = ''
+  public displayName = ''
   public themeNameExists = false
   public themeImportError = false
   public themeSnapshot: ThemeSnapshot | null = null
@@ -45,12 +46,14 @@ export class ThemeImportComponent implements OnInit {
       this.themeSnapshot = null
       try {
         const themeSnapshot = JSON.parse(text)
+        console.log('THEME', themeSnapshot)
         if (this.isThemeImportRequestDTO(themeSnapshot)) {
           this.themeSnapshot = themeSnapshot
           this.themeImportError = false
           if (themeSnapshot.themes) {
             const key: string[] = Object.keys(themeSnapshot.themes)
             this.themeName = key[0]
+            this.displayName = key[0]
             this.properties = themeSnapshot.themes[key[0]].properties
           }
           this.checkThemeExistence()

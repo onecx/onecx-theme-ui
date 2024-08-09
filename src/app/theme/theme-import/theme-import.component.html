@@ -40,6 +40,21 @@
       />
       <label class="ocx-required-label" for="theme_import_theme_name">{{ 'THEME.THEME_NAME' | translate }}</label>
     </span>
+    <span class="p-float-label" controlErrorAnchor>
+      <input
+        pInputText
+        type="text"
+        id="theme_import_theme_display_name"
+        class="w-full pt-3 pb-2"
+        [(ngModel)]="displayName"
+        (ngModelChange)="checkThemeExistence()"
+        (keyup)="checkThemeExistence()"
+        [pTooltip]="'THEME.DISPLAY_NAME' | translate"
+        tooltipPosition="top"
+        tooltipEvent="focus"
+      />
+      <label class="ocx-required-label" for="theme_import_display_name">{{ 'THEME.DISPLAY_NAME' | translate }}</label>
+    </span>
     <app-theme-color-box *ngIf="properties" [properties]="properties" styleClass="h-inputtext" />
     <div *ngIf="!properties">{{ 'THEME.NO_PROPERTIES' | translate }}</div>
   </div>
