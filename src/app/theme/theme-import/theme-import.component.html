@@ -59,7 +59,7 @@
     <div *ngIf="!properties">{{ 'THEME.NO_PROPERTIES' | translate }}</div>
   </div>
   <p-message
-    *ngIf="themeSnapshot && themeNameExists"
+    *ngIf="themeSnapshot && (themeNameExists || displayNameExists)"
     severity="warn"
     styleClass="mt-3"
     text="{{ 'THEME.IMPORT.THEME_EXISTS_MESSAGE' | translate }}"
