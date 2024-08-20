@@ -10,8 +10,7 @@
     "helm/**",
     "node_modules/**",
     "src/app/shared/generated/**",
-    "src/app/api/*",
-    "src/app/model/*",
+    "src/assets/api/*",
     "src/**/*.ico",
     "src/**/*.svg"
   ],
