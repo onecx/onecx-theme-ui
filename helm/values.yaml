@@ -19,6 +19,9 @@ app:
           technology: WEBCOMPONENTMODULE
           remoteName: onecx-theme
           tagName: ocx-theme-component
+          endpoints:
+            - name: theme-detail
+              path: /{theme-name}
     # Permission
     permission:
       enabled: true
