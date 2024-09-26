@@ -9,7 +9,7 @@
   <ocx-page-content>
     <ng-container *ngIf="themes$ | async as themes">
       <p-dataView
-        id="thsearch_dataview"
+        id="th_search_dataview"
         [value]="(themes.stream || []).sort(sortThemesByName)"
         [paginator]="true"
         [alwaysShowPaginator]="true"
