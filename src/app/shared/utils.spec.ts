@@ -2,15 +2,31 @@ import { SelectItem } from 'primeng/api'
 import { dropDownSortItemsByLabel, filterObject, limitText, prepareUrlPath, bffImageUrl } from './utils'
 import { RefType } from './generated'
 
-describe('utils', () => {
-  it('should limit text if text too long', () => {
-    const result = limitText('textData', 4)
-    expect(result).toBe('text...')
-  })
+describe('util functions', () => {
+  describe('limitText', () => {
+    it('should truncate text that exceeds the specified limit', () => {
+      const result = limitText('hello', 4)
 
-  it('should handle zero length text', () => {
-    const result = limitText(null, 4)
-    expect(result).toBe('')
+      expect(result).toEqual('hell...')
+    })
+
+    it('should return the original text if it does not exceed the limit', () => {
+      const result = limitText('hello', 6)
+
+      expect(result).toEqual('hello')
+    })
+
+    it('should return an empty string for undefined input', () => {
+      const str: any = undefined
+      const result = limitText(str, 5)
+
+      expect(result).toEqual('')
+    })
+
+    it('should handle zero length text', () => {
+      const result = limitText(null, 4)
+      expect(result).toEqual('')
+    })
   })
 
   it('should exclude props', () => {
