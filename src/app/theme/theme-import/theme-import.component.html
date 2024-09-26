@@ -58,7 +58,7 @@
         {{ 'THEME.DISPLAY_NAME' | translate }}
       </label>
     </span>
-    <app-theme-color-box *ngIf="properties" [properties]="properties" styleClass="h-inputtext" />
+    <app-theme-color-box *ngIf="properties" [properties]="properties" />
     <div *ngIf="!properties">{{ 'THEME.NO_PROPERTIES' | translate }}</div>
   </div>
   <p-message
