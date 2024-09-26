@@ -16,7 +16,7 @@
           tooltipEvent="hover"
         >
           <p-inputSwitch
-            inputId="theme_designer_header_is_current_theme"
+            inputId="th_designer_header_is_current_theme"
             name="autoApplyToggle"
             [disabled]="themeIsCurrentUsedTheme"
             [(ngModel)]="autoApply"
@@ -24,7 +24,7 @@
             tooltipPosition="top"
             tooltipEvent="hover"
           ></p-inputSwitch>
-          <label for="theme_designer_header_is_current_theme">{{ 'THEME.DETAIL.AUTO_APPLY' | translate }}</label>
+          <label for="th_designer_header_is_current_theme">{{ 'THEME.DETAIL.AUTO_APPLY' | translate }}</label>
         </div>
         <span
           *ngIf="themeIsCurrentUsedTheme"
@@ -38,7 +38,7 @@
           <span class="p-float-label">
             <p-dropdown
               #themeTemplate
-              inputId="theme_designer_fields_selected_theme"
+              inputId="th_designer_fields_selected_theme"
               [options]="themeTemplates"
               styleClass="w-full"
               [(ngModel)]="themeTemplateSelectedId"
@@ -49,7 +49,7 @@
               tooltipPosition="top"
               tooltipEvent="hover"
             ></p-dropdown>
-            <label for="theme_designer_fields_selected_theme" class="white-space-nowrap">
+            <label for="th_designer_fields_selected_theme" class="white-space-nowrap">
               {{ 'THEME.TEMPLATE.SELECTOR' | translate }}</label
             >
           </span>
@@ -69,15 +69,13 @@
                   minlength="2"
                   maxlength="255"
                   type="text"
-                  id="theme_designer_field_name"
+                  id="th_designer_field_name"
                   formControlName="name"
                   [pTooltip]="'THEME.TOOLTIPS.NAME' | translate"
                   tooltipPosition="top"
                   tooltipEvent="hover"
                 />
-                <label class="ocx-required-label" for="theme_designer_field_name">
-                  {{ 'THEME.NAME' | translate }}
-                </label>
+                <label class="ocx-required-label" for="th_designer_field_name"> {{ 'THEME.NAME' | translate }} </label>
               </span>
             </div>
             <div class="field col-12 mb-4">
@@ -87,13 +85,13 @@
                   minlength="2"
                   maxlength="255"
                   type="text"
-                  id="theme_designer_field_display_name"
+                  id="th_designer_field_display_name"
                   formControlName="displayName"
                   [pTooltip]="'THEME.TOOLTIPS.DISPLAY_NAME' | translate"
                   tooltipPosition="top"
                   tooltipEvent="hover"
                 />
-                <label class="ocx-required-label" for="theme_designer_field_display_name">
+                <label class="ocx-required-label" for="th_designer_field_display_name">
                   {{ 'THEME.DISPLAY_NAME' | translate }}
                 </label>
               </span>
@@ -103,13 +101,13 @@
                 <input
                   pInputText
                   type="text"
-                  id="theme_designer_field_description"
+                  id="th_designer_field_description"
                   formControlName="description"
                   [pTooltip]="'THEME.TOOLTIPS.DESCRIPTION' | translate"
                   tooltipPosition="top"
                   tooltipEvent="hover"
                 />
-                <label for="theme_designer_field_description"> {{ 'THEME.DESCRIPTION' | translate }} </label>
+                <label for="th_designer_field_description"> {{ 'THEME.DESCRIPTION' | translate }} </label>
               </span>
             </div>
             <!-- helper inputs because p-fileupload does not work inside inputgroup -->
@@ -133,7 +131,7 @@
             <div class="field col-12 mb-3">
               <div class="flex flex-wrap sm:flex-nowrap align-items-center pb-2 row-gap-2 column-gap-4">
                 <app-image-container
-                  id="theme_designer_field_logo_url_image"
+                  id="th_designer_field_logo_url_image"
                   [styleClass]="'w-5rem'"
                   [imageUrl]="fetchingLogoUrl"
                   [small]="true"
@@ -141,7 +139,7 @@
                 ></app-image-container>
                 <button
                   pButton
-                  id="theme_designer_field_logo_upload"
+                  id="th_designer_field_logo_upload"
                   icon="pi pi-upload"
                   [disabled]="mode === 'NEW'"
                   class="action-button p-button-icon-only"
@@ -154,16 +152,16 @@
                   <input
                     pInputText
                     type="text"
-                    id="theme_designer_field_logo_url"
+                    id="th_designer_field_logo_url"
                     formControlName="logoUrl"
                     (input)="onInputChange(RefType.Logo)"
                     [pTooltip]="'IMAGE.TOOLTIPS.URL' | translate"
                     tooltipPosition="top"
                     tooltipEvent="hover"
                   />
-                  <label for="theme_designer_field_logo_url">{{ 'LOGO.URL' | translate }}</label>
+                  <label for="th_designer_field_logo_url">{{ 'LOGO.URL' | translate }}</label>
                 </span>
-                <label *ngIf="displayFileTypeErrorLogo" for="theme_designer_field_logo_url" class="control-error">
+                <label *ngIf="displayFileTypeErrorLogo" for="th_designer_field_logo_url" class="control-error">
                   {{ 'VALIDATION.ERRORS.FILETYPE_PATTERN_ERROR' | translate }}
                 </label>
               </div>
@@ -171,7 +169,7 @@
             <div class="field col-12 mb-0">
               <div class="flex flex-wrap sm:flex-nowrap align-items-center pb-2 row-gap-2 column-gap-4">
                 <app-image-container
-                  id="theme_designer_field_favicon_url_image"
+                  id="th_designer_field_favicon_url_image"
                   [styleClass]="'w-5rem'"
                   [imageUrl]="fetchingFaviconUrl"
                   [small]="true"
@@ -179,7 +177,7 @@
                 ></app-image-container>
                 <button
                   pButton
-                  id="theme_designer_field_favicon_upload"
+                  id="th_designer_field_favicon_upload"
                   icon="pi pi-upload"
                   [disabled]="mode === 'NEW'"
                   class="action-button p-button-icon-only"
@@ -192,18 +190,18 @@
                   <input
                     pInputText
                     type="text"
-                    id="theme_designer_field_favicon_url"
+                    id="th_designer_field_favicon_url"
                     formControlName="faviconUrl"
                     (input)="onInputChange(RefType.Favicon)"
                     [pTooltip]="'IMAGE.TOOLTIPS.URL' | translate"
                     tooltipPosition="top"
                     tooltipEvent="hover"
                   />
-                  <label for="theme_designer_field_favicon_url">{{ 'FAVICON.URL' | translate }}</label>
+                  <label for="th_designer_field_favicon_url">{{ 'FAVICON.URL' | translate }}</label>
                 </span>
                 <label
                   *ngIf="this.displayFileTypeErrorFavicon"
-                  for="theme_designer_field_favicon_url"
+                  for="th_designer_field_favicon_url"
                   class="control-error"
                 >
                   {{ 'VALIDATION.ERRORS.FILETYPE_PATTERN_ERROR' | translate }}
@@ -224,14 +222,14 @@
                   <input
                     pInputText
                     type="text"
-                    id="theme_detail_font-family"
+                    id="th_designer_font-family"
                     formControlName="font-family"
                     class="w-full"
                     [pTooltip]="'THEME.TOOLTIPS.FONT_FAMILY' | translate"
                     tooltipPosition="top"
                     tooltipEvent="hover"
                   />
-                  <label for="theme_detail_font-family">font-family</label>
+                  <label for="th_designer_font-family">font-family</label>
                 </span>
               </div>
             </div>
@@ -241,14 +239,14 @@
                   <input
                     pInputText
                     type="text"
-                    id="theme_detail_font-size"
+                    id="th_designer_font-size"
                     formControlName="font-size"
                     class="w-full"
                     [pTooltip]="'THEME.TOOLTIPS.FONT_SIZE' | translate"
                     tooltipPosition="top"
                     tooltipEvent="hover"
                   />
-                  <label for="theme_detail_font-size">font-size</label>
+                  <label for="th_designer_font-size">font-size</label>
                 </span>
               </div>
             </div>
@@ -265,14 +263,14 @@
                 <span class="p-float-label">
                   <input
                     pInputText
-                    id="theme_detail_item_color_{{ item }}"
+                    id="th_designer_item_color_{{ item }}"
                     [formControlName]="item"
                     [value]="group.formGroup.value[item]"
                     [pTooltip]="'THEME.TOOLTIPS.ITEM_COLOR' | translate"
                     tooltipPosition="top"
                     tooltipEvent="hover"
                   />
-                  <label for="theme_detail_item_color_{{ item }}">{{ item }}</label>
+                  <label for="th_designer_item_color_{{ item }}">{{ item }}</label>
                 </span>
                 <p-overlayPanel #op>
                   <ng-template pTemplate>
@@ -283,7 +281,7 @@
                 </p-overlayPanel>
                 <a
                   tabindex="0"
-                  id="theme_detail_item_color_{{ item }}_toggle"
+                  id="th_designer_item_color_{{ item }}_toggle"
                   class="p-inputgroup-addon cursor-pointer"
                   (click)="op.toggle($event)"
                   (keyup)="op.toggle($event)"
@@ -317,7 +315,7 @@
     <input
       #saveAsThemeName
       pInputText
-      id="theme_detail_new_theme_name"
+      id="th_saveas_new_theme_name"
       class="w-full"
       type="text"
       [placeholder]="'THEME.NAME' | translate"
@@ -325,13 +323,13 @@
       tooltipPosition="top"
       tooltipEvent="hover"
     />
-    <label for="theme_detail_new_theme_name"> {{ 'THEME.NAME' | translate }} </label>
+    <label for="th_saveas_new_theme_name"> {{ 'THEME.NAME' | translate }} </label>
   </span>
   <span class="p-float-label block mt-3">
     <input
       #saveAsThemeDisplayName
       pInputText
-      id="theme_detail_new_theme_display_name"
+      id="th_saveas_new_theme_display_name"
       class="w-full"
       type="text"
       [placeholder]="'THEME.DISPLAY_NAME' | translate"
@@ -339,7 +337,7 @@
       tooltipPosition="top"
       tooltipEvent="hover"
     />
-    <label for="theme_detail_new_theme_display_name"> {{ 'THEME.DISPLAY_NAME' | translate }} </label>
+    <label for="th_saveas_new_theme_display_name"> {{ 'THEME.DISPLAY_NAME' | translate }} </label>
   </span>
   <ng-template pTemplate="footer">
     <div class="flex flex-wrap gap-2 justify-content-end">

@@ -1,13 +1,14 @@
 <p-dialog
-  header="{{ 'THEME.IMPORT.HEADER' | translate }}"
+  [header]="'THEME.IMPORT.HEADER' | translate"
   [(visible)]="displayThemeImport"
   [draggable]="true"
+  [resizable]="true"
   [closable]="true"
   [modal]="true"
   (onHide)="onImportThemeHide()"
 >
   <p-fileUpload
-    inputId="theme_import_upload"
+    inputId="th_import_upload"
     mode="advanced"
     name="file"
     accept=".json"
@@ -24,36 +25,38 @@
     [cancelLabel]="'ACTIONS.CANCEL' | translate"
     [chooseLabel]="'ACTIONS.CHOOSE' | translate"
   ></p-fileUpload>
-  <div *ngIf="themeSnapshot" class="flex flex-wrap justify-content-between align-items-center gap-2 mt-4">
+  <div *ngIf="themeSnapshot" class="flex flex-wrap justify-content-start align-items-center gap-2 mt-4">
     <span class="p-float-label" controlErrorAnchor>
       <input
         pInputText
         type="text"
-        id="theme_import_theme_name"
+        id="th_import_theme_name"
         class="w-full pt-3 pb-2"
         [(ngModel)]="themeName"
         (ngModelChange)="checkThemeExistence()"
         (keyup)="checkThemeExistence()"
         [pTooltip]="'THEME.THEME_NAME' | translate"
         tooltipPosition="top"
-        tooltipEvent="focus"
+        tooltipEvent="hover"
       />
-      <label class="ocx-required-label" for="theme_import_theme_name">{{ 'THEME.THEME_NAME' | translate }}</label>
+      <label class="ocx-required-label" for="th_import_theme_name">{{ 'THEME.THEME_NAME' | translate }}</label>
     </span>
     <span class="p-float-label" controlErrorAnchor>
       <input
         pInputText
         type="text"
-        id="theme_import_theme_display_name"
+        id="th_import_theme_display_name"
         class="w-full pt-3 pb-2"
         [(ngModel)]="displayName"
         (ngModelChange)="checkThemeExistence()"
         (keyup)="checkThemeExistence()"
         [pTooltip]="'THEME.DISPLAY_NAME' | translate"
         tooltipPosition="top"
-        tooltipEvent="focus"
+        tooltipEvent="hover"
       />
-      <label class="ocx-required-label" for="theme_import_display_name">{{ 'THEME.DISPLAY_NAME' | translate }}</label>
+      <label class="ocx-required-label" for="th_import_theme_display_name">
+        {{ 'THEME.DISPLAY_NAME' | translate }}
+      </label>
     </span>
     <app-theme-color-box *ngIf="properties" [properties]="properties" styleClass="h-inputtext" />
     <div *ngIf="!properties">{{ 'THEME.NO_PROPERTIES' | translate }}</div>
@@ -62,26 +65,28 @@
     *ngIf="themeSnapshot && (themeNameExists || displayNameExists)"
     severity="warn"
     styleClass="mt-3"
-    text="{{ 'THEME.IMPORT.THEME_EXISTS_MESSAGE' | translate }}"
+    id="th_import_exists_message"
+    [text]="'THEME.IMPORT.THEME_EXISTS_MESSAGE' | translate"
   ></p-message>
   <p-message
     *ngIf="themeImportError"
     severity="error"
     styleClass="mt-3"
-    text="{{ 'VALIDATION.ERRORS.PARSE_ERROR' | translate }}"
+    id="th_import_parse_error"
+    [text]="'VALIDATION.ERRORS.PARSE_ERROR' | translate"
   ></p-message>
 
-  <div class="flex justify-content-end gap-3 pt-3">
-    <button
-      pButton
-      type="button"
-      icon="pi pi-times"
-      id="theme_import_button_close"
-      (click)="onImportThemeHide()"
-      [label]="'ACTIONS.NAVIGATION.CLOSE' | translate"
-      [pTooltip]="'ACTIONS.NAVIGATION.CLOSE_WITHOUT_SAVE' | translate"
-      tooltipPosition="top"
-      tooltipEvent="focus"
-    ></button>
-  </div>
+  <ng-template pTemplate="footer">
+    <div class="flex flex-wrap column-gap-2 row-gap-1 justify-content-end">
+      <p-button
+        icon="pi pi-times"
+        id="th_import_button_close"
+        (onClick)="onImportThemeHide()"
+        [label]="'ACTIONS.NAVIGATION.CLOSE' | translate"
+        [pTooltip]="'ACTIONS.NAVIGATION.CLOSE.TOOLTIP' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      ></p-button>
+    </div>
+  </ng-template>
 </p-dialog>

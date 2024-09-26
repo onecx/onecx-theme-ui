@@ -9,21 +9,22 @@
   <ocx-page-content>
     <ng-container *ngIf="themes$ | async as themes">
       <p-dataView
-        id="theme_search_dataview"
+        id="thsearch_dataview"
         [value]="(themes.stream || []).sort(sortThemesByName)"
         [paginator]="true"
         [alwaysShowPaginator]="true"
         [rowsPerPageOptions]="viewMode === 'grid' ? [12, 24, 60] : [10, 20, 50]"
         [rows]="viewMode === 'grid' ? 12 : 10"
         [layout]="viewMode"
+        [emptyMessage]="'ACTIONS.SEARCH.NO_DATA' | translate"
         filterBy="displayName,name"
         [sortField]="sortField"
         [sortOrder]="sortOrder"
       >
         <ng-template pTemplate="header">
           <ocx-data-view-controls
-            [enableFiltering]="true"
             [enableSorting]="true"
+            [enableFiltering]="true"
             [supportedViews]="['grid', 'list']"
             [initialViewMode]="viewMode"
             [sortingOptions]="[
@@ -31,7 +32,7 @@
               { label: 'THEME.NAME' | translate, value: 'name' }
             ]"
             [defaultSortOption]="sortField"
-            [defaultSortDirection]="sortOrder === 1"
+            [defaultSortDirection]="false"
             (dataViewChange)="onLayoutChange($event)"
             (filterChange)="onFilterChange($event)"
             [filterColumns]="['THEME.DISPLAY_NAME' | translate, 'THEME.NAME' | translate]"
@@ -39,21 +40,22 @@
             (sortDirectionChange)="onSortDirChange($event)"
             [translations]="dataViewControlsTranslations"
           >
-          </ocx-data-view-controls
-        ></ng-template>
+          </ocx-data-view-controls>
+        </ng-template>
 
         <!-- LIST -->
-        <ng-template let-themes let-row="rowIndex" pTemplate="listItem">
+        <ng-template let-themes pTemplate="listItem">
           <div
-            *ngFor="let theme of themes"
+            *ngFor="let theme of themes; index as i"
             class="flex flex-row flex-nowrap justify-content-start align-items-center column-gap-3 py-1 px-3 hover:bg-gray-200 cursor-pointer"
+            [id]="'th_search_data_list_row_' + i"
             [routerLink]="['./', theme.name]"
           >
-            <div class="p-0 col-3 sm:col-3 md:col-2 flex justify-content-around align-items-center">
+            <div class="p-0 col-3 md:col-2 flex justify-content-around align-items-center">
               <app-image-container
-                [id]="'theme_search_data_row_' + row + '_logo'"
+                [id]="'th_search_data_list_row_' + i + '_logo'"
                 [small]="true"
-                styleClass="h-2rem sm:h-3rem md:h-4rem max-h-2rem sm:max-h-3rem md:max-h-4rem max-w-4rem sm:max-w-8rem"
+                styleClass="h-2rem sm:h-3rem md:h-3rem max-h-2rem sm:max-h-3rem max-w-4rem sm:max-w-8rem"
                 [imageUrl]="getLogoUrl(theme)"
               ></app-image-container>
             </div>
@@ -61,7 +63,7 @@
               <div class="flex flex-column row-gap-1 justify-content-center">
                 <div
                   class="sm:font-bold word-break-all"
-                  [id]="'theme_search_data_row_' + row + '_display_name'"
+                  [id]="'th_search_data_list_row_' + i + '_display_name'"
                   [pTooltip]="theme.displayName.length < 40 ? '' : theme.displayName"
                   tooltipPosition="top"
                   tooltipEvent="hover"
@@ -70,7 +72,7 @@
                 </div>
                 <div
                   class="hidden md:block"
-                  [id]="'theme_search_data_row_' + row + '_description'"
+                  [id]="'th_search_data_list_row_' + i + '_description'"
                   [pTooltip]="theme.description"
                   tooltipPosition="top"
                   tooltipEvent="hover"
@@ -82,7 +84,7 @@
             <div class="p-0 sm:col-3 md:col-4 lg:col-4 xl:col-4">
               <div class="flex flex-column justify-content-center align-items-center h-full">
                 <app-theme-color-box
-                  [id]="'theme_search_data_row_' + row + '_properties'"
+                  [id]="'th_search_data_list_row_' + i + '_properties'"
                   [properties]="theme.properties"
                   styleClass="h-1rem md:h-1rem w-6rem sm:w-10rem md:w-14rem"
                 />
@@ -92,15 +94,16 @@
         </ng-template>
 
         <!-- GRID -->
-        <ng-template let-themes let-row="rowIndex" pTemplate="gridItem">
+        <ng-template let-themes pTemplate="gridItem">
           <div class="p-grid p-nogutter grid grid-nogutter">
-            <div *ngFor="let theme of themes" class="col-6 md:col-4 xl:col-3 p-2 md:p-3">
+            <div *ngFor="let theme of themes; index as i" class="col-6 md:col-4 xl:col-3 p-2 md:p-3">
               <div
+                [id]="'th_search_data_grid_row_' + i"
                 class="card px-2 p-1 sm:p-2 flex flex-column gap-1 sm:gap-2 justify-content-between text-center hover:bg-gray-200 cursor-pointer"
                 [routerLink]="['./', theme.name]"
               >
                 <app-image-container
-                  [id]="'theme_search_data_row_' + row + '_logo'"
+                  [id]="'th_search_data_grid_row_' + i + '_logo'"
                   [small]="false"
                   styleClass="h-2rem sm:h-3rem md:h-4rem max-h-2rem sm:max-h-3rem md:max-h-4rem max-w-10rem"
                   [imageUrl]="getLogoUrl(theme)"
@@ -108,6 +111,7 @@
                 <app-theme-color-box [properties]="theme.properties" styleClass="h-05rem md:h-1rem m-auto" />
                 <div class="flex flex-column justify-content-between gap-1 text-center">
                   <div
+                    [id]="'th_search_data_grid_row_' + i + '_display_name'"
                     class="font-bold sm:text-lg md:text-xl text-responsive"
                     [pTooltip]="theme.displayName.length < 20 ? '' : theme.displayName"
                     tooltipPosition="top"
@@ -116,6 +120,7 @@
                     {{ theme.displayName }}
                   </div>
                   <div
+                    [id]="'th_search_data_grid_row_' + i + '_name'"
                     class="text-xs md:text-sm text-responsive"
                     [pTooltip]="theme.name.length < 30 ? '' : theme.displayName"
                     tooltipPosition="top"
