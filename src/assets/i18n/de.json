@@ -55,6 +55,12 @@
       "DETAILS.TOOLTIP": "Anzeige Details",
       "NEW.TOOLTIP": "Erstelle neuen Eintrag"
     },
+    "SEARCH": {
+      "ERROR": "Daten nicht abrufbar",
+      "NO_DATA": "Keine Daten",
+      "RELOAD": "Daten neu laden",
+      "RELOAD.OK": "Daten erfolgreich geladen"
+    },
     "CANCEL": "Abbrechen",
     "CHOOSE": "Auswählen",
     "SAVE": "Speichern",

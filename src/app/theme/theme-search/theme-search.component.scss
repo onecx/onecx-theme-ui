@@ -1,8 +1,9 @@
-@import 'src/_mixins.scss';
+@import 'src/app/_th-mixins.scss';
 
 @include correct-select-button;
+@include correct-dataview-header;
 @include displaying-text-responsive;
-@include dataview-list-zebra-rows;
+@include dataview-list-flex-zebra-rows;
 @include media-queries;
 
 :host ::ng-deep {

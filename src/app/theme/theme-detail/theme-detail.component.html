@@ -17,7 +17,7 @@
 
   <ocx-page-content>
     <p-tabView>
-      <p-tabPanel id="theme_detail_panel_props" [header]="'THEME.TABS.PROPERTIES' | translate">
+      <p-tabPanel id="th_detail_panel_props" [header]="'THEME.TABS.PROPERTIES' | translate">
         <div class="grid grid-nogutter m-3">
           <div class="col-12 md:col-10 lg:col-10 xl:col-6 flex flex-column row-gap-4">
             <span class="p-float-label">
@@ -26,13 +26,13 @@
                 type="text"
                 readonly
                 class="w-full"
-                id="theme_detail_item_display_name"
+                id="th_detail_item_display_name"
                 [value]="theme?.displayName"
                 [pTooltip]="'THEME.TOOLTIPS.DISPLAY_NAME' | translate"
                 tooltipPosition="top"
                 tooltipEvent="hover"
               />
-              <label for="theme_detail_item_display_name">{{ 'THEME.DISPLAY_NAME' | translate }}</label>
+              <label for="th_detail_item_display_name">{{ 'THEME.DISPLAY_NAME' | translate }}</label>
             </span>
 
             <span class="p-float-label">
@@ -42,32 +42,32 @@
                 class="w-full"
                 autoresize="true"
                 rows="3"
-                id="theme_detail_item_description"
+                id="th_detail_item_description"
                 [ngModel]="theme?.description"
                 [pTooltip]="'THEME.DESCRIPTION' | translate"
                 tooltipPosition="top"
                 tooltipEvent="hover"
               ></textarea>
-              <label for="theme_detail_item_description">{{ 'THEME.DESCRIPTION' | translate }}</label>
+              <label for="th_detail_item_description">{{ 'THEME.DESCRIPTION' | translate }}</label>
             </span>
 
             <div class="flex flex-wrap sm:flex-nowrap justify-content-around align-items-center row-gap-1">
               <div class="flex flex-nowrap align-items-center column-gap-2">
-                <label for="theme_detail_item_logo" class="flex font-medium text-600">
+                <label for="th_detail_item_logo" class="flex font-medium text-600">
                   {{ 'LOGO.LABEL' | translate }}</label
                 >
                 <app-image-container
-                  id="theme_detail_item_logo"
+                  id="th_detail_item_logo"
                   [imageUrl]="getImageUrl(theme, RefType.Logo)"
                   [small]="true"
                 ></app-image-container>
               </div>
               <div class="flex flex-nowrap align-items-center column-gap-2">
-                <label for="theme_detail_item_favicon" class="flex font-medium text-600">
+                <label for="th_detail_item_favicon" class="flex font-medium text-600">
                   {{ 'FAVICON.LABEL' | translate }}</label
                 >
                 <app-image-container
-                  id="theme_detail_item_favicon"
+                  id="th_detail_item_favicon"
                   [imageUrl]="getImageUrl(theme, RefType.Favicon)"
                   [small]="true"
                 ></app-image-container>
@@ -81,9 +81,9 @@
         <app-theme-intern [theme]="theme" [dateFormat]="dateFormat" [workspaceList]="workspaceList"></app-theme-intern>
       </p-tabPanel>
 
-      <p-tabPanel id="theme_detail_panel_variables" [header]="'THEME.TABS.VARIABLES' | translate">
+      <p-tabPanel id="th_detail_panel_variables" [header]="'THEME.TABS.VARIABLES' | translate">
         <p-panel [showHeader]="false" styleClass="pt-1 pb-0 mx-2 my-1 surface-50">
-          <pre id="theme_detail_panel_variables_content" class="my-2">
+          <pre id="th_detail_panel_variables_content" class="my-2">
             {{ theme?.properties | json }}
           </pre>
         </p-panel>
@@ -108,27 +108,26 @@
     </div>
     <ng-template pTemplate="footer">
       <div class="flex flex-wrap column-gap-2 row-gap-1 justify-content-end">
-        <button
-          pButton
-          autofocus
-          type="button"
-          class="m-0"
+        <p-button
           icon="pi pi-times"
-          iconPos="left"
+          styleClass="m-0"
+          id="th_delete_action_no"
+          (onClick)="themeDeleteVisible = false"
           [label]="'ACTIONS.CONFIRMATION.NO' | translate"
-          [title]="'ACTIONS.CONFIRMATION.NO.TOOLTIP' | translate"
-          (click)="themeDeleteVisible = false"
-        ></button>
-        <button
-          pButton
-          type="button"
-          class="m-0"
+          [pTooltip]="'ACTIONS.CONFIRMATION.NO.TOOLTIP' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
+        ></p-button>
+        <p-button
           icon="pi pi-check"
-          iconPos="left"
+          styleClass="m-0"
+          id="th_delete_action_yes"
+          (onClick)="confirmThemeDeletion()"
           [label]="'ACTIONS.CONFIRMATION.YES' | translate"
-          [title]="'ACTIONS.CONFIRMATION.YES.TOOLTIP' | translate"
-          (click)="confirmThemeDeletion()"
-        ></button>
+          [pTooltip]="'ACTIONS.CONFIRMATION.YES.TOOLTIP' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
+        ></p-button>
       </div>
     </ng-template>
   </p-dialog>

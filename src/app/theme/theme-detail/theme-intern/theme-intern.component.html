@@ -4,7 +4,7 @@
       <p-checkbox
         type="text"
         [readonly]="true"
-        inputId="theme_detail_item_operator"
+        inputId="th_detail_item_operator"
         [(ngModel)]="operator"
         [binary]="true"
         [styleClass]="'cursor-auto shadow-none'"
@@ -22,13 +22,13 @@
           type="text"
           readonly
           class="w-full"
-          id="theme_detail_item_name"
+          id="th_detail_item_name"
           [value]="theme?.name"
           [pTooltip]="'THEME.TOOLTIPS.NAME' | translate"
           tooltipPosition="top"
           tooltipEvent="hover"
         />
-        <label for="theme_detail_item_name">{{ 'THEME.NAME' | translate }}</label>
+        <label for="th_detail_item_name">{{ 'THEME.NAME' | translate }}</label>
       </span>
     </div>
 
@@ -39,14 +39,14 @@
             pInputText
             type="text"
             readonly
-            id="theme_detail_item_creationDate"
+            id="th_detail_item_creationDate"
             class="w-full pt-3 pb-2"
             [value]="theme?.creationDate | date: dateFormat"
             [pTooltip]="'INTERNAL.TOOLTIPS.CREATION_DATE' | translate"
             tooltipPosition="top"
             tooltipEvent="hover"
           />
-          <label for="theme_detail_item_creationDate">{{ 'INTERNAL.CREATION_DATE' | translate }}</label>
+          <label for="th_detail_item_creationDate">{{ 'INTERNAL.CREATION_DATE' | translate }}</label>
         </span>
       </div>
 
@@ -56,14 +56,14 @@
             pInputText
             type="text"
             readonly
-            id="theme_detail_item_creationUser"
+            id="th_detail_item_creationUser"
             class="w-full pt-3 pb-2"
             [value]="theme?.creationUser"
             [pTooltip]="'INTERNAL.TOOLTIPS.CREATION_USER' | translate"
             tooltipPosition="top"
             tooltipEvent="hover"
           />
-          <label for="theme_detail_item_creationUser">{{ 'INTERNAL.CREATION_USER' | translate }}</label>
+          <label for="th_detail_item_creationUser">{{ 'INTERNAL.CREATION_USER' | translate }}</label>
         </span>
       </div>
     </div>
@@ -75,14 +75,14 @@
             pInputText
             type="text"
             readonly
-            id="theme_detail_item_modificationDate"
+            id="th_detail_item_modificationDate"
             class="w-full pt-3 pb-2"
             [value]="theme?.modificationDate | date: dateFormat"
             [pTooltip]="'INTERNAL.TOOLTIPS.MODIFICATION_DATE' | translate"
             tooltipPosition="top"
             tooltipEvent="hover"
           />
-          <label for="theme_detail_item_modificationDate">{{ 'INTERNAL.MODIFICATION_DATE' | translate }}</label>
+          <label for="th_detail_item_modificationDate">{{ 'INTERNAL.MODIFICATION_DATE' | translate }}</label>
         </span>
       </div>
 
@@ -92,14 +92,14 @@
             pInputText
             type="text"
             readonly
-            id="theme_detail_item_modificationUser"
+            id="th_detail_item_modificationUser"
             class="w-full pt-3 pb-2"
             [value]="theme?.modificationUser"
             [pTooltip]="'INTERNAL.TOOLTIPS.MODIFICATION_USER' | translate"
             tooltipPosition="top"
             tooltipEvent="hover"
           />
-          <label for="theme_detail_item_modificationUser">{{ 'INTERNAL.MODIFICATION_USER' | translate }}</label>
+          <label for="th_detail_item_modificationUser">{{ 'INTERNAL.MODIFICATION_USER' | translate }}</label>
         </span>
       </div>
     </div>
@@ -113,13 +113,13 @@
           class="w-full"
           autoresize="true"
           rows="3"
-          id="theme_detail_intern_item_workspaces"
+          id="th_detail_intern_item_workspaces"
           [pTooltip]="'THEME.TOOLTIPS.WORKSPACES' | translate"
           tooltipPosition="top"
           tooltipEvent="hover"
         >
         </textarea>
-        <label for="theme_detail_intern_item_workspaces">{{ 'THEME.WORKSPACES' | translate }}</label>
+        <label for="th_detail_intern_item_workspaces">{{ 'THEME.WORKSPACES' | translate }}</label>
       </span>
     </div>
   </div>

@@ -1,0 +1,567 @@
+/* **********************************************
+ *  FORM - Control Improvements
+ * **********************************************/
+
+/* displaying text like an input field with floating label */
+@mixin float-label-textbox {
+  :host {
+    .p-float-label {
+      display: block;
+      position: relative;
+      .ocx-float-label-textbox {
+        font-family: var(--font-family);
+        font-size: var(--input-text-font-size);
+        color: var(--emphasis-high);
+        background: var(--input-bg);
+        padding: var(--input-padding);
+        border: var(--input-border);
+        transition: var(--form-element-transition);
+        appearance: none;
+        border-radius: var(--border-radius);
+      }
+      .ocx-float-label {
+        position: absolute;
+        left: 0.75rem;
+        top: -0.5rem !important;
+        padding: 2px 4px;
+        margin-left: -4px;
+        margin-top: 0;
+        line-height: 1;
+        font-size: 12px;
+        pointer-events: none;
+        color: var(--emphasis-medium);
+        background-color: var(--input-bg);
+        transition-property: all;
+        transition-timing-function: ease;
+        transition-duration: var(--transition-duration);
+      }
+    }
+  }
+}
+
+@mixin displaying-text-responsive {
+  :host ::ng-deep {
+    .text-responsive {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+/* disable preset of opacity in form: not readable */
+@mixin readable-disabled-form-controls {
+  :host ::ng-deep {
+    .p-inputtext.p-component:disabled,
+    .p-dropdown.p-component.p-disabled,
+    .p-checkbox-box.p-disabled,
+    .p-checkbox-label.p-disabled {
+      opacity: unset;
+    }
+  }
+}
+
+@mixin compact-dropdown-list-items {
+  :host ::ng-deep {
+    .p-dropdown-panel .p-dropdown-items .p-dropdown-item {
+      padding: 0.4rem 1rem !important;
+    }
+  }
+}
+
+@mixin invisible {
+  :host ::ng-deep {
+    .invisible {
+      visibility: hidden;
+    }
+  }
+}
+
+/* highlight */
+@mixin danger-action {
+  :host ::ng-deep {
+    .danger-action-text {
+      color: var(--danger-button-bg);
+    }
+    .danger-action-bg {
+      color: white;
+      background-color: var(--danger-button-bg);
+    }
+  }
+}
+
+@mixin prepare-inputgroup {
+  :host ::ng-deep {
+    .inputgroup-dropdown-with-link {
+      border-right: none;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+    .input-field-correction .p-inputtext {
+      padding-top: 1rem !important;
+      padding-bottom: 0.5rem !important;
+    }
+    .pseudo-button:hover {
+      background: var(--button-hover-bg) !important;
+      cursor: pointer;
+      * {
+        background: var(--button-hover-bg) !important;
+      }
+    }
+  }
+}
+
+/* **********************************************
+ *  Card Badges
+ * **********************************************/
+@mixin card-badges {
+  :host ::ng-deep {
+    /* badge basics: position */
+    .card-badge-right,
+    .card-badge-left {
+      display: inline-block;
+      position: absolute;
+      padding: 4px !important;
+      &.badge-1 {
+        top: 3px;
+      }
+      &.badge-2 {
+        top: 35px;
+      }
+    }
+    .card-badge-right {
+      right: 1px;
+    }
+    .card-badge-left {
+      left: 1px;
+    }
+    /* correct colors on clickable badges */
+    .card-primary-color {
+      background-color: var(--primary-color);
+      color: var(--primary-color-text);
+      &:hover {
+        color: inherit;
+        * {
+          color: inherit;
+          background-color: inherit;
+        }
+      }
+    }
+    /* clickable icon-only buttons */
+    .button-icon-only {
+      border-radius: var(--border-radius);
+      &:hover {
+        color: var(--primary-color-text);
+        background: var(--button-hover-bg);
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+/* **********************************************
+ *  PrimeNG - Layout Corrections
+ * **********************************************/
+@mixin input-clear-icon {
+  .p-input-icon-right > a:last-of-type {
+    right: 0.75rem;
+    color: var(--emphasis-medium);
+  }
+  .p-input-icon-left > a,
+  .p-input-icon-right > a {
+    position: absolute;
+    top: 50%;
+    margin-top: -0.5rem;
+  }
+}
+
+@mixin correct-autocomplete {
+  :host ::ng-deep {
+    .p-autocomplete-panel .p-autocomplete-items .p-autocomplete-item {
+      padding-top: 0.4rem;
+      padding-bottom: 0.4rem;
+      &:nth-child(odd) {
+        background-color: #f8f9fa;
+      }
+    }
+    .p-autocomplete-clear-icon {
+      /* fix for bug in PrimeNG */
+      right: 3.5rem;
+    }
+    .p-autocomplete .p-autocomplete-loader {
+      /* fix for bug in PrimeNG */
+      display: none;
+    }
+    .p-autocomplete-input.p-inputtext.p-autocomplete-dd-input {
+      border-bottom-right-radius: unset;
+      border-top-right-radius: unset;
+    }
+    .p-autocomplete-dropdown.p-button-icon-only.p-button {
+      border-bottom-left-radius: unset;
+      border-top-left-radius: unset;
+    }
+  }
+}
+
+/* DATA VIEW */
+@mixin correct-dataview-header {
+  :host ::ng-deep {
+    .p-dataview .p-dataview-header {
+      border-top-left-radius: 0.25rem; // value taken from .content-wrap
+      border-top-right-radius: 0.25rem;
+    }
+  }
+}
+
+@mixin correct-data-view-header-for-tabpanel {
+  :host ::ng-deep {
+    .p-dataview .p-dataview-header,
+    .p-datatable .p-datatable-header {
+      padding: 0.2rem 0.2rem 0.9rem 0.2rem;
+    }
+  }
+}
+
+@mixin correct-data-view-control {
+  :host ::ng-deep {
+    .data-view-control,
+    .data-view-control * {
+      color: var(--emphasis-medium);
+    }
+    /* correction for data-view-control component */
+    .data-view-control-border {
+      border: var(--toggle-button-border);
+      &.p-dropdown {
+        .p-inputtext {
+          color: var(--emphasis-medium);
+          opacity: 0.9;
+        }
+        &:last-of-type {
+          border-top-left-radius: var(--border-radius);
+          border-bottom-left-radius: var(--border-radius);
+        }
+      }
+      &.p-inputtext:hover,
+      &.p-dropdown:hover {
+        border-color: rgb(0 0 0 / 30%) !important;
+      }
+    }
+  }
+}
+
+/* File Upload */
+@mixin correct-file-upload {
+  :host ::ng-deep {
+    .p-fileupload {
+      .p-fileupload-buttonbar,
+      .p-fileupload-content {
+        background-color: var(--surface-100) !important;
+      }
+      .p-fileupload-content {
+        padding: 0.5rem;
+        .p-fileupload-row {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-between;
+          gap: 0;
+          > div {
+            width: unset;
+            &.p-fileupload-filename {
+              max-width: 25rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@mixin correct-select-button {
+  :host ::ng-deep {
+    .p-selectbutton.p-buttonset {
+      .p-button:first-of-type:not(:only-of-type) {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+      .p-button:not(:last-child),
+      .p-button:not(:last-child):hover {
+        border-right: 0 none;
+      }
+      .p-button:last-of-type:not(:only-of-type) {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+      .p-button:not(:first-of-type):not(:last-of-type) {
+        border-radius: 0;
+      }
+    }
+  }
+}
+
+/* **********************************************
+ *  OneCX Widget - Layout Corrections
+ * **********************************************/
+@mixin correct-search-criteria {
+  :host ::ng-deep {
+    .search-criteria-container > div {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: center;
+      row-gap: 1rem;
+      column-gap: 3rem;
+      .search-criteria-buttons {
+        flex-wrap: wrap;
+        align-content: center;
+        margin-top: unset;
+      }
+    }
+  }
+}
+
+@mixin search-criteria-select-button-slim {
+  :host ::ng-deep {
+    .slim-selectbutton {
+      display: flex;
+      flex-wrap: wrap;
+      flex-direction: column;
+      row-gap: 0.1rem;
+
+      .p-selectbutton .p-button {
+        text-align: center;
+        display: inline-block;
+        color: var(--emphasis-medium);
+        font-weight: var(--font-weight);
+        padding: 0.3rem 0.8rem;
+        border: var(--input-border);
+      }
+      .p-selectbutton-subtitle {
+        font-size: 0.8rem;
+        padding-left: 0.25rem;
+      }
+    }
+  }
+}
+@mixin search-criteria-select-button-filter {
+  :host ::ng-deep {
+    .filter-selectbutton {
+      .p-selectbutton .p-button {
+        opacity: 0.9 !important;
+        border: var(--toggle-button-border);
+        &.p-highlight {
+          background: var(--toggle-button-active-bg);
+          border-color: var(--toggle-button-active-border-color);
+        }
+        &:not(.p-disabled):not(.p-highlight):hover {
+          color: var(--text-color);
+          border-color: var(--toggle-button-hover-border-color);
+          background-color: var(--toggle-button-hover-bg);
+        }
+      }
+    }
+  }
+}
+@mixin search-criteria-select-button {
+  :host ::ng-deep {
+    .p-selectbutton-title {
+      width: 2rem;
+      text-align: right;
+    }
+    .search-criteria-selectbutton {
+      .p-selectbutton .p-button {
+        &.p-highlight {
+          color: var(--primary-text-color);
+          border-color: var(--toggle-button-hover-border-color);
+          background-color: var(--primary-color);
+        }
+        &:not(.p-disabled):not(.p-highlight):hover {
+          color: var(--primary-text-color);
+          border-color: var(--toggle-button-hover-border-color);
+          background-color: var(--button-hover-bg);
+        }
+      }
+    }
+  }
+}
+
+/* ZEBRA rows */
+@mixin dataview-list-zebra-rows {
+  :host ::ng-deep {
+    .p-dataview-list .p-dataview-content .p-grid > div {
+      &:nth-child(odd) {
+        background-color: #f8f9fa;
+      }
+    }
+  }
+}
+@mixin dataview-list-flex-zebra-rows {
+  :host ::ng-deep {
+    .p-dataview-list .p-dataview-content > div {
+      &:nth-child(odd) {
+        background-color: #f8f9fa;
+      }
+    }
+  }
+}
+@mixin dropdown-zebra-rows {
+  :host ::ng-deep {
+    .p-dropdown-panel .p-dropdown-items *:nth-child(odd) .p-dropdown-item {
+      background-color: #f8f9fa;
+    }
+  }
+}
+@mixin listbox-zebra-rows {
+  :host ::ng-deep {
+    .p-listbox:not(.p-disabled) .p-listbox-item:not(.p-highlight):not(.p-disabled) {
+      &:nth-child(odd) {
+        background-color: #f8f9fa;
+      }
+    }
+  }
+}
+@mixin picklist-zebra-rows {
+  :host ::ng-deep {
+    .p-picklist-list li {
+      &:nth-child(odd) {
+        background-color: #f8f9fa;
+      }
+    }
+  }
+}
+@mixin table-zebra-rows {
+  :host ::ng-deep {
+    .p-datatable .p-datatable-tbody > tr:nth-child(odd) > td {
+      background-color: #f8f9fa;
+    }
+  }
+}
+
+/* PICKLIST */
+@mixin picklist-hide-double-buttons {
+  :host ::ng-deep {
+    .p-picklist .p-picklist-buttons {
+      button[icon='pi pi-angle-double-left'],
+      button[icon='pi pi-angle-double-right'],
+      button:nth-child(2),
+      button:nth-child(4) {
+        display: none !important;
+      }
+    }
+  }
+}
+
+/* **********************************************
+ *  DIALOG
+ * **********************************************/
+@mixin dialog-modal-dialog-content {
+  :host ::ng-deep {
+    .p-dialog .p-dialog-content {
+      border-radius: unset !important;
+    }
+  }
+}
+@mixin dialog-non-full-size-modal {
+  :host ::ng-deep {
+    @media (max-width: 991px) {
+      .p-dialog.p-dialog {
+        max-height: unset !important;
+        height: unset !important;
+      }
+    }
+    @media (max-width: 576px) {
+      .p-dialog.p-dialog {
+        max-height: inherit !important;
+        height: inherit !important;
+      }
+    }
+  }
+}
+@mixin dialog-footer-buttons {
+  :host ::ng-deep {
+    .p-dialog .p-dialog-footer button {
+      margin: 0;
+    }
+  }
+}
+
+@mixin tabview-reduce-padding {
+  :host ::ng-deep {
+    .p-tabview .p-tabview-panels {
+      padding: 1.4rem 0 0 0;
+    }
+  }
+}
+/* **********************************************
+ *  TABLE
+ * **********************************************/
+@mixin table-inline-buttons {
+  :host ::ng-deep {
+    /* reduce the size of buttons used inside a table row */
+    th button.p-button,
+    td button.p-button {
+      &.p-button-icon-only {
+        padding: 0.5rem;
+        width: unset !important;
+      }
+      &.p-button-rounded {
+        height: unset !important;
+      }
+      &:disabled {
+        opacity: 0.38 !important;
+      }
+    }
+  }
+}
+@mixin table-vertical-lines {
+  :host ::ng-deep {
+    .p-datatable .p-datatable-tbody > tr > td {
+      &:not(:first-of-type) {
+        border-left-width: 1px;
+      }
+    }
+  }
+}
+@mixin table-responsive-columns {
+  :host ::ng-deep {
+    /* responsive table result view */
+    @media screen and (min-width: 576px) {
+      .sm\:table-cell {
+        display: table-cell !important;
+      }
+    }
+    @media screen and (min-width: 768px) {
+      .md\:table-cell {
+        display: table-cell !important;
+      }
+    }
+    @media screen and (min-width: 992px) {
+      .lg\:table-cell {
+        display: table-cell !important;
+      }
+    }
+    @media screen and (min-width: 1200px) {
+      .xl\:table-cell {
+        display: table-cell !important;
+      }
+    }
+  }
+}
+
+@mixin media-queries {
+  :host ::ng-deep {
+    @media screen and (min-width: 768px) {
+      .md\:h-2-5rem {
+        height: 2.5rem !important;
+      }
+      .md\:h-3-5rem {
+        height: 3.5rem !important;
+      }
+    }
+    @media screen and (min-width: 576px) {
+      .card-badge-right {
+        &.sm\:badge-2-2 {
+          top: 33px !important;
+        }
+      }
+    }
+  }
+}

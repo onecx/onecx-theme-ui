@@ -55,6 +55,12 @@
       "DETAILS.TOOLTIP": "Display details",
       "NEW.TOOLTIP": "Create new entry"
     },
+    "SEARCH": {
+      "ERROR": "Data not available",
+      "NO_DATA": "No Data",
+      "RELOAD": "Reload data",
+      "RELOAD.OK": "Data successfully reloaded"
+    },
     "CANCEL": "Cancel",
     "CHOOSE": "Choose",
     "SAVE": "Save",

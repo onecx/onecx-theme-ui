@@ -1,3 +1,4 @@
-@import 'src/_mixins.scss';
+@import 'src/app/_th-mixins.scss';
 
 @include correct-file-upload;
+@include dialog-footer-buttons;
