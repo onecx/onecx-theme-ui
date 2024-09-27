@@ -25,13 +25,13 @@
     [cancelLabel]="'ACTIONS.CANCEL' | translate"
     [chooseLabel]="'ACTIONS.CHOOSE' | translate"
   ></p-fileUpload>
-  <div *ngIf="themeSnapshot" class="flex flex-wrap justify-content-start align-items-center gap-2 mt-4">
-    <span class="p-float-label" controlErrorAnchor>
+  <div *ngIf="themeSnapshot" class="flex flex-wrap justify-content-start align-items-center gap-3 mt-4">
+    <span class="p-float-label w-full md:w-15rem" controlErrorAnchor>
       <input
         pInputText
         type="text"
         id="th_import_theme_name"
-        class="w-full pt-3 pb-2"
+        class="w-full pt-3 pb-2 text-responsive"
         [(ngModel)]="themeName"
         (ngModelChange)="checkThemeExistence()"
         (keyup)="checkThemeExistence()"
@@ -41,12 +41,12 @@
       />
       <label class="ocx-required-label" for="th_import_theme_name">{{ 'THEME.THEME_NAME' | translate }}</label>
     </span>
-    <span class="p-float-label" controlErrorAnchor>
+    <span class="p-float-label w-full md:w-15rem" controlErrorAnchor>
       <input
         pInputText
         type="text"
         id="th_import_theme_display_name"
-        class="w-full pt-3 pb-2"
+        class="w-full pt-3 pb-2 text-responsive"
         [(ngModel)]="displayName"
         (ngModelChange)="checkThemeExistence()"
         (keyup)="checkThemeExistence()"
@@ -58,7 +58,7 @@
         {{ 'THEME.DISPLAY_NAME' | translate }}
       </label>
     </span>
-    <app-theme-color-box *ngIf="properties" [properties]="properties" />
+    <app-theme-color-box *ngIf="properties" [properties]="properties" styleClass="h-inputtext w-15rem" />
     <div *ngIf="!properties">{{ 'THEME.NO_PROPERTIES' | translate }}</div>
   </div>
   <p-message
