@@ -94,6 +94,7 @@
   },
   "GENERAL": {
     "COPY_OF": "Kopie von ",
+    "OF": "von",
     "TOOLTIP": {
       "VIEW_MODE_GRID": "Kachelansicht",
       "VIEW_MODE_LIST": "Listenansicht",

@@ -27,11 +27,11 @@ export class ThemeSearchComponent implements OnInit {
   @ViewChild(DataView) dv: DataView | undefined
 
   constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private themeApi: ThemesAPIService,
-    private translate: TranslateService,
-    private imageApi: ImagesInternalAPIService
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly themeApi: ThemesAPIService,
+    private readonly translate: TranslateService,
+    private readonly imageApi: ImagesInternalAPIService
   ) {}
 
   ngOnInit(): void {

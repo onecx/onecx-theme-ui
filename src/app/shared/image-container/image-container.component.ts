@@ -30,7 +30,7 @@ export class ImageContainerComponent implements OnChanges {
 
   prepareUrlPath = prepareUrlPath
 
-  constructor(private appState: AppStateService) {
+  constructor(private readonly appState: AppStateService) {
     appState.currentMfe$
       .pipe(
         map((mfe) => {

@@ -94,6 +94,7 @@
   },
   "GENERAL": {
     "COPY_OF": "Copy of ",
+    "OF": "of",
     "TOOLTIP": {
       "VIEW_MODE_GRID": "Tile view",
       "VIEW_MODE_LIST": "List view",

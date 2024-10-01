@@ -34,13 +34,13 @@ export class ThemeDetailComponent implements OnInit {
   public headerImageUrl?: string
 
   constructor(
-    private user: UserService,
-    private router: Router,
-    private route: ActivatedRoute,
-    private themeApi: ThemesAPIService,
-    private msgService: PortalMessageService,
-    private translate: TranslateService,
-    private imageApi: ImagesInternalAPIService
+    private readonly user: UserService,
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly themeApi: ThemesAPIService,
+    private readonly msgService: PortalMessageService,
+    private readonly translate: TranslateService,
+    private readonly imageApi: ImagesInternalAPIService
   ) {
     this.themeName = this.route.snapshot.paramMap.get('name') || ''
     this.dateFormat = this.user.lang$.getValue() === 'de' ? 'dd.MM.yyyy HH:mm:ss' : 'medium'
