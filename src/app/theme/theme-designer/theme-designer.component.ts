@@ -5,7 +5,7 @@ import { Observable, combineLatest, debounceTime, first, map, switchMap } from '
 import { TranslateService } from '@ngx-translate/core'
 import { ConfirmationService, SelectItem } from 'primeng/api'
 
-import { Action, AppStateService, PortalMessageService, ThemeService } from '@onecx/portal-integration-angular'
+import { Action, PortalMessageService, ThemeService } from '@onecx/portal-integration-angular'
 import { bffImageUrl, dropDownSortItemsByLabel, dropDownGetLabelByValue } from 'src/app/shared/utils'
 import {
   GetThemeResponse,
@@ -65,16 +65,15 @@ export class ThemeDesignerComponent implements OnInit {
   }[]
 
   constructor(
-    private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private router: Router,
-    private appStateService: AppStateService,
-    private themeApi: ThemesAPIService,
-    private themeService: ThemeService,
-    private imageApi: ImagesInternalAPIService,
-    private translate: TranslateService,
-    private confirmation: ConfirmationService,
-    private msgService: PortalMessageService
+    private readonly fb: FormBuilder,
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly themeApi: ThemesAPIService,
+    private readonly themeService: ThemeService,
+    private readonly imageApi: ImagesInternalAPIService,
+    private readonly translate: TranslateService,
+    private readonly confirmation: ConfirmationService,
+    private readonly msgService: PortalMessageService
   ) {
     this.mode = route.snapshot.paramMap.has('name') ? 'EDIT' : 'NEW'
     this.themeName = route.snapshot.paramMap.get('name')

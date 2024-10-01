@@ -29,11 +29,11 @@ export class ThemeImportComponent implements OnInit {
   public properties: any = null
 
   constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private themeApi: ThemesAPIService,
-    public translate: TranslateService,
-    private msgService: PortalMessageService
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly themeApi: ThemesAPIService,
+    public readonly translate: TranslateService,
+    private readonly msgService: PortalMessageService
   ) {}
 
   ngOnInit(): void {
