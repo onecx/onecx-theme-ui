@@ -149,8 +149,13 @@
     "NO_PROPERTIES": "No properties specified",
     "TABS": {
       "INTERN": "Internal",
+      "INTERN_TOOLTIP": "Internal information for the Theme",
       "PROPERTIES": "Properties",
-      "VARIABLES": "Theme Variables"
+      "PROPERTIES_TOOLTIP": "Properties of the Theme",
+      "USE": "Use",
+      "USE_TOOLTIP": "List of Workspaces using the Theme",
+      "VARIABLES": "Theme Variables",
+      "VARIABLES_TOOLTIP": "JSON representation of Theme Variables"
     },
     "IMPORT": {
       "HEADER": "Import Theme",

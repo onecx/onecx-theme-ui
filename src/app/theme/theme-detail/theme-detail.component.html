@@ -81,6 +81,10 @@
         <app-theme-intern [theme]="theme" [dateFormat]="dateFormat" [workspaceList]="workspaceList"></app-theme-intern>
       </p-tabPanel>
 
+      <p-tabPanel [header]="'THEME.TABS.USE' | translate">
+        <app-theme-intern [theme]="theme"></app-theme-intern>
+      </p-tabPanel>
+
       <p-tabPanel id="th_detail_panel_variables" [header]="'THEME.TABS.VARIABLES' | translate">
         <p-panel [showHeader]="false" styleClass="pt-1 pb-0 mx-2 my-1 surface-50">
           <pre id="th_detail_panel_variables_content" class="my-2">

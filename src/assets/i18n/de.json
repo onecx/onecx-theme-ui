@@ -149,8 +149,13 @@
     "NO_PROPERTIES": "Keine Farbwerte enthalten",
     "TABS": {
       "INTERN": "Intern",
-      "PROPERTIES": "Eigenschaften",
-      "VARIABLES": "Theme Variablen"
+      "INTERN_TOOLTIP": "Interne Informationen zum Theme",
+      "PROPERTIES": "Eigenschaften des Themes",
+      "PROPERTIES_TOOLTIP": "Eigenschaften",
+      "USE": "Verwendung",
+      "USE_TOOLTIP": "Liste der Workspaces, die das Theme verwenden",
+      "VARIABLES": "Theme-Variablen",
+      "VARIABLES_TOOLTIP": "JSON-Darstellung der Theme-Variablen"
     },
     "IMPORT": {
       "HEADER": "Import Theme",
