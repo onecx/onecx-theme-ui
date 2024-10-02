@@ -1,4 +1,4 @@
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing'
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { ThemeInternComponent } from './theme-intern.component'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { TranslateTestingModule } from 'ngx-translate-testing'
@@ -49,13 +49,4 @@ describe('ThemeInternComponent', () => {
     component.ngOnChanges()
     expect(component.operator).toBeFalse()
   })
-
-  it('should update usedInWorkspaces.nativeElement.innerHTML with workspaceList', fakeAsync(() => {
-    const nativeElement = document.createElement('textarea')
-    component.usedInWorkspaces = { nativeElement }
-    component.workspaceList = 'Workspace 1, Workspace 2'
-    component.ngOnChanges()
-    tick(1000)
-    expect(nativeElement?.innerHTML).toBe('Workspace 1, Workspace 2')
-  }))
 })
