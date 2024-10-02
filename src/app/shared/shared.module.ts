@@ -28,6 +28,7 @@ import { TableModule } from 'primeng/table'
 import { ToastModule } from 'primeng/toast'
 
 import { PortalCoreModule } from '@onecx/portal-integration-angular'
+import { AngularRemoteComponentsModule } from '@onecx/angular-remote-components'
 
 import { LabelResolver } from './label.resolver'
 import { ImageContainerComponent } from './image-container/image-container.component'
@@ -38,6 +39,7 @@ import { ThemeColorBoxComponent } from './theme-color-box/theme-color-box.compon
   imports: [
     PortalCoreModule.forMicroFrontend(),
     AutoCompleteModule,
+    AngularRemoteComponentsModule,
     CheckboxModule,
     ColorSketchModule,
     CommonModule,
@@ -65,6 +67,7 @@ import { ThemeColorBoxComponent } from './theme-color-box/theme-color-box.compon
   ],
   exports: [
     AutoCompleteModule,
+    AngularRemoteComponentsModule,
     CheckboxModule,
     CommonModule,
     ColorSketchModule,

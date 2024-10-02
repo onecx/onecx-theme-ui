@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
-import { ThemeInternComponent } from './theme-intern.component'
+import { ThemeUseComponent } from './theme-use.component'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 import { NO_ERRORS_SCHEMA } from '@angular/core'
 
-describe('ThemeInternComponent', () => {
-  let component: ThemeInternComponent
-  let fixture: ComponentFixture<ThemeInternComponent>
+describe('ThemeUseComponent', () => {
+  let component: ThemeUseComponent
+  let fixture: ComponentFixture<ThemeUseComponent>
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ThemeInternComponent],
+      declarations: [ThemeUseComponent],
       imports: [
         TranslateModule.forRoot(),
         TranslateTestingModule.withTranslations({
@@ -24,29 +24,12 @@ describe('ThemeInternComponent', () => {
   }))
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ThemeInternComponent)
+    fixture = TestBed.createComponent(ThemeUseComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
   })
 
   it('should create', () => {
     expect(component).toBeTruthy()
-  })
-
-  it('should set operator to false if theme is not provided', () => {
-    component.ngOnChanges()
-    expect(component.operator).toBeFalse()
-  })
-
-  it('should set operator to theme.operator if theme is provided', () => {
-    component.theme = { operator: true }
-    component.ngOnChanges()
-    expect(component.operator).toBeTrue()
-  })
-
-  it('should set operator to false if theme is provided', () => {
-    component.theme = { operator: undefined }
-    component.ngOnChanges()
-    expect(component.operator).toBeFalse()
   })
 })

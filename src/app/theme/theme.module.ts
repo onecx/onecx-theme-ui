@@ -16,6 +16,7 @@ import { ThemeSearchComponent } from './theme-search/theme-search.component'
 import { ThemeImportComponent } from './theme-import/theme-import.component'
 import { ThemeDetailComponent } from './theme-detail/theme-detail.component'
 import { ThemeInternComponent } from './theme-detail/theme-intern/theme-intern.component'
+import { ThemeUseComponent } from './theme-detail/theme-use/theme-use.component'
 import { ThemeDesignerComponent } from './theme-designer/theme-designer.component'
 
 const routes: Routes = [
@@ -58,7 +59,8 @@ const routes: Routes = [
     ThemeDetailComponent,
     ThemeDesignerComponent,
     ThemeImportComponent,
-    ThemeInternComponent
+    ThemeInternComponent,
+    ThemeUseComponent
   ],
   imports: [
     CommonModule,

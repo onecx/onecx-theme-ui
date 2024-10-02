@@ -36,5 +36,11 @@ app:
             VIEW: View mode for theme
             IMPORT: Import theme
             EXPORT: Export theme
+    slot:
+      enabled: true
+      specs:
+        onecx-theme-list-workspaces-using-theme:
+          name: 'onecx-theme-list-workspaces-using-theme'
+          description: 'List of Workspaces using the given Theme'
 
 # PIPE Config

@@ -19,6 +19,7 @@ import { AngularAuthModule } from '@onecx/angular-auth'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { environment } from 'src/environments/environment'
 import { Configuration } from './shared/generated'
+import { SLOT_SERVICE, SlotService } from '@onecx/angular-remote-components'
 
 function apiConfigProvider(configService: ConfigurationService, appStateService: AppStateService) {
   return new PortalApiConfiguration(Configuration, environment.apiPrefix, configService, appStateService)
@@ -58,6 +59,7 @@ const routes: Routes = [
       deps: [Router, AppStateService]
     },
     { provide: Configuration, useFactory: apiConfigProvider, deps: [ConfigurationService, AppStateService] },
+    { provide: SLOT_SERVICE, useExisting: SlotService },
     provideHttpClient(withInterceptorsFromDi())
   ],
   schemas: []

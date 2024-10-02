@@ -17,7 +17,14 @@
 
   <ocx-page-content>
     <p-tabView>
-      <p-tabPanel id="th_detail_panel_props" [header]="'THEME.TABS.PROPERTIES' | translate">
+      <p-tabPanel
+        id="th_detail_panel_props"
+        [header]="'THEME.TABS.PROPERTIES' | translate"
+        [attr.aria-label]="'THEME.TABS.PROPERTIES' | translate"
+        [tooltip]="'THEME.TABS.PROPERTIES_TOOLTIP' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      >
         <div class="grid grid-nogutter m-3">
           <div class="col-12 md:col-10 lg:col-10 xl:col-6 flex flex-column row-gap-4">
             <span class="p-float-label">
@@ -77,11 +84,34 @@
         </div>
       </p-tabPanel>
 
-      <p-tabPanel [header]="'THEME.TABS.INTERN' | translate">
+      <p-tabPanel
+        [header]="'THEME.TABS.INTERN' | translate"
+        [attr.aria-label]="'THEME.TABS.INTERN' | translate"
+        [tooltip]="'THEME.TABS.INTERN_TOOLTIP' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      >
         <app-theme-intern [theme]="theme" [dateFormat]="dateFormat" [workspaceList]="workspaceList"></app-theme-intern>
       </p-tabPanel>
 
-      <p-tabPanel id="th_detail_panel_variables" [header]="'THEME.TABS.VARIABLES' | translate">
+      <p-tabPanel
+        [header]="'THEME.TABS.USE' | translate"
+        [attr.aria-label]="'THEME.TABS.USE' | translate"
+        [tooltip]="'THEME.TABS.USE_TOOLTIP' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      >
+        <app-theme-use [theme]="theme"></app-theme-use>
+      </p-tabPanel>
+
+      <p-tabPanel
+        id="th_detail_panel_variables"
+        [header]="'THEME.TABS.VARIABLES' | translate"
+        [attr.aria-label]="'THEME.TABS.VARIABLES' | translate"
+        [tooltip]="'THEME.TABS.VARIABLES_TOOLTIP' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      >
         <p-panel [showHeader]="false" styleClass="pt-1 pb-0 mx-2 my-1 surface-50">
           <pre id="th_detail_panel_variables_content" class="my-2">
             {{ theme?.properties | json }}
