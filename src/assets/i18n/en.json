@@ -82,8 +82,8 @@
     "CREATION_USER": "Created by",
     "MODIFICATION_DATE": "Changed on",
     "MODIFICATION_USER": "Changed by",
-    "OPERATOR": "Automated created",
-    "OPERATOR_MESSAGE": "This Theme was automated created. All changes will be lost during the next deployment.",
+    "OPERATOR": "Created by automation",
+    "OPERATOR_MESSAGE": "This Theme was created by automation. All changes will be lost during the next deployment.",
     "TOOLTIPS": {
       "CREATION_DATE": "Timestamp of the creation",
       "CREATION_USER": "Name of the user of the creation",

@@ -1,0 +1,8 @@
+<div class="sm:pt-2 pb-2 sm:pb-3 px-3">
+  <ocx-slot
+    *ngIf="isListWorkspacesUsingThemeComponentDefined$ | async"
+    [name]="listWorkspacesUsingThemeSlotName"
+    [inputs]="{ themeName: theme?.name }"
+  >
+  </ocx-slot>
+</div>
