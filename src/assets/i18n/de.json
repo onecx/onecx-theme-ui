@@ -150,8 +150,8 @@
     "TABS": {
       "INTERN": "Intern",
       "INTERN_TOOLTIP": "Interne Informationen zum Theme",
-      "PROPERTIES": "Eigenschaften des Themes",
-      "PROPERTIES_TOOLTIP": "Eigenschaften",
+      "PROPERTIES": "Eigenschaften",
+      "PROPERTIES_TOOLTIP": "Eigenschaften des Themes",
       "USE": "Verwendung",
       "USE_TOOLTIP": "Liste der Workspaces, die das Theme verwenden",
       "VARIABLES": "Theme-Variablen",
