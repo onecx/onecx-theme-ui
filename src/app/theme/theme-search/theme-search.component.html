@@ -75,7 +75,7 @@
                 <div
                   class="hidden md:block"
                   [id]="'th_search_data_list_row_' + i + '_description'"
-                  [pTooltip]="theme.description"
+                  [pTooltip]="theme.description.length < 75 ? '' : theme.description"
                   tooltipPosition="top"
                   tooltipEvent="hover"
                 >

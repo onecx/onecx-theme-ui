@@ -7,16 +7,10 @@
     [figureImage]="headerImageUrl"
     [figureBackground]="!theme?.logoUrl"
   >
-    <p-message
-      *ngIf="theme?.operator"
-      id="theme_designer_operator_message"
-      severity="warn"
-      [text]="'INTERNAL.OPERATOR_MESSAGE' | translate"
-    ></p-message>
   </ocx-page-header>
 
   <ocx-page-content>
-    <p-tabView>
+    <p-tabView (onChange)="onTabChange($event)">
       <p-tabPanel
         id="th_detail_panel_props"
         [header]="'THEME.TABS.PROPERTIES' | translate"
@@ -25,15 +19,22 @@
         tooltipPosition="top"
         tooltipEvent="hover"
       >
-        <div class="grid grid-nogutter m-3">
-          <div class="col-12 md:col-10 lg:col-10 xl:col-6 flex flex-column row-gap-4">
+        <p-message
+          *ngIf="theme?.operator && showOperatorMessage"
+          id="th_detail_operator_message"
+          styleClass="absolute z-1 max-w-11 fadeout animation-duration-1000 animation-delay-3000 animation-iteration-1 animation-fill-forwards"
+          severity="warn"
+          [text]="'INTERNAL.OPERATOR_MESSAGE' | translate"
+        ></p-message>
+        <div class="surface-section mb-1 mt-2 mx-3">
+          <div class="flex flex-wrap flex-column row-gap-4 w-12 md:w-10 lg:w-8 xl:w-6">
             <span class="p-float-label">
               <input
                 pInputText
                 type="text"
                 readonly
                 class="w-full"
-                id="th_detail_item_display_name"
+                id="th_detail_props_item_display_name"
                 [value]="theme?.displayName"
                 [pTooltip]="'THEME.TOOLTIPS.DISPLAY_NAME' | translate"
                 tooltipPosition="top"
@@ -41,7 +42,6 @@
               />
               <label for="th_detail_item_display_name">{{ 'THEME.DISPLAY_NAME' | translate }}</label>
             </span>
-
             <span class="p-float-label">
               <textarea
                 pInputTextarea
@@ -49,7 +49,7 @@
                 class="w-full"
                 autoresize="true"
                 rows="3"
-                id="th_detail_item_description"
+                id="th_detail_props_item_description"
                 [ngModel]="theme?.description"
                 [pTooltip]="'THEME.DESCRIPTION' | translate"
                 tooltipPosition="top"
@@ -64,7 +64,7 @@
                   {{ 'LOGO.LABEL' | translate }}</label
                 >
                 <app-image-container
-                  id="th_detail_item_logo"
+                  id="th_detail_props_item_logo"
                   [imageUrl]="getImageUrl(theme, RefType.Logo)"
                   [small]="true"
                 ></app-image-container>
@@ -74,7 +74,7 @@
                   {{ 'FAVICON.LABEL' | translate }}</label
                 >
                 <app-image-container
-                  id="th_detail_item_favicon"
+                  id="th_detail_props_item_favicon"
                   [imageUrl]="getImageUrl(theme, RefType.Favicon)"
                   [small]="true"
                 ></app-image-container>
@@ -91,7 +91,7 @@
         tooltipPosition="top"
         tooltipEvent="hover"
       >
-        <app-theme-intern [theme]="theme" [dateFormat]="dateFormat" [workspaceList]="workspaceList"></app-theme-intern>
+        <app-theme-intern [theme]="theme" [dateFormat]="dateFormat"></app-theme-intern>
       </p-tabPanel>
 
       <p-tabPanel
@@ -125,14 +125,15 @@
     [(visible)]="themeDeleteVisible"
     [header]="('ACTIONS.DELETE.TOOLTIP' | translate).replace('{{TYPE}}', 'Theme')"
     [modal]="true"
-    [resizable]="false"
+    [resizable]="true"
+    [dragable]="true"
     [dismissableMask]="true"
     [style]="{ 'max-width': '425px' }"
   >
     <div class="flex column-gap-3 row-gap-1 justify-content-start align-items-center">
       <div class="pi pi-question-circle text-3xl danger-action-text"></div>
       <div>
-        <div>{{ this.themeDeleteMessage }}</div>
+        <div id="th_delete_message_text" class="font-bold">{{ this.themeDeleteMessage }}</div>
         <div class="mt-2">{{ 'ACTIONS.DELETE.MESSAGE_INFO' | translate }}</div>
       </div>
     </div>
@@ -152,7 +153,7 @@
           icon="pi pi-check"
           styleClass="m-0"
           id="th_delete_action_yes"
-          (onClick)="confirmThemeDeletion()"
+          (onClick)="onConfirmThemeDeletion()"
           [label]="'ACTIONS.CONFIRMATION.YES' | translate"
           [pTooltip]="'ACTIONS.CONFIRMATION.YES.TOOLTIP' | translate"
           tooltipPosition="top"

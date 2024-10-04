@@ -1,13 +1,13 @@
-/* limit deletion dialog */
-:host ::ng-deep {
-  @media (max-width: 991px) {
-    .p-dialog.p-dialog {
-      max-height: unset !important;
-      height: unset !important;
-    }
-  }
+@import 'src/app/_th-mixins.scss';
 
-  .danger-action-text {
-    color: var(--danger-button-bg);
+@include dialog-non-full-size-modal;
+@include danger-action;
+
+:host ::ng-deep {
+  .max-w-11 {
+    max-width: 90%;
+  }
+  .animation-delay-3000 {
+    animation-delay: 3000ms !important;
   }
 }

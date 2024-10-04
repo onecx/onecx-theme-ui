@@ -7,12 +7,13 @@ import { Theme } from 'src/app/shared/generated'
 
 @Component({
   selector: 'app-theme-intern',
-  templateUrl: './theme-intern.component.html'
+  templateUrl: './theme-intern.component.html',
+  styleUrls: ['./theme-intern.component.scss']
 })
 export class ThemeInternComponent implements OnChanges {
   @Input() theme: Theme | undefined
   @Input() dateFormat = 'medium'
-  @Input() workspaceList: string | undefined
+
   public isListWorkspacesUsingThemeComponentDefined$: Observable<boolean> | undefined
   public listWorkspacesUsingThemeSlotName = 'onecx-theme-list-workspaces-using-theme'
 
