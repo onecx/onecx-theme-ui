@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core'
+import { Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateService } from '@ngx-translate/core'
 import { Observable, finalize, map } from 'rxjs'
@@ -21,13 +22,13 @@ import {
   styleUrls: ['./theme-detail.component.scss']
 })
 export class ThemeDetailComponent implements OnInit {
-  theme: Theme | undefined
-  workspaceList: string | undefined
-  themeName!: string
-  themeDeleteVisible = false
-  themeDeleteMessage = ''
-  loading = true
-  RefType = RefType
+  public theme: Theme | undefined
+  public themeName!: string
+  public themeDeleteVisible = false
+  public themeDeleteMessage = ''
+  public showOperatorMessage = true // display initially only
+  public loading = true
+  public RefType = RefType
   public dateFormat = 'medium'
   // page header
   public actions$: Observable<Action[]> | undefined
@@ -37,6 +38,7 @@ export class ThemeDetailComponent implements OnInit {
     private readonly user: UserService,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
+    private readonly location: Location,
     private readonly themeApi: ThemesAPIService,
     private readonly msgService: PortalMessageService,
     private readonly translate: TranslateService,
@@ -57,7 +59,6 @@ export class ThemeDetailComponent implements OnInit {
       .subscribe({
         next: (data) => {
           this.theme = data.resource
-          this.workspaceList = this.prepareWorkspaceList(data.workspaces)
           this.preparePage()
           this.headerImageUrl = this.getImageUrl(this.theme, RefType.Logo)
         },
@@ -66,7 +67,7 @@ export class ThemeDetailComponent implements OnInit {
             summaryKey: 'THEME.LOAD_ERROR',
             detailKey: err.error.indexOf('was not found') > 1 ? 'THEME.NOT_FOUND' : err.error
           })
-          this.close()
+          this.onClose()
         }
       })
   }
@@ -78,8 +79,8 @@ export class ThemeDetailComponent implements OnInit {
   private prepareActionButtons(): void {
     this.actions$ = this.translate
       .get([
-        'ACTIONS.NAVIGATION.CLOSE',
-        'ACTIONS.NAVIGATION.CLOSE.TOOLTIP',
+        'ACTIONS.NAVIGATION.BACK',
+        'ACTIONS.NAVIGATION.BACK.TOOLTIP',
         'ACTIONS.EDIT.LABEL',
         'ACTIONS.EDIT.TOOLTIP',
         'ACTIONS.EXPORT.LABEL',
@@ -92,20 +93,11 @@ export class ThemeDetailComponent implements OnInit {
         map((data) => {
           return [
             {
-              label: data['ACTIONS.NAVIGATION.CLOSE'],
-              title: data['ACTIONS.NAVIGATION.CLOSE.TOOLTIP'],
-              actionCallback: () => this.close(),
-              icon: 'pi pi-times',
-              show: 'always',
-              permission: 'THEME#SEARCH'
-            },
-            {
-              label: data['ACTIONS.EDIT.LABEL'],
-              title: data['ACTIONS.EDIT.TOOLTIP'],
-              actionCallback: () => this.router.navigate(['./edit'], { relativeTo: this.route }),
-              icon: 'pi pi-pencil',
-              show: 'always',
-              permission: 'THEME#EDIT'
+              label: data['ACTIONS.NAVIGATION.BACK'],
+              title: data['ACTIONS.NAVIGATION.BACK.TOOLTIP'],
+              actionCallback: () => this.onClose(),
+              icon: 'pi pi-arrow-left',
+              show: 'always'
             },
             {
               label: data['ACTIONS.EXPORT.LABEL'],
@@ -116,11 +108,22 @@ export class ThemeDetailComponent implements OnInit {
               permission: 'THEME#EXPORT'
             },
             {
+              label: data['ACTIONS.EDIT.LABEL'],
+              title: data['ACTIONS.EDIT.TOOLTIP'],
+              actionCallback: () => this.router.navigate(['./edit'], { relativeTo: this.route }),
+              icon: 'pi pi-pencil',
+              show: 'always',
+              permission: 'THEME#EDIT'
+            },
+            {
               label: data['ACTIONS.DELETE.LABEL'],
               title: data['ACTIONS.DELETE.TOOLTIP'],
               actionCallback: () => {
                 this.themeDeleteVisible = true
-                this.themeDeleteMessage = data['ACTIONS.DELETE.THEME_MESSAGE'].replace('{{ITEM}}', this.theme?.name)
+                this.themeDeleteMessage = data['ACTIONS.DELETE.THEME_MESSAGE'].replace(
+                  '{{ITEM}}',
+                  this.theme?.displayName
+                )
               },
               icon: 'pi pi-trash',
               show: 'asOverflow',
@@ -133,11 +136,11 @@ export class ThemeDetailComponent implements OnInit {
       )
   }
 
-  public close(): void {
-    this.router.navigate(['./..'], { relativeTo: this.route })
+  public onClose(): void {
+    this.location.back()
   }
 
-  confirmThemeDeletion(): void {
+  public onConfirmThemeDeletion(): void {
     this.deleteTheme()
     this.themeDeleteVisible = false
   }
@@ -152,6 +155,13 @@ export class ThemeDetailComponent implements OnInit {
         this.msgService.error({ summaryKey: 'ACTIONS.DELETE.THEME_NOK', detailKey: err.error.message })
       }
     })
+  }
+
+  /**
+   * UI EVENTS
+   */
+  public onTabChange($event: any) {
+    this.showOperatorMessage = false
   }
 
   onExportTheme(): void {

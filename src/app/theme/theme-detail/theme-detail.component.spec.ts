@@ -1,5 +1,6 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
+import { Location } from '@angular/common'
 import { HttpErrorResponse } from '@angular/common/http'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -26,6 +27,7 @@ describe('ThemeDetailComponent', () => {
     }
   }
   const msgServiceSpy = jasmine.createSpyObj<PortalMessageService>('PortalMessageService', ['success', 'error'])
+  const locationSpy = jasmine.createSpyObj<Location>('Location', ['back'])
 
   const configServiceSpy = {
     getProperty: jasmine.createSpy('getProperty').and.returnValue('123'),
@@ -53,6 +55,7 @@ describe('ThemeDetailComponent', () => {
         { provide: UserService, useValue: mockUserService },
         { provide: PortalMessageService, useValue: msgServiceSpy },
         { provide: ConfigurationService, useValue: configServiceSpy },
+        { provide: Location, useValue: locationSpy },
         { provide: ThemesAPIService, useValue: themesApiSpy }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -63,6 +66,7 @@ describe('ThemeDetailComponent', () => {
     themesApiSpy.getThemeByName.calls.reset()
     themesApiSpy.exportThemes.and.returnValue(of({}) as any)
     themesApiSpy.exportThemes.calls.reset()
+    locationSpy.back.calls.reset()
   }))
 
   beforeEach(() => {
@@ -118,22 +122,15 @@ describe('ThemeDetailComponent', () => {
 
   it('should load theme and action translations on successful call', async () => {
     const themeResponse = {
-      resource: {
-        name: 'themeName'
-      },
-      workspaces: [
-        {
-          name: 'workspace',
-          description: 'workspaceDesc'
-        }
-      ]
+      resource: { name: 'themeName', displayName: 'Theme' },
+      workspaces: [{ name: 'workspace', description: 'workspaceDesc' }]
     }
     themesApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
 
     const translateService = TestBed.inject(TranslateService)
     const actionsTranslations = {
-      'ACTIONS.NAVIGATION.CLOSE': 'actionNavigationClose',
-      'ACTIONS.NAVIGATION.CLOSE.TOOLTIP': 'actionNavigationCloseTooltip',
+      'ACTIONS.NAVIGATION.BACK': 'actionNavigationClose',
+      'ACTIONS.NAVIGATION.BACK.TOOLTIP': 'actionNavigationCloseTooltip',
       'ACTIONS.EDIT.LABEL': 'actionEditLabel',
       'ACTIONS.EDIT.TOOLTIP': 'actionEditTooltip',
       'ACTIONS.EXPORT.LABEL': 'actionExportLabel',
@@ -155,8 +152,6 @@ describe('ThemeDetailComponent', () => {
     await component.ngOnInit()
 
     expect(component.theme).toEqual(themeResponse['resource'])
-    //expect(component.workspaceList).toEqual('workspaces')
-    //this.prepareWorkspaceList(data.workspaces)
 
     let actions: any = []
     component.actions$!.subscribe((act) => (actions = act))
@@ -166,9 +161,9 @@ describe('ThemeDetailComponent', () => {
       (a: { label: string; title: string }) =>
         a.label === 'actionNavigationClose' && a.title === 'actionNavigationCloseTooltip'
     )[0]
-    spyOn(component, 'close')
+    spyOn(component, 'onClose')
     closeAction.actionCallback()
-    expect(component.close).toHaveBeenCalledTimes(1)
+    expect(component.onClose).toHaveBeenCalledTimes(1)
 
     const editAction = actions.filter(
       (a: { label: string; title: string }) => a.label === 'actionEditLabel' && a.title === 'actionEditTooltip'
@@ -192,31 +187,25 @@ describe('ThemeDetailComponent', () => {
     expect(component.themeDeleteMessage).toBe('')
     deleteAction.actionCallback()
     expect(component.themeDeleteVisible).toBe(true)
-    expect(component.themeDeleteMessage).toBe('themeName actionDeleteThemeMessage')
+    expect(component.themeDeleteMessage).toBe('Theme actionDeleteThemeMessage')
   })
 
   it('should load prepare object details on successfull call', async () => {
     const themeResponse = {
       resource: {
         name: 'themeName',
+        displayName: 'Theme',
         creationDate: 'myCreDate',
         modificationDate: 'myModDate'
       },
-      workspaces: [
-        {
-          name: 'workspace1'
-        },
-        {
-          name: 'workspace2'
-        }
-      ]
+      workspaces: [{ name: 'workspace1' }, { name: 'workspace2' }]
     }
     themesApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
 
     const translateService = TestBed.inject(TranslateService)
     const actionsTranslations = {
-      'ACTIONS.NAVIGATION.CLOSE': 'actionNavigationClose',
-      'ACTIONS.NAVIGATION.CLOSE.TOOLTIP': 'actionNavigationCloseTooltip',
+      'ACTIONS.NAVIGATION.BACK': 'actionNavigationClose',
+      'ACTIONS.NAVIGATION.BACK.TOOLTIP': 'actionNavigationCloseTooltip',
       'ACTIONS.EDIT.LABEL': 'actionEditLabel',
       'ACTIONS.EDIT.TOOLTIP': 'actionEditTooltip',
       'ACTIONS.EXPORT.LABEL': 'actionExportLabel',
@@ -236,12 +225,10 @@ describe('ThemeDetailComponent', () => {
     spyOn(translateService, 'get').and.returnValues(of(actionsTranslations), of(generalTranslations))
 
     await component.ngOnInit()
-
-    expect(component.workspaceList).toBe('workspace1, workspace2')
   })
 
   it('should display not found error and close page on theme fetch failure', () => {
-    spyOn(component, 'close')
+    spyOn(component, 'onClose')
     themesApiSpy.getThemeByName.and.returnValue(
       throwError(
         () =>
@@ -257,11 +244,11 @@ describe('ThemeDetailComponent', () => {
       summaryKey: 'THEME.LOAD_ERROR',
       detailKey: 'THEME.NOT_FOUND'
     })
-    expect(component.close).toHaveBeenCalledTimes(1)
+    expect(component.onClose).toHaveBeenCalledTimes(1)
   })
 
   it('should display catched error and close page on theme fetch failure', () => {
-    spyOn(component, 'close')
+    spyOn(component, 'onClose')
     themesApiSpy.getThemeByName.and.returnValue(
       throwError(
         () =>
@@ -277,7 +264,7 @@ describe('ThemeDetailComponent', () => {
       summaryKey: 'THEME.LOAD_ERROR',
       detailKey: 'does not contain checked string'
     })
-    expect(component.close).toHaveBeenCalledTimes(1)
+    expect(component.onClose).toHaveBeenCalledTimes(1)
   })
 
   it('should return empty string if theme has no workspaces', () => {
@@ -288,12 +275,10 @@ describe('ThemeDetailComponent', () => {
   })
 
   it('should navigate back on close', () => {
-    const router = TestBed.inject(Router)
-    spyOn(router, 'navigate')
+    component.ngOnInit()
+    component.onClose()
 
-    component.close()
-
-    expect(router.navigate).toHaveBeenCalledOnceWith(['./..'], jasmine.any(Object))
+    expect(locationSpy.back).toHaveBeenCalled()
   })
 
   it('should set header image url with prefix when theme logo doesnt have http/https', async () => {
@@ -331,7 +316,7 @@ describe('ThemeDetailComponent', () => {
     themesApiSpy.deleteTheme.and.returnValue(of({}) as any)
     component.themeDeleteVisible = true
 
-    component.confirmThemeDeletion()
+    component.onConfirmThemeDeletion()
 
     expect(component.themeDeleteVisible).toBe(false)
     expect(router.navigate).toHaveBeenCalledOnceWith(['..'], jasmine.any(Object))
@@ -351,7 +336,7 @@ describe('ThemeDetailComponent', () => {
     )
     component.themeDeleteVisible = true
 
-    component.confirmThemeDeletion()
+    component.onConfirmThemeDeletion()
 
     expect(component.themeDeleteVisible).toBe(false)
     expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({
@@ -378,6 +363,7 @@ describe('ThemeDetailComponent', () => {
     component.theme = {
       modificationCount: 1,
       name: 'themeName',
+      displayName: 'Theme',
       logoUrl: 'url',
 
       creationDate: 'creationDate',

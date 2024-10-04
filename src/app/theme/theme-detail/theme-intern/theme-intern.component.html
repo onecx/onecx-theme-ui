@@ -1,21 +1,19 @@
-<div class="surface-section w-full my-3">
+<div class="surface-section my-1 mx-3">
   <div class="flex flex-wrap flex-column row-gap-4 w-12 sm:w-10 md:w-8 lg:w-6 xl:w-6">
-    <div class="w-12 sm:w-6 px-4 flex align-items-center">
-      <p-checkbox
-        type="text"
-        [readonly]="true"
-        inputId="th_detail_item_operator"
-        [(ngModel)]="operator"
-        [binary]="true"
-        [styleClass]="'cursor-auto shadow-none'"
-        [label]="'INTERNAL.OPERATOR' | translate"
-        [pTooltip]="'INTERNAL.TOOLTIPS.OPERATOR' | translate"
-        tooltipPosition="top"
-        tooltipEvent="hover"
-      ></p-checkbox>
-    </div>
+    <p-checkbox
+      type="text"
+      inputId="th_detail_item_operator"
+      styleClass="ml-3 cursor-auto shadow-none"
+      [(ngModel)]="operator"
+      [binary]="true"
+      [readonly]="true"
+      [label]="'INTERNAL.OPERATOR' | translate"
+      [pTooltip]="'INTERNAL.TOOLTIPS.OPERATOR' | translate"
+      tooltipPosition="top"
+      tooltipEvent="hover"
+    ></p-checkbox>
 
-    <div class="w-12 px-3">
+    <div class="w-12">
       <span class="p-float-label">
         <input
           pInputText
@@ -33,14 +31,14 @@
     </div>
 
     <div class="flex flex-wrap row-gap-4">
-      <div class="w-12 sm:w-6 px-3">
+      <div class="w-12 sm:w-5 sm:pr-3">
         <span class="p-float-label mb-1">
           <input
             pInputText
             type="text"
             readonly
             id="th_detail_item_creationDate"
-            class="w-full pt-3 pb-2"
+            class="w-full pt-3 pb-2 text-responsive"
             [value]="theme?.creationDate | date: dateFormat"
             [pTooltip]="'INTERNAL.TOOLTIPS.CREATION_DATE' | translate"
             tooltipPosition="top"
@@ -50,14 +48,14 @@
         </span>
       </div>
 
-      <div class="w-12 sm:w-6 px-3">
+      <div class="w-12 sm:w-7 sm:pl-3">
         <span class="p-float-label mb-1">
           <input
             pInputText
             type="text"
             readonly
             id="th_detail_item_creationUser"
-            class="w-full pt-3 pb-2"
+            class="w-full pt-3 pb-2 text-responsive"
             [value]="theme?.creationUser"
             [pTooltip]="'INTERNAL.TOOLTIPS.CREATION_USER' | translate"
             tooltipPosition="top"
@@ -69,14 +67,14 @@
     </div>
 
     <div class="flex flex-wrap row-gap-4">
-      <div class="w-12 sm:w-6 px-3">
+      <div class="w-12 sm:w-5 sm:pr-3">
         <span class="p-float-label mb-1">
           <input
             pInputText
             type="text"
             readonly
             id="th_detail_item_modificationDate"
-            class="w-full pt-3 pb-2"
+            class="w-full pt-3 pb-2 text-responsive"
             [value]="theme?.modificationDate | date: dateFormat"
             [pTooltip]="'INTERNAL.TOOLTIPS.MODIFICATION_DATE' | translate"
             tooltipPosition="top"
@@ -86,14 +84,14 @@
         </span>
       </div>
 
-      <div class="w-12 sm:w-6 px-3">
+      <div class="w-12 sm:w-7 sm:pl-3">
         <span class="p-float-label mb-1">
           <input
             pInputText
             type="text"
             readonly
             id="th_detail_item_modificationUser"
-            class="w-full pt-3 pb-2"
+            class="w-full pt-3 pb-2 text-responsive"
             [value]="theme?.modificationUser"
             [pTooltip]="'INTERNAL.TOOLTIPS.MODIFICATION_USER' | translate"
             tooltipPosition="top"
