@@ -107,6 +107,15 @@ describe('ThemeDetailComponent', () => {
     expect(component.loading).toBe(false)
   })
 
+  it('should set showOperatorMessage to false', async () => {
+    const event = { index: 1 }
+
+    await component.ngOnInit()
+    component.onTabChange(event)
+
+    expect(component.showOperatorMessage).toBeFalsy()
+  })
+
   it('should create with default dateFormat', async () => {
     // recreate component to test constructor
     initializeComponent()
@@ -265,13 +274,6 @@ describe('ThemeDetailComponent', () => {
       detailKey: 'does not contain checked string'
     })
     expect(component.onClose).toHaveBeenCalledTimes(1)
-  })
-
-  it('should return empty string if theme has no workspaces', () => {
-    component.theme = undefined
-
-    const result = component.prepareWorkspaceList()
-    expect(result).toBe('')
   })
 
   it('should navigate back on close', () => {

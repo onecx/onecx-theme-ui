@@ -7,14 +7,13 @@ import FileSaver from 'file-saver'
 
 import { Action, PortalMessageService, UserService } from '@onecx/portal-integration-angular'
 
-import { sortByLocale, bffImageUrl, getCurrentDateTime } from 'src/app/shared/utils'
+import { bffImageUrl, getCurrentDateTime } from 'src/app/shared/utils'
 import {
   ExportThemeRequest,
   ImagesInternalAPIService,
   RefType,
   Theme,
-  ThemesAPIService,
-  Workspace
+  ThemesAPIService
 } from 'src/app/shared/generated'
 
 @Component({
@@ -185,12 +184,6 @@ export class ThemeDetailComponent implements OnInit {
           }
         })
     }
-  }
-
-  public prepareWorkspaceList(workspace?: Workspace[]): string {
-    const arr = workspace?.map((workspace: Workspace) => workspace.name)
-    arr?.sort(sortByLocale)
-    return arr ? arr.join(', ') : ''
   }
 
   public getImageUrl(theme: Theme | undefined, refType: RefType): string | undefined {
