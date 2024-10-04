@@ -4,9 +4,6 @@
 @include danger-action;
 
 :host ::ng-deep {
-  .mt-01 {
-    //margin-top: 0.25rem !important;
-  }
   .max-w-11 {
     max-width: 90%;
   }
