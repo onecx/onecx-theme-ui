@@ -1,10 +1,9 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { Location } from '@angular/common'
-import { HttpErrorResponse } from '@angular/common/http'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
-import { ActivatedRoute, Router } from '@angular/router'
-import { RouterTestingModule } from '@angular/router/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { HttpErrorResponse, provideHttpClient } from '@angular/common/http'
+import { ActivatedRoute, provideRouter, Router } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 import { of, throwError } from 'rxjs'
@@ -43,8 +42,6 @@ describe('ThemeDetailComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ThemeDetailComponent],
       imports: [
-        RouterTestingModule,
-        HttpClientTestingModule,
         TranslateModule.forRoot(),
         TranslateTestingModule.withTranslations({
           de: require('src/assets/i18n/de.json'),
@@ -52,6 +49,9 @@ describe('ThemeDetailComponent', () => {
         }).withDefaultLanguage('de')
       ],
       providers: [
+        provideHttpClientTesting(),
+        provideHttpClient(),
+        provideRouter([{ path: '', component: ThemeDetailComponent }]),
         { provide: UserService, useValue: mockUserService },
         { provide: PortalMessageService, useValue: msgServiceSpy },
         { provide: ConfigurationService, useValue: configServiceSpy },

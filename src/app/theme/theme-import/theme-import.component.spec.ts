@@ -1,8 +1,8 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
-import { Router } from '@angular/router'
-import { RouterTestingModule } from '@angular/router/testing'
+import { HttpResponse, provideHttpClient } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { provideRouter, Router } from '@angular/router'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 import { of, throwError } from 'rxjs'
 
@@ -10,7 +10,6 @@ import { PortalMessageService } from '@onecx/portal-integration-angular'
 
 import { ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeImportComponent } from './theme-import.component'
-import { HttpResponse } from '@angular/common/http'
 
 describe('ThemeImportComponent', () => {
   let component: ThemeImportComponent
@@ -24,14 +23,15 @@ describe('ThemeImportComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ThemeImportComponent],
       imports: [
-        RouterTestingModule,
-        HttpClientTestingModule,
         TranslateTestingModule.withTranslations({
           de: require('src/assets/i18n/de.json'),
           en: require('src/assets/i18n/en.json')
         }).withDefaultLanguage('en')
       ],
       providers: [
+        provideHttpClientTesting(),
+        provideHttpClient(),
+        provideRouter([{ path: '', component: ThemeImportComponent }]),
         { provide: PortalMessageService, useValue: msgServiceSpy },
         { provide: ThemesAPIService, useValue: themeApiSpy }
       ],
