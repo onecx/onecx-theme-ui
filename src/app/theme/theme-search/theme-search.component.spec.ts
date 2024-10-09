@@ -1,8 +1,8 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
-import { Router } from '@angular/router'
-import { RouterTestingModule } from '@angular/router/testing'
+import { provideHttpClient } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { provideRouter, Router } from '@angular/router'
 import { TranslateService } from '@ngx-translate/core'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 import { DataViewModule } from 'primeng/dataview'
@@ -21,15 +21,18 @@ describe('ThemeSearchComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ThemeSearchComponent],
       imports: [
-        RouterTestingModule,
-        HttpClientTestingModule,
         DataViewModule,
         TranslateTestingModule.withTranslations({
           de: require('src/assets/i18n/de.json'),
           en: require('src/assets/i18n/en.json')
         }).withDefaultLanguage('en')
       ],
-      providers: [{ provide: ThemesAPIService, useValue: themeApiSpy }],
+      providers: [
+        provideHttpClientTesting(),
+        provideHttpClient(),
+        provideRouter([{ path: '', component: ThemeSearchComponent }]),
+        { provide: ThemesAPIService, useValue: themeApiSpy }
+      ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents()
   }))

@@ -1,12 +1,11 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from '@angular/core/testing'
-import { HttpResponse, HttpErrorResponse } from '@angular/common/http'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { HttpResponse, HttpErrorResponse, provideHttpClient } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { By } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { ActivatedRoute, Router } from '@angular/router'
-import { RouterTestingModule } from '@angular/router/testing'
+import { ActivatedRoute, provideRouter, Router } from '@angular/router'
 import { TranslateService } from '@ngx-translate/core'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 import { of, throwError } from 'rxjs'
@@ -19,11 +18,11 @@ import { OverlayPanelModule } from 'primeng/overlaypanel'
 import { ConfirmDialog, ConfirmDialogModule } from 'primeng/confirmdialog'
 
 import { PortalMessageService, ThemeService } from '@onecx/portal-integration-angular'
+import { CurrentThemeTopic } from '@onecx/integration-interface'
 
 import { RefType, ThemesAPIService, ImagesInternalAPIService } from 'src/app/shared/generated'
 import { themeVariables } from './theme-variables'
 import { ThemeDesignerComponent } from './theme-designer.component'
-import { CurrentThemeTopic } from '@onecx/integration-interface'
 
 describe('ThemeDesignerComponent', () => {
   let component: ThemeDesignerComponent
@@ -64,10 +63,8 @@ describe('ThemeDesignerComponent', () => {
         DropdownModule,
         FormsModule,
         InputSwitchModule,
-        HttpClientTestingModule,
         OverlayPanelModule,
         ReactiveFormsModule,
-        RouterTestingModule,
         TranslateTestingModule.withTranslations({
           de: require('src/assets/i18n/de.json'),
           en: require('src/assets/i18n/en.json')
@@ -75,6 +72,9 @@ describe('ThemeDesignerComponent', () => {
       ],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
+        provideHttpClientTesting(),
+        provideHttpClient(),
+        provideRouter([{ path: '', component: ThemeDesignerComponent }]),
         { provide: PortalMessageService, useValue: msgServiceSpy },
         { provide: ThemeService, useValue: themeServiceSpy },
         { provide: ThemesAPIService, useValue: themeApiSpy },
