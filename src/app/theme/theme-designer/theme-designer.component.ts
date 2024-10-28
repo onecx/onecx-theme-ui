@@ -148,6 +148,9 @@ export class ThemeDesignerComponent implements OnInit {
         this.themeApi.getThemeByName({ name: this.themeName })
       ]).subscribe(([currentTheme, data]) => {
         this.theme = data.resource
+        if (!(this.theme.properties as any).sidebar['menu-item-bg-color']) {
+          ;(this.theme.properties as any).sidebar['menu-item-bg-color'] = '#ffffff'
+        }
         this.basicForm.patchValue(this.theme)
         this.basicForm.controls['name'].disable()
         this.propertiesForm.reset()
