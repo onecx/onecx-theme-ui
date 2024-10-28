@@ -46,6 +46,6 @@ export const themeVariables: ThemeVariablesType = {
     'menu-item-hover-bg-color',
     'menu-active-item-text-color',
     'menu-active-item-bg-color',
-    'inline-menu-border-color'
+    'menu-inline-border-color'
   ]
 }
