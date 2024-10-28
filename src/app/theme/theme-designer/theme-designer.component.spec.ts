@@ -1190,4 +1190,36 @@ describe('ThemeDesignerComponent', () => {
     expect(component.getImageUrl(theme, RefType.Logo)).toBe(theme.logoUrl)
     expect(component.getImageUrl(theme, RefType.Favicon)).toBe(theme.faviconUrl)
   })
+
+  it('should get display name', () => {
+    const themeData = {
+      id: 'id',
+      description: 'desc',
+      logoUrl: 'logo_url',
+      faviconUrl: 'fav_url',
+      name: 'themeName',
+      properties: {
+        font: {
+          'font-family': 'myFont'
+        },
+        general: {
+          'primary-color': 'rgb(0,0,0)'
+        }
+      }
+    }
+    const themeResponse = {
+      resource: themeData
+    }
+    themeApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
+    component.mode = 'EDIT'
+    component.themeName = 'themeName'
+
+    component.ngOnInit()
+
+    expect(component.theme).toBe(themeData)
+    expect(themeApiSpy.getThemeByName).toHaveBeenCalledOnceWith({ name: 'themeName' })
+    const res = component.getDisplayName()
+
+    expect(res).toBe('themeName')
+  })
 })
