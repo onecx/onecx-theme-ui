@@ -24,7 +24,7 @@ export const themeVariables: ThemeVariablesType = {
     'text-secondary-color',
     'body-bg-color',
     'content-bg-color',
-    'content-alt-bg-colorr',
+    'content-alt-bg-color',
     'overlay-content-bg-color',
     'hover-bg-color',
     'solid-surface-text-color',
@@ -42,9 +42,10 @@ export const themeVariables: ThemeVariablesType = {
     'menu-text-color',
     'menu-bg-color',
     'menu-item-text-color',
+    'menu-item-bg-color',
     'menu-item-hover-bg-color',
     'menu-active-item-text-color',
     'menu-active-item-bg-color',
-    'inline-menu-border-color'
+    'menu-inline-border-color'
   ]
 }
