@@ -17,7 +17,15 @@
       [text]="exceptionKey | translate"
     ></p-message>
   </div>
-  <ocx-page-content *ngIf="!exceptionKey">
+  <div *ngIf="loading" id="ws_detail_loading" class="card px-3 align-items-center">
+    <p-message
+      id="ws_detail_loading_message"
+      severity="info"
+      styleClass="p-2"
+      [text]="'ACTIONS.LOADING' | translate"
+    ></p-message>
+  </div>
+  <ocx-page-content *ngIf="!exceptionKey && !loading">
     <p-tabView (onChange)="onTabChange($event)">
       <p-tabPanel
         id="th_detail_panel_props"

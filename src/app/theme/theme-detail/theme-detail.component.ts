@@ -49,6 +49,7 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loading = true
     this.themeApi
       .getThemeByName({ name: this.themeName })
       .pipe(
