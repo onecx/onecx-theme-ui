@@ -236,44 +236,36 @@ describe('ThemeDetailComponent', () => {
     await component.ngOnInit()
   })
 
-  it('should display not found error and close page on theme fetch failure', () => {
-    spyOn(component, 'onClose')
+  it('should display not found error', () => {
     themesApiSpy.getThemeByName.and.returnValue(
       throwError(
         () =>
           new HttpErrorResponse({
-            error: 'err: was not found'
+            status: 404
           })
       )
     )
+    component.exceptionKey = ''
 
     component.ngOnInit()
 
-    expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({
-      summaryKey: 'THEME.LOAD_ERROR',
-      detailKey: 'THEME.NOT_FOUND'
-    })
-    expect(component.onClose).toHaveBeenCalledTimes(1)
+    expect(component.exceptionKey).toBe('THEME.NOT_FOUND')
   })
 
-  it('should display catched error and close page on theme fetch failure', () => {
-    spyOn(component, 'onClose')
+  it('should display load error', () => {
     themesApiSpy.getThemeByName.and.returnValue(
       throwError(
         () =>
           new HttpErrorResponse({
-            error: 'does not contain checked string'
+            status: 400
           })
       )
     )
+    component.exceptionKey = ''
 
     component.ngOnInit()
 
-    expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({
-      summaryKey: 'THEME.LOAD_ERROR',
-      detailKey: 'does not contain checked string'
-    })
-    expect(component.onClose).toHaveBeenCalledTimes(1)
+    expect(component.exceptionKey).toBe('THEME.LOAD_ERROR')
   })
 
   it('should navigate back on close', () => {

@@ -9,7 +9,15 @@
   >
   </ocx-page-header>
 
-  <ocx-page-content>
+  <div *ngIf="exceptionKey" id="th_detail_error" class="card px-3 align-items-center">
+    <p-message
+      id="th_detail_error_message"
+      severity="error"
+      styleClass="p-2"
+      [text]="exceptionKey | translate"
+    ></p-message>
+  </div>
+  <ocx-page-content *ngIf="!exceptionKey">
     <p-tabView (onChange)="onTabChange($event)">
       <p-tabPanel
         id="th_detail_panel_props"

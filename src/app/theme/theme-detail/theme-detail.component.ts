@@ -32,6 +32,7 @@ export class ThemeDetailComponent implements OnInit {
   // page header
   public actions$: Observable<Action[]> | undefined
   public headerImageUrl?: string
+  public exceptionKey = ''
 
   constructor(
     private readonly user: UserService,
@@ -62,11 +63,8 @@ export class ThemeDetailComponent implements OnInit {
           this.headerImageUrl = this.getImageUrl(this.theme, RefType.Logo)
         },
         error: (err) => {
-          this.msgService.error({
-            summaryKey: 'THEME.LOAD_ERROR',
-            detailKey: err.error.indexOf('was not found') > 1 ? 'THEME.NOT_FOUND' : err.error
-          })
-          this.onClose()
+          if (err.status === 404) this.exceptionKey = 'THEME.NOT_FOUND'
+          else this.exceptionKey = 'THEME.LOAD_ERROR'
         }
       })
   }
