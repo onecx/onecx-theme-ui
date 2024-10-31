@@ -20,7 +20,7 @@ export class ThemeImportComponent implements OnInit {
 
   public themes!: Theme[]
   public themeName = ''
-  public displayName = ''
+  public displayName: string | null = ''
   public themeNameExists = false
   public displayNameExists = false
   public themeImportError = false
@@ -53,7 +53,7 @@ export class ThemeImportComponent implements OnInit {
           if (themeSnapshot.themes) {
             const key: string[] = Object.keys(themeSnapshot.themes)
             this.themeName = key[0]
-            this.displayName = themeSnapshot.themes[key[0]].displayName ?? ''
+            this.displayName = themeSnapshot.themes[key[0]].displayName ?? null
             this.properties = themeSnapshot.themes[key[0]].properties
           }
           this.checkThemeExistence()
@@ -82,7 +82,7 @@ export class ThemeImportComponent implements OnInit {
   public onThemeUpload(): void {
     if (!this.themeSnapshot?.themes) return
     const key: string[] = Object.keys(this.themeSnapshot?.themes)
-    this.themeSnapshot.themes[key[0]].displayName = this.displayName
+    this.themeSnapshot.themes[key[0]].displayName = this.displayName ?? undefined
     if (key[0] !== this.themeName) {
       // save the theme properties to be reassigned on new key
       const themeProps = Object.getOwnPropertyDescriptor(this.themeSnapshot.themes, key[0])
