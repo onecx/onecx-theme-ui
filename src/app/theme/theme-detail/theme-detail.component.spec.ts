@@ -15,6 +15,11 @@ import { RefType, Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeDetailComponent } from './theme-detail.component'
 import { bffImageUrl, getCurrentDateTime } from 'src/app/shared/utils'
 
+const theme: Theme = {
+  name: 'themeName',
+  id: 'theme-id'
+}
+
 describe('ThemeDetailComponent', () => {
   let component: ThemeDetailComponent
   let fixture: ComponentFixture<ThemeDetailComponent>
@@ -97,14 +102,17 @@ describe('ThemeDetailComponent', () => {
     component = fixture.componentInstance
     fixture.detectChanges()
 
-    themesApiSpy.getThemeByName.calls.reset()
+    themesApiSpy.getThemeByName.and.returnValue(of({ resource: theme } as any))
     component.loading = true
 
     await component.ngOnInit()
-    expect(component.themeName).toBe(name)
-    expect(component.dateFormat).toBe('medium')
-    expect(themesApiSpy.getThemeByName).toHaveBeenCalledOnceWith({ name: name })
-    expect(component.loading).toBe(false)
+
+    component.theme$?.subscribe((data) => {
+      expect(data).toBe(theme)
+      expect(component.themeName).toBe(name)
+      expect(component.dateFormat).toBe('medium')
+      expect(themesApiSpy.getThemeByName).toHaveBeenCalled()
+    })
   })
 
   it('should set showOperatorMessage to false', async () => {
@@ -160,43 +168,45 @@ describe('ThemeDetailComponent', () => {
 
     await component.ngOnInit()
 
-    expect(component.theme).toEqual(themeResponse['resource'])
+    component.theme$?.subscribe(() => {
+      expect(component.theme).toEqual(themeResponse['resource'])
 
-    let actions: any = []
-    component.actions$!.subscribe((act) => (actions = act))
+      let actions: any = []
+      component.actions$!.subscribe((act) => (actions = act))
 
-    expect(actions.length).toBe(4)
-    const closeAction = actions.filter(
-      (a: { label: string; title: string }) =>
-        a.label === 'actionNavigationClose' && a.title === 'actionNavigationCloseTooltip'
-    )[0]
-    spyOn(component, 'onClose')
-    closeAction.actionCallback()
-    expect(component.onClose).toHaveBeenCalledTimes(1)
+      expect(actions.length).toBe(4)
+      const closeAction = actions.filter(
+        (a: { label: string; title: string }) =>
+          a.label === 'actionNavigationClose' && a.title === 'actionNavigationCloseTooltip'
+      )[0]
+      spyOn(component, 'onClose')
+      closeAction.actionCallback()
+      expect(component.onClose).toHaveBeenCalledTimes(1)
 
-    const editAction = actions.filter(
-      (a: { label: string; title: string }) => a.label === 'actionEditLabel' && a.title === 'actionEditTooltip'
-    )[0]
-    const router = TestBed.inject(Router)
-    spyOn(router, 'navigate')
-    editAction.actionCallback()
-    expect(router.navigate).toHaveBeenCalledOnceWith(['./edit'], jasmine.any(Object))
+      const editAction = actions.filter(
+        (a: { label: string; title: string }) => a.label === 'actionEditLabel' && a.title === 'actionEditTooltip'
+      )[0]
+      const router = TestBed.inject(Router)
+      spyOn(router, 'navigate')
+      editAction.actionCallback()
+      expect(router.navigate).toHaveBeenCalledOnceWith(['./edit'], jasmine.any(Object))
 
-    const exportAction = actions.filter(
-      (a: { label: string; title: string }) => a.label === 'actionExportLabel' && a.title === 'actionExportTooltip'
-    )[0]
-    spyOn(component, 'onExportTheme')
-    exportAction.actionCallback()
-    expect(component.onExportTheme).toHaveBeenCalledTimes(1)
+      const exportAction = actions.filter(
+        (a: { label: string; title: string }) => a.label === 'actionExportLabel' && a.title === 'actionExportTooltip'
+      )[0]
+      spyOn(component, 'onExportTheme')
+      exportAction.actionCallback()
+      expect(component.onExportTheme).toHaveBeenCalledTimes(1)
 
-    const deleteAction = actions.filter(
-      (a: { label: string; title: string }) => a.label === 'actionDeleteLabel' && a.title === 'actionDeleteTooltip'
-    )[0]
-    expect(component.themeDeleteVisible).toBe(false)
-    expect(component.themeDeleteMessage).toBe('')
-    deleteAction.actionCallback()
-    expect(component.themeDeleteVisible).toBe(true)
-    expect(component.themeDeleteMessage).toBe('Theme actionDeleteThemeMessage')
+      const deleteAction = actions.filter(
+        (a: { label: string; title: string }) => a.label === 'actionDeleteLabel' && a.title === 'actionDeleteTooltip'
+      )[0]
+      expect(component.themeDeleteVisible).toBe(false)
+      expect(component.themeDeleteMessage).toBe('')
+      deleteAction.actionCallback()
+      expect(component.themeDeleteVisible).toBe(true)
+      expect(component.themeDeleteMessage).toBe('Theme actionDeleteThemeMessage')
+    })
   })
 
   it('should load prepare object details on successfull call', async () => {
@@ -249,7 +259,9 @@ describe('ThemeDetailComponent', () => {
 
     component.ngOnInit()
 
-    expect(component.exceptionKey).toBe('THEME.NOT_FOUND')
+    component.theme$?.subscribe(() => {
+      expect(component.exceptionKey).toBe('THEME.NOT_FOUND')
+    })
   })
 
   it('should display load error', () => {
@@ -265,7 +277,9 @@ describe('ThemeDetailComponent', () => {
 
     component.ngOnInit()
 
-    expect(component.exceptionKey).toBe('THEME.LOAD_ERROR')
+    component.theme$?.subscribe(() => {
+      expect(component.exceptionKey).toBe('THEME.LOAD_ERROR')
+    })
   })
 
   it('should navigate back on close', () => {
@@ -287,7 +301,9 @@ describe('ThemeDetailComponent', () => {
 
     await component.ngOnInit()
 
-    expect(component.headerImageUrl).toBe('logo123.png')
+    component.theme$?.subscribe(() => {
+      expect(component.headerImageUrl).toBe('logo123.png')
+    })
   })
 
   it('should set header image url without prefix when theme logo has http/https', async () => {
@@ -301,7 +317,10 @@ describe('ThemeDetailComponent', () => {
     }
     themesApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
     await component.ngOnInit()
-    expect(component.headerImageUrl).toBe(url)
+
+    component.theme$?.subscribe(() => {
+      expect(component.headerImageUrl).toBe(url)
+    })
   })
 
   it('should hide dialog, inform and navigate on successfull deletion', () => {

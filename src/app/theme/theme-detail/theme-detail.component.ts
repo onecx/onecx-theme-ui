@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core'
 import { Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateService } from '@ngx-translate/core'
-import { Observable, finalize, map } from 'rxjs'
+import { Observable, catchError, finalize, map, of } from 'rxjs'
 import FileSaver from 'file-saver'
 
 import { Action, PortalMessageService, UserService } from '@onecx/portal-integration-angular'
@@ -22,6 +22,7 @@ import {
 })
 export class ThemeDetailComponent implements OnInit {
   public theme: Theme | undefined
+  public theme$: Observable<Theme> | undefined
   public themeName!: string
   public themeDeleteVisible = false
   public themeDeleteMessage = ''
@@ -50,24 +51,23 @@ export class ThemeDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.loading = true
-    this.themeApi
-      .getThemeByName({ name: this.themeName })
-      .pipe(
-        finalize(() => {
-          this.loading = false
-        })
-      )
-      .subscribe({
-        next: (data) => {
-          this.theme = data.resource
-          this.preparePage()
-          this.headerImageUrl = this.getImageUrl(this.theme, RefType.Logo)
-        },
-        error: (err) => {
-          if (err.status === 404) this.exceptionKey = 'THEME.NOT_FOUND'
-          else this.exceptionKey = 'THEME.LOAD_ERROR'
-        }
+    this.theme$ = this.themeApi.getThemeByName({ name: this.themeName }).pipe(
+      map((data) => {
+        this.preparePage()
+        if (data.resource) this.theme = data.resource
+        this.headerImageUrl = this.getImageUrl(this.theme, RefType.Logo)
+        return data.resource
+      }),
+      catchError((err) => {
+        if (err.status === 404) this.exceptionKey = 'THEME.NOT_FOUND'
+        else this.exceptionKey = 'THEME.LOAD_ERROR'
+        console.error('getThemeByName():', err)
+        return of({} as Theme)
+      }),
+      finalize(() => {
+        this.loading = false
       })
+    )
   }
 
   private preparePage() {
