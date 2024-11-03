@@ -210,6 +210,7 @@
   },
   "VALIDATION": {
     "ERRORS": {
+      "FORM_INVALID": "Die Formulardaten sind nicht bereit zum Speichern des Themes.",
       "PARSE_ERROR": "Parserfehler: Die enthaltene Struktur entspricht nicht dem erwarteten Format.",
       "INTERNAL_ERROR": "Interner Fehler",
       "EMPTY_REQUIRED_FIELD": "Dieses Feld ist ein Pflichtfeld.",

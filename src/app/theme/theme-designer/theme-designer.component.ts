@@ -303,7 +303,7 @@ export class ThemeDesignerComponent implements OnInit {
 
   public onSaveTheme(): void {
     if (this.basicForm.invalid || this.propertiesForm.invalid) {
-      this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_NOK' })
+      this.msgService.error({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
       return
     }
     const newTheme: ThemeUpdateCreate = { ...this.basicForm.value }
@@ -394,10 +394,11 @@ export class ThemeDesignerComponent implements OnInit {
         this.msgService.success({ summaryKey: 'ACTIONS.CREATE.MESSAGE.CREATE_OK' })
       },
       error: (err) => {
+        console.error(err)
         this.msgService.error({
           summaryKey: 'ACTIONS.CREATE.MESSAGE.CREATE_NOK',
           detailKey:
-            err?.error?.key && err?.error?.key === 'PERSIST_ENTITY_FAILED'
+            err?.error?.errorCode && err?.error?.errorCode === 'PERSIST_ENTITY_FAILED'
               ? 'ACTIONS.CREATE.MESSAGE.THEME_ALREADY_EXISTS'
               : err.error
         })
