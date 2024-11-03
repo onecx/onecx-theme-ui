@@ -330,35 +330,27 @@ describe('ThemeDesignerComponent', () => {
       component.actions$?.subscribe((actions) => {
         const updateThemeAction = actions[1]
         updateThemeAction.actionCallback()
-        expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_NOK' })
-
+        expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
         done()
       })
     })
 
-    it('should display error when updating theme call fails', (done: DoneFn) => {
-      const themeData = {
-        id: 'id',
-        description: 'desc',
-        logoUrl: 'logo_url',
-        faviconUrl: 'fav_url',
-        name: 'themeName',
-        properties: {
-          font: { 'font-family': 'myFont' },
-          general: { 'primary-color': 'rgb(0,0,0)' }
-        }
+    it('should display error when theme data are not ready', (done: DoneFn) => {
+      component.fontForm.patchValue({ 'font-family': 'updatedFont' })
+      component.propertiesForm.patchValue({ 'primary-color': 'rgb(255,255,255)' })
+      // display name is missing
+      const newBasicData = {
+        name: 'updatedName',
+        description: 'updatedDesc',
+        logoUrl: 'updated_logo_url',
+        faviconUrl: 'updated_favicon_url'
       }
-      const themeResponse = {
-        resource: themeData
-      }
-      themeApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
-      themeApiSpy.updateTheme.and.returnValue(throwError(() => new Error()))
+      component.basicForm.patchValue(newBasicData)
 
       component.actions$?.subscribe((actions) => {
         const updateThemeAction = actions[1]
         updateThemeAction.actionCallback()
-        expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_NOK' })
-
+        expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
         done()
       })
     })
@@ -384,6 +376,7 @@ describe('ThemeDesignerComponent', () => {
       component.generalForm.patchValue({ 'primary-color': 'rgb(255,255,255)' })
       const newBasicData = {
         name: 'updatedName',
+        displayName: 'updatedDisplayName',
         description: 'updatedDesc',
         logoUrl: 'updated_logo_url',
         faviconUrl: 'updated_favicon_url'
@@ -444,7 +437,7 @@ describe('ThemeDesignerComponent', () => {
 
     it('should display theme already exists message on theme save failure', () => {
       themeApiSpy.createTheme.and.returnValue(
-        throwError(() => new HttpErrorResponse({ error: { key: 'PERSIST_ENTITY_FAILED' } }))
+        throwError(() => new HttpErrorResponse({ error: { errorCode: 'PERSIST_ENTITY_FAILED' } }))
       )
 
       component.saveAsTheme('myTheme', 'myDisplayName')
@@ -480,19 +473,9 @@ describe('ThemeDesignerComponent', () => {
         faviconUrl: 'new_favicon_url'
       }
       component.basicForm.patchValue(newBasicData)
-      component.fontForm.patchValue({
-        'font-family': 'newFont'
-      })
-      component.generalForm.patchValue({
-        'primary-color': 'rgb(255,255,255)'
-      })
-      themeApiSpy.createTheme.and.returnValue(
-        of({
-          resource: {
-            name: 'myTheme'
-          }
-        }) as any
-      )
+      component.fontForm.patchValue({ 'font-family': 'newFont' })
+      component.generalForm.patchValue({ 'primary-color': 'rgb(255,255,255)' })
+      themeApiSpy.createTheme.and.returnValue(of({ resource: { name: 'myTheme' } }) as any)
       component.changeMode = 'EDIT'
 
       component.saveAsTheme('myTheme', 'myDisplayName')
@@ -590,19 +573,9 @@ describe('ThemeDesignerComponent', () => {
         faviconUrl: 'new_favicon_url'
       }
       component.basicForm.patchValue(newBasicData)
-      component.fontForm.patchValue({
-        'font-family': 'newFont'
-      })
-      component.generalForm.patchValue({
-        'primary-color': 'rgb(255,255,255)'
-      })
-      themeApiSpy.createTheme.and.returnValue(
-        of({
-          resource: {
-            name: 'myTheme'
-          }
-        }) as any
-      )
+      component.fontForm.patchValue({ 'font-family': 'newFont' })
+      component.generalForm.patchValue({ 'primary-color': 'rgb(255,255,255)' })
+      themeApiSpy.createTheme.and.returnValue(of({ resource: { name: 'myTheme' } }) as any)
       component.changeMode = 'NEW'
 
       component.saveAsTheme('myTheme', 'myDisplayName')
