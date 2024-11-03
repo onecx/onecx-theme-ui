@@ -44,7 +44,7 @@ export class ThemeSearchComponent implements OnInit {
     this.themes$ = this.themeApi.getThemes({})
   }
   public sortThemesByName(a: Theme, b: Theme): number {
-    return (a.displayName ?? '').toUpperCase().localeCompare((b.displayName ?? '').toUpperCase())
+    return a.displayName!.toUpperCase().localeCompare(b.displayName!.toUpperCase())
   }
 
   private prepareTranslations() {

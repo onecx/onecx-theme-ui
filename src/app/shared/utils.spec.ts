@@ -1,5 +1,5 @@
 import { SelectItem } from 'primeng/api'
-import { dropDownSortItemsByLabel, filterObject, limitText, prepareUrlPath, bffImageUrl } from './utils'
+import { dropDownSortItemsByLabel, filterObject, limitText, prepareUrlPath, bffImageUrl, sortByLocale } from './utils'
 import { RefType } from './generated'
 
 describe('util functions', () => {
@@ -39,6 +39,38 @@ describe('util functions', () => {
     expect(result).toEqual({
       name: 'John',
       isVisible: true
+    })
+  })
+
+  describe('sortByLocale', () => {
+    it('should return 0 when both strings are identical', () => {
+      const result = sortByLocale('apple', 'apple')
+      expect(result).toBe(0)
+    })
+
+    it('should correctly sort strings ignoring case', () => {
+      expect(sortByLocale('apple', 'Banana')).toBeLessThan(0)
+      expect(sortByLocale('Banana', 'apple')).toBeGreaterThan(0)
+    })
+
+    it('should correctly sort strings with different cases', () => {
+      expect(sortByLocale('Apple', 'apple')).toBe(0)
+      expect(sortByLocale('apple', 'Apple')).toBe(0)
+    })
+
+    it('should correctly sort strings with special characters', () => {
+      expect(sortByLocale('café', 'Cafe')).toBeGreaterThan(0)
+      expect(sortByLocale('Cafe', 'café')).toBeLessThan(0)
+    })
+
+    it('should correctly sort strings with different alphabets', () => {
+      expect(sortByLocale('äpple', 'banana')).toBeLessThan(0)
+      expect(sortByLocale('banana', 'äpple')).toBeGreaterThan(0)
+    })
+
+    it('should correctly sort strings with numbers', () => {
+      expect(sortByLocale('apple1', 'apple2')).toBeLessThan(0)
+      expect(sortByLocale('apple2', 'apple1')).toBeGreaterThan(0)
     })
   })
 
