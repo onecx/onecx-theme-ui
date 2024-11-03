@@ -168,45 +168,41 @@ describe('ThemeDetailComponent', () => {
 
     await component.ngOnInit()
 
-    component.theme$?.subscribe(() => {
-      expect(component.theme).toEqual(themeResponse['resource'])
+    expect(component.theme).toEqual(themeResponse['resource'])
 
-      let actions: any = []
-      component.actions$!.subscribe((act) => (actions = act))
+    let actions: any = []
+    component.actions$!.subscribe((act) => (actions = act))
 
-      expect(actions.length).toBe(4)
-      const closeAction = actions.filter(
-        (a: { label: string; title: string }) =>
-          a.label === 'actionNavigationClose' && a.title === 'actionNavigationCloseTooltip'
-      )[0]
-      spyOn(component, 'onClose')
-      closeAction.actionCallback()
-      expect(component.onClose).toHaveBeenCalledTimes(1)
+    expect(actions.length).toBe(4)
+    const closeAction = actions.filter(
+      (a: { label: string; title: string }) =>
+        a.label === 'actionNavigationClose' && a.title === 'actionNavigationCloseTooltip'
+    )[0]
+    spyOn(component, 'onClose')
+    closeAction.actionCallback()
+    expect(component.onClose).toHaveBeenCalledTimes(1)
 
-      const editAction = actions.filter(
-        (a: { label: string; title: string }) => a.label === 'actionEditLabel' && a.title === 'actionEditTooltip'
-      )[0]
-      const router = TestBed.inject(Router)
-      spyOn(router, 'navigate')
-      editAction.actionCallback()
-      expect(router.navigate).toHaveBeenCalledOnceWith(['./edit'], jasmine.any(Object))
+    const editAction = actions.filter(
+      (a: { label: string; title: string }) => a.label === 'actionEditLabel' && a.title === 'actionEditTooltip'
+    )[0]
+    const router = TestBed.inject(Router)
+    spyOn(router, 'navigate')
+    editAction.actionCallback()
+    expect(router.navigate).toHaveBeenCalledOnceWith(['./edit'], jasmine.any(Object))
 
-      const exportAction = actions.filter(
-        (a: { label: string; title: string }) => a.label === 'actionExportLabel' && a.title === 'actionExportTooltip'
-      )[0]
-      spyOn(component, 'onExportTheme')
-      exportAction.actionCallback()
-      expect(component.onExportTheme).toHaveBeenCalledTimes(1)
+    const exportAction = actions.filter(
+      (a: { label: string; title: string }) => a.label === 'actionExportLabel' && a.title === 'actionExportTooltip'
+    )[0]
+    spyOn(component, 'onExportTheme')
+    exportAction.actionCallback()
+    expect(component.onExportTheme).toHaveBeenCalledTimes(1)
 
-      const deleteAction = actions.filter(
-        (a: { label: string; title: string }) => a.label === 'actionDeleteLabel' && a.title === 'actionDeleteTooltip'
-      )[0]
-      expect(component.themeDeleteVisible).toBe(false)
-      expect(component.themeDeleteMessage).toBe('')
-      deleteAction.actionCallback()
-      expect(component.themeDeleteVisible).toBe(true)
-      expect(component.themeDeleteMessage).toBe('Theme actionDeleteThemeMessage')
-    })
+    const deleteAction = actions.filter(
+      (a: { label: string; title: string }) => a.label === 'actionDeleteLabel' && a.title === 'actionDeleteTooltip'
+    )[0]
+    expect(component.themeDeleteVisible).toBe(false)
+    deleteAction.actionCallback()
+    expect(component.themeDeleteVisible).toBe(true)
   })
 
   it('should load prepare object details on successfull call', async () => {

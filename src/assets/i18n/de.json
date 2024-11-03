@@ -18,7 +18,7 @@
     "DELETE": {
       "LABEL": "Löschen",
       "TOOLTIP": "Theme löschen",
-      "THEME_MESSAGE": "Möchten Sie \"{{ITEM}}\" löschen?",
+      "THEME_MESSAGE": "Möchten Sie dieses Theme löschen?",
       "MESSAGE_INFO": "Diese Aktion kann nicht rückgängig gemacht werden!",
       "THEME_NOK": "Theme konnte nicht gelöscht werden",
       "THEME_OK": "Theme erfolgreich gelöscht"

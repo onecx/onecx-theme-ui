@@ -46,7 +46,7 @@ export class ThemeDesignerComponent implements OnInit {
   public imageLogoUrlExists = false
   public imageFaviconUrlExists = false
 
-  public mode: 'EDIT' | 'NEW' = 'NEW'
+  public changeMode: 'EDIT' | 'NEW' = 'NEW'
   public autoApply = false
   public saveAsNewPopupDisplay = false
   public displayFileTypeErrorLogo = false
@@ -75,7 +75,7 @@ export class ThemeDesignerComponent implements OnInit {
     private readonly confirmation: ConfirmationService,
     private readonly msgService: PortalMessageService
   ) {
-    this.mode = route.snapshot.paramMap.has('name') ? 'EDIT' : 'NEW'
+    this.changeMode = route.snapshot.paramMap.has('name') ? 'EDIT' : 'NEW'
     this.themeName = route.snapshot.paramMap.get('name')
     this.bffImagePath = this.imageApi.configuration.basePath!
     this.prepareActionButtons()
@@ -142,7 +142,7 @@ export class ThemeDesignerComponent implements OnInit {
   ngOnInit(): void {
     this.imageLogoUrlExists = false
     this.imageFaviconUrlExists = false
-    if (this.mode === 'EDIT' && this.themeName) {
+    if (this.changeMode === 'EDIT' && this.themeName) {
       combineLatest([
         this.themeService.currentTheme$.pipe(first()),
         this.themeApi.getThemeByName({ name: this.themeName })
@@ -199,19 +199,21 @@ export class ThemeDesignerComponent implements OnInit {
             {
               label: data['ACTIONS.SAVE'],
               title: data['ACTIONS.TOOLTIPS.SAVE'],
-              actionCallback: () => this.updateTheme(),
+              actionCallback: () => this.onSaveTheme(),
               icon: 'pi pi-save',
               show: 'always',
               conditional: true,
-              showCondition: this.mode === 'EDIT',
-              permission: 'THEME#SAVE'
+              showCondition: this.changeMode === 'EDIT' || this.changeMode === 'NEW',
+              permission: this.changeMode === 'EDIT' ? 'THEME#EDIT' : 'THEME#CREATE'
             },
             {
               label: data['ACTIONS.SAVE_AS'],
               title: data['ACTIONS.TOOLTIPS.SAVE_AS'],
-              actionCallback: () => this.saveAsNewPopup(),
+              actionCallback: () => this.onOpenSaveAsPopup(),
               icon: 'pi pi-plus-circle',
               show: 'always',
+              conditional: true,
+              showCondition: this.changeMode === 'EDIT',
               permission: 'THEME#CREATE'
             }
           ]
@@ -256,7 +258,7 @@ export class ThemeDesignerComponent implements OnInit {
             data,
             () => {
               this.getThemeById(this.themeTemplateSelectedId).subscribe((result) => {
-                if (this.mode === 'NEW') {
+                if (this.changeMode === 'NEW') {
                   this.basicForm.controls['name'].setValue(data['GENERAL.COPY_OF'] + result.resource.name)
                   this.basicForm.controls['displayName'].setValue(result.resource.displayName)
                   this.basicForm.controls['description'].setValue(result.resource.description)
@@ -299,70 +301,98 @@ export class ThemeDesignerComponent implements OnInit {
     this.router.navigate(['./..'], { relativeTo: this.route })
   }
 
-  private updateTheme(): void {
-    if (this.propertiesForm.invalid) {
+  public onSaveTheme(): void {
+    if (this.basicForm.invalid || this.propertiesForm.invalid) {
       this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_NOK' })
-    } else {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.themeApi
-        .getThemeByName({ name: this.themeName! })
-        .pipe(
-          switchMap((data) => {
-            data.resource.properties = this.propertiesForm.value
-            if (this.imageFaviconUrlExists) {
-              data.resource.faviconUrl = undefined
-            } else {
-              data.resource.faviconUrl = this.basicForm.controls['faviconUrl'].value
-            }
-            if (this.imageLogoUrlExists) {
-              data.resource.logoUrl = undefined
-            } else {
-              data.resource.logoUrl = this.basicForm.controls['logoUrl'].value
-            }
-            Object.assign(data.resource, this.basicForm.value)
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            return this.themeApi.updateTheme({
-              id: this.themeId!,
-              updateThemeRequest: data
-            })
-          })
-        )
-        .subscribe({
-          next: (data: UpdateThemeResponse) => {
-            this.msgService.success({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_OK' })
-            // apply theme changes immediately if it is the theme of the current portal
-            if (this.themeIsCurrentUsedTheme) {
-              this.themeService.apply(data as object)
-            }
-          },
-          // eslint-disable @typescript-eslint/no-unused-vars
-          error: () => {
-            this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_NOK' })
-          }
-        })
+      return
     }
+    const newTheme: ThemeUpdateCreate = { ...this.basicForm.value }
+    newTheme.properties = this.propertiesForm.value
+    if (this.changeMode === 'NEW') this.createTheme(newTheme)
+    if (this.changeMode === 'EDIT') this.updateTheme()
   }
 
-  public saveTheme(newThemename: string, newDisplayName: string): void {
+  public saveAsTheme(newThemename: string, newDisplayName: string): void {
     const newTheme: ThemeUpdateCreate = { ...this.basicForm.value }
     newTheme.name = newThemename
     newTheme.displayName = newDisplayName
     newTheme.properties = this.propertiesForm.value
     if (this.imageFaviconUrlExists) newTheme.faviconUrl = undefined
     if (this.imageLogoUrlExists) newTheme.logoUrl = undefined
+    this.createTheme(newTheme)
+  }
 
-    this.themeApi.createTheme({ createThemeRequest: { resource: newTheme } }).subscribe({
-      next: (data) => {
-        if (this.mode === 'EDIT') {
-          this.router.navigate([`../../${data.resource.name}`], {
-            relativeTo: this.route
+  // SAVE AS => EDIT mode
+  public onOpenSaveAsPopup(): void {
+    this.saveAsNewPopupDisplay = true
+  }
+  public onShowSaveAsDialog(): void {
+    const basicFormName = this.basicForm.controls['name'].value ?? ''
+    const basicFormDisplayName = this.basicForm.controls['displayName'].value ?? ''
+    const translatedCopyOf = this.translate.instant('GENERAL.COPY_OF')
+    this.updateSaveAsElement(this.saveAsThemeName, translatedCopyOf + basicFormName)
+    this.updateSaveAsElement(this.saveAsThemeDisplayName, translatedCopyOf + basicFormDisplayName)
+  }
+  private updateSaveAsElement(saveAsElement: ElementRef | undefined, newValue: string): void {
+    if (saveAsElement) {
+      saveAsElement.nativeElement.value = newValue
+    }
+  }
+
+  // EDIT
+  private updateTheme(): void {
+    if (this.propertiesForm.invalid) {
+      this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_NOK' })
+      return
+    }
+    this.themeApi
+      .getThemeByName({ name: this.themeName! })
+      .pipe(
+        switchMap((data) => {
+          data.resource.properties = this.propertiesForm.value
+          if (this.imageFaviconUrlExists) {
+            data.resource.faviconUrl = undefined
+          } else {
+            data.resource.faviconUrl = this.basicForm.controls['faviconUrl'].value
+          }
+          if (this.imageLogoUrlExists) {
+            data.resource.logoUrl = undefined
+          } else {
+            data.resource.logoUrl = this.basicForm.controls['logoUrl'].value
+          }
+          Object.assign(data.resource, this.basicForm.value)
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          return this.themeApi.updateTheme({
+            id: this.themeId!,
+            updateThemeRequest: data
           })
-        } else {
-          this.router.navigate([`../${data.resource.name}`], { relativeTo: this.route })
+        })
+      )
+      .subscribe({
+        next: (data: UpdateThemeResponse) => {
+          this.msgService.success({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_OK' })
+          // apply theme changes immediately if it is the theme of the current portal
+          if (this.themeIsCurrentUsedTheme) {
+            this.themeService.apply(data as object)
+          }
+        },
+        error: () => {
+          this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_NOK' })
         }
+      })
+  }
+
+  // NEW
+  private createTheme(theme: ThemeUpdateCreate): void {
+    this.themeApi.createTheme({ createThemeRequest: { resource: theme } }).subscribe({
+      next: (data) => {
+        // new:  go to theme detail
+        // edit: stay on designer => update theme with data?
+        this.router.navigate([(this.changeMode === 'EDIT' ? '../' : '') + `../${data.resource.name}`], {
+          relativeTo: this.route
+        })
         this.msgService.success({ summaryKey: 'ACTIONS.CREATE.MESSAGE.CREATE_OK' })
       },
-      // eslint-disable @typescript-eslint/no-unused-vars
       error: (err) => {
         this.msgService.error({
           summaryKey: 'ACTIONS.CREATE.MESSAGE.CREATE_NOK',
@@ -373,34 +403,6 @@ export class ThemeDesignerComponent implements OnInit {
         })
       }
     })
-  }
-
-  // SAVE AS
-  public saveAsNewPopup(): void {
-    this.saveAsNewPopupDisplay = true
-  }
-  public onShowSaveAsDialog(): void {
-    const basicFormName = this.basicForm.controls['name'].value
-    const basicFormDisplayName = this.basicForm.controls['displayName'].value
-    const translatedCopyOf = this.translate.instant('GENERAL.COPY_OF')
-
-    if (this.saveAsThemeName || this.saveAsThemeDisplayName) {
-      if (this.mode === 'NEW') {
-        const newValue = basicFormName
-        this.updateSaveAsElement(this.saveAsThemeName, newValue)
-        this.updateSaveAsElement(this.saveAsThemeDisplayName, newValue)
-      } else if (this.mode === 'EDIT') {
-        const newValue = `${translatedCopyOf}${basicFormName}`
-        this.updateSaveAsElement(this.saveAsThemeName, newValue)
-        this.updateSaveAsElement(this.saveAsThemeDisplayName, basicFormDisplayName)
-      }
-    }
-  }
-
-  private updateSaveAsElement(saveAsElement: ElementRef | undefined, newValue: string): void {
-    if (saveAsElement) {
-      saveAsElement.nativeElement.value = newValue
-    }
   }
 
   private getThemeById(id: string): Observable<GetThemeResponse> {

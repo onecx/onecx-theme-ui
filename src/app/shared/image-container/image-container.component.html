@@ -5,7 +5,7 @@
   [ocxSrc]="displayImageUrl"
   (error)="onImageError()"
   [alt]="title"
-  [pTooltip]="title ? title : ('IMAGE.TOOLTIPS.IMAGE' | translate)"
+  [pTooltip]="title"
   tooltipPosition="top"
   tooltipEvent="hover"
 />
@@ -15,7 +15,7 @@
   [class]="'image-object image-' + (small ? 'sm' : 'lg') + ' sm:image-lg ' + (styleClass ? styleClass : '')"
   [src]="defaultImageUrl"
   [alt]="'LOGO.LABEL' | translate"
-  [pTooltip]="title ? title : ('IMAGE.TOOLTIPS.PLACEHOLDER' | translate)"
+  [pTooltip]="title"
   tooltipPosition="top"
   tooltipEvent="hover"
 />
