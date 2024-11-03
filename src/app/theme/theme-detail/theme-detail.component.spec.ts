@@ -193,10 +193,8 @@ describe('ThemeDetailComponent', () => {
       (a: { label: string; title: string }) => a.label === 'actionDeleteLabel' && a.title === 'actionDeleteTooltip'
     )[0]
     expect(component.themeDeleteVisible).toBe(false)
-    expect(component.themeDeleteMessage).toBe('')
     deleteAction.actionCallback()
     expect(component.themeDeleteVisible).toBe(true)
-    expect(component.themeDeleteMessage).toBe('Theme actionDeleteThemeMessage')
   })
 
   it('should load prepare object details on successfull call', async () => {

@@ -1,14 +1,14 @@
 <ocx-portal-page permission="THEME#EDIT" helpArticleId="PAGE_THEME_DESIGNER">
   <ocx-page-header
-    header="{{ theme ? theme.displayName : 'Theme Designer' }}"
-    [subheader]="'THEME.DESIGNER.' + mode + '.SUBHEADER' | translate"
+    [header]="theme ? theme.displayName : 'Theme Designer'"
+    [subheader]="'THEME.DESIGNER.' + changeMode + '.SUBHEADER' | translate"
     [actions]="(actions$ | async) ?? []"
     [figureImage]="fetchingLogoUrl"
     [figureBackground]="!fetchingLogoUrl"
   ></ocx-page-header>
   <ocx-page-content>
     <div>
-      <div class="flex flex-wrap justify-content-between align-items-center my-2 mx-4 p-2 row-gap-2 column-gap-3">
+      <div class="flex flex-wrap justify-content-between align-items-center my-2 mx-4 pt-2 row-gap-2 column-gap-3">
         <div
           class="field mb-0 flex flex-wrap sm:flex-nowrap align-items-center row-gap-1 column-gap-3"
           [pTooltip]="'THEME.DETAIL.AUTO_APPLY.TOOLTIP' | translate"
@@ -62,7 +62,7 @@
             <span>{{ 'THEME.GROUPS.BASE' | translate }}</span>
           </ng-template>
           <div [formGroup]="basicForm" class="grid grid-nogutter formgrid p-fluid mx-1">
-            <div *ngIf="mode === 'NEW'" class="field col-12 mb-4">
+            <div *ngIf="changeMode === 'NEW'" class="field col-12 mb-4">
               <span class="p-float-label" controlErrorAnchor>
                 <input
                   pInputText
@@ -141,7 +141,7 @@
                   pButton
                   id="th_designer_field_logo_upload"
                   icon="pi pi-upload"
-                  [disabled]="mode === 'NEW'"
+                  [disabled]="changeMode === 'NEW'"
                   class="action-button p-button-icon-only"
                   (click)="selectedFileInputLogo.click()"
                   [pTooltip]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
@@ -167,7 +167,7 @@
               </div>
             </div>
             <div class="field col-12 mb-0">
-              <div class="flex flex-wrap sm:flex-nowrap align-items-center pb-2 row-gap-2 column-gap-4">
+              <div class="flex flex-wrap sm:flex-nowrap align-items-center row-gap-2 column-gap-4">
                 <app-image-container
                   id="th_designer_field_favicon_url_image"
                   [styleClass]="'w-5rem'"
@@ -179,7 +179,7 @@
                   pButton
                   id="th_designer_field_favicon_upload"
                   icon="pi pi-upload"
-                  [disabled]="mode === 'NEW'"
+                  [disabled]="changeMode === 'NEW'"
                   class="action-button p-button-icon-only"
                   (click)="selectedFileInputFavicon.click()"
                   [pTooltip]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
@@ -301,59 +301,67 @@
 <p-dialog
   [header]="'ACTIONS.CREATE.THEME' | translate"
   [(visible)]="saveAsNewPopupDisplay"
-  [draggable]="true"
-  [closable]="true"
   [modal]="true"
+  [closable]="true"
+  [draggable]="true"
+  [resizable]="true"
   [style]="{ width: '20vw' }"
-  [baseZIndex]="10000"
   (onShow)="onShowSaveAsDialog()"
 >
-  <span class="p-float-label block mt-3">
-    <input
-      #saveAsThemeName
-      pInputText
-      id="th_saveas_new_theme_name"
-      class="w-full"
-      type="text"
-      [placeholder]="'THEME.NAME' | translate"
-      [pTooltip]="'THEME.TOOLTIPS.NAME' | translate"
-      tooltipPosition="top"
-      tooltipEvent="hover"
-    />
-    <label for="th_saveas_new_theme_name"> {{ 'THEME.NAME' | translate }} </label>
-  </span>
-  <span class="p-float-label block mt-3">
-    <input
-      #saveAsThemeDisplayName
-      pInputText
-      id="th_saveas_new_theme_display_name"
-      class="w-full"
-      type="text"
-      [placeholder]="'THEME.DISPLAY_NAME' | translate"
-      [pTooltip]="'THEME.TOOLTIPS.DISPLAY_NAME' | translate"
-      tooltipPosition="top"
-      tooltipEvent="hover"
-    />
-    <label for="th_saveas_new_theme_display_name"> {{ 'THEME.DISPLAY_NAME' | translate }} </label>
-  </span>
+  <div class="mt-1 flex flex-column row-gap-4" errorTailor>
+    <span class="p-float-label" controlErrorAnchor>
+      <input
+        #saveAsThemeName
+        pInputText
+        id="th_saveas_new_theme_name"
+        class="w-full"
+        type="text"
+        aria-labelledby="th_saveas_new_theme_name"
+        [placeholder]="'THEME.NAME' | translate"
+        [pTooltip]="'THEME.TOOLTIPS.NAME' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      />
+      <label for="th_saveas_new_theme_name" class="ocx-required-label"> {{ 'THEME.NAME' | translate }} </label>
+    </span>
+    <span class="p-float-label" controlErrorAnchor>
+      <input
+        #saveAsThemeDisplayName
+        pInputText
+        id="th_saveas_new_theme_display_name"
+        class="w-full"
+        type="text"
+        aria-labelledby="th_saveas_new_theme_display_name"
+        [placeholder]="'THEME.DISPLAY_NAME' | translate"
+        [pTooltip]="'THEME.TOOLTIPS.DISPLAY_NAME' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      />
+      <label for="th_saveas_new_theme_display_name" class="ocx-required-label">
+        {{ 'THEME.DISPLAY_NAME' | translate }}
+      </label>
+    </span>
+  </div>
   <ng-template pTemplate="footer">
     <div class="flex flex-wrap gap-2 justify-content-end">
       <p-button
         icon="pi pi-times"
         styleClass="m-0"
-        [label]="'ACTIONS.CANCEL' | translate"
         (onClick)="saveAsNewPopupDisplay = false"
-        [pTooltip]="'ACTIONS.CANCEL' | translate"
+        [label]="'ACTIONS.CANCEL' | translate"
+        [ariaLabel]="'ACTIONS.CANCEL' | translate"
+        [pTooltip]="'ACTIONS.TOOLTIPS.CANCEL_AND_CLOSE' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
       ></p-button>
       <p-button
         icon="pi pi-save"
         styleClass="m-0"
+        (onClick)="saveAsTheme(saveAsThemeName.value, saveAsThemeDisplayName.value)"
         [disabled]="saveAsThemeName.value === '' || saveAsThemeDisplayName.value === ''"
         [label]="'ACTIONS.SAVE' | translate"
-        (onClick)="saveTheme(saveAsThemeName.value, saveAsThemeDisplayName.value)"
-        [pTooltip]="'ACTIONS.SAVE' | translate"
+        [ariaLabel]="'ACTIONS.SAVE' | translate"
+        [pTooltip]="'ACTIONS.TOOLTIPS.SAVE_AS' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
       ></p-button>

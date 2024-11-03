@@ -24,7 +24,6 @@ export class ThemeDetailComponent implements OnInit {
   public theme: Theme | undefined
   public themeName!: string
   public themeDeleteVisible = false
-  public themeDeleteMessage = ''
   public showOperatorMessage = true // display initially only
   public loading = true
   public RefType = RefType
@@ -117,13 +116,7 @@ export class ThemeDetailComponent implements OnInit {
             {
               label: data['ACTIONS.DELETE.LABEL'],
               title: data['ACTIONS.DELETE.TOOLTIP'],
-              actionCallback: () => {
-                this.themeDeleteVisible = true
-                this.themeDeleteMessage = data['ACTIONS.DELETE.THEME_MESSAGE'].replace(
-                  '{{ITEM}}',
-                  this.theme?.displayName
-                )
-              },
+              actionCallback: () => (this.themeDeleteVisible = true),
               icon: 'pi pi-trash',
               show: 'asOverflow',
               permission: 'THEME#DELETE',
