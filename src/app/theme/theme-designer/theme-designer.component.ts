@@ -225,16 +225,16 @@ export class ThemeDesignerComponent implements OnInit {
   private loadThemeTemplates(): void {
     this.themeApi.getThemes({}).subscribe((data) => {
       if (data.stream !== undefined) {
-        this.themeTemplates = [...data.stream.map(this.themeDropdownMappingFn).sort(dropDownSortItemsByLabel)]
+        this.themeTemplates = [
+          ...data.stream
+            .map((theme) => ({
+              label: theme.name,
+              value: theme.id
+            }))
+            .sort(dropDownSortItemsByLabel)
+        ]
       }
     })
-  }
-
-  private themeDropdownMappingFn = (theme: Theme) => {
-    return {
-      label: theme.name,
-      value: theme.id
-    }
   }
 
   public onThemeTemplateDropdownChange(): void {
