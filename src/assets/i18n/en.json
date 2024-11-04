@@ -63,6 +63,7 @@
     },
     "CANCEL": "Cancel",
     "CHOOSE": "Choose",
+    "LOADING": "...is loading",
     "SAVE": "Save",
     "SAVE_AS": "Save as ...",
     "UPLOAD": "Upload",

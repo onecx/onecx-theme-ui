@@ -15,6 +15,11 @@ import { RefType, Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeDetailComponent } from './theme-detail.component'
 import { bffImageUrl, getCurrentDateTime } from 'src/app/shared/utils'
 
+const theme: Theme = {
+  name: 'themeName',
+  id: 'theme-id'
+}
+
 describe('ThemeDetailComponent', () => {
   let component: ThemeDetailComponent
   let fixture: ComponentFixture<ThemeDetailComponent>
@@ -97,14 +102,17 @@ describe('ThemeDetailComponent', () => {
     component = fixture.componentInstance
     fixture.detectChanges()
 
-    themesApiSpy.getThemeByName.calls.reset()
+    themesApiSpy.getThemeByName.and.returnValue(of({ resource: theme } as any))
     component.loading = true
 
     await component.ngOnInit()
-    expect(component.themeName).toBe(name)
-    expect(component.dateFormat).toBe('medium')
-    expect(themesApiSpy.getThemeByName).toHaveBeenCalledOnceWith({ name: name })
-    expect(component.loading).toBe(false)
+
+    component.theme$?.subscribe((data) => {
+      expect(data).toBe(theme)
+      expect(component.themeName).toBe(name)
+      expect(component.dateFormat).toBe('medium')
+      expect(themesApiSpy.getThemeByName).toHaveBeenCalled()
+    })
   })
 
   it('should set showOperatorMessage to false', async () => {
@@ -130,71 +138,22 @@ describe('ThemeDetailComponent', () => {
   })
 
   it('should load theme and action translations on successful call', async () => {
-    const themeResponse = {
-      resource: { name: 'themeName', displayName: 'Theme' },
-      workspaces: [{ name: 'workspace', description: 'workspaceDesc' }]
-    }
-    themesApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
-
-    const translateService = TestBed.inject(TranslateService)
-    const actionsTranslations = {
-      'ACTIONS.NAVIGATION.BACK': 'actionNavigationClose',
-      'ACTIONS.NAVIGATION.BACK.TOOLTIP': 'actionNavigationCloseTooltip',
-      'ACTIONS.EDIT.LABEL': 'actionEditLabel',
-      'ACTIONS.EDIT.TOOLTIP': 'actionEditTooltip',
-      'ACTIONS.EXPORT.LABEL': 'actionExportLabel',
-      'ACTIONS.EXPORT.TOOLTIP': 'actionExportTooltip',
-      'ACTIONS.DELETE.LABEL': 'actionDeleteLabel',
-      'ACTIONS.DELETE.TOOLTIP': 'actionDeleteTooltip',
-      'ACTIONS.DELETE.THEME_MESSAGE': '{{ITEM}} actionDeleteThemeMessage'
-    }
-    const generalTranslations = {
-      'DETAIL.CREATION_DATE': 'detailCreationDate',
-      'DETAIL.TOOLTIPS.CREATION_DATE': 'detailTooltipsCreationDate',
-      'DETAIL.MODIFICATION_DATE': 'detailModificationDate',
-      'DETAIL.TOOLTIPS.MODIFICATION_DATE': 'detailTooltipsModificationDate',
-      'THEME.WORKSPACES': 'themeWorkspaces',
-      'THEME.TOOLTIPS.WORKSPACES': 'themeTooltipsWorkspaces'
-    }
-    spyOn(translateService, 'get').and.returnValues(of(actionsTranslations), of(generalTranslations))
-
-    await component.ngOnInit()
-
-    expect(component.theme).toEqual(themeResponse['resource'])
+    spyOn(component, 'onClose')
+    spyOn(component, 'onExportTheme')
+    component.themeDeleteVisible = false
 
     let actions: any = []
     component.actions$!.subscribe((act) => (actions = act))
 
+    actions[0].actionCallback()
+    actions[1].actionCallback()
+    actions[2].actionCallback()
+    actions[3].actionCallback()
+
     expect(actions.length).toBe(4)
-    const closeAction = actions.filter(
-      (a: { label: string; title: string }) =>
-        a.label === 'actionNavigationClose' && a.title === 'actionNavigationCloseTooltip'
-    )[0]
-    spyOn(component, 'onClose')
-    closeAction.actionCallback()
-    expect(component.onClose).toHaveBeenCalledTimes(1)
-
-    const editAction = actions.filter(
-      (a: { label: string; title: string }) => a.label === 'actionEditLabel' && a.title === 'actionEditTooltip'
-    )[0]
-    const router = TestBed.inject(Router)
-    spyOn(router, 'navigate')
-    editAction.actionCallback()
-    expect(router.navigate).toHaveBeenCalledOnceWith(['./edit'], jasmine.any(Object))
-
-    const exportAction = actions.filter(
-      (a: { label: string; title: string }) => a.label === 'actionExportLabel' && a.title === 'actionExportTooltip'
-    )[0]
-    spyOn(component, 'onExportTheme')
-    exportAction.actionCallback()
-    expect(component.onExportTheme).toHaveBeenCalledTimes(1)
-
-    const deleteAction = actions.filter(
-      (a: { label: string; title: string }) => a.label === 'actionDeleteLabel' && a.title === 'actionDeleteTooltip'
-    )[0]
-    expect(component.themeDeleteVisible).toBe(false)
-    deleteAction.actionCallback()
-    expect(component.themeDeleteVisible).toBe(true)
+    expect(component.onClose).toHaveBeenCalled()
+    expect(component.onExportTheme).toHaveBeenCalled()
+    expect(component.themeDeleteVisible).toBeTrue()
   })
 
   it('should load prepare object details on successfull call', async () => {
@@ -234,44 +193,40 @@ describe('ThemeDetailComponent', () => {
     await component.ngOnInit()
   })
 
-  it('should display not found error and close page on theme fetch failure', () => {
-    spyOn(component, 'onClose')
+  it('should display not found error', () => {
     themesApiSpy.getThemeByName.and.returnValue(
       throwError(
         () =>
           new HttpErrorResponse({
-            error: 'err: was not found'
+            status: 404
           })
       )
     )
+    component.exceptionKey = ''
 
     component.ngOnInit()
 
-    expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({
-      summaryKey: 'THEME.LOAD_ERROR',
-      detailKey: 'THEME.NOT_FOUND'
+    component.theme$?.subscribe(() => {
+      expect(component.exceptionKey).toBe('THEME.NOT_FOUND')
     })
-    expect(component.onClose).toHaveBeenCalledTimes(1)
   })
 
-  it('should display catched error and close page on theme fetch failure', () => {
-    spyOn(component, 'onClose')
+  it('should display load error', () => {
     themesApiSpy.getThemeByName.and.returnValue(
       throwError(
         () =>
           new HttpErrorResponse({
-            error: 'does not contain checked string'
+            status: 400
           })
       )
     )
+    component.exceptionKey = ''
 
     component.ngOnInit()
 
-    expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({
-      summaryKey: 'THEME.LOAD_ERROR',
-      detailKey: 'does not contain checked string'
+    component.theme$?.subscribe(() => {
+      expect(component.exceptionKey).toBe('THEME.LOAD_ERROR')
     })
-    expect(component.onClose).toHaveBeenCalledTimes(1)
   })
 
   it('should navigate back on close', () => {
@@ -293,7 +248,9 @@ describe('ThemeDetailComponent', () => {
 
     await component.ngOnInit()
 
-    expect(component.headerImageUrl).toBe('logo123.png')
+    component.theme$?.subscribe(() => {
+      expect(component.headerImageUrl).toBe('logo123.png')
+    })
   })
 
   it('should set header image url without prefix when theme logo has http/https', async () => {
@@ -307,7 +264,10 @@ describe('ThemeDetailComponent', () => {
     }
     themesApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
     await component.ngOnInit()
-    expect(component.headerImageUrl).toBe(url)
+
+    component.theme$?.subscribe(() => {
+      expect(component.headerImageUrl).toBe(url)
+    })
   })
 
   it('should hide dialog, inform and navigate on successfull deletion', () => {

@@ -63,6 +63,7 @@
     },
     "CANCEL": "Abbrechen",
     "CHOOSE": "Auswählen",
+    "LOADING": "...wird geladen",
     "SAVE": "Speichern",
     "SAVE_AS": "Speichern als ...",
     "UPLOAD": "Hochladen",

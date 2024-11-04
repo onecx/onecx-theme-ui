@@ -1,5 +1,6 @@
 <ocx-portal-page permission="THEME#VIEW" helpArticleId="PAGE_THEME_DETAIL">
   <ocx-page-header
+    *ngIf="theme$ | async as theme"
     [loading]="loading"
     [header]="theme?.displayName ?? ''"
     [subheader]="'THEME.DETAIL.SUBHEADER' | translate"
@@ -9,7 +10,23 @@
   >
   </ocx-page-header>
 
-  <ocx-page-content>
+  <div *ngIf="exceptionKey" id="th_detail_error" class="card px-3 align-items-center">
+    <p-message
+      id="th_detail_error_message"
+      severity="error"
+      styleClass="p-2"
+      [text]="exceptionKey | translate"
+    ></p-message>
+  </div>
+  <div *ngIf="loading" id="ws_detail_loading" class="card px-3 align-items-center">
+    <p-message
+      id="ws_detail_loading_message"
+      severity="info"
+      styleClass="p-2"
+      [text]="'ACTIONS.LOADING' | translate"
+    ></p-message>
+  </div>
+  <ocx-page-content *ngIf="!exceptionKey && (theme$ | async) as theme">
     <p-tabView (onChange)="onTabChange($event)">
       <p-tabPanel
         id="th_detail_panel_props"
