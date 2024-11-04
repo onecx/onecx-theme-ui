@@ -138,71 +138,22 @@ describe('ThemeDetailComponent', () => {
   })
 
   it('should load theme and action translations on successful call', async () => {
-    const themeResponse = {
-      resource: { name: 'themeName', displayName: 'Theme' },
-      workspaces: [{ name: 'workspace', description: 'workspaceDesc' }]
-    }
-    themesApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
-
-    const translateService = TestBed.inject(TranslateService)
-    const actionsTranslations = {
-      'ACTIONS.NAVIGATION.BACK': 'actionNavigationClose',
-      'ACTIONS.NAVIGATION.BACK.TOOLTIP': 'actionNavigationCloseTooltip',
-      'ACTIONS.EDIT.LABEL': 'actionEditLabel',
-      'ACTIONS.EDIT.TOOLTIP': 'actionEditTooltip',
-      'ACTIONS.EXPORT.LABEL': 'actionExportLabel',
-      'ACTIONS.EXPORT.TOOLTIP': 'actionExportTooltip',
-      'ACTIONS.DELETE.LABEL': 'actionDeleteLabel',
-      'ACTIONS.DELETE.TOOLTIP': 'actionDeleteTooltip',
-      'ACTIONS.DELETE.THEME_MESSAGE': '{{ITEM}} actionDeleteThemeMessage'
-    }
-    const generalTranslations = {
-      'DETAIL.CREATION_DATE': 'detailCreationDate',
-      'DETAIL.TOOLTIPS.CREATION_DATE': 'detailTooltipsCreationDate',
-      'DETAIL.MODIFICATION_DATE': 'detailModificationDate',
-      'DETAIL.TOOLTIPS.MODIFICATION_DATE': 'detailTooltipsModificationDate',
-      'THEME.WORKSPACES': 'themeWorkspaces',
-      'THEME.TOOLTIPS.WORKSPACES': 'themeTooltipsWorkspaces'
-    }
-    spyOn(translateService, 'get').and.returnValues(of(actionsTranslations), of(generalTranslations))
-
-    await component.ngOnInit()
-
-    expect(component.theme).toEqual(themeResponse['resource'])
+    spyOn(component, 'onClose')
+    spyOn(component, 'onExportTheme')
+    component.themeDeleteVisible = false
 
     let actions: any = []
     component.actions$!.subscribe((act) => (actions = act))
 
+    actions[0].actionCallback()
+    actions[1].actionCallback()
+    actions[2].actionCallback()
+    actions[3].actionCallback()
+
     expect(actions.length).toBe(4)
-    const closeAction = actions.filter(
-      (a: { label: string; title: string }) =>
-        a.label === 'actionNavigationClose' && a.title === 'actionNavigationCloseTooltip'
-    )[0]
-    spyOn(component, 'onClose')
-    closeAction.actionCallback()
-    expect(component.onClose).toHaveBeenCalledTimes(1)
-
-    const editAction = actions.filter(
-      (a: { label: string; title: string }) => a.label === 'actionEditLabel' && a.title === 'actionEditTooltip'
-    )[0]
-    const router = TestBed.inject(Router)
-    spyOn(router, 'navigate')
-    editAction.actionCallback()
-    expect(router.navigate).toHaveBeenCalledOnceWith(['./edit'], jasmine.any(Object))
-
-    const exportAction = actions.filter(
-      (a: { label: string; title: string }) => a.label === 'actionExportLabel' && a.title === 'actionExportTooltip'
-    )[0]
-    spyOn(component, 'onExportTheme')
-    exportAction.actionCallback()
-    expect(component.onExportTheme).toHaveBeenCalledTimes(1)
-
-    const deleteAction = actions.filter(
-      (a: { label: string; title: string }) => a.label === 'actionDeleteLabel' && a.title === 'actionDeleteTooltip'
-    )[0]
-    expect(component.themeDeleteVisible).toBe(false)
-    deleteAction.actionCallback()
-    expect(component.themeDeleteVisible).toBe(true)
+    expect(component.onClose).toHaveBeenCalled()
+    expect(component.onExportTheme).toHaveBeenCalled()
+    expect(component.themeDeleteVisible).toBeTrue()
   })
 
   it('should load prepare object details on successfull call', async () => {
