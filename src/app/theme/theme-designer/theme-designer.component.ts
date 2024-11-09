@@ -36,17 +36,16 @@ export class ThemeDesignerComponent implements OnInit {
   public theme: Theme | undefined
   public themeId: string | undefined
   public themeName: string | null
+  public copyOfPrefix: string | undefined
   public themeVars = themeVariables
   public themeTemplates!: SelectItem[]
-  public themeTemplateSelectedId = ''
-  public themeIsCurrentUsedTheme = false
   public bffImagePath = ''
   public fetchingLogoUrl?: string
   public fetchingFaviconUrl?: string
   public imageLogoUrlExists = false
   public imageFaviconUrlExists = false
 
-  public changeMode: 'EDIT' | 'NEW' = 'NEW'
+  public changeMode: 'EDIT' | 'CREATE' = 'CREATE'
   public autoApply = false
   public saveAsNewPopupDisplay = false
   public displayFileTypeErrorLogo = false
@@ -75,7 +74,7 @@ export class ThemeDesignerComponent implements OnInit {
     private readonly confirmation: ConfirmationService,
     private readonly msgService: PortalMessageService
   ) {
-    this.changeMode = route.snapshot.paramMap.has('name') ? 'EDIT' : 'NEW'
+    this.changeMode = route.snapshot.paramMap.has('name') ? 'EDIT' : 'CREATE'
     this.themeName = route.snapshot.paramMap.get('name')
     this.bffImagePath = this.imageApi.configuration.basePath!
     this.prepareActionButtons()
@@ -148,13 +147,12 @@ export class ThemeDesignerComponent implements OnInit {
         this.themeApi.getThemeByName({ name: this.themeName })
       ]).subscribe(([currentTheme, data]) => {
         this.theme = data.resource
+        this.themeId = this.theme.id
         this.basicForm.patchValue(this.theme)
         this.basicForm.controls['name'].disable()
         this.propertiesForm.reset()
         this.propertiesForm.patchValue(this.theme.properties ?? {})
-        this.themeId = this.theme.id
-        this.themeIsCurrentUsedTheme = this.theme.name === currentTheme.name
-        this.autoApply = this.themeIsCurrentUsedTheme
+        this.autoApply = this.theme.name === currentTheme.name
         // images
         this.fetchingLogoUrl = this.getImageUrl(this.theme, RefType.Logo)
         this.fetchingFaviconUrl = this.getImageUrl(this.theme, RefType.Favicon)
@@ -178,6 +176,7 @@ export class ThemeDesignerComponent implements OnInit {
   private prepareActionButtons(): void {
     this.actions$ = this.translate
       .get([
+        'GENERAL.COPY_OF',
         'ACTIONS.CANCEL',
         'ACTIONS.TOOLTIPS.CANCEL_AND_CLOSE',
         'ACTIONS.SAVE',
@@ -187,11 +186,12 @@ export class ThemeDesignerComponent implements OnInit {
       ])
       .pipe(
         map((data) => {
+          this.copyOfPrefix = data['GENERAL.COPY_OF']
           return [
             {
               label: data['ACTIONS.CANCEL'],
               title: data['ACTIONS.TOOLTIPS.CANCEL_AND_CLOSE'],
-              actionCallback: () => this.close(),
+              actionCallback: () => this.onClose(),
               icon: 'pi pi-times',
               show: 'always',
               permission: 'THEME#VIEW'
@@ -203,7 +203,7 @@ export class ThemeDesignerComponent implements OnInit {
               icon: 'pi pi-save',
               show: 'always',
               conditional: true,
-              showCondition: this.changeMode === 'EDIT' || this.changeMode === 'NEW',
+              showCondition: this.changeMode === 'EDIT' || this.changeMode === 'CREATE',
               permission: this.changeMode === 'EDIT' ? 'THEME#EDIT' : 'THEME#CREATE'
             },
             {
@@ -237,12 +237,12 @@ export class ThemeDesignerComponent implements OnInit {
     })
   }
 
-  public onThemeTemplateDropdownChange(): void {
-    const themeName = dropDownGetLabelByValue(this.themeTemplates, this.themeTemplateSelectedId)
-    this.confirmTemplateTheme(themeName)
+  public onThemeTemplateDropdownChange(ev: any): void {
+    const themeName = dropDownGetLabelByValue(this.themeTemplates, ev.value)
+    this.confirmTemplateTheme(themeName, ev.value)
   }
 
-  private confirmTemplateTheme(themeName: string) {
+  private confirmTemplateTheme(name: string, id: string) {
     this.translate
       .get([
         'GENERAL.COPY_OF',
@@ -253,37 +253,29 @@ export class ThemeDesignerComponent implements OnInit {
       ])
       .pipe(
         map((data) => {
-          this.confirmUseThemeAsTemplate(
-            themeName,
-            data,
-            () => {
-              this.getThemeById(this.themeTemplateSelectedId).subscribe((result) => {
-                if (this.changeMode === 'NEW') {
-                  this.basicForm.controls['name'].setValue(data['GENERAL.COPY_OF'] + result.resource.name)
-                  this.basicForm.controls['displayName'].setValue(result.resource.displayName)
-                  this.basicForm.controls['description'].setValue(result.resource.description)
-                  this.basicForm.controls['logoUrl'].setValue(result.resource.logoUrl)
-                  this.basicForm.controls['faviconUrl'].setValue(result.resource.faviconUrl)
-                  this.fetchingLogoUrl = this.getImageUrl(result.resource, RefType.Logo)
-                  this.fetchingFaviconUrl = this.getImageUrl(result.resource, RefType.Favicon)
-                }
-                if (result.resource.properties) {
-                  this.propertiesForm.reset()
-                  this.propertiesForm.patchValue(result.resource.properties)
-                }
-              })
-            },
-            () => {
-              // on reject
-              this.themeTemplateSelectedId = ''
-            }
-          )
+          this.confirmUseThemeAsTemplate(name, data, () => {
+            this.getThemeById(id).subscribe((result) => {
+              if (this.changeMode === 'CREATE') {
+                this.basicForm.controls['name'].setValue(data['GENERAL.COPY_OF'] + result.resource.name)
+                this.basicForm.controls['displayName'].setValue(result.resource.displayName)
+                this.basicForm.controls['description'].setValue(result.resource.description)
+                this.basicForm.controls['logoUrl'].setValue(result.resource.logoUrl)
+                this.basicForm.controls['faviconUrl'].setValue(result.resource.faviconUrl)
+                this.fetchingLogoUrl = this.getImageUrl(result.resource, RefType.Logo)
+                this.fetchingFaviconUrl = this.getImageUrl(result.resource, RefType.Favicon)
+              }
+              if (result.resource.properties) {
+                this.propertiesForm.reset()
+                this.propertiesForm.patchValue(result.resource.properties)
+              }
+            })
+          })
         })
       )
       .subscribe()
   }
 
-  private confirmUseThemeAsTemplate(themeName: string, data: any, onConfirm: () => void, onReject: () => void): void {
+  private confirmUseThemeAsTemplate(themeName: string, data: any, onConfirm: () => void): void {
     this.confirmation.confirm({
       icon: 'pi pi-question-circle',
       defaultFocus: 'reject',
@@ -292,12 +284,11 @@ export class ThemeDesignerComponent implements OnInit {
       message: data['THEME.TEMPLATE.CONFIRMATION.MESSAGE'].replace('{{ITEM}}', themeName),
       acceptLabel: data['ACTIONS.CONFIRMATION.YES'],
       rejectLabel: data['ACTIONS.CONFIRMATION.NO'],
-      accept: () => onConfirm(),
-      reject: () => onReject()
+      accept: () => onConfirm()
     })
   }
 
-  private close(): void {
+  private onClose(): void {
     this.router.navigate(['./..'], { relativeTo: this.route })
   }
 
@@ -308,7 +299,7 @@ export class ThemeDesignerComponent implements OnInit {
     }
     const newTheme: ThemeUpdateCreate = { ...this.basicForm.value }
     newTheme.properties = this.propertiesForm.value
-    if (this.changeMode === 'NEW') this.createTheme(newTheme)
+    if (this.changeMode === 'CREATE') this.createTheme(newTheme)
     if (this.changeMode === 'EDIT') this.updateTheme()
   }
 
@@ -327,12 +318,12 @@ export class ThemeDesignerComponent implements OnInit {
     this.saveAsNewPopupDisplay = true
   }
   public onShowSaveAsDialog(): void {
-    const basicFormName = this.basicForm.controls['name'].value ?? ''
-    const basicFormDisplayName = this.basicForm.controls['displayName'].value ?? ''
-    const translatedCopyOf = this.translate.instant('GENERAL.COPY_OF')
-    this.updateSaveAsElement(this.saveAsThemeName, translatedCopyOf + basicFormName)
-    this.updateSaveAsElement(this.saveAsThemeDisplayName, translatedCopyOf + basicFormDisplayName)
+    const basicFormName = this.basicForm.controls['name'].value
+    const basicFormDisplayName = this.basicForm.controls['displayName'].value
+    this.updateSaveAsElement(this.saveAsThemeName, this.copyOfPrefix + basicFormName)
+    this.updateSaveAsElement(this.saveAsThemeDisplayName, this.copyOfPrefix + basicFormDisplayName)
   }
+
   private updateSaveAsElement(saveAsElement: ElementRef | undefined, newValue: string): void {
     if (saveAsElement) {
       saveAsElement.nativeElement.value = newValue
@@ -341,10 +332,7 @@ export class ThemeDesignerComponent implements OnInit {
 
   // EDIT
   private updateTheme(): void {
-    if (this.propertiesForm.invalid) {
-      this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_NOK' })
-      return
-    }
+    console.log('updateTheme')
     this.themeApi
       .getThemeByName({ name: this.themeName! })
       .pipe(
@@ -372,7 +360,7 @@ export class ThemeDesignerComponent implements OnInit {
         next: (data: UpdateThemeResponse) => {
           this.msgService.success({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_OK' })
           // apply theme changes immediately if it is the theme of the current portal
-          if (this.themeIsCurrentUsedTheme) {
+          if (this.autoApply) {
             this.themeService.apply(data as object)
           }
         },
@@ -408,10 +396,6 @@ export class ThemeDesignerComponent implements OnInit {
 
   private getThemeById(id: string): Observable<GetThemeResponse> {
     return this.themeApi.getThemeById({ id: id })
-  }
-
-  getDisplayName() {
-    return this.basicForm.controls['name'].value
   }
 
   // Applying Styles

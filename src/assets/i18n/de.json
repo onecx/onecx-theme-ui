@@ -53,7 +53,7 @@
       "NEXT.TOOLTIP": "Nächste Seite",
       "BACK.TOOLTIP": "Vorherige Seite",
       "DETAILS.TOOLTIP": "Anzeige Details",
-      "NEW.TOOLTIP": "Erstelle neuen Eintrag"
+      "CREATE.TOOLTIP": "Erstelle neuen Eintrag"
     },
     "SEARCH": {
       "ERROR": "Daten nicht abrufbar",
@@ -139,7 +139,7 @@
     "SEARCH.HEADER": "Theme Verwaltung",
     "SEARCH.SUBHEADER": "Erstellung und Bearbeitung von Themes",
     "DESIGNER.EDIT.SUBHEADER": "Theme Details ändern",
-    "DESIGNER.NEW.SUBHEADER": "Ein neues Theme erstellen",
+    "DESIGNER.CREATE.SUBHEADER": "Ein neues Theme erstellen",
     "DETAIL.SUBHEADER": "Theme Details",
     "DETAIL.AUTO_APPLY": "Änderungen automatisch anwenden",
     "DETAIL.AUTO_APPLY.TOOLTIP": "Wenn diese Option eingeschaltet ist, dann werden alle Änderungen (Schriftart, Farben) automatisch auf die aktuelle Seite angewendet.",

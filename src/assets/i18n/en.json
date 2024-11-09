@@ -53,7 +53,7 @@
       "NEXT.TOOLTIP": "Next page",
       "BACK.TOOLTIP": "Previous page",
       "DETAILS.TOOLTIP": "Display details",
-      "NEW.TOOLTIP": "Create new entry"
+      "CREATE.TOOLTIP": "Create new entry"
     },
     "SEARCH": {
       "ERROR": "Data not available",
@@ -139,7 +139,7 @@
     "SEARCH.HEADER": "Theme Management",
     "SEARCH.SUBHEADER": "Creation and editing of Themes",
     "DESIGNER.EDIT.SUBHEADER": "Change Theme Details",
-    "DESIGNER.NEW.SUBHEADER": "Create a new Theme",
+    "DESIGNER.CREATE.SUBHEADER": "Create a new Theme",
     "DETAIL.SUBHEADER": "Theme Details",
     "DETAIL.AUTO_APPLY": "Auto apply changes",
     "DETAIL.AUTO_APPLY.TOOLTIP": "If this option is switched on, then all changes (font, colors) are automatically applied to the current page.",

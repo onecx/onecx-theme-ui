@@ -21,12 +21,24 @@ import { PortalMessageService, ThemeService } from '@onecx/portal-integration-an
 import { CurrentThemeTopic } from '@onecx/integration-interface'
 
 import { RefType, ThemesAPIService, ImagesInternalAPIService } from 'src/app/shared/generated'
-import { themeVariables } from './theme-variables'
 import { ThemeDesignerComponent } from './theme-designer.component'
+import { themeVariables } from './theme-variables'
 
 describe('ThemeDesignerComponent', () => {
   let component: ThemeDesignerComponent
   let fixture: ComponentFixture<ThemeDesignerComponent>
+  const validTheme = {
+    id: 'id',
+    name: 'themeName',
+    displayName: 'themeDisplayName',
+    description: 'desc',
+    logoUrl: 'logo_url',
+    faviconUrl: 'fav_url',
+    properties: {
+      font: { 'font-family': 'myFont' },
+      general: { 'primary-color': 'rgb(0,0,0)' }
+    }
+  }
 
   const msgServiceSpy = jasmine.createSpyObj<PortalMessageService>('PortalMessageService', ['success', 'error', 'info'])
   const themeServiceSpy = jasmine.createSpyObj<ThemeService>('ThemeService', ['apply'], {
@@ -124,7 +136,7 @@ describe('ThemeDesignerComponent', () => {
 
       initializeComponent()
 
-      expect(component.changeMode).toBe('NEW')
+      expect(component.changeMode).toBe('CREATE')
     })
 
     it('should populate state and create forms', () => {
@@ -134,7 +146,7 @@ describe('ThemeDesignerComponent', () => {
       initializeComponent()
 
       expect(component.themeName).toBe('themeName')
-      expect(component.themeIsCurrentUsedTheme).toBeFalse()
+      expect(component.autoApply).toBeFalse()
       expect(Object.keys(component.fontForm.controls).length).toBe(themeVariables.font.length)
       expect(Object.keys(component.generalForm.controls).length).toBe(themeVariables.general.length)
       expect(Object.keys(component.topbarForm.controls).length).toBe(themeVariables.topbar.length)
@@ -161,9 +173,9 @@ describe('ThemeDesignerComponent', () => {
         const cancelAction = actions.filter(
           (a) => a.label === 'actionCancel' && a.title === 'actionTooltipsCancelAndClose'
         )[0]
-        spyOn<any>(component, 'close')
+        spyOn<any>(component, 'onClose')
         cancelAction.actionCallback()
-        expect(component['close']).toHaveBeenCalledTimes(1)
+        expect(component['onClose']).toHaveBeenCalledTimes(1)
 
         const saveAction = actions.filter((a) => a.label === 'actionsSave' && a.title === 'actionsTooltipsSave')[0]
         spyOn<any>(component, 'onSaveTheme')
@@ -221,40 +233,29 @@ describe('ThemeDesignerComponent', () => {
     }))
   })
 
-  describe('after creation', () => {
+  describe('after component initialization', () => {
     beforeEach(() => {
       initializeComponent()
     })
 
-    it('should create', () => {
+    it('should initialize component', () => {
       expect(component).toBeTruthy()
     })
 
     it('should populate form with theme data in edit changeMode', () => {
-      const themeData = {
-        id: 'id',
-        description: 'desc',
-        logoUrl: 'logo_url',
-        faviconUrl: 'fav_url',
-        name: 'themeName',
-        properties: {
-          font: { 'font-family': 'myFont' },
-          general: { 'primary-color': 'rgb(0,0,0)' }
-        }
-      }
-      const themeResponse = { resource: themeData }
+      const themeResponse = { resource: validTheme }
       themeApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
       component.changeMode = 'EDIT'
       component.themeName = 'themeName'
 
       component.ngOnInit()
 
-      expect(component.theme).toBe(themeData)
+      expect(component.theme).toBe(validTheme)
       expect(themeApiSpy.getThemeByName).toHaveBeenCalledOnceWith({ name: 'themeName' })
-      expect(component.basicForm.controls['name'].value).toBe(themeData.name)
-      expect(component.basicForm.controls['description'].value).toBe(themeData.description)
-      expect(component.basicForm.controls['logoUrl'].value).toBe(themeData.logoUrl)
-      expect(component.basicForm.controls['faviconUrl'].value).toBe(themeData.faviconUrl)
+      expect(component.basicForm.controls['name'].value).toBe(validTheme.name)
+      expect(component.basicForm.controls['description'].value).toBe(validTheme.description)
+      expect(component.basicForm.controls['logoUrl'].value).toBe(validTheme.logoUrl)
+      expect(component.basicForm.controls['faviconUrl'].value).toBe(validTheme.faviconUrl)
       expect(component.fontForm.controls['font-family'].value).toBe('myFont')
       expect(component.generalForm.controls['primary-color'].value).toBe('rgb(0,0,0)')
       expect(component.themeId).toBe('id')
@@ -324,15 +325,19 @@ describe('ThemeDesignerComponent', () => {
       })
     })
 
-    it('should display error when updating theme with invalid form', (done: DoneFn) => {
+    it('should display error when updating theme with invalid basic form', () => {
+      spyOnProperty(component.basicForm, 'invalid').and.returnValue(true)
+
+      component.onSaveTheme()
+
+      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
+    })
+    it('should display error when updating theme with invalid property form', () => {
       spyOnProperty(component.propertiesForm, 'invalid').and.returnValue(true)
 
-      component.actions$?.subscribe((actions) => {
-        const updateThemeAction = actions[1]
-        updateThemeAction.actionCallback()
-        expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
-        done()
-      })
+      component.onSaveTheme()
+
+      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
     })
 
     it('should display error when theme data are not ready', (done: DoneFn) => {
@@ -356,22 +361,12 @@ describe('ThemeDesignerComponent', () => {
     })
 
     // on save
-    xit('should only update properties and base theme data and show success when updating theme call is successful', (done: DoneFn) => {
+    it('should only update properties and base theme data and show success when updating theme call is successful', () => {
       component.themeId = 'id'
-      const themeData = {
-        id: 'id',
-        description: 'desc',
-        logoUrl: 'logo_url',
-        faviconUrl: 'fav_url',
-        name: 'themeName',
-        properties: {
-          font: { 'font-family': 'myFont' },
-          general: { 'primary-color': 'rgb(0,0,0)' }
-        }
-      }
-      const themeResponse = { resource: themeData }
+      const themeResponse = { resource: validTheme }
       themeApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
 
+      // updating forms with different data
       component.fontForm.patchValue({ 'font-family': 'updatedFont' })
       component.generalForm.patchValue({ 'primary-color': 'rgb(255,255,255)' })
       const newBasicData = {
@@ -387,55 +382,55 @@ describe('ThemeDesignerComponent', () => {
 
       themeApiSpy.updateTheme.and.returnValue(of({}) as any)
 
-      component.actions$?.subscribe((actions) => {
-        const updateThemeAction = actions[2]
-        updateThemeAction.actionCallback()
-        expect(msgServiceSpy.success).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_OK' })
-        expect(themeApiSpy.updateTheme).toHaveBeenCalledTimes(1)
-        const updateArgs = themeApiSpy.updateTheme.calls.mostRecent().args[0]
-        expect(updateArgs.updateThemeRequest?.resource.name).toBe(newBasicData.name)
-        expect(updateArgs.updateThemeRequest?.resource.description).toBe(newBasicData.description)
-        expect(updateArgs.updateThemeRequest?.resource.logoUrl).toBe(newBasicData.logoUrl)
-        expect(updateArgs.updateThemeRequest?.resource.faviconUrl).toBe(newBasicData.faviconUrl)
-        expect(updateArgs.updateThemeRequest?.resource.properties).toEqual(
-          jasmine.objectContaining({
-            font: jasmine.objectContaining({ 'font-family': 'updatedFont' }),
-            general: jasmine.objectContaining({ 'primary-color': 'rgb(255,255,255)' })
-          })
-        )
-        done()
-      })
+      component.changeMode = 'EDIT'
+      component.onSaveTheme()
+
+      expect(msgServiceSpy.success).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_OK' })
+      expect(themeApiSpy.updateTheme).toHaveBeenCalledTimes(1)
+      const updateArgs = themeApiSpy.updateTheme.calls.mostRecent().args[0]
+      expect(updateArgs.updateThemeRequest?.resource.name).toBe(newBasicData.name)
+      expect(updateArgs.updateThemeRequest?.resource.description).toBe(newBasicData.description)
+      expect(updateArgs.updateThemeRequest?.resource.logoUrl).toBe(newBasicData.logoUrl)
+      expect(updateArgs.updateThemeRequest?.resource.faviconUrl).toBe(newBasicData.faviconUrl)
+      expect(updateArgs.updateThemeRequest?.resource.properties).toEqual(
+        jasmine.objectContaining({
+          font: jasmine.objectContaining({ 'font-family': 'updatedFont' }),
+          general: jasmine.objectContaining({ 'primary-color': 'rgb(255,255,255)' })
+        })
+      )
     })
 
-    xit('should apply changes when updating current theme is successful', (done: DoneFn) => {
+    it('should apply changes when updating current theme is successful', (done: DoneFn) => {
       component.themeId = 'id'
-      const themeData = {
-        id: 'id',
-        description: 'desc',
-        logoUrl: 'logo_url',
-        faviconUrl: 'fav_url',
-        name: 'themeName',
-        properties: {
-          font: { 'font-family': 'myFont' },
-          general: { 'primary-color': 'rgb(0,0,0)' }
-        }
-      }
-      const themeResponse = { resource: themeData }
+      const themeResponse = { resource: validTheme }
       themeApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
-      const updateThemeData = { resource: { id: 'updatedCallId' } }
+
+      component.fontForm.patchValue({ 'font-family': 'updatedFont' })
+      component.generalForm.patchValue({ 'primary-color': 'rgb(255,255,255)' })
+      const newBasicData = {
+        name: 'updatedName',
+        displayName: 'updatedDisplayName',
+        description: 'updatedDesc',
+        logoUrl: 'updated_logo_url',
+        faviconUrl: 'updated_favicon_url'
+      }
+      component.basicForm.patchValue(newBasicData)
+
+      const updateThemeData = { resource: validTheme }
       themeApiSpy.updateTheme.and.returnValue(of(updateThemeData) as any)
 
-      component.themeIsCurrentUsedTheme = true
+      component.autoApply = true
+      component.changeMode = 'EDIT'
 
       component.actions$?.subscribe((actions) => {
-        const updateThemeAction = actions[2]
-        updateThemeAction.actionCallback()
+        const saveThemeAction = actions[1]
+        saveThemeAction.actionCallback()
         expect(themeServiceSpy.apply).toHaveBeenCalledOnceWith(updateThemeData as any)
         done()
       })
     })
 
-    it('should display theme already exists message on theme save failure', () => {
+    it('should display theme already exists message on theme save as failure', () => {
       themeApiSpy.createTheme.and.returnValue(
         throwError(() => new HttpErrorResponse({ error: { errorCode: 'PERSIST_ENTITY_FAILED' } }))
       )
@@ -448,7 +443,7 @@ describe('ThemeDesignerComponent', () => {
       })
     })
 
-    it('should display error message on theme save failure', () => {
+    it('should display error message on theme save failure on creation', () => {
       const responseError = 'Error message'
       themeApiSpy.createTheme.and.returnValue(throwError(() => new HttpErrorResponse({ error: responseError })))
 
@@ -458,6 +453,25 @@ describe('ThemeDesignerComponent', () => {
         summaryKey: 'ACTIONS.CREATE.MESSAGE.CREATE_NOK',
         detailKey: responseError
       })
+    })
+
+    it('should display error message on theme updating', () => {
+      component.themeId = validTheme.id
+      component.themeName = validTheme.name
+      const themeResponse = { resource: validTheme }
+      themeApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
+      themeApiSpy.updateTheme.and.returnValue(throwError(() => new HttpErrorResponse({})))
+
+      component.changeMode = 'EDIT'
+      component.basicForm.patchValue(validTheme)
+      component.fontForm.patchValue(validTheme.properties.font)
+      component.generalForm.patchValue(validTheme.properties.general)
+
+      component.onSaveTheme()
+
+      expect(component.basicForm.valid).toBeTrue()
+      expect(component.propertiesForm.valid).toBeTrue()
+      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_NOK' })
     })
 
     it('should display success message and route correctly in edit changeMode', () => {
@@ -476,8 +490,8 @@ describe('ThemeDesignerComponent', () => {
       component.fontForm.patchValue({ 'font-family': 'newFont' })
       component.generalForm.patchValue({ 'primary-color': 'rgb(255,255,255)' })
       themeApiSpy.createTheme.and.returnValue(of({ resource: { name: 'myTheme' } }) as any)
-      component.changeMode = 'EDIT'
 
+      component.changeMode = 'EDIT'
       component.saveAsTheme('myTheme', 'myDisplayName')
 
       const createArgs = themeApiSpy.createTheme.calls.mostRecent().args[0]
@@ -501,6 +515,34 @@ describe('ThemeDesignerComponent', () => {
       expect(router.navigate).toHaveBeenCalledOnceWith(
         [`../../myTheme`],
         jasmine.objectContaining({ relativeTo: route })
+      )
+    })
+
+    it('should display success message in create changeMode', () => {
+      const router = TestBed.inject(Router)
+      spyOn(router, 'navigate')
+
+      component.basicForm.patchValue(validTheme)
+      component.fontForm.patchValue(validTheme.properties.font)
+      component.generalForm.patchValue(validTheme.properties.general)
+      themeApiSpy.createTheme.and.returnValue(of({ resource: { name: 'myTheme' } }) as any)
+
+      component.changeMode = 'CREATE'
+      component.onSaveTheme()
+
+      const createArgs = themeApiSpy.createTheme.calls.mostRecent().args[0]
+      expect(createArgs.createThemeRequest?.resource).toEqual(
+        jasmine.objectContaining({
+          name: validTheme.name,
+          displayName: validTheme.displayName,
+          description: validTheme.description,
+          logoUrl: validTheme.logoUrl,
+          faviconUrl: validTheme.faviconUrl,
+          properties: jasmine.objectContaining({
+            font: jasmine.objectContaining(validTheme.properties.font),
+            general: jasmine.objectContaining(validTheme.properties.general)
+          })
+        })
       )
     })
 
@@ -560,7 +602,7 @@ describe('ThemeDesignerComponent', () => {
       )
     })
 
-    it('should display success message and route correctly in new changeMode', () => {
+    it('should display success message and route correctly in create changeMode', () => {
       const router = TestBed.inject(Router)
       spyOn(router, 'navigate')
 
@@ -576,7 +618,7 @@ describe('ThemeDesignerComponent', () => {
       component.fontForm.patchValue({ 'font-family': 'newFont' })
       component.generalForm.patchValue({ 'primary-color': 'rgb(255,255,255)' })
       themeApiSpy.createTheme.and.returnValue(of({ resource: { name: 'myTheme' } }) as any)
-      component.changeMode = 'NEW'
+      component.changeMode = 'CREATE'
 
       component.saveAsTheme('myTheme', 'myDisplayName')
 
@@ -595,29 +637,27 @@ describe('ThemeDesignerComponent', () => {
       })
     })
 
-    it('should use form theme name in save as dialog while in NEW changeMode', () => {
+    it('should use form theme name in save as dialog while in create changeMode', () => {
       component.saveAsThemeName = jasmine.createSpyObj('ElementRef', [], { nativeElement: { value: '' } })
       component.saveAsThemeDisplayName = jasmine.createSpyObj('ElementRef', [], { nativeElement: { value: '' } })
       component.basicForm.controls['name'].setValue('newThemeName')
       component.basicForm.controls['displayName'].setValue('newThemeDisplayName')
-      component.changeMode = 'NEW'
+      component.changeMode = 'CREATE'
 
       component.onShowSaveAsDialog()
 
-      expect(component.saveAsThemeName?.nativeElement.value).toBe('Copy of newThemeName')
-      expect(component.saveAsThemeDisplayName?.nativeElement.value).toBe('Copy of newThemeDisplayName')
+      expect(component.saveAsThemeName?.nativeElement.value).toBe(component.copyOfPrefix + 'newThemeName')
+      expect(component.saveAsThemeDisplayName?.nativeElement.value).toBe(component.copyOfPrefix + 'newThemeDisplayName')
     })
 
     it('should use COPY_OF + form theme name in save as dialog while in EDIT changeMode', () => {
-      const translateService = TestBed.inject(TranslateService)
-      spyOn(translateService, 'instant').and.returnValue('copy_of: ')
       component.saveAsThemeName = jasmine.createSpyObj('ElementRef', [], { nativeElement: { value: '' } })
       component.basicForm.controls['name'].setValue('newThemeName')
       component.changeMode = 'EDIT'
 
       component.onShowSaveAsDialog()
 
-      expect(component.saveAsThemeName?.nativeElement.value).toBe('copy_of: newThemeName')
+      expect(component.saveAsThemeName?.nativeElement.value).toBe(component.copyOfPrefix + 'newThemeName')
     })
 
     it('should not upload a file if currThemeName is empty', () => {
@@ -830,10 +870,8 @@ describe('ThemeDesignerComponent', () => {
         { label: 'myTheme', value: 'id2' }
       ]
 
-      component.themeTemplateSelectedId = 'id2'
-
       const translationData = {
-        'GENERAL.COPY_OF': 'generalCopyOf',
+        'GENERAL.COPY_OF': 'Copy of ',
         'THEME.TEMPLATE.CONFIRMATION.HEADER': 'themeTemplateConfirmationHeader',
         'THEME.TEMPLATE.CONFIRMATION.MESSAGE': '{{ITEM}} themeTemplateConfirmationMessage',
         'ACTIONS.CONFIRMATION.YES': 'actionsConfirmationYes',
@@ -844,7 +882,7 @@ describe('ThemeDesignerComponent', () => {
 
       const confirmdialog: ConfirmDialog = fixture.debugElement.query(By.css('p-confirmdialog')).componentInstance
 
-      component.onThemeTemplateDropdownChange()
+      component.onThemeTemplateDropdownChange({ value: 'id2' })
       fixture.detectChanges()
 
       expect(confirmdialog.confirmation).toEqual(
@@ -863,12 +901,10 @@ describe('ThemeDesignerComponent', () => {
         { label: 'myTheme', value: 'id2' }
       ]
 
-      component.themeTemplateSelectedId = 'id2'
-
       const confirmdialog: ConfirmDialog = fixture.debugElement.query(By.css('p-confirmdialog')).componentInstance
       const reject = spyOn(confirmdialog, 'reject').and.callThrough()
 
-      component.onThemeTemplateDropdownChange()
+      component.onThemeTemplateDropdownChange({ value: 'id2' })
       fixture.detectChanges()
       component = fixture.componentInstance
 
@@ -876,7 +912,6 @@ describe('ThemeDesignerComponent', () => {
       cancelBtn.click()
 
       expect(reject).toHaveBeenCalled()
-      expect(component.themeTemplateSelectedId).toBe('')
     })
 
     it('should populate only properties with template data on confirmation accept and EDIT changeMode', () => {
@@ -885,10 +920,10 @@ describe('ThemeDesignerComponent', () => {
         { label: 'myTheme', value: 'id2' }
       ]
 
-      component.themeTemplateSelectedId = 'id2'
+      component.onThemeTemplateDropdownChange({ value: 'id2' })
 
       const translationData = {
-        'GENERAL.COPY_OF': 'generalCopyOf',
+        'GENERAL.COPY_OF': 'Copy of ',
         'THEME.TEMPLATE.CONFIRMATION.HEADER': 'themeTemplateConfirmationHeader',
         'THEME.TEMPLATE.CONFIRMATION.MESSAGE': '{{ITEM}} themeTemplateConfirmationMessage',
         'ACTIONS.CONFIRMATION.YES': 'actionsConfirmationYes',
@@ -927,7 +962,7 @@ describe('ThemeDesignerComponent', () => {
       const confirmdialog: ConfirmDialog = fixture.debugElement.query(By.css('p-confirmdialog')).componentInstance
       const accept = spyOn(confirmdialog, 'accept').and.callThrough()
 
-      component.onThemeTemplateDropdownChange()
+      component.onThemeTemplateDropdownChange({ value: 'id2' })
       fixture.detectChanges()
 
       const acceptBtn = fixture.debugElement.nativeElement.querySelector('.p-confirm-dialog-accept')
@@ -950,10 +985,9 @@ describe('ThemeDesignerComponent', () => {
         { label: 'theme1', value: 'id1' },
         { label: 'myTheme', value: 'id2' }
       ]
-      component.themeTemplateSelectedId = 'id2'
 
       const translationData = {
-        'GENERAL.COPY_OF': 'generalCopyOf: ',
+        'GENERAL.COPY_OF': 'Copy of ',
         'THEME.TEMPLATE.CONFIRMATION.HEADER': 'themeTemplateConfirmationHeader',
         'THEME.TEMPLATE.CONFIRMATION.MESSAGE': '{{ITEM}} themeTemplateConfirmationMessage',
         'ACTIONS.CONFIRMATION.YES': 'actionsConfirmationYes',
@@ -962,7 +996,7 @@ describe('ThemeDesignerComponent', () => {
       const translateService = TestBed.inject(TranslateService)
       spyOn(translateService, 'get').and.returnValue(of(translationData))
 
-      component.changeMode = 'NEW'
+      component.changeMode = 'CREATE'
       const basicFormBeforeFetch = {
         name: 'n',
         displayName: 'n',
@@ -979,12 +1013,8 @@ describe('ThemeDesignerComponent', () => {
         faviconUrl: 'fetchedFavUrl',
         logoUrl: 'fetchedLogoUrl',
         properties: {
-          font: {
-            'font-family': 'fetchedFont'
-          },
-          general: {
-            'primary-color': 'rgb(255,255,255)'
-          }
+          font: { 'font-family': 'fetchedFont' },
+          general: { 'primary-color': 'rgb(255,255,255)' }
         }
       }
       const fetchedThemeResponse = {
@@ -995,7 +1025,7 @@ describe('ThemeDesignerComponent', () => {
       const confirmdialog: ConfirmDialog = fixture.debugElement.query(By.css('p-confirmdialog')).componentInstance
       const accept = spyOn(confirmdialog, 'accept').and.callThrough()
 
-      component.onThemeTemplateDropdownChange()
+      component.onThemeTemplateDropdownChange({ value: 'id2' })
       fixture.detectChanges()
 
       const acceptBtn = fixture.debugElement.nativeElement.querySelector('.p-confirm-dialog-accept')
@@ -1003,7 +1033,7 @@ describe('ThemeDesignerComponent', () => {
 
       expect(accept).toHaveBeenCalled()
       expect(component.basicForm.value).toEqual({
-        name: 'generalCopyOf: fetchedName',
+        name: 'Copy of fetchedName',
         displayName: 'fetchedNamedisplay',
         description: 'fetchedDesc',
         faviconUrl: 'fetchedFavUrl',
@@ -1032,37 +1062,5 @@ describe('ThemeDesignerComponent', () => {
     }
     expect(component.getImageUrl(theme, RefType.Logo)).toBe(theme.logoUrl)
     expect(component.getImageUrl(theme, RefType.Favicon)).toBe(theme.faviconUrl)
-  })
-
-  it('should get display name', () => {
-    const themeData = {
-      id: 'id',
-      description: 'desc',
-      logoUrl: 'logo_url',
-      faviconUrl: 'fav_url',
-      name: 'themeName',
-      properties: {
-        font: {
-          'font-family': 'myFont'
-        },
-        general: {
-          'primary-color': 'rgb(0,0,0)'
-        }
-      }
-    }
-    const themeResponse = {
-      resource: themeData
-    }
-    themeApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
-    component.changeMode = 'EDIT'
-    component.themeName = 'themeName'
-
-    component.ngOnInit()
-
-    expect(component.theme).toBe(themeData)
-    expect(themeApiSpy.getThemeByName).toHaveBeenCalledOnceWith({ name: 'themeName' })
-    const res = component.getDisplayName()
-
-    expect(res).toBe('themeName')
   })
 })
