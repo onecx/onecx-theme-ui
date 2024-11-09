@@ -145,8 +145,6 @@
     "DETAIL.AUTO_APPLY.TOOLTIP": "Wenn diese Option eingeschaltet ist, dann werden alle Änderungen (Schriftart, Farben) automatisch auf die aktuelle Seite angewendet.",
     "DETAIL.AUTO_APPLY_CURRENT_THEME": "Änderungen werden beim Speichern sofort angewendet, weil es das aktuell benutzte Theme ist",
     "DETAIL.THEME_SELECTOR": "Ein Theme als Vorlage wählen",
-    "LOAD_ERROR": "Theme konnte nicht geladen werden",
-    "NOT_FOUND": "Theme nicht gefunden",
     "NO_PROPERTIES": "Keine Farbwerte enthalten",
     "TABS": {
       "INTERN": "Intern",
@@ -223,20 +221,19 @@
   },
   "EXCEPTIONS": {
     "HTTP_STATUS_0": {
-      "PORTALS": "Unbekanntes Problem beim Abrufen von Workspace-Daten - Bitte versuchen sie es noch einmal.",
-      "MENUS": "Unbekanntes Problem beim Abrufen von Menü-Daten - Bitte versuchen sie es noch einmal."
+      "THEME": "Unbekanntes Problem beim Abrufen des Themes - Bitte versuchen sie es noch einmal."
+    },
+    "HTTP_STATUS_401": {
+      "THEME": "Sie sind nicht authorisiert um Themes zu sehen."
     },
     "HTTP_STATUS_403": {
-      "PORTALS": "Sie haben keine Rechte um Workspaces zu sehen.",
-      "MENUS": "Sie haben keine Rechte um Menüs zu sehen."
+      "THEME": "Sie haben keine Rechte um Themes zu sehen."
     },
     "HTTP_STATUS_404": {
-      "PORTALS": "Es konnten keine Workspaces gefunden werden.",
-      "MENUS": "Es konnten keine Menüs gefunden werden."
+      "THEME": "Theme nicht gefunden werden."
     },
     "HTTP_STATUS_500": {
-      "PORTALS": "Unbekanntes Server-Problem beim Abrufen von Workspace-Daten - Bitte versuchen sie es noch einmal.",
-      "MENUS": "Unbekanntes Server-Problem beim Abrufen von Menü-Daten - Bitte versuchen sie es noch einmal."
+      "MENUS": "Unbekanntes Server-Problem beim Abrufen des Themes - Bitte versuchen sie es noch einmal."
     }
   }
 }

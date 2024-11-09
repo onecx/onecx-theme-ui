@@ -1,7 +1,8 @@
 @import 'src/app/_th-mixins.scss';
 
-@include dialog-non-full-size-modal;
 @include danger-action;
+@include dialog-non-full-size-modal;
+@include tabview-fix-color-selected-tab;
 
 :host ::ng-deep {
   .max-w-11 {

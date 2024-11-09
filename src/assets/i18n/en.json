@@ -145,8 +145,6 @@
     "DETAIL.AUTO_APPLY.TOOLTIP": "If this option is switched on, then all changes (font, colors) are automatically applied to the current page.",
     "DETAIL.AUTO_APPLY_CURRENT_THEME": "Changes are applied immediately when saving because it is the Theme currently in use",
     "DETAIL.THEME_SELECTOR": "Select Theme as Template",
-    "LOAD_ERROR": "Failed to load Theme",
-    "NOT_FOUND": "Theme was not found",
     "NO_PROPERTIES": "No properties specified",
     "TABS": {
       "INTERN": "Internal",
@@ -223,20 +221,19 @@
   },
   "EXCEPTIONS": {
     "HTTP_STATUS_0": {
-      "PORTALS": "Unknown problem retrieving Workspace data - please try again.",
-      "MENUS": "Unknown problem retrieving menu data - please try again."
+      "MENUS": "Unknown problem retrieving Theme data - please try again."
+    },
+    "HTTP_STATUS_401": {
+      "MENUS": "You are not authorized to see Themes."
     },
     "HTTP_STATUS_403": {
-      "PORTALS": "You have no permissions to see workspaces.",
-      "MENUS": "You have no permissions to see menus."
+      "MENUS": "You have no permissions to see Themes."
     },
     "HTTP_STATUS_404": {
-      "PORTALS": "No Workspaces could be found.",
-      "MENUS": "No menus could be found."
+      "MENUS": "Theme could not be found."
     },
     "HTTP_STATUS_500": {
-      "PORTALS": "Unknown server problem retrieving Workspace data - please try again.",
-      "MENUS": "Unknown server problem retrieving menu data - please try again."
+      "MENUS": "Unknown server problem retrieving the Theme - please try again."
     }
   }
 }

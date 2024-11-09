@@ -16,8 +16,9 @@ import { ThemeDetailComponent } from './theme-detail.component'
 import { bffImageUrl, getCurrentDateTime } from 'src/app/shared/utils'
 
 const theme: Theme = {
+  id: 'theme-id',
   name: 'themeName',
-  id: 'theme-id'
+  displayName: 'themeDisplayName'
 }
 
 describe('ThemeDetailComponent', () => {
@@ -92,9 +93,8 @@ describe('ThemeDetailComponent', () => {
   })
 
   it('should create with provided id and get theme', async () => {
-    const name = 'themeName'
     const route = TestBed.inject(ActivatedRoute)
-    spyOn(route.snapshot.paramMap, 'get').and.returnValue(name)
+    spyOn(route.snapshot.paramMap, 'get').and.returnValue(theme.name!)
     translateService.use('de')
 
     // recreate component to test constructor
@@ -103,13 +103,13 @@ describe('ThemeDetailComponent', () => {
     fixture.detectChanges()
 
     themesApiSpy.getThemeByName.and.returnValue(of({ resource: theme } as any))
-    component.loading = true
 
     await component.ngOnInit()
 
     component.theme$?.subscribe((data) => {
       expect(data).toBe(theme)
-      expect(component.themeName).toBe(name)
+      expect(component.themeName).toBe(theme.name!)
+      expect(component.theme?.displayName).toBe(theme.displayName!)
       expect(component.dateFormat).toBe('medium')
       expect(themesApiSpy.getThemeByName).toHaveBeenCalled()
     })
@@ -194,38 +194,24 @@ describe('ThemeDetailComponent', () => {
   })
 
   it('should display not found error', () => {
-    themesApiSpy.getThemeByName.and.returnValue(
-      throwError(
-        () =>
-          new HttpErrorResponse({
-            status: 404
-          })
-      )
-    )
-    component.exceptionKey = ''
+    themesApiSpy.getThemeByName.and.returnValue(throwError(() => new HttpErrorResponse({ status: 404 })))
+    component.exceptionKey = undefined
 
     component.ngOnInit()
 
     component.theme$?.subscribe(() => {
-      expect(component.exceptionKey).toBe('THEME.NOT_FOUND')
+      expect(component.exceptionKey).toBe('EXCEPTIONS.HTTP_STATUS_404.THEME')
     })
   })
 
-  it('should display load error', () => {
-    themesApiSpy.getThemeByName.and.returnValue(
-      throwError(
-        () =>
-          new HttpErrorResponse({
-            status: 400
-          })
-      )
-    )
-    component.exceptionKey = ''
+  it('should display permission error', () => {
+    themesApiSpy.getThemeByName.and.returnValue(throwError(() => new HttpErrorResponse({ status: 403 })))
+    component.exceptionKey = undefined
 
     component.ngOnInit()
 
     component.theme$?.subscribe(() => {
-      expect(component.exceptionKey).toBe('THEME.LOAD_ERROR')
+      expect(component.exceptionKey).toBe('EXCEPTIONS.HTTP_STATUS_403.THEME')
     })
   })
 
@@ -358,10 +344,10 @@ describe('ThemeDetailComponent', () => {
 
   it('should display error on theme export fail', () => {
     themesApiSpy.exportThemes.and.returnValue(throwError(() => new Error()))
-    component.theme = {
-      name: 'themeName'
-    }
+    component.theme = theme
+
     component.onExportTheme()
+
     expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EXPORT.EXPORT_THEME_FAIL' })
   })
 

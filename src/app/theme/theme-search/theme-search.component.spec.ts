@@ -8,14 +8,17 @@ import { TranslateTestingModule } from 'ngx-translate-testing'
 import { DataViewModule } from 'primeng/dataview'
 import { of } from 'rxjs'
 
-import { Theme, ThemesAPIService } from 'src/app/shared/generated'
+import { GetThemesResponse, ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeSearchComponent } from './theme-search.component'
 
 describe('ThemeSearchComponent', () => {
   let component: ThemeSearchComponent
   let fixture: ComponentFixture<ThemeSearchComponent>
 
-  const themeApiSpy = jasmine.createSpyObj<ThemesAPIService>('ThemesAPIService', ['getThemes'])
+  //const themeApiSpy = jasmine.createSpyObj<ThemesAPIService>('ThemesAPIService', ['getThemes'])
+  const themeApiSpy = {
+    getThemes: jasmine.createSpy('getThemes').and.returnValue(of({}))
+  }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -47,7 +50,7 @@ describe('ThemeSearchComponent', () => {
     expect(component).toBeTruthy()
   })
 
-  it('should load themes and translations on initialization', async () => {
+  it('should load themes and translations on initialization', (done) => {
     const translateService = TestBed.inject(TranslateService)
     const actionsTranslations = {
       'ACTIONS.CREATE.THEME': 'actionsCreateTheme',
@@ -74,12 +77,21 @@ describe('ThemeSearchComponent', () => {
         { name: 'theme2', displayName: 'Theme 2' }
       ]
     }
-    const themesObservable = of(themesResponse as any)
-    themeApiSpy.getThemes.and.returnValue(themesObservable)
+    themeApiSpy.getThemes.and.returnValue(of(themesResponse as GetThemesResponse))
 
-    await component.ngOnInit()
+    component.ngOnInit()
 
-    expect(component.themes$).toEqual(themesObservable)
+    component.themes$.subscribe({
+      next: (result) => {
+        if (result) {
+          expect(result.length).toBe(2)
+          expect(result[0].name).toEqual('theme1')
+          expect(result[1].name).toEqual('theme2')
+        }
+        done()
+      },
+      error: done.fail
+    })
 
     let actions: any = []
     component.actions$!.subscribe((act) => (actions = act))
@@ -152,25 +164,5 @@ describe('ThemeSearchComponent', () => {
     component.themeImportDialogVisible = false
     component.onImportThemeClick()
     expect(component.themeImportDialogVisible).toBe(true)
-  })
-
-  it('should sort themes by display name ', () => {
-    const a: Theme = {
-      name: 'a',
-      displayName: 'a'
-    }
-    const b: Theme = {
-      name: 'b',
-      displayName: 'b'
-    }
-    const c: Theme = {
-      name: 'c',
-      displayName: 'c'
-    }
-    const themes = [b, c, a]
-
-    themes.sort((x, y) => component.sortThemesByName(x, y))
-
-    expect(themes).toEqual([a, b, c])
   })
 })

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateService } from '@ngx-translate/core'
@@ -7,7 +7,7 @@ import FileSaver from 'file-saver'
 
 import { Action, PortalMessageService, UserService } from '@onecx/portal-integration-angular'
 
-import { bffImageUrl, getCurrentDateTime } from 'src/app/shared/utils'
+import { bffImageUrl, getCurrentDateTime, limitText } from 'src/app/shared/utils'
 import {
   ExportThemeRequest,
   ImagesInternalAPIService,
@@ -20,19 +20,20 @@ import {
   templateUrl: './theme-detail.component.html',
   styleUrls: ['./theme-detail.component.scss']
 })
-export class ThemeDetailComponent implements OnInit {
+export class ThemeDetailComponent implements OnInit, AfterViewInit {
   public theme: Theme | undefined
-  public theme$: Observable<Theme> | undefined
-  public themeName!: string
+  public theme$!: Observable<Theme>
+  public themeName: string
   public themeDeleteVisible = false
   public showOperatorMessage = true // display initially only
   public loading = true
+  public exceptionKey: string | undefined = undefined
   public RefType = RefType
   public dateFormat = 'medium'
   // page header
   public actions$: Observable<Action[]> | undefined
   public headerImageUrl?: string
-  public exceptionKey = ''
+  public limitText = limitText
 
   constructor(
     private readonly user: UserService,
@@ -42,35 +43,39 @@ export class ThemeDetailComponent implements OnInit {
     private readonly themeApi: ThemesAPIService,
     private readonly msgService: PortalMessageService,
     private readonly translate: TranslateService,
-    private readonly imageApi: ImagesInternalAPIService
+    private readonly imageApi: ImagesInternalAPIService,
+    private readonly cd: ChangeDetectorRef
   ) {
     this.themeName = this.route.snapshot.paramMap.get('name') || ''
     this.dateFormat = this.user.lang$.getValue() === 'de' ? 'dd.MM.yyyy HH:mm:ss' : 'medium'
   }
 
   ngOnInit(): void {
+    this.getTheme()
+  }
+
+  ngAfterViewInit() {
+    this.cd.detectChanges()
+  }
+
+  private getTheme() {
     this.loading = true
     this.theme$ = this.themeApi.getThemeByName({ name: this.themeName }).pipe(
       map((data) => {
-        this.preparePage()
         if (data.resource) this.theme = data.resource
         this.headerImageUrl = this.getImageUrl(this.theme, RefType.Logo)
         return data.resource
       }),
       catchError((err) => {
-        if (err.status === 404) this.exceptionKey = 'THEME.NOT_FOUND'
-        else this.exceptionKey = 'THEME.LOAD_ERROR'
+        this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + err.status + '.THEME'
         console.error('getThemeByName():', err)
         return of({} as Theme)
       }),
       finalize(() => {
         this.loading = false
+        this.prepareActionButtons()
       })
     )
-  }
-
-  private preparePage() {
-    this.prepareActionButtons()
   }
 
   private prepareActionButtons(): void {
@@ -102,7 +107,9 @@ export class ThemeDetailComponent implements OnInit {
               actionCallback: () => this.onExportTheme(),
               icon: 'pi pi-download',
               show: 'always',
-              permission: 'THEME#EXPORT'
+              permission: 'THEME#EXPORT',
+              conditional: true,
+              showCondition: this.theme !== undefined
             },
             {
               label: data['ACTIONS.EDIT.LABEL'],
@@ -110,7 +117,9 @@ export class ThemeDetailComponent implements OnInit {
               actionCallback: () => this.router.navigate(['./edit'], { relativeTo: this.route }),
               icon: 'pi pi-pencil',
               show: 'always',
-              permission: 'THEME#EDIT'
+              permission: 'THEME#EDIT',
+              conditional: true,
+              showCondition: this.theme !== undefined
             },
             {
               label: data['ACTIONS.DELETE.LABEL'],
@@ -120,7 +129,7 @@ export class ThemeDetailComponent implements OnInit {
               show: 'asOverflow',
               permission: 'THEME#DELETE',
               conditional: true,
-              showCondition: !this.theme?.operator
+              showCondition: this.theme !== undefined && !this.theme?.operator
             }
           ]
         })
@@ -158,23 +167,19 @@ export class ThemeDetailComponent implements OnInit {
   onExportTheme(): void {
     if (this.theme?.name) {
       const exportThemeRequest: ExportThemeRequest = { names: [this.theme.name] }
-      this.themeApi
-        .exportThemes({
-          exportThemeRequest
-        })
-        .subscribe({
-          next: (data) => {
-            const themeJSON = JSON.stringify(data, null, 2)
-            FileSaver.saveAs(
-              new Blob([themeJSON], { type: 'text/json' }),
-              `onecx-theme_${this.theme?.name}_${getCurrentDateTime()}.json`
-            )
-          },
-          error: (err) => {
-            console.log(err)
-            this.msgService.error({ summaryKey: 'ACTIONS.EXPORT.EXPORT_THEME_FAIL' })
-          }
-        })
+      this.themeApi.exportThemes({ exportThemeRequest }).subscribe({
+        next: (data) => {
+          const themeJSON = JSON.stringify(data, null, 2)
+          FileSaver.saveAs(
+            new Blob([themeJSON], { type: 'text/json' }),
+            `onecx-theme_${this.theme?.name}_${getCurrentDateTime()}.json`
+          )
+        },
+        error: (err) => {
+          console.log(err)
+          this.msgService.error({ summaryKey: 'ACTIONS.EXPORT.EXPORT_THEME_FAIL' })
+        }
+      })
     }
   }
 

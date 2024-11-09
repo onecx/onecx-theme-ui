@@ -8,7 +8,7 @@ import { of, throwError } from 'rxjs'
 
 import { PortalMessageService } from '@onecx/portal-integration-angular'
 
-import { ThemesAPIService } from 'src/app/shared/generated'
+import { Theme, ThemesAPIService, GetThemesResponse } from 'src/app/shared/generated'
 import { ThemeImportComponent } from './theme-import.component'
 
 describe('ThemeImportComponent', () => {
@@ -50,23 +50,18 @@ describe('ThemeImportComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy()
-    expect(component.httpHeaders.get('Content-Type')).toBe('application/json')
-    expect(component.themes).toEqual([])
   })
 
   it('should initialize themes and headers onInit', () => {
-    const themeArr = [
-      {
-        name: 'theme1'
-      },
-      {
-        name: 'theme2'
-      }
+    const themeArr: Theme[] = [
+      { name: 'theme1', displayName: 'Theme-1' },
+      { name: 'theme2', displayName: 'Theme-2' }
     ]
-    const themesResponse = {
-      stream: themeArr
-    }
+    const themesResponse: GetThemesResponse = { stream: themeArr }
+
     themeApiSpy.getThemes.and.returnValue(of(themesResponse as any))
+
+    component.displayThemeImport = true
     component.ngOnInit()
 
     expect(component.themes).toEqual(themeArr)
@@ -126,14 +121,11 @@ describe('ThemeImportComponent', () => {
   })
 
   it('should indicate theme name existance if already present', async () => {
-    component.themes = [
-      {
-        name: 'themeName'
-      }
-    ]
+    component.themes = [{ name: 'themeName', displayName: 'Theme-1' }]
     const themeSnapshot = JSON.stringify({
       themes: {
         themeName: {
+          displayName: 'Theme-1',
           logoUrl: 'logo_url'
         }
       }
@@ -146,7 +138,7 @@ describe('ThemeImportComponent', () => {
     expect(component.themeImportError).toBe(false)
     expect(component.themeSnapshot).toBeDefined()
     expect(component.themeNameExists).toBe(true)
-    // TODO: if error is visible
+    expect(component.displayNameExists).toBe(true)
   })
 
   it('should emit displayThemeImportChange on import hide', () => {
@@ -179,7 +171,7 @@ describe('ThemeImportComponent', () => {
     themeApiSpy.importThemes.and.returnValue(
       of(
         new HttpResponse({
-          body: { id: 'id' }
+          body: { id: 'id', name: 'themeName', displayName: 'themeDisplayName' }
         })
       )
     )
@@ -189,7 +181,8 @@ describe('ThemeImportComponent', () => {
       created: 'created',
       themes: { ['theme']: { description: 'themeDescription' } }
     }
-
+    component.themeName = 'themeName'
+    component.displayName = 'themeDisplayName'
     component.onThemeUpload()
 
     expect(msgServiceSpy.success).toHaveBeenCalledOnceWith({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_SUCCESS' })
@@ -197,15 +190,11 @@ describe('ThemeImportComponent', () => {
   })
 
   it('should return if no themes available', () => {
-    themeApiSpy.importThemes.and.returnValue(
-      of(
-        new HttpResponse({
-          body: { id: 'id' }
-        })
-      )
-    )
+    themeApiSpy.importThemes.and.returnValue(of(new HttpResponse({ body: { id: 'id' } })))
     spyOn(component.uploadEmitter, 'emit')
 
+    component.themeName = 'themeName'
+    component.displayName = 'themeDisplayName'
     component.onThemeUpload()
 
     expect(component.uploadEmitter.emit).not.toHaveBeenCalled()
@@ -219,6 +208,8 @@ describe('ThemeImportComponent', () => {
       themes: { ['theme']: { description: 'themeDescription' } }
     }
 
+    component.themeName = 'themeName'
+    component.displayName = 'themeDisplayName'
     component.onThemeUpload()
 
     expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_FAIL' })

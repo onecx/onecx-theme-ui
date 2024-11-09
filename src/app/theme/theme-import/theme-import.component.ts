@@ -1,4 +1,13 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
+import {
+  AfterViewInit,
+  Component,
+  ChangeDetectorRef,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild
+} from '@angular/core'
 import { HttpHeaders } from '@angular/common/http'
 import { TranslateService } from '@ngx-translate/core'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -13,14 +22,16 @@ import { FileSelectEvent } from 'primeng/fileupload'
   templateUrl: './theme-import.component.html',
   styleUrls: ['./theme-import.component.scss']
 })
-export class ThemeImportComponent implements OnInit {
+export class ThemeImportComponent implements OnInit, AfterViewInit {
   @Input() public displayThemeImport = false
   @Output() public displayThemeImportChange = new EventEmitter<boolean>()
   @Output() public uploadEmitter = new EventEmitter()
 
+  @ViewChild('themeNameInput') themeNameInput!: HTMLInputElement
+
   public themes!: Theme[]
-  public themeName = ''
-  public displayName: string | null = ''
+  public themeName: string | undefined = undefined
+  public displayName: string | undefined = undefined
   public themeNameExists = false
   public displayNameExists = false
   public themeImportError = false
@@ -33,13 +44,20 @@ export class ThemeImportComponent implements OnInit {
     private readonly router: Router,
     private readonly themeApi: ThemesAPIService,
     public readonly translate: TranslateService,
-    private readonly msgService: PortalMessageService
+    private readonly msgService: PortalMessageService,
+    private readonly cd: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    this.httpHeaders = new HttpHeaders()
-    this.httpHeaders = this.httpHeaders.set('Content-Type', 'application/json')
-    this.getThemes()
+    if (this.displayThemeImport) {
+      this.httpHeaders = new HttpHeaders()
+      this.httpHeaders = this.httpHeaders.set('Content-Type', 'application/json')
+      this.getThemes()
+    }
+  }
+
+  ngAfterViewInit() {
+    this.cd.detectChanges()
   }
 
   public async onImportThemeSelect(event: FileSelectEvent): Promise<void> {
@@ -53,7 +71,7 @@ export class ThemeImportComponent implements OnInit {
           if (themeSnapshot.themes) {
             const key: string[] = Object.keys(themeSnapshot.themes)
             this.themeName = key[0]
-            this.displayName = themeSnapshot.themes[key[0]].displayName ?? null
+            this.displayName = themeSnapshot.themes[key[0]].displayName
             this.properties = themeSnapshot.themes[key[0]].properties
           }
           this.checkThemeExistence()
@@ -68,8 +86,9 @@ export class ThemeImportComponent implements OnInit {
   }
 
   public checkThemeExistence() {
-    this.themeNameExists = this.themes.filter((theme) => theme.name === this.themeName).length > 0
-    this.displayNameExists = this.themes.filter((theme) => theme.displayName === this.displayName).length > 0
+    if (this.themeName) this.themeNameExists = this.themes.filter((theme) => theme.name === this.themeName).length > 0
+    if (this.displayName)
+      this.displayNameExists = this.themes.filter((theme) => theme.displayName === this.displayName).length > 0
   }
 
   public onImportThemeHide(): void {
@@ -80,15 +99,18 @@ export class ThemeImportComponent implements OnInit {
     this.themeImportError = false
   }
   public onThemeUpload(): void {
+    if (!this.themeName || !this.displayName) return
     if (!this.themeSnapshot?.themes) return
+    // Import data preparation
     const key: string[] = Object.keys(this.themeSnapshot?.themes)
-    this.themeSnapshot.themes[key[0]].displayName = this.displayName ?? undefined
+    this.themeSnapshot.themes[key[0]].displayName = this.displayName
     if (key[0] !== this.themeName) {
       // save the theme properties to be reassigned on new key
       const themeProps = Object.getOwnPropertyDescriptor(this.themeSnapshot.themes, key[0])
-      Object.defineProperty(this.themeSnapshot.themes, this.themeName, themeProps ?? {})
+      Object.defineProperty(this.themeSnapshot.themes, this.themeName ?? '', themeProps ?? {})
       delete this.themeSnapshot.themes[key[0]]
     }
+    // Import execution: upload
     this.themeApi
       .importThemes({
         themeSnapshot: this.themeSnapshot
