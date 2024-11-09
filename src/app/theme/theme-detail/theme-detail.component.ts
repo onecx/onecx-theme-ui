@@ -23,7 +23,7 @@ import {
 export class ThemeDetailComponent implements OnInit, AfterViewInit {
   public theme: Theme | undefined
   public theme$!: Observable<Theme>
-  public themeName: string
+  public themeName: string | null
   public themeDeleteVisible = false
   public showOperatorMessage = true // display initially only
   public loading = true
@@ -31,7 +31,7 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
   public RefType = RefType
   public dateFormat = 'medium'
   // page header
-  public actions$: Observable<Action[]> | undefined
+  public actions$: Observable<Action[]> = of([])
   public headerImageUrl?: string
   public limitText = limitText
 
@@ -46,7 +46,7 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
     private readonly imageApi: ImagesInternalAPIService,
     private readonly cd: ChangeDetectorRef
   ) {
-    this.themeName = this.route.snapshot.paramMap.get('name') || ''
+    this.themeName = this.route.snapshot.paramMap.get('name')
     this.dateFormat = this.user.lang$.getValue() === 'de' ? 'dd.MM.yyyy HH:mm:ss' : 'medium'
   }
 
@@ -59,11 +59,14 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
   }
 
   private getTheme() {
+    this.prepareActionButtons()
+    if (!this.themeName) return
     this.loading = true
-    this.theme$ = this.themeApi.getThemeByName({ name: this.themeName }).pipe(
+    this.theme$ = this.themeApi.getThemeByName({ name: this.themeName! }).pipe(
       map((data) => {
         if (data.resource) this.theme = data.resource
         this.headerImageUrl = this.getImageUrl(this.theme, RefType.Logo)
+        this.prepareActionButtons()
         return data.resource
       }),
       catchError((err) => {
@@ -71,10 +74,7 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
         console.error('getThemeByName():', err)
         return of({} as Theme)
       }),
-      finalize(() => {
-        this.loading = false
-        this.prepareActionButtons()
-      })
+      finalize(() => (this.loading = false))
     )
   }
 

@@ -27,18 +27,11 @@ describe('ThemeDetailComponent', () => {
   let fixture: ComponentFixture<ThemeDetailComponent>
   let translateService: TranslateService
 
-  const mockUserService = {
-    lang$: {
-      getValue: jasmine.createSpy('getValue').and.returnValue('en')
-    }
-  }
+  const mockUserService = { lang$: { getValue: jasmine.createSpy('getValue').and.returnValue('en') } }
   const msgServiceSpy = jasmine.createSpyObj<PortalMessageService>('PortalMessageService', ['success', 'error'])
   const locationSpy = jasmine.createSpyObj<Location>('Location', ['back'])
 
-  const configServiceSpy = {
-    getProperty: jasmine.createSpy('getProperty').and.returnValue('123'),
-    lang: 'en'
-  }
+  const configServiceSpy = { getProperty: jasmine.createSpy('getProperty').and.returnValue('123'), lang: 'en' }
   const themesApiSpy = jasmine.createSpyObj<ThemesAPIService>('ThemesAPIService', [
     'getThemeByName',
     'deleteTheme',
@@ -115,7 +108,9 @@ describe('ThemeDetailComponent', () => {
       expect(themesApiSpy.getThemeByName).toHaveBeenCalled()
       component.actions$!.subscribe((actions) => {
         expect(actions.length).toBe(4)
-        expect(actions[3].showCondition).toBeTrue()
+        if (actions.length > 0) {
+          expect(actions[3].showCondition).toBeTrue()
+        }
       })
     })
   })
@@ -145,20 +140,21 @@ describe('ThemeDetailComponent', () => {
   it('should load theme and action translations on successful call', async () => {
     spyOn(component, 'onClose')
     spyOn(component, 'onExportTheme')
+    component.themeName = 'dummy'
     component.themeDeleteVisible = false
 
-    let actions: any = []
-    component.actions$!.subscribe((act) => (actions = act))
-
-    actions[0].actionCallback()
-    actions[1].actionCallback()
-    actions[2].actionCallback()
-    actions[3].actionCallback()
-
-    expect(actions.length).toBe(4)
-    expect(component.onClose).toHaveBeenCalled()
-    expect(component.onExportTheme).toHaveBeenCalled()
-    expect(component.themeDeleteVisible).toBeTrue()
+    component.actions$!.subscribe((actions) => {
+      expect(actions.length).toBe(4)
+      if (actions.length > 0) {
+        actions[0].actionCallback()
+        actions[1].actionCallback()
+        actions[2].actionCallback()
+        actions[3].actionCallback()
+        expect(component.onClose).toHaveBeenCalled()
+        expect(component.onExportTheme).toHaveBeenCalled()
+        expect(component.themeDeleteVisible).toBeTrue()
+      }
+    })
   })
 
   it('should load prepare translations on successfull call', async () => {
@@ -185,12 +181,10 @@ describe('ThemeDetailComponent', () => {
       'ACTIONS.DELETE.THEME_MESSAGE': '{{ITEM}} actionDeleteThemeMessage'
     }
     const generalTranslations = {
-      'DETAIL.CREATION_DATE': 'detailCreationDate',
-      'DETAIL.TOOLTIPS.CREATION_DATE': 'detailTooltipsCreationDate',
-      'DETAIL.MODIFICATION_DATE': 'detailModificationDate',
-      'DETAIL.TOOLTIPS.MODIFICATION_DATE': 'detailTooltipsModificationDate',
-      'THEME.WORKSPACES': 'themeWorkspaces',
-      'THEME.TOOLTIPS.WORKSPACES': 'themeTooltipsWorkspaces'
+      'INTERNAL.CREATION_DATE': 'detailCreationDate',
+      'INTERNAL.TOOLTIPS.CREATION_DATE': 'detailTooltipsCreationDate',
+      'INTERNAL.MODIFICATION_DATE': 'detailModificationDate',
+      'INTERNAL.TOOLTIPS.MODIFICATION_DATE': 'detailTooltipsModificationDate'
     }
     spyOn(translateService, 'get').and.returnValues(of(actionsTranslations), of(generalTranslations))
 
@@ -205,7 +199,9 @@ describe('ThemeDetailComponent', () => {
 
     component.actions$!.subscribe((actions) => {
       expect(actions.length).toBe(4)
-      expect(actions[3].showCondition).toBeFalse() // hide delete action
+      if (actions.length > 0) {
+        expect(actions[3].showCondition).toBeFalse() // hide delete action
+      }
     })
 
     component.theme$?.subscribe(() => {

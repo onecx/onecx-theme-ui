@@ -127,15 +127,12 @@
         tooltipPosition="top"
         tooltipEvent="hover"
       >
-        <p-panel [showHeader]="false" styleClass="pt-1 pb-0 mx-2 my-1 surface-50">
-          <pre id="th_detail_panel_variables_content" class="my-2">
-            {{ theme?.properties | json }}
-          </pre>
-        </p-panel>
+        <pre class="my-0 pt-1 pb-0 card surface-50">{{ theme?.properties | json }}</pre>
       </p-tabPanel>
     </p-tabView>
   </ocx-page-content>
 
+  <!-- DELETE -->
   <p-dialog
     [header]="'ACTIONS.DELETE.TOOLTIP' | translate"
     [(visible)]="themeDeleteVisible"
@@ -160,7 +157,6 @@
       <div class="flex flex-wrap column-gap-2 row-gap-1 justify-content-end">
         <p-button
           icon="pi pi-times"
-          styleClass="m-0"
           id="th_delete_action_no"
           (onClick)="themeDeleteVisible = false"
           [label]="'ACTIONS.CONFIRMATION.NO' | translate"
@@ -170,7 +166,6 @@
         ></p-button>
         <p-button
           icon="pi pi-check"
-          styleClass="m-0"
           id="th_delete_action_yes"
           (onClick)="onConfirmThemeDeletion()"
           [label]="'ACTIONS.CONFIRMATION.YES' | translate"

@@ -306,8 +306,8 @@ describe('ThemeDesignerComponent', () => {
 
       component.ngOnInit()
       expect(component.themeTemplates).toEqual([
-        { label: 'myTheme', value: 'id2' },
-        { label: 'theme1', value: 'id1' }
+        { label: 'themeDisplay1', value: 'id1' },
+        { label: 'themeDisplay2', value: 'id2' }
       ])
     })
 

@@ -184,11 +184,6 @@
     "VERSION": "Version",
     "DESCRIPTION": "Description",
     "CSS_FILE": "CSS File",
-    "CREATION_DATE": "Created on",
-    "CREATION_USER": "Created by",
-    "MODIFICATION_DATE": "Changed on",
-    "MODIFICATION_USER": "Changed by",
-    "WORKSPACES": "Used in Workspaces",
     "TOOLTIPS": {
       "ID": "Unique technical ID of the Theme",
       "NAME": "Unique name of the Theme, cannot be changed. Used as reference to the Theme.",
@@ -196,15 +191,10 @@
       "FONT_FAMILY": "Select Font family",
       "FONT_SIZE": "Select Font size",
       "ITEM_COLOR": "Select a Color",
-      "ITEM_COLOR_PICKER": "Select a color with color picker",
+      "ITEM_COLOR_PICKER": "Select a color with the color picker",
       "VERSION": "Version of the Theme",
       "DESCRIPTION": "Description of the Theme",
-      "WORKSPACES": "Workspaces using the Theme",
-      "CSS_FILE": "CSS file name",
-      "CREATION_DATE": "Timestamp the Theme was created",
-      "CREATION_USER": "Name of the user which created the Theme",
-      "MODIFICATION_DATE": "Timestamp the Theme was latest modified",
-      "MODIFICATION_USER": "Name of the user which changed the Theme last time"
+      "CSS_FILE": "CSS file name"
     }
   },
   "VALIDATION": {

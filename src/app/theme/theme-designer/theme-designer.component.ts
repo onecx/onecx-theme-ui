@@ -228,7 +228,7 @@ export class ThemeDesignerComponent implements OnInit {
         this.themeTemplates = [
           ...data.stream
             .map((theme) => ({
-              label: theme.name,
+              label: theme.displayName,
               value: theme.id
             }))
             .sort(dropDownSortItemsByLabel)
@@ -363,7 +363,7 @@ export class ThemeDesignerComponent implements OnInit {
       })
   }
 
-  // NEW
+  // CREATE
   private createTheme(theme: ThemeUpdateCreate): void {
     this.themeApi.createTheme({ createThemeRequest: { resource: theme } }).subscribe({
       next: (data) => {
