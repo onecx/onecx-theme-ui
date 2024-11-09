@@ -62,7 +62,7 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
     this.prepareActionButtons()
     if (!this.themeName) return
     this.loading = true
-    this.theme$ = this.themeApi.getThemeByName({ name: this.themeName! }).pipe(
+    this.theme$ = this.themeApi.getThemeByName({ name: this.themeName }).pipe(
       map((data) => {
         if (data.resource) this.theme = data.resource
         this.headerImageUrl = this.getImageUrl(this.theme, RefType.Logo)
