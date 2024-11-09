@@ -176,7 +176,7 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
           )
         },
         error: (err) => {
-          console.log(err)
+          console.error(err)
           this.msgService.error({ summaryKey: 'ACTIONS.EXPORT.EXPORT_THEME_FAIL' })
         }
       })

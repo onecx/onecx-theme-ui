@@ -39,7 +39,7 @@ export class ThemeDesignerComponent implements OnInit {
   public copyOfPrefix: string | undefined
   public themeVars = themeVariables
   public themeTemplates!: SelectItem[]
-  public bffImagePath = ''
+  public bffImagePath: string | undefined
   public fetchingLogoUrl?: string
   public fetchingFaviconUrl?: string
   public imageLogoUrlExists = false
@@ -76,7 +76,7 @@ export class ThemeDesignerComponent implements OnInit {
   ) {
     this.changeMode = route.snapshot.paramMap.has('name') ? 'EDIT' : 'CREATE'
     this.themeName = route.snapshot.paramMap.get('name')
-    this.bffImagePath = this.imageApi.configuration.basePath!
+    this.bffImagePath = this.imageApi.configuration.basePath
     this.prepareActionButtons()
 
     this.fontForm = new FormGroup({})
@@ -320,19 +320,12 @@ export class ThemeDesignerComponent implements OnInit {
   public onShowSaveAsDialog(): void {
     const basicFormName = this.basicForm.controls['name'].value
     const basicFormDisplayName = this.basicForm.controls['displayName'].value
-    this.updateSaveAsElement(this.saveAsThemeName, this.copyOfPrefix + basicFormName)
-    this.updateSaveAsElement(this.saveAsThemeDisplayName, this.copyOfPrefix + basicFormDisplayName)
-  }
-
-  private updateSaveAsElement(saveAsElement: ElementRef | undefined, newValue: string): void {
-    if (saveAsElement) {
-      saveAsElement.nativeElement.value = newValue
-    }
+    this.saveAsThemeName!.nativeElement.value = this.copyOfPrefix + basicFormName
+    this.saveAsThemeDisplayName!.nativeElement.value = this.copyOfPrefix + basicFormDisplayName
   }
 
   // EDIT
   private updateTheme(): void {
-    console.log('updateTheme')
     this.themeApi
       .getThemeByName({ name: this.themeName! })
       .pipe(
