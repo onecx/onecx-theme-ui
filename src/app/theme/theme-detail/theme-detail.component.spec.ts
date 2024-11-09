@@ -18,7 +18,8 @@ import { bffImageUrl, getCurrentDateTime } from 'src/app/shared/utils'
 const theme: Theme = {
   id: 'theme-id',
   name: 'themeName',
-  displayName: 'themeDisplayName'
+  displayName: 'themeDisplayName',
+  operator: false
 }
 
 describe('ThemeDetailComponent', () => {
@@ -112,6 +113,10 @@ describe('ThemeDetailComponent', () => {
       expect(component.theme?.displayName).toBe(theme.displayName!)
       expect(component.dateFormat).toBe('medium')
       expect(themesApiSpy.getThemeByName).toHaveBeenCalled()
+      component.actions$!.subscribe((actions) => {
+        expect(actions.length).toBe(4)
+        expect(actions[3].showCondition).toBeTrue()
+      })
     })
   })
 
@@ -156,15 +161,14 @@ describe('ThemeDetailComponent', () => {
     expect(component.themeDeleteVisible).toBeTrue()
   })
 
-  it('should load prepare object details on successfull call', async () => {
+  it('should load prepare translations on successfull call', async () => {
     const themeResponse = {
       resource: {
         name: 'themeName',
         displayName: 'Theme',
         creationDate: 'myCreDate',
         modificationDate: 'myModDate'
-      },
-      workspaces: [{ name: 'workspace1' }, { name: 'workspace2' }]
+      }
     }
     themesApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
 
@@ -193,11 +197,16 @@ describe('ThemeDetailComponent', () => {
     await component.ngOnInit()
   })
 
-  it('should display not found error', () => {
+  it('should display not found error and limited header actions', () => {
     themesApiSpy.getThemeByName.and.returnValue(throwError(() => new HttpErrorResponse({ status: 404 })))
     component.exceptionKey = undefined
 
     component.ngOnInit()
+
+    component.actions$!.subscribe((actions) => {
+      expect(actions.length).toBe(4)
+      expect(actions[3].showCondition).toBeFalse() // hide delete action
+    })
 
     component.theme$?.subscribe(() => {
       expect(component.exceptionKey).toBe('EXCEPTIONS.HTTP_STATUS_404.THEME')
@@ -227,8 +236,7 @@ describe('ThemeDetailComponent', () => {
       resource: {
         name: 'themeName',
         logoUrl: 'logo123.png'
-      },
-      workspaces: []
+      }
     }
     themesApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
 
@@ -245,8 +253,7 @@ describe('ThemeDetailComponent', () => {
       resource: {
         name: 'themeName',
         logoUrl: url
-      },
-      workspaces: []
+      }
     }
     themesApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
     await component.ngOnInit()
