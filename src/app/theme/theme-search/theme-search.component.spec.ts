@@ -5,8 +5,8 @@ import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { provideRouter, Router } from '@angular/router'
 import { TranslateService } from '@ngx-translate/core'
 import { TranslateTestingModule } from 'ngx-translate-testing'
+import { of, throwError } from 'rxjs'
 import { DataViewModule } from 'primeng/dataview'
-import { of } from 'rxjs'
 
 import { GetThemesResponse, ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeSearchComponent } from './theme-search.component'
@@ -104,6 +104,40 @@ describe('ThemeSearchComponent', () => {
     spyOn(component, 'onImportThemeClick')
     actions[1].actionCallback()
     expect(component.onImportThemeClick).toHaveBeenCalledTimes(1)
+  })
+
+  it('should search themes without results', (done) => {
+    themeApiSpy.getThemes.and.returnValue(of({ stream: [] } as GetThemesResponse))
+
+    component.ngOnInit()
+
+    component.themes$.subscribe({
+      next: (result) => {
+        if (result) {
+          expect(result.length).toBe(0)
+        }
+        done()
+      },
+      error: done.fail
+    })
+  })
+
+  it('should search themes but display error if API call fails', (done) => {
+    const err = { status: 403 }
+    themeApiSpy.getThemes.and.returnValue(throwError(() => err))
+
+    component.ngOnInit()
+
+    component.themes$.subscribe({
+      next: (result) => {
+        if (result) {
+          expect(result.length).toBe(0)
+          expect(component.exceptionKey).toEqual('EXCEPTIONS.HTTP_STATUS_403.THEMES')
+        }
+        done()
+      },
+      error: done.fail
+    })
   })
 
   it('should get the logo url: theme undefined', () => {

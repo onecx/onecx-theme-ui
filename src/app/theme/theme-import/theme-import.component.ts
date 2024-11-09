@@ -86,6 +86,8 @@ export class ThemeImportComponent implements OnInit, AfterViewInit {
   }
 
   public checkThemeExistence() {
+    this.themeNameExists = false
+    this.displayNameExists = false
     if (this.themeName) this.themeNameExists = this.themes.filter((theme) => theme.name === this.themeName).length > 0
     if (this.displayName)
       this.displayNameExists = this.themes.filter((theme) => theme.displayName === this.displayName).length > 0
@@ -99,7 +101,7 @@ export class ThemeImportComponent implements OnInit, AfterViewInit {
     this.themeImportError = false
   }
   public onThemeUpload(): void {
-    if (!this.themeName || !this.displayName) return
+    if (!this.themeName || !this.displayName || !this.properties) return
     if (!this.themeSnapshot?.themes) return
     // Import data preparation
     const key: string[] = Object.keys(this.themeSnapshot?.themes)
@@ -107,7 +109,7 @@ export class ThemeImportComponent implements OnInit, AfterViewInit {
     if (key[0] !== this.themeName) {
       // save the theme properties to be reassigned on new key
       const themeProps = Object.getOwnPropertyDescriptor(this.themeSnapshot.themes, key[0])
-      Object.defineProperty(this.themeSnapshot.themes, this.themeName ?? '', themeProps ?? {})
+      Object.defineProperty(this.themeSnapshot.themes, this.themeName, themeProps!)
       delete this.themeSnapshot.themes[key[0]]
     }
     // Import execution: upload

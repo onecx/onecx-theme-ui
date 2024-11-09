@@ -126,7 +126,8 @@ describe('ThemeImportComponent', () => {
       themes: {
         themeName: {
           displayName: 'Theme-1',
-          logoUrl: 'logo_url'
+          logoUrl: 'logo_url',
+          properties: {}
         }
       }
     })
@@ -183,6 +184,8 @@ describe('ThemeImportComponent', () => {
     }
     component.themeName = 'themeName'
     component.displayName = 'themeDisplayName'
+    component.properties = {}
+
     component.onThemeUpload()
 
     expect(msgServiceSpy.success).toHaveBeenCalledOnceWith({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_SUCCESS' })
@@ -195,6 +198,19 @@ describe('ThemeImportComponent', () => {
 
     component.themeName = 'themeName'
     component.displayName = 'themeDisplayName'
+    component.properties = {}
+    component.onThemeUpload()
+
+    expect(component.themeNameExists).toBe(false)
+    expect(component.displayNameExists).toBe(false)
+    expect(component.uploadEmitter.emit).not.toHaveBeenCalled()
+  })
+
+  it('should prevent upload if form is not ready', () => {
+    themeApiSpy.importThemes.and.returnValue(of(new HttpResponse({ body: { id: 'id' } })))
+    spyOn(component.uploadEmitter, 'emit')
+
+    component.themeName = 'themeName'
     component.onThemeUpload()
 
     expect(component.uploadEmitter.emit).not.toHaveBeenCalled()
@@ -210,6 +226,7 @@ describe('ThemeImportComponent', () => {
 
     component.themeName = 'themeName'
     component.displayName = 'themeDisplayName'
+    component.properties = {}
     component.onThemeUpload()
 
     expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_FAIL' })

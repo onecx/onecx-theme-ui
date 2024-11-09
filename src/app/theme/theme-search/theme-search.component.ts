@@ -47,7 +47,7 @@ export class ThemeSearchComponent implements OnInit {
     this.themes$ = this.themeApi.getThemes({}).pipe(
       map((data) => (data?.stream ? data.stream.sort(this.sortThemesByName) : [])),
       catchError((err) => {
-        this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + err.status + '.WORKSPACES'
+        this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + err.status + '.THEMES'
         console.error('getThemes():', err)
         return of([] as Theme[])
       }),
