@@ -20,4 +20,3 @@ export * from './themeSnapshot';
 export * from './themeUpdateCreate';
 export * from './updateThemeRequest';
 export * from './updateThemeResponse';
-export * from './workspace';

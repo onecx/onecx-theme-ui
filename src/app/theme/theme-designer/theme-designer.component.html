@@ -18,7 +18,7 @@
           <p-inputSwitch
             inputId="th_designer_header_is_current_theme"
             name="autoApplyToggle"
-            [disabled]="themeIsCurrentUsedTheme"
+            [disabled]="autoApply"
             [(ngModel)]="autoApply"
             [pTooltip]="'THEME.DETAIL.AUTO_APPLY' | translate"
             tooltipPosition="top"
@@ -27,7 +27,7 @@
           <label for="th_designer_header_is_current_theme">{{ 'THEME.DETAIL.AUTO_APPLY' | translate }}</label>
         </div>
         <span
-          *ngIf="themeIsCurrentUsedTheme"
+          *ngIf="autoApply"
           class="pi pi-bolt text-primary font-medium"
           [pTooltip]="'THEME.DETAIL.AUTO_APPLY_CURRENT_THEME' | translate"
           tooltipPosition="top"
@@ -38,11 +38,10 @@
           <span class="p-float-label">
             <p-dropdown
               #themeTemplate
-              inputId="th_designer_fields_selected_theme"
+              inputId="th_designer_template_"
               [options]="themeTemplates"
               styleClass="w-full"
-              [(ngModel)]="themeTemplateSelectedId"
-              (onChange)="onThemeTemplateDropdownChange()"
+              (onChange)="onThemeTemplateDropdownChange($event)"
               [showClear]="false"
               [autoDisplayFirst]="false"
               [pTooltip]="'THEME.TEMPLATE.SELECTOR.TOOLTIP' | translate"
@@ -62,7 +61,7 @@
             <span>{{ 'THEME.GROUPS.BASE' | translate }}</span>
           </ng-template>
           <div [formGroup]="basicForm" class="grid grid-nogutter formgrid p-fluid mx-1">
-            <div *ngIf="changeMode === 'NEW'" class="field col-12 mb-4">
+            <div *ngIf="changeMode === 'CREATE'" class="field col-12 mb-4">
               <span class="p-float-label" controlErrorAnchor>
                 <input
                   pInputText
@@ -141,7 +140,7 @@
                   pButton
                   id="th_designer_field_logo_upload"
                   icon="pi pi-upload"
-                  [disabled]="changeMode === 'NEW'"
+                  [disabled]="changeMode === 'CREATE'"
                   class="action-button p-button-icon-only"
                   (click)="selectedFileInputLogo.click()"
                   [pTooltip]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
@@ -179,7 +178,7 @@
                   pButton
                   id="th_designer_field_favicon_upload"
                   icon="pi pi-upload"
-                  [disabled]="changeMode === 'NEW'"
+                  [disabled]="changeMode === 'CREATE'"
                   class="action-button p-button-icon-only"
                   (click)="selectedFileInputFavicon.click()"
                   [pTooltip]="'IMAGE.TOOLTIPS.UPLOAD' | translate"

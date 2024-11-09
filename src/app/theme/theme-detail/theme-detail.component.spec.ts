@@ -16,8 +16,10 @@ import { ThemeDetailComponent } from './theme-detail.component'
 import { bffImageUrl, getCurrentDateTime } from 'src/app/shared/utils'
 
 const theme: Theme = {
+  id: 'theme-id',
   name: 'themeName',
-  id: 'theme-id'
+  displayName: 'themeDisplayName',
+  operator: false
 }
 
 describe('ThemeDetailComponent', () => {
@@ -25,18 +27,11 @@ describe('ThemeDetailComponent', () => {
   let fixture: ComponentFixture<ThemeDetailComponent>
   let translateService: TranslateService
 
-  const mockUserService = {
-    lang$: {
-      getValue: jasmine.createSpy('getValue').and.returnValue('en')
-    }
-  }
+  const mockUserService = { lang$: { getValue: jasmine.createSpy('getValue').and.returnValue('en') } }
   const msgServiceSpy = jasmine.createSpyObj<PortalMessageService>('PortalMessageService', ['success', 'error'])
   const locationSpy = jasmine.createSpyObj<Location>('Location', ['back'])
 
-  const configServiceSpy = {
-    getProperty: jasmine.createSpy('getProperty').and.returnValue('123'),
-    lang: 'en'
-  }
+  const configServiceSpy = { getProperty: jasmine.createSpy('getProperty').and.returnValue('123'), lang: 'en' }
   const themesApiSpy = jasmine.createSpyObj<ThemesAPIService>('ThemesAPIService', [
     'getThemeByName',
     'deleteTheme',
@@ -92,9 +87,8 @@ describe('ThemeDetailComponent', () => {
   })
 
   it('should create with provided id and get theme', async () => {
-    const name = 'themeName'
     const route = TestBed.inject(ActivatedRoute)
-    spyOn(route.snapshot.paramMap, 'get').and.returnValue(name)
+    spyOn(route.snapshot.paramMap, 'get').and.returnValue(theme.name!)
     translateService.use('de')
 
     // recreate component to test constructor
@@ -103,15 +97,21 @@ describe('ThemeDetailComponent', () => {
     fixture.detectChanges()
 
     themesApiSpy.getThemeByName.and.returnValue(of({ resource: theme } as any))
-    component.loading = true
 
     await component.ngOnInit()
 
     component.theme$?.subscribe((data) => {
       expect(data).toBe(theme)
-      expect(component.themeName).toBe(name)
+      expect(component.themeName).toBe(theme.name!)
+      expect(component.theme?.displayName).toBe(theme.displayName!)
       expect(component.dateFormat).toBe('medium')
       expect(themesApiSpy.getThemeByName).toHaveBeenCalled()
+      component.actions$!.subscribe((actions) => {
+        expect(actions.length).toBe(4)
+        if (actions.length > 0) {
+          expect(actions[3].showCondition).toBeTrue()
+        }
+      })
     })
   })
 
@@ -140,31 +140,31 @@ describe('ThemeDetailComponent', () => {
   it('should load theme and action translations on successful call', async () => {
     spyOn(component, 'onClose')
     spyOn(component, 'onExportTheme')
+    component.themeName = 'dummy'
     component.themeDeleteVisible = false
 
-    let actions: any = []
-    component.actions$!.subscribe((act) => (actions = act))
-
-    actions[0].actionCallback()
-    actions[1].actionCallback()
-    actions[2].actionCallback()
-    actions[3].actionCallback()
-
-    expect(actions.length).toBe(4)
-    expect(component.onClose).toHaveBeenCalled()
-    expect(component.onExportTheme).toHaveBeenCalled()
-    expect(component.themeDeleteVisible).toBeTrue()
+    component.actions$!.subscribe((actions) => {
+      expect(actions.length).toBe(4)
+      if (actions.length > 0) {
+        actions[0].actionCallback()
+        actions[1].actionCallback()
+        actions[2].actionCallback()
+        actions[3].actionCallback()
+        expect(component.onClose).toHaveBeenCalled()
+        expect(component.onExportTheme).toHaveBeenCalled()
+        expect(component.themeDeleteVisible).toBeTrue()
+      }
+    })
   })
 
-  it('should load prepare object details on successfull call', async () => {
+  it('should load prepare translations on successfull call', async () => {
     const themeResponse = {
       resource: {
         name: 'themeName',
         displayName: 'Theme',
         creationDate: 'myCreDate',
         modificationDate: 'myModDate'
-      },
-      workspaces: [{ name: 'workspace1' }, { name: 'workspace2' }]
+      }
     }
     themesApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
 
@@ -181,51 +181,42 @@ describe('ThemeDetailComponent', () => {
       'ACTIONS.DELETE.THEME_MESSAGE': '{{ITEM}} actionDeleteThemeMessage'
     }
     const generalTranslations = {
-      'DETAIL.CREATION_DATE': 'detailCreationDate',
-      'DETAIL.TOOLTIPS.CREATION_DATE': 'detailTooltipsCreationDate',
-      'DETAIL.MODIFICATION_DATE': 'detailModificationDate',
-      'DETAIL.TOOLTIPS.MODIFICATION_DATE': 'detailTooltipsModificationDate',
-      'THEME.WORKSPACES': 'themeWorkspaces',
-      'THEME.TOOLTIPS.WORKSPACES': 'themeTooltipsWorkspaces'
+      'INTERNAL.CREATION_DATE': 'detailCreationDate',
+      'INTERNAL.TOOLTIPS.CREATION_DATE': 'detailTooltipsCreationDate',
+      'INTERNAL.MODIFICATION_DATE': 'detailModificationDate',
+      'INTERNAL.TOOLTIPS.MODIFICATION_DATE': 'detailTooltipsModificationDate'
     }
     spyOn(translateService, 'get').and.returnValues(of(actionsTranslations), of(generalTranslations))
 
     await component.ngOnInit()
   })
 
-  it('should display not found error', () => {
-    themesApiSpy.getThemeByName.and.returnValue(
-      throwError(
-        () =>
-          new HttpErrorResponse({
-            status: 404
-          })
-      )
-    )
-    component.exceptionKey = ''
-
+  it('should display not found error and limited header actions', () => {
+    themesApiSpy.getThemeByName.and.returnValue(throwError(() => new HttpErrorResponse({ status: 404 })))
+    component.exceptionKey = undefined
+    component.themeName = 'dummy'
     component.ngOnInit()
 
+    component.actions$!.subscribe((actions) => {
+      expect(actions.length).toBe(4)
+      if (actions.length > 0) {
+        expect(actions[3].showCondition).toBeFalse() // hide delete action
+      }
+    })
+
     component.theme$?.subscribe(() => {
-      expect(component.exceptionKey).toBe('THEME.NOT_FOUND')
+      expect(component.exceptionKey).toBe('EXCEPTIONS.HTTP_STATUS_404.THEME')
     })
   })
 
-  it('should display load error', () => {
-    themesApiSpy.getThemeByName.and.returnValue(
-      throwError(
-        () =>
-          new HttpErrorResponse({
-            status: 400
-          })
-      )
-    )
-    component.exceptionKey = ''
+  it('should display permission error', () => {
+    themesApiSpy.getThemeByName.and.returnValue(throwError(() => new HttpErrorResponse({ status: 403 })))
+    component.exceptionKey = undefined
 
     component.ngOnInit()
 
     component.theme$?.subscribe(() => {
-      expect(component.exceptionKey).toBe('THEME.LOAD_ERROR')
+      expect(component.exceptionKey).toBe('EXCEPTIONS.HTTP_STATUS_403.THEME')
     })
   })
 
@@ -241,8 +232,7 @@ describe('ThemeDetailComponent', () => {
       resource: {
         name: 'themeName',
         logoUrl: 'logo123.png'
-      },
-      workspaces: []
+      }
     }
     themesApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
 
@@ -259,8 +249,7 @@ describe('ThemeDetailComponent', () => {
       resource: {
         name: 'themeName',
         logoUrl: url
-      },
-      workspaces: []
+      }
     }
     themesApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
     await component.ngOnInit()
@@ -358,10 +347,10 @@ describe('ThemeDetailComponent', () => {
 
   it('should display error on theme export fail', () => {
     themesApiSpy.exportThemes.and.returnValue(throwError(() => new Error()))
-    component.theme = {
-      name: 'themeName'
-    }
+    component.theme = theme
+
     component.onExportTheme()
+
     expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EXPORT.EXPORT_THEME_FAIL' })
   })
 

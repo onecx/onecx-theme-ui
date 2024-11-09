@@ -32,6 +32,5 @@ model/themeSnapshot.ts
 model/themeUpdateCreate.ts
 model/updateThemeRequest.ts
 model/updateThemeResponse.ts
-model/workspace.ts
 param.ts
 variables.ts

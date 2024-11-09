@@ -53,7 +53,7 @@
       "NEXT.TOOLTIP": "Nächste Seite",
       "BACK.TOOLTIP": "Vorherige Seite",
       "DETAILS.TOOLTIP": "Anzeige Details",
-      "NEW.TOOLTIP": "Erstelle neuen Eintrag"
+      "CREATE.TOOLTIP": "Erstelle neuen Eintrag"
     },
     "SEARCH": {
       "ERROR": "Daten nicht abrufbar",
@@ -139,14 +139,12 @@
     "SEARCH.HEADER": "Theme Verwaltung",
     "SEARCH.SUBHEADER": "Erstellung und Bearbeitung von Themes",
     "DESIGNER.EDIT.SUBHEADER": "Theme Details ändern",
-    "DESIGNER.NEW.SUBHEADER": "Ein neues Theme erstellen",
+    "DESIGNER.CREATE.SUBHEADER": "Ein neues Theme erstellen",
     "DETAIL.SUBHEADER": "Theme Details",
     "DETAIL.AUTO_APPLY": "Änderungen automatisch anwenden",
     "DETAIL.AUTO_APPLY.TOOLTIP": "Wenn diese Option eingeschaltet ist, dann werden alle Änderungen (Schriftart, Farben) automatisch auf die aktuelle Seite angewendet.",
     "DETAIL.AUTO_APPLY_CURRENT_THEME": "Änderungen werden beim Speichern sofort angewendet, weil es das aktuell benutzte Theme ist",
     "DETAIL.THEME_SELECTOR": "Ein Theme als Vorlage wählen",
-    "LOAD_ERROR": "Theme konnte nicht geladen werden",
-    "NOT_FOUND": "Theme nicht gefunden",
     "NO_PROPERTIES": "Keine Farbwerte enthalten",
     "TABS": {
       "INTERN": "Intern",
@@ -186,11 +184,6 @@
     "VERSION": "Version",
     "DESCRIPTION": "Beschreibung",
     "CSS_FILE": "CSS Datei",
-    "CREATION_DATE": "Erstellt am",
-    "CREATION_USER": "Erstellt von",
-    "MODIFICATION_DATE": "Geändert am",
-    "MODIFICATION_USER": "Geändert von",
-    "WORKSPACES": "Verwendet in Workspaces",
     "TOOLTIPS": {
       "ID": "Eindeutige technische ID des Themes",
       "NAME": "Eindeutiger Name des Themes, der nicht geändert werden kann. Wird als Referenz auf das Theme benutzt.",
@@ -198,15 +191,10 @@
       "FONT_FAMILY": "Wähle die Schriftart",
       "FONT_SIZE": "Wähle die Schriftgröße",
       "ITEM_COLOR": "Wähle eine Farbe",
-      "ITEM_COLOR_PICKER": "Wähle eine Farbe mit Farbwähler",
+      "ITEM_COLOR_PICKER": "Wähle eine Farbe mit dem Farbwähler",
       "VERSION": "Version des Themes",
       "DESCRIPTION": "Beschreibung des Themes",
-      "WORKSPACES": "Workspaces, die das Theme benutzen",
-      "CSS_FILE": "CSS Datei",
-      "CREATION_DATE": "Erstellt am",
-      "CREATION_USER": "Erstellt von",
-      "MODIFICATION_DATE": "Geändert am",
-      "MODIFICATION_USER": "Geändert von"
+      "CSS_FILE": "CSS Datei"
     }
   },
   "VALIDATION": {
@@ -223,20 +211,19 @@
   },
   "EXCEPTIONS": {
     "HTTP_STATUS_0": {
-      "PORTALS": "Unbekanntes Problem beim Abrufen von Workspace-Daten - Bitte versuchen sie es noch einmal.",
-      "MENUS": "Unbekanntes Problem beim Abrufen von Menü-Daten - Bitte versuchen sie es noch einmal."
+      "THEME": "Unbekanntes Problem beim Abrufen des Themes - Bitte versuchen sie es noch einmal."
+    },
+    "HTTP_STATUS_401": {
+      "THEME": "Sie sind nicht authorisiert um Themes zu sehen."
     },
     "HTTP_STATUS_403": {
-      "PORTALS": "Sie haben keine Rechte um Workspaces zu sehen.",
-      "MENUS": "Sie haben keine Rechte um Menüs zu sehen."
+      "THEME": "Sie haben keine Rechte um Themes zu sehen."
     },
     "HTTP_STATUS_404": {
-      "PORTALS": "Es konnten keine Workspaces gefunden werden.",
-      "MENUS": "Es konnten keine Menüs gefunden werden."
+      "THEME": "Theme nicht gefunden werden."
     },
     "HTTP_STATUS_500": {
-      "PORTALS": "Unbekanntes Server-Problem beim Abrufen von Workspace-Daten - Bitte versuchen sie es noch einmal.",
-      "MENUS": "Unbekanntes Server-Problem beim Abrufen von Menü-Daten - Bitte versuchen sie es noch einmal."
+      "MENUS": "Unbekanntes Server-Problem beim Abrufen des Themes - Bitte versuchen sie es noch einmal."
     }
   }
 }

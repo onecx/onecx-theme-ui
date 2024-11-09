@@ -125,6 +125,24 @@ describe('util functions', () => {
   })
 
   describe('bffImageUrl', () => {
+    it('should return a correct image path', () => {
+      const basePath = 'base'
+      const name = 'name'
+
+      const preparedUrl = bffImageUrl(basePath, name, RefType.Logo)
+
+      expect(preparedUrl).toBe('base/images/name/logo')
+    })
+
+    it('should return a path without base', () => {
+      const basePath = undefined
+      const name = 'name'
+
+      const preparedUrl = bffImageUrl(basePath, name)
+
+      expect(preparedUrl).toBe('/images/name/logo')
+    })
+
     it('should return empty string if no name is provided', () => {
       const basePath = 'base'
       const name = undefined

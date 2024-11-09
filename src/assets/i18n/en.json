@@ -53,7 +53,7 @@
       "NEXT.TOOLTIP": "Next page",
       "BACK.TOOLTIP": "Previous page",
       "DETAILS.TOOLTIP": "Display details",
-      "NEW.TOOLTIP": "Create new entry"
+      "CREATE.TOOLTIP": "Create new entry"
     },
     "SEARCH": {
       "ERROR": "Data not available",
@@ -139,14 +139,12 @@
     "SEARCH.HEADER": "Theme Management",
     "SEARCH.SUBHEADER": "Creation and editing of Themes",
     "DESIGNER.EDIT.SUBHEADER": "Change Theme Details",
-    "DESIGNER.NEW.SUBHEADER": "Create a new Theme",
+    "DESIGNER.CREATE.SUBHEADER": "Create a new Theme",
     "DETAIL.SUBHEADER": "Theme Details",
     "DETAIL.AUTO_APPLY": "Auto apply changes",
     "DETAIL.AUTO_APPLY.TOOLTIP": "If this option is switched on, then all changes (font, colors) are automatically applied to the current page.",
     "DETAIL.AUTO_APPLY_CURRENT_THEME": "Changes are applied immediately when saving because it is the Theme currently in use",
     "DETAIL.THEME_SELECTOR": "Select Theme as Template",
-    "LOAD_ERROR": "Failed to load Theme",
-    "NOT_FOUND": "Theme was not found",
     "NO_PROPERTIES": "No properties specified",
     "TABS": {
       "INTERN": "Internal",
@@ -186,11 +184,6 @@
     "VERSION": "Version",
     "DESCRIPTION": "Description",
     "CSS_FILE": "CSS File",
-    "CREATION_DATE": "Created on",
-    "CREATION_USER": "Created by",
-    "MODIFICATION_DATE": "Changed on",
-    "MODIFICATION_USER": "Changed by",
-    "WORKSPACES": "Used in Workspaces",
     "TOOLTIPS": {
       "ID": "Unique technical ID of the Theme",
       "NAME": "Unique name of the Theme, cannot be changed. Used as reference to the Theme.",
@@ -198,15 +191,10 @@
       "FONT_FAMILY": "Select Font family",
       "FONT_SIZE": "Select Font size",
       "ITEM_COLOR": "Select a Color",
-      "ITEM_COLOR_PICKER": "Select a color with color picker",
+      "ITEM_COLOR_PICKER": "Select a color with the color picker",
       "VERSION": "Version of the Theme",
       "DESCRIPTION": "Description of the Theme",
-      "WORKSPACES": "Workspaces using the Theme",
-      "CSS_FILE": "CSS file name",
-      "CREATION_DATE": "Timestamp the Theme was created",
-      "CREATION_USER": "Name of the user which created the Theme",
-      "MODIFICATION_DATE": "Timestamp the Theme was latest modified",
-      "MODIFICATION_USER": "Name of the user which changed the Theme last time"
+      "CSS_FILE": "CSS file name"
     }
   },
   "VALIDATION": {
@@ -223,20 +211,19 @@
   },
   "EXCEPTIONS": {
     "HTTP_STATUS_0": {
-      "PORTALS": "Unknown problem retrieving Workspace data - please try again.",
-      "MENUS": "Unknown problem retrieving menu data - please try again."
+      "MENUS": "Unknown problem retrieving Theme data - please try again."
+    },
+    "HTTP_STATUS_401": {
+      "MENUS": "You are not authorized to see Themes."
     },
     "HTTP_STATUS_403": {
-      "PORTALS": "You have no permissions to see workspaces.",
-      "MENUS": "You have no permissions to see menus."
+      "MENUS": "You have no permissions to see Themes."
     },
     "HTTP_STATUS_404": {
-      "PORTALS": "No Workspaces could be found.",
-      "MENUS": "No menus could be found."
+      "MENUS": "Theme could not be found."
     },
     "HTTP_STATUS_500": {
-      "PORTALS": "Unknown server problem retrieving Workspace data - please try again.",
-      "MENUS": "Unknown server problem retrieving menu data - please try again."
+      "MENUS": "Unknown server problem retrieving the Theme - please try again."
     }
   }
 }

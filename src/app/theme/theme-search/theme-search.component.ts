@@ -1,12 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateService } from '@ngx-translate/core'
-import { Observable, map } from 'rxjs'
+import { catchError, finalize, map, Observable, of } from 'rxjs'
 import { DataView } from 'primeng/dataview'
 
 import { Action, DataViewControlTranslations } from '@onecx/portal-integration-angular'
 
-import { GetThemesResponse, ImagesInternalAPIService, RefType, Theme, ThemesAPIService } from 'src/app/shared/generated'
+import { ImagesInternalAPIService, RefType, Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { limitText, bffImageUrl } from 'src/app/shared/utils'
 
 @Component({
@@ -14,8 +14,10 @@ import { limitText, bffImageUrl } from 'src/app/shared/utils'
   styleUrls: ['./theme-search.component.scss']
 })
 export class ThemeSearchComponent implements OnInit {
-  themes$!: Observable<GetThemesResponse>
+  public themes$!: Observable<Theme[]>
   public actions$: Observable<Action[]> | undefined
+  public loading = false
+  public exceptionKey: string | undefined = undefined
   public viewMode: 'list' | 'grid' = 'grid'
   public filter: string | undefined
   public sortField = 'displayName'
@@ -35,15 +37,24 @@ export class ThemeSearchComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadThemes()
     this.prepareTranslations()
     this.prepareActionButtons()
+    this.loadThemes()
   }
 
   public loadThemes(): void {
-    this.themes$ = this.themeApi.getThemes({})
+    this.loading = true
+    this.themes$ = this.themeApi.getThemes({}).pipe(
+      map((data) => (data?.stream ? data.stream.sort(this.sortThemesByName) : [])),
+      catchError((err) => {
+        this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + err.status + '.THEMES'
+        console.error('getThemes():', err)
+        return of([] as Theme[])
+      }),
+      finalize(() => (this.loading = false))
+    )
   }
-  public sortThemesByName(a: Theme, b: Theme): number {
+  private sortThemesByName(a: Theme, b: Theme): number {
     return a.displayName!.toUpperCase().localeCompare(b.displayName!.toUpperCase())
   }
 

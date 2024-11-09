@@ -1,4 +1,4 @@
-import { APP_INITIALIZER, CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA, NgModule } from '@angular/core'
+import { APP_INITIALIZER, NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { RouterModule, Routes } from '@angular/router'
@@ -6,33 +6,34 @@ import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core'
 
-import {
-  APP_CONFIG,
-  AppStateService,
-  createTranslateLoader,
-  translateServiceInitializer,
-  PortalCoreModule,
-  UserService
-} from '@onecx/portal-integration-angular'
 import { KeycloakAuthModule } from '@onecx/keycloak-auth'
+import { createTranslateLoader } from '@onecx/angular-accelerator'
+import { APP_CONFIG, AppStateService, UserService } from '@onecx/angular-integration-interface'
+import { translateServiceInitializer, PortalCoreModule } from '@onecx/portal-integration-angular'
 
+import { environment } from 'src/environments/environment'
 import { AppComponent } from './app.component'
-import { environment } from '../environments/environment'
 
-const routes: Routes = [{ path: '', pathMatch: 'full' }]
+const routes: Routes = [
+  {
+    path: '',
+    loadChildren: () => import('./theme/theme.module').then((m) => m.ThemeModule)
+  }
+]
+
 @NgModule({
   bootstrap: [AppComponent],
   declarations: [AppComponent],
   imports: [
     CommonModule,
     BrowserModule,
-    KeycloakAuthModule,
     BrowserAnimationsModule,
+    KeycloakAuthModule,
+    PortalCoreModule.forRoot('onecx-theme-ui'),
     RouterModule.forRoot(routes, {
       initialNavigation: 'enabledBlocking',
       enableTracing: true
     }),
-    PortalCoreModule.forRoot('onecx-theme-ui'),
     TranslateModule.forRoot({
       isolate: true,
       loader: {
@@ -51,11 +52,10 @@ const routes: Routes = [{ path: '', pathMatch: 'full' }]
       deps: [UserService, TranslateService]
     },
     provideHttpClient(withInterceptorsFromDi())
-  ],
-  schemas: [NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA]
+  ]
 })
 export class AppModule {
   constructor() {
-    console.info('App Module constructor')
+    console.info('OneCX Theme Module constructor')
   }
 }
