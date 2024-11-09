@@ -194,7 +194,7 @@ describe('ThemeDetailComponent', () => {
   it('should display not found error and limited header actions', () => {
     themesApiSpy.getThemeByName.and.returnValue(throwError(() => new HttpErrorResponse({ status: 404 })))
     component.exceptionKey = undefined
-
+    component.themeName = 'dummy'
     component.ngOnInit()
 
     component.actions$!.subscribe((actions) => {
