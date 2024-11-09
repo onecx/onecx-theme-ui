@@ -10,11 +10,9 @@
  * Do not edit the class manually.
  */
 import { Theme } from './theme';
-import { Workspace } from './workspace';
 
 
 export interface GetThemeResponse { 
     resource: Theme;
-    workspaces?: Array<Workspace>;
 }
 
