@@ -30,8 +30,6 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
 
   @ViewChild('themeNameInput') themeNameInput!: HTMLInputElement
 
-  public themeName: string | undefined = undefined
-  public displayName: string | undefined = undefined
   public themeNameExists = false
   public displayNameExists = false
   public themeImportError = false
