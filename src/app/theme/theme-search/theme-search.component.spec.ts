@@ -195,8 +195,20 @@ describe('ThemeSearchComponent', () => {
   })
 
   it('should show import dialog on import theme click', () => {
-    component.themeImportDialogVisible = false
+    component.importDialogVisible = false
     component.onImportThemeClick()
-    expect(component.themeImportDialogVisible).toBe(true)
+    expect(component.importDialogVisible).toBe(true)
+  })
+  it('should hide import dialog on import close', () => {
+    component.importDialogVisible = true
+    component.onThemeUpload(false)
+    expect(component.importDialogVisible).toBe(false)
+  })
+  it('should hide import dialog on import close and reload', () => {
+    spyOn(component, 'loadThemes')
+    component.importDialogVisible = true
+    component.onThemeUpload(true)
+    expect(component.importDialogVisible).toBe(false)
+    expect(component.loadThemes).toHaveBeenCalledTimes(1)
   })
 })

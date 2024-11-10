@@ -4,12 +4,13 @@ import {
   ChangeDetectorRef,
   EventEmitter,
   Input,
-  OnInit,
   Output,
-  ViewChild
+  ViewChild,
+  OnChanges
 } from '@angular/core'
 import { HttpHeaders } from '@angular/common/http'
 import { TranslateService } from '@ngx-translate/core'
+import { FormControl, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 
 import { PortalMessageService } from '@onecx/portal-integration-angular'
@@ -22,14 +23,13 @@ import { FileSelectEvent } from 'primeng/fileupload'
   templateUrl: './theme-import.component.html',
   styleUrls: ['./theme-import.component.scss']
 })
-export class ThemeImportComponent implements OnInit, AfterViewInit {
+export class ThemeImportComponent implements OnChanges, AfterViewInit {
   @Input() public displayThemeImport = false
-  @Output() public displayThemeImportChange = new EventEmitter<boolean>()
-  @Output() public uploadEmitter = new EventEmitter()
+  @Input() public themes: Theme[] = []
+  @Output() public uploadEmitter = new EventEmitter<boolean>()
 
   @ViewChild('themeNameInput') themeNameInput!: HTMLInputElement
 
-  public themes!: Theme[]
   public themeName: string | undefined = undefined
   public displayName: string | undefined = undefined
   public themeNameExists = false
@@ -38,6 +38,7 @@ export class ThemeImportComponent implements OnInit, AfterViewInit {
   public themeSnapshot: ThemeSnapshot | null = null
   public httpHeaders!: HttpHeaders
   public properties: any = null
+  public formGroup: FormGroup
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -46,13 +47,17 @@ export class ThemeImportComponent implements OnInit, AfterViewInit {
     public readonly translate: TranslateService,
     private readonly msgService: PortalMessageService,
     private readonly cd: ChangeDetectorRef
-  ) {}
+  ) {
+    this.formGroup = new FormGroup({
+      themeName: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(100)]),
+      displayName: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(100)])
+    })
+  }
 
-  ngOnInit(): void {
+  ngOnChanges(): void {
     if (this.displayThemeImport) {
       this.httpHeaders = new HttpHeaders()
       this.httpHeaders = this.httpHeaders.set('Content-Type', 'application/json')
-      this.getThemes()
     }
   }
 
@@ -61,6 +66,7 @@ export class ThemeImportComponent implements OnInit, AfterViewInit {
   }
 
   public async onImportThemeSelect(event: FileSelectEvent): Promise<void> {
+    this.formGroup.reset()
     return event.files[0].text().then((text) => {
       this.themeSnapshot = null
       try {
@@ -70,11 +76,11 @@ export class ThemeImportComponent implements OnInit, AfterViewInit {
           this.themeImportError = false
           if (themeSnapshot.themes) {
             const key: string[] = Object.keys(themeSnapshot.themes)
-            this.themeName = key[0]
-            this.displayName = themeSnapshot.themes[key[0]].displayName
             this.properties = themeSnapshot.themes[key[0]].properties
+            this.formGroup.controls['themeName'].setValue(key[0])
+            this.formGroup.controls['displayName'].setValue(themeSnapshot.themes[key[0]].displayName)
           }
-          this.checkThemeExistence()
+          this.onThemeNameChange()
         } else {
           console.error('Theme Import Error: not valid data ')
           this.themeImportError = true
@@ -85,31 +91,31 @@ export class ThemeImportComponent implements OnInit, AfterViewInit {
     })
   }
 
-  public checkThemeExistence() {
-    this.themeNameExists = false
-    this.displayNameExists = false
-    if (this.themeName) this.themeNameExists = this.themes.filter((theme) => theme.name === this.themeName).length > 0
-    if (this.displayName)
-      this.displayNameExists = this.themes.filter((theme) => theme.displayName === this.displayName).length > 0
+  public onThemeNameChange() {
+    if (this.themes.length === 0 || !this.formGroup.valid) return
+    this.themeNameExists =
+      this.themes.filter((theme) => theme.name === this.formGroup.controls['themeName'].value).length > 0
+    this.displayNameExists =
+      this.themes.filter((theme) => theme.displayName === this.formGroup.controls['displayName'].value).length > 0
   }
 
   public onImportThemeHide(): void {
-    this.displayThemeImportChange.emit(false)
+    this.uploadEmitter.emit(false)
   }
   public onImportThemeClear(): void {
     this.themeSnapshot = null
     this.themeImportError = false
   }
   public onThemeUpload(): void {
-    if (!this.themeName || !this.displayName || !this.properties) return
+    if (!this.formGroup.valid || !this.properties) return
     if (!this.themeSnapshot?.themes) return
     // Import data preparation
     const key: string[] = Object.keys(this.themeSnapshot?.themes)
-    this.themeSnapshot.themes[key[0]].displayName = this.displayName
-    if (key[0] !== this.themeName) {
+    this.themeSnapshot.themes[key[0]].displayName = this.formGroup.controls['displayName'].value
+    if (key[0] !== this.formGroup.controls['themeName'].value) {
       // save the theme properties to be reassigned on new key
       const themeProps = Object.getOwnPropertyDescriptor(this.themeSnapshot.themes, key[0])
-      Object.defineProperty(this.themeSnapshot.themes, this.themeName, themeProps!)
+      Object.defineProperty(this.themeSnapshot.themes, this.formGroup.controls['themeName'].value, themeProps!)
       delete this.themeSnapshot.themes[key[0]]
     }
     // Import execution: upload
@@ -121,9 +127,8 @@ export class ThemeImportComponent implements OnInit, AfterViewInit {
         next: () => {
           this.msgService.success({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_SUCCESS' })
           this.onImportThemeClear()
-          this.displayThemeImport = false
-          this.uploadEmitter.emit()
-          this.router.navigate([`./${this.themeName}`], { relativeTo: this.route })
+          this.uploadEmitter.emit(true)
+          this.router.navigate([`./${this.formGroup.controls['themeName'].value}`], { relativeTo: this.route })
         },
         error: () => {
           this.msgService.error({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_FAIL' })
@@ -134,13 +139,5 @@ export class ThemeImportComponent implements OnInit, AfterViewInit {
   private isThemeImportRequestDTO(obj: unknown): obj is ThemeSnapshot {
     const dto = obj as ThemeSnapshot
     return !!(typeof dto === 'object' && dto?.themes)
-  }
-
-  private getThemes(): void {
-    this.themeApi.getThemes({}).subscribe((themes) => {
-      if (themes.stream) {
-        this.themes = themes.stream
-      }
-    })
   }
 }

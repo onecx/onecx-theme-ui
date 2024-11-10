@@ -149,6 +149,10 @@
         </div>
       </ng-template>
     </p-dataView>
+    <app-theme-import
+      [themes]="themes"
+      [displayThemeImport]="importDialogVisible"
+      (uploadEmitter)="onThemeUpload($event)"
+    ></app-theme-import>
   </ocx-page-content>
-  <app-theme-import [(displayThemeImport)]="themeImportDialogVisible" (uploadEmitter)="loadThemes()"></app-theme-import>
 </ocx-portal-page>
