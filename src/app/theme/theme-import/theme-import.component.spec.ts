@@ -2,22 +2,30 @@ import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { HttpResponse, provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { FormControl, FormGroup } from '@angular/forms'
 import { provideRouter, Router } from '@angular/router'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 import { of, throwError } from 'rxjs'
 
 import { PortalMessageService } from '@onecx/portal-integration-angular'
 
-import { Theme, ThemesAPIService, GetThemesResponse } from 'src/app/shared/generated'
+import { Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeImportComponent } from './theme-import.component'
 
 describe('ThemeImportComponent', () => {
   let component: ThemeImportComponent
   let fixture: ComponentFixture<ThemeImportComponent>
+  const themes: Theme[] = [
+    { name: 'theme1', displayName: 'Theme-1' },
+    { name: 'theme2', displayName: 'Theme-2' }
+  ]
+  const formGroup = new FormGroup({
+    themeName: new FormControl(null),
+    displayName: new FormControl(null)
+  })
 
   const msgServiceSpy = jasmine.createSpyObj<PortalMessageService>('PortalMessageService', ['success', 'error'])
-
-  const themeApiSpy = jasmine.createSpyObj<ThemesAPIService>('ThemesAPIService', ['getThemes', 'importThemes'])
+  const themeApiSpy = jasmine.createSpyObj<ThemesAPIService>('ThemesAPIService', ['importThemes'])
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -37,7 +45,6 @@ describe('ThemeImportComponent', () => {
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents()
-    themeApiSpy.getThemes.and.returnValue(of({ stream: [] }) as any)
     msgServiceSpy.success.calls.reset()
     msgServiceSpy.error.calls.reset()
   }))
@@ -45,37 +52,25 @@ describe('ThemeImportComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ThemeImportComponent)
     component = fixture.componentInstance
+    component.displayThemeImport = true
+    component.themes = themes
+    component.formGroup = formGroup
     fixture.detectChanges()
   })
 
   it('should create', () => {
     expect(component).toBeTruthy()
-  })
-
-  it('should initialize themes and headers onInit', () => {
-    const themeArr: Theme[] = [
-      { name: 'theme1', displayName: 'Theme-1' },
-      { name: 'theme2', displayName: 'Theme-2' }
-    ]
-    const themesResponse: GetThemesResponse = { stream: themeArr }
-
-    themeApiSpy.getThemes.and.returnValue(of(themesResponse as any))
-
-    component.displayThemeImport = true
-    component.ngOnInit()
-
-    expect(component.themes).toEqual(themeArr)
+    component.ngOnChanges()
   })
 
   it('should read file on theme import select', async () => {
     const themeSnapshot = JSON.stringify({
       themes: {
         themeName: {
+          displayName: 'themeDisplayName',
           logoUrl: 'logo_url',
           properties: {
-            general: {
-              'primary-color': '#000000'
-            }
+            general: { 'primary-color': '#000000' }
           }
         }
       }
@@ -87,11 +82,9 @@ describe('ThemeImportComponent', () => {
 
     expect(component.themeImportError).toBe(false)
     expect(component.themeSnapshot).toBeDefined()
-    expect(component.properties).toEqual({
-      general: {
-        'primary-color': '#000000'
-      }
-    })
+    expect(component.properties).toEqual({ general: { 'primary-color': '#000000' } })
+    expect(component.formGroup.controls['themeName'].value).toEqual('themeName')
+    expect(component.formGroup.controls['displayName'].value).toEqual('themeDisplayName')
     expect(component.themeNameExists).toBe(false)
   })
 
@@ -105,7 +98,6 @@ describe('ThemeImportComponent', () => {
     expect(component.themeImportError).toBe(true)
     expect(component.themeSnapshot).toBe(null)
     expect(console.error).toHaveBeenCalledOnceWith('Theme Import Error: not valid data ')
-    // TODO: if error is visible
   })
 
   it('should log error on data parsing error', async () => {
@@ -121,10 +113,9 @@ describe('ThemeImportComponent', () => {
   })
 
   it('should indicate theme name existance if already present', async () => {
-    component.themes = [{ name: 'themeName', displayName: 'Theme-1' }]
     const themeSnapshot = JSON.stringify({
       themes: {
-        themeName: {
+        theme1: {
           displayName: 'Theme-1',
           logoUrl: 'logo_url',
           properties: {}
@@ -142,12 +133,12 @@ describe('ThemeImportComponent', () => {
     expect(component.displayNameExists).toBe(true)
   })
 
-  it('should emit displayThemeImportChange on import hide', () => {
-    spyOn(component.displayThemeImportChange, 'emit')
+  it('should emit uploadEmitter false on closing import dialog', () => {
+    spyOn(component.uploadEmitter, 'emit')
 
     component.onImportThemeHide()
 
-    expect(component.displayThemeImportChange.emit).toHaveBeenCalledOnceWith(false)
+    expect(component.uploadEmitter.emit).toHaveBeenCalledOnceWith(false)
   })
 
   it('should clear error and import data on import clear', () => {
@@ -182,22 +173,22 @@ describe('ThemeImportComponent', () => {
       created: 'created',
       themes: { ['theme']: { description: 'themeDescription' } }
     }
-    component.themeName = 'themeName'
-    component.displayName = 'themeDisplayName'
+    component.formGroup.controls['themeName'].setValue('themeName')
+    component.formGroup.controls['displayName'].setValue('themeDisplayName')
     component.properties = {}
 
     component.onThemeUpload()
 
     expect(msgServiceSpy.success).toHaveBeenCalledOnceWith({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_SUCCESS' })
-    expect(component.uploadEmitter.emit).toHaveBeenCalledTimes(1)
+    expect(component.uploadEmitter.emit).toHaveBeenCalledOnceWith(true)
   })
 
   it('should return if no themes available', () => {
     themeApiSpy.importThemes.and.returnValue(of(new HttpResponse({ body: { id: 'id' } })))
     spyOn(component.uploadEmitter, 'emit')
 
-    component.themeName = 'themeName'
-    component.displayName = 'themeDisplayName'
+    component.formGroup.controls['themeName'].setValue('themeName')
+    component.formGroup.controls['displayName'].setValue('themeDisplayName')
     component.properties = {}
     component.onThemeUpload()
 
@@ -210,7 +201,7 @@ describe('ThemeImportComponent', () => {
     themeApiSpy.importThemes.and.returnValue(of(new HttpResponse({ body: { id: 'id' } })))
     spyOn(component.uploadEmitter, 'emit')
 
-    component.themeName = 'themeName'
+    component.formGroup.controls['themeName'].setValue('themeName')
     component.onThemeUpload()
 
     expect(component.uploadEmitter.emit).not.toHaveBeenCalled()
@@ -224,11 +215,19 @@ describe('ThemeImportComponent', () => {
       themes: { ['theme']: { description: 'themeDescription' } }
     }
 
-    component.themeName = 'themeName'
-    component.displayName = 'themeDisplayName'
+    component.formGroup.controls['themeName'].setValue('themeName')
+    component.formGroup.controls['displayName'].setValue('themeDisplayName')
     component.properties = {}
     component.onThemeUpload()
 
     expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_FAIL' })
+  })
+
+  it('should not check existence if form is not ready', () => {
+    component.themeNameExists = true
+    spyOnProperty(component.formGroup, 'valid').and.returnValue(false)
+    component.onThemeNameChange()
+
+    expect(component.themeNameExists).toBeTrue()
   })
 })

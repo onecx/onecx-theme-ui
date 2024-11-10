@@ -6,6 +6,7 @@
   [closable]="true"
   [modal]="true"
   (onHide)="onImportThemeHide()"
+  [style]="{ 'max-width': '700px' }"
 >
   <p-fileUpload
     inputId="th_import_upload"
@@ -19,12 +20,16 @@
     (onRemove)="onImportThemeClear()"
     (onSelect)="onImportThemeSelect($event)"
     (uploadHandler)="onThemeUpload()"
-    [showUploadButton]="displayName && !themeImportError"
+    [showUploadButton]="formGroup.valid && !themeImportError"
     [uploadLabel]="'ACTIONS.UPLOAD' | translate"
     [cancelLabel]="'ACTIONS.CANCEL' | translate"
     [chooseLabel]="'ACTIONS.CHOOSE' | translate"
   ></p-fileUpload>
-  <div *ngIf="themeSnapshot" class="flex flex-wrap justify-content-start align-items-center gap-3 mt-4">
+  <div
+    *ngIf="themeSnapshot"
+    [formGroup]="formGroup"
+    class="flex flex-wrap justify-content-start align-items-center gap-3 mt-4"
+  >
     <span class="p-float-label w-full md:w-15rem" controlErrorAnchor>
       <input
         #themeNameInput
@@ -32,9 +37,8 @@
         type="text"
         id="th_import_theme_name"
         class="w-full pt-3 pb-2 text-responsive"
-        [(ngModel)]="themeName"
-        (ngModelChange)="checkThemeExistence()"
-        (keyup)="checkThemeExistence()"
+        formControlName="themeName"
+        (keyup)="onThemeNameChange()"
         [pTooltip]="'THEME.THEME_NAME' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
@@ -47,9 +51,8 @@
         type="text"
         id="th_import_theme_display_name"
         class="w-full pt-3 pb-2 text-responsive"
-        [(ngModel)]="displayName"
-        (ngModelChange)="checkThemeExistence()"
-        (keyup)="checkThemeExistence()"
+        formControlName="displayName"
+        (keyup)="onThemeNameChange()"
         [pTooltip]="'THEME.DISPLAY_NAME' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
@@ -61,12 +64,20 @@
     <app-theme-color-box *ngIf="properties" [properties]="properties" styleClass="h-inputtext w-15rem" />
     <div *ngIf="!properties">{{ 'THEME.NO_PROPERTIES' | translate }}</div>
   </div>
+
   <p-message
-    *ngIf="themeSnapshot && (themeNameExists || displayNameExists)"
+    *ngIf="themeSnapshot && themeNameExists"
     severity="warn"
     styleClass="mt-3"
-    id="th_import_exists_message"
-    [text]="'THEME.IMPORT.THEME_EXISTS_MESSAGE' | translate"
+    id="th_import_name_exists_message"
+    [text]="'THEME.IMPORT.NAME_EXISTS_MESSAGE' | translate"
+  ></p-message>
+  <p-message
+    *ngIf="themeSnapshot && !themeNameExists && displayNameExists"
+    severity="warn"
+    styleClass="mt-3"
+    id="th_import_display_name_exists_message"
+    [text]="'THEME.IMPORT.DISPLAY_NAME_EXISTS_MESSAGE' | translate"
   ></p-message>
   <p-message
     *ngIf="themeImportError"
@@ -83,6 +94,7 @@
         id="th_import_button_close"
         (onClick)="onImportThemeHide()"
         [label]="'ACTIONS.NAVIGATION.CLOSE' | translate"
+        [ariaLabel]="'ACTIONS.NAVIGATION.CLOSE' | translate"
         [pTooltip]="'ACTIONS.NAVIGATION.CLOSE.TOOLTIP' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"

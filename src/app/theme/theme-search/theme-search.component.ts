@@ -24,7 +24,7 @@ export class ThemeSearchComponent implements OnInit {
   public sortOrder = 1
   public limitText = limitText
 
-  public themeImportDialogVisible = false
+  public importDialogVisible = false
   public dataViewControlsTranslations: DataViewControlTranslations = {}
   @ViewChild(DataView) dv: DataView | undefined
 
@@ -147,6 +147,10 @@ export class ThemeSearchComponent implements OnInit {
     this.sortOrder = asc ? -1 : 1
   }
   public onImportThemeClick(): void {
-    this.themeImportDialogVisible = true
+    this.importDialogVisible = true
+  }
+  public onThemeUpload(uploaded: boolean) {
+    this.importDialogVisible = false
+    if (uploaded) this.loadThemes()
   }
 }
