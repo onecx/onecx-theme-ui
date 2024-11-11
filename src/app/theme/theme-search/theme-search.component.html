@@ -79,7 +79,7 @@
               <div
                 class="sm:font-bold word-break-all"
                 [id]="'th_search_data_list_row_' + i + '_display_name'"
-                [pTooltip]="theme.displayName.length < 40 ? '' : theme.displayName"
+                [pTooltip]="theme.displayName?.length < 40 ? '' : theme.displayName"
                 tooltipPosition="top"
                 tooltipEvent="hover"
               >
