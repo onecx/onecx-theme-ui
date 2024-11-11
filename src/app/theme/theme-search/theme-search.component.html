@@ -88,7 +88,7 @@
               <div
                 class="hidden md:block"
                 [id]="'th_search_data_list_row_' + i + '_description'"
-                [pTooltip]="theme.description.length < 75 ? '' : theme.description"
+                [pTooltip]="theme.description?.length < 75 ? '' : theme.description"
                 tooltipPosition="top"
                 tooltipEvent="hover"
               >
@@ -128,7 +128,7 @@
                 <div
                   [id]="'th_search_data_grid_row_' + i + '_display_name'"
                   class="font-bold sm:text-lg md:text-xl text-responsive"
-                  [pTooltip]="theme.displayName.length < 20 ? '' : theme.displayName"
+                  [pTooltip]="theme.displayName?.length < 20 ? '' : theme.displayName"
                   tooltipPosition="top"
                   tooltipEvent="hover"
                 >
