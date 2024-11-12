@@ -32,6 +32,7 @@
             "styles": ["src/styles.scss"],
             "scripts": ["node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js"],
             "extraWebpackConfig": "webpack.config.js",
+            "outputHashing": "all",
             "commonChunk": false
           },
           "configurations": {
@@ -62,7 +63,6 @@
                   "with": "src/environments/environment.prod.ts"
                 }
               ],
-              "outputHashing": "all",
               "extraWebpackConfig": "webpack.prod.config.js"
             }
           },
