@@ -357,7 +357,8 @@ export class ThemeDesignerComponent implements OnInit {
             this.themeService.apply(data as object)
           }
         },
-        error: () => {
+        error: (err) => {
+          console.error(err)
           this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_NOK' })
         }
       })
@@ -432,7 +433,7 @@ export class ThemeDesignerComponent implements OnInit {
             summaryKey: 'IMAGE.CONSTRAINT_FAILED',
             detailKey: 'IMAGE.CONSTRAINT_SIZE'
           })
-        } else if (!/^.*.(jpg|jpeg|png)$/.exec(files[0].name)) {
+        } else if (!/^.*.(ico|jpg|jpeg|png)$/.exec(files[0].name)) {
           this.displayFileTypeErrorLogo = fieldType === RefType.Logo
           this.displayFileTypeErrorFavicon = fieldType === RefType.Favicon
           this.msgService.error({
