@@ -11,9 +11,9 @@ import { TranslateTestingModule } from 'ngx-translate-testing'
 import { of, throwError } from 'rxjs'
 
 import { ConfirmationService } from 'primeng/api'
-import { InputSwitchModule } from 'primeng/inputswitch'
 import { DialogModule } from 'primeng/dialog'
 import { DropdownModule } from 'primeng/dropdown'
+import { InputSwitchModule } from 'primeng/inputswitch'
 import { OverlayPanelModule } from 'primeng/overlaypanel'
 import { ConfirmDialog, ConfirmDialogModule } from 'primeng/confirmdialog'
 
@@ -431,9 +431,12 @@ describe('ThemeDesignerComponent', () => {
     })
 
     it('should display theme already exists message on theme save as failure', () => {
-      themeApiSpy.createTheme.and.returnValue(
-        throwError(() => new HttpErrorResponse({ error: { errorCode: 'PERSIST_ENTITY_FAILED' } }))
-      )
+      const errorResponse = {
+        error: { message: 'Theme already exists', errorCode: 'PERSIST_ENTITY_FAILED' },
+        statusText: 'Bad Request',
+        status: 400
+      }
+      themeApiSpy.createTheme.and.returnValue(throwError(() => new HttpErrorResponse(errorResponse)))
 
       component.saveAsTheme('myTheme', 'myDisplayName')
 
@@ -444,23 +447,24 @@ describe('ThemeDesignerComponent', () => {
     })
 
     it('should display error message on theme save failure on creation', () => {
-      const responseError = 'Error message'
-      themeApiSpy.createTheme.and.returnValue(throwError(() => new HttpErrorResponse({ error: responseError })))
+      const errorResponse = { error: 'Cannot create', statusText: 'Bad Request', status: 400 }
+      themeApiSpy.createTheme.and.returnValue(throwError(() => new HttpErrorResponse(errorResponse)))
 
       component.saveAsTheme('myTheme', 'myDisplayName')
 
       expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({
         summaryKey: 'ACTIONS.CREATE.MESSAGE.CREATE_NOK',
-        detailKey: responseError
+        detailKey: errorResponse.error
       })
     })
 
     it('should display error message on theme updating', () => {
+      const errorResponse = { error: 'Cannot update', statusText: 'Bad Request', status: 400 }
       component.themeId = validTheme.id
       component.themeName = validTheme.name
       const themeResponse = { resource: validTheme }
       themeApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
-      themeApiSpy.updateTheme.and.returnValue(throwError(() => new HttpErrorResponse({})))
+      themeApiSpy.updateTheme.and.returnValue(throwError(() => new HttpErrorResponse(errorResponse)))
 
       component.changeMode = 'EDIT'
       component.basicForm.patchValue(validTheme)

@@ -8,6 +8,6 @@
     "target": "ES2022"
   },
   "files": ["src/main.ts", "src/polyfills.ts", "src/app/onecx-theme-remote.module.ts"],
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.d.ts"],
   "exclude": ["src/test.ts", "src/**/*.spec.ts"]
 }

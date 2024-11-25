@@ -1,8 +1,9 @@
+import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
-import { ThemeInternComponent } from './theme-intern.component'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { TranslateTestingModule } from 'ngx-translate-testing'
-import { NO_ERRORS_SCHEMA } from '@angular/core'
+
+import { ThemeInternComponent } from './theme-intern.component'
 
 describe('ThemeInternComponent', () => {
   let component: ThemeInternComponent

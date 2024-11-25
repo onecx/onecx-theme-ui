@@ -1,15 +1,13 @@
-import { NO_ERRORS_SCHEMA } from '@angular/core'
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
-import { RouterTestingModule } from '@angular/router/testing'
 
 import { AppComponent } from './app.component'
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RouterTestingModule],
       declarations: [AppComponent],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents()
   })
 
@@ -19,9 +17,9 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy()
   })
 
-  it(`should have as title 'onecx-theme-ui'`, () => {
+  it(`should have as title 'onecx-ui'`, () => {
     const fixture = TestBed.createComponent(AppComponent)
     const app = fixture.componentInstance
-    expect(app.title).toEqual('onecx-theme-ui')
+    expect(app.title).toEqual('onecx-ui')
   })
 })

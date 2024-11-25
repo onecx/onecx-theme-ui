@@ -1,8 +1,8 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { Location } from '@angular/common'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { HttpErrorResponse, provideHttpClient } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ActivatedRoute, provideRouter, Router } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { TranslateTestingModule } from 'ngx-translate-testing'
@@ -12,8 +12,9 @@ import FileSaver from 'file-saver'
 import { ConfigurationService, PortalMessageService, UserService } from '@onecx/portal-integration-angular'
 
 import { RefType, Theme, ThemesAPIService } from 'src/app/shared/generated'
-import { ThemeDetailComponent } from './theme-detail.component'
 import { bffImageUrl, getCurrentDateTime } from 'src/app/shared/utils'
+
+import { ThemeDetailComponent } from './theme-detail.component'
 
 const theme: Theme = {
   id: 'theme-id',
@@ -82,11 +83,11 @@ describe('ThemeDetailComponent', () => {
     fixture.detectChanges()
   }
 
-  it('should create', () => {
+  it('should create component', () => {
     expect(component).toBeTruthy()
   })
 
-  it('should create with provided id and get theme', async () => {
+  it('should create component with provided id and get theme', async () => {
     const route = TestBed.inject(ActivatedRoute)
     spyOn(route.snapshot.paramMap, 'get').and.returnValue(theme.name!)
     translateService.use('de')
@@ -140,6 +141,8 @@ describe('ThemeDetailComponent', () => {
   it('should load theme and action translations on successful call', async () => {
     spyOn(component, 'onClose')
     spyOn(component, 'onExportTheme')
+    const router = TestBed.inject(Router)
+    spyOn(router, 'navigate')
     component.themeName = 'dummy'
     component.themeDeleteVisible = false
 
@@ -148,10 +151,11 @@ describe('ThemeDetailComponent', () => {
       if (actions.length > 0) {
         actions[0].actionCallback()
         actions[1].actionCallback()
-        actions[2].actionCallback()
+        actions[2].actionCallback() // => go to designer with ./edit
         actions[3].actionCallback()
         expect(component.onClose).toHaveBeenCalled()
         expect(component.onExportTheme).toHaveBeenCalled()
+        expect(router.navigate).toHaveBeenCalledOnceWith(['./edit'], jasmine.any(Object))
         expect(component.themeDeleteVisible).toBeTrue()
       }
     })
@@ -192,7 +196,8 @@ describe('ThemeDetailComponent', () => {
   })
 
   it('should display not found error and limited header actions', () => {
-    themesApiSpy.getThemeByName.and.returnValue(throwError(() => new HttpErrorResponse({ status: 404 })))
+    const errorResponse = { error: 'Theme not found', status: 404, statusText: 'Not found' }
+    themesApiSpy.getThemeByName.and.returnValue(throwError(() => new HttpErrorResponse(errorResponse)))
     component.exceptionKey = undefined
     component.themeName = 'dummy'
     component.ngOnInit()
@@ -210,13 +215,14 @@ describe('ThemeDetailComponent', () => {
   })
 
   it('should display permission error', () => {
-    themesApiSpy.getThemeByName.and.returnValue(throwError(() => new HttpErrorResponse({ status: 403 })))
+    const errorResponse = { error: { message: 'No permissions' }, status: 403 }
+    themesApiSpy.getThemeByName.and.returnValue(throwError(() => new HttpErrorResponse(errorResponse)))
     component.exceptionKey = undefined
 
     component.ngOnInit()
 
     component.theme$?.subscribe(() => {
-      expect(component.exceptionKey).toBe('EXCEPTIONS.HTTP_STATUS_403.THEME')
+      expect(component.exceptionKey).toBe('EXCEPTIONS.HTTP_STATUS_' + errorResponse.status + '.THEME')
     })
   })
 
@@ -259,111 +265,110 @@ describe('ThemeDetailComponent', () => {
     })
   })
 
-  it('should hide dialog, inform and navigate on successfull deletion', () => {
-    const router = TestBed.inject(Router)
-    spyOn(router, 'navigate')
-    themesApiSpy.deleteTheme.and.returnValue(of({}) as any)
-    component.themeDeleteVisible = true
+  describe('Theme deletion', () => {
+    it('should hide dialog, inform and navigate on successfull deletion', () => {
+      const router = TestBed.inject(Router)
+      spyOn(router, 'navigate')
+      themesApiSpy.deleteTheme.and.returnValue(of({}) as any)
+      component.themeDeleteVisible = true
 
-    component.onConfirmThemeDeletion()
+      component.onConfirmThemeDeletion()
 
-    expect(component.themeDeleteVisible).toBe(false)
-    expect(router.navigate).toHaveBeenCalledOnceWith(['..'], jasmine.any(Object))
-    expect(msgServiceSpy.success).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.DELETE.THEME_OK' })
-  })
+      expect(component.themeDeleteVisible).toBe(false)
+      expect(router.navigate).toHaveBeenCalledOnceWith(['..'], jasmine.any(Object))
+      expect(msgServiceSpy.success).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.DELETE.THEME_OK' })
+    })
 
-  it('should hide dialog and display error on failed deletion', () => {
-    themesApiSpy.deleteTheme.and.returnValue(
-      throwError(
-        () =>
-          new HttpErrorResponse({
-            error: {
-              message: 'errorMessage'
-            }
-          })
-      )
-    )
-    component.themeDeleteVisible = true
+    it('should hide dialog and display error on failed deletion', () => {
+      const errorResponse = { error: { message: 'Error on deleting theme' }, status: 400 }
+      themesApiSpy.deleteTheme.and.returnValue(throwError(() => new HttpErrorResponse(errorResponse)))
+      component.themeDeleteVisible = true
 
-    component.onConfirmThemeDeletion()
+      component.onConfirmThemeDeletion()
 
-    expect(component.themeDeleteVisible).toBe(false)
-    expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({
-      summaryKey: 'ACTIONS.DELETE.THEME_NOK',
-      detailKey: 'errorMessage'
+      expect(component.themeDeleteVisible).toBe(false)
+      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({
+        summaryKey: 'ACTIONS.DELETE.THEME_NOK',
+        detailKey: errorResponse.error.message
+      })
     })
   })
 
-  it('should save file on theme export', () => {
-    spyOn(JSON, 'stringify').and.returnValue('themejson')
-    spyOn(FileSaver, 'saveAs')
+  describe('Theme export', () => {
+    it('should save file on theme export', () => {
+      spyOn(JSON, 'stringify').and.returnValue('themejson')
+      spyOn(FileSaver, 'saveAs')
 
-    themesApiSpy.exportThemes.and.returnValue(
-      of({
-        themes: {
-          themeName: {
-            version: 1,
-            logoUrl: 'url'
+      themesApiSpy.exportThemes.and.returnValue(
+        of({
+          themes: {
+            themeName: {
+              version: 1,
+              logoUrl: 'url'
+            }
           }
-        }
-      }) as any
-    )
+        }) as any
+      )
 
-    component.theme = {
-      modificationCount: 1,
-      name: 'themeName',
-      displayName: 'Theme',
-      logoUrl: 'url',
+      component.theme = {
+        modificationCount: 1,
+        name: 'themeName',
+        displayName: 'Theme',
+        logoUrl: 'url',
 
-      creationDate: 'creationDate',
-      creationUser: 'createionUser',
-      modificationDate: 'modificationDate',
-      modificationUser: 'modificationUser',
-      id: 'id'
-    }
+        creationDate: 'creationDate',
+        creationUser: 'createionUser',
+        modificationDate: 'modificationDate',
+        modificationUser: 'modificationUser',
+        id: 'id'
+      }
 
-    component.onExportTheme()
+      component.onExportTheme()
 
-    expect(themesApiSpy.exportThemes).toHaveBeenCalledOnceWith(
-      jasmine.objectContaining({ exportThemeRequest: { names: ['themeName'] } })
-    )
-    expect(JSON.stringify).toHaveBeenCalledOnceWith(
-      jasmine.objectContaining({
-        themes: {
-          themeName: {
-            version: 1,
-            logoUrl: 'url'
+      expect(themesApiSpy.exportThemes).toHaveBeenCalledOnceWith(
+        jasmine.objectContaining({ exportThemeRequest: { names: ['themeName'] } })
+      )
+      expect(JSON.stringify).toHaveBeenCalledOnceWith(
+        jasmine.objectContaining({
+          themes: {
+            themeName: {
+              version: 1,
+              logoUrl: 'url'
+            }
           }
-        }
-      }),
-      null,
-      2
-    )
-    expect(FileSaver.saveAs).toHaveBeenCalledOnceWith(
-      jasmine.any(Blob),
-      `onecx-theme_themeName_${getCurrentDateTime()}.json`
-    )
-  })
+        }),
+        null,
+        2
+      )
+      expect(FileSaver.saveAs).toHaveBeenCalledOnceWith(
+        jasmine.any(Blob),
+        `onecx-theme_themeName_${getCurrentDateTime()}.json`
+      )
+    })
 
-  it('should display error on theme export fail', () => {
-    themesApiSpy.exportThemes.and.returnValue(throwError(() => new Error()))
-    component.theme = theme
+    it('should display error on theme export fail', () => {
+      const errorResponse = { error: 'Error on exporting theme', status: 400 }
+      themesApiSpy.exportThemes.and.returnValue(throwError(() => errorResponse))
+      component.theme = theme
 
-    component.onExportTheme()
+      component.onExportTheme()
 
-    expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EXPORT.EXPORT_THEME_FAIL' })
-  })
+      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EXPORT.EXPORT_THEME_FAIL' })
+    })
 
-  it('should get correct favicon URL', () => {
-    const theme: Theme = {
-      modificationCount: 0,
-      name: 'themeName',
-      faviconUrl: 'faviconUrl'
-    }
-    expect(component.getImageUrl(theme, RefType.Favicon)).toBe('faviconUrl')
+    it('should get correct favicon URL', () => {
+      const theme: Theme = {
+        modificationCount: 0,
+        name: 'themeName',
+        faviconUrl: 'faviconUrl'
+      }
+      expect(component.getImageUrl(theme, RefType.Favicon)).toBe('faviconUrl')
 
-    const configBasePath = 'http://onecx-theme-bff:8080'
-    theme.faviconUrl = ''
-    expect(component.getImageUrl(theme, RefType.Favicon)).toBe(bffImageUrl(configBasePath, theme.name, RefType.Favicon))
+      const configBasePath = 'http://onecx-theme-bff:8080'
+      theme.faviconUrl = ''
+      expect(component.getImageUrl(theme, RefType.Favicon)).toBe(
+        bffImageUrl(configBasePath, theme.name, RefType.Favicon)
+      )
+    })
   })
 })
