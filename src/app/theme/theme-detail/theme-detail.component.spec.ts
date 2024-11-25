@@ -1,8 +1,8 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { Location } from '@angular/common'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { HttpErrorResponse, provideHttpClient } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ActivatedRoute, provideRouter, Router } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { TranslateTestingModule } from 'ngx-translate-testing'
@@ -12,9 +12,9 @@ import FileSaver from 'file-saver'
 import { ConfigurationService, PortalMessageService, UserService } from '@onecx/portal-integration-angular'
 
 import { RefType, Theme, ThemesAPIService } from 'src/app/shared/generated'
-import { ThemeDetailComponent } from './theme-detail.component'
-
 import { bffImageUrl, getCurrentDateTime } from 'src/app/shared/utils'
+
+import { ThemeDetailComponent } from './theme-detail.component'
 
 const theme: Theme = {
   id: 'theme-id',
