@@ -18,8 +18,8 @@
           <p-inputSwitch
             inputId="th_designer_header_is_current_theme"
             name="autoApplyToggle"
-            [disabled]="autoApply"
             [(ngModel)]="autoApply"
+            [ariaLabel]="'THEME.DETAIL.AUTO_APPLY' | translate"
             [pTooltip]="'THEME.DETAIL.AUTO_APPLY' | translate"
             tooltipPosition="top"
             tooltipEvent="hover"
@@ -27,7 +27,7 @@
           <label for="th_designer_header_is_current_theme">{{ 'THEME.DETAIL.AUTO_APPLY' | translate }}</label>
         </div>
         <span
-          *ngIf="autoApply"
+          *ngIf="isCurrentTheme"
           class="pi pi-bolt text-primary font-medium"
           [pTooltip]="'THEME.DETAIL.AUTO_APPLY_CURRENT_THEME' | translate"
           tooltipPosition="top"

@@ -30,7 +30,7 @@ export class ThemeDesignerComponent implements OnInit {
   @ViewChild('selectedFileInputLogo') selectedFileInputLogo: ElementRef | undefined
   @ViewChild('selectedFileInputFavicon') selectedFileInputFavicon: ElementRef | undefined
 
-  RefType = RefType
+  public RefType = RefType
   public actions$: Observable<Action[]> | undefined
   public themes: Theme[] = []
   public theme: Theme | undefined
@@ -46,6 +46,7 @@ export class ThemeDesignerComponent implements OnInit {
   public imageFaviconUrlExists = false
 
   public changeMode: 'EDIT' | 'CREATE' = 'CREATE'
+  public isCurrentTheme = false
   public autoApply = false
   public saveAsNewPopupDisplay = false
   public displayFileTypeErrorLogo = false
@@ -77,7 +78,7 @@ export class ThemeDesignerComponent implements OnInit {
     this.changeMode = route.snapshot.paramMap.has('name') ? 'EDIT' : 'CREATE'
     this.themeName = route.snapshot.paramMap.get('name')
     this.bffImagePath = this.imageApi.configuration.basePath
-    this.prepareActionButtons()
+    this.preparePageActions()
 
     this.fontForm = new FormGroup({})
     this.topbarForm = new FormGroup({})
@@ -117,6 +118,7 @@ export class ThemeDesignerComponent implements OnInit {
       })
       this.generalForm.addControl(v, fc)
     })
+
     themeVariables.topbar.forEach((v: string) => {
       const fc = new FormControl<string | null>(null)
       fc.valueChanges.pipe(debounceTime(300)).subscribe((formVal) => {
@@ -152,7 +154,8 @@ export class ThemeDesignerComponent implements OnInit {
         this.basicForm.controls['name'].disable()
         this.propertiesForm.reset()
         this.propertiesForm.patchValue(this.theme.properties ?? {})
-        this.autoApply = this.theme.name === currentTheme.name
+        this.isCurrentTheme = this.theme.name === currentTheme.name
+        this.autoApply = this.isCurrentTheme
         // images
         this.fetchingLogoUrl = this.getImageUrl(this.theme, RefType.Logo)
         this.fetchingFaviconUrl = this.getImageUrl(this.theme, RefType.Favicon)
@@ -173,7 +176,7 @@ export class ThemeDesignerComponent implements OnInit {
     this.loadThemeTemplates()
   }
 
-  private prepareActionButtons(): void {
+  private preparePageActions(): void {
     this.actions$ = this.translate
       .get([
         'GENERAL.COPY_OF',
