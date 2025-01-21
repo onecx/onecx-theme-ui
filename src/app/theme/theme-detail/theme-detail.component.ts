@@ -72,13 +72,14 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
       }),
       catchError((err) => {
         this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + err.status + '.THEME'
-        console.error('getThemeByName():', err)
-        return of({} as Theme)
+        console.error('getThemeByName', err)
+        return of({})
       }),
       finalize(() => (this.loading = false))
     )
   }
 
+  // default: we guess the Theme is in use so that deletion is not offered
   public preparePageAction(inUse?: boolean): void {
     this.actions$ = this.translate
       .get([
@@ -153,6 +154,7 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
         this.msgService.success({ summaryKey: 'ACTIONS.DELETE.THEME_OK' })
       },
       error: (err) => {
+        console.error('deleteTheme', err)
         this.msgService.error({ summaryKey: 'ACTIONS.DELETE.THEME_NOK', detailKey: err.error.message })
       }
     })
@@ -177,7 +179,7 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
           )
         },
         error: (err) => {
-          console.error(err)
+          console.error('exportThemes', err)
           this.msgService.error({ summaryKey: 'ACTIONS.EXPORT.EXPORT_THEME_FAIL' })
         }
       })

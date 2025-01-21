@@ -358,7 +358,7 @@ export class ThemeDesignerComponent implements OnInit {
           }
         },
         error: (err) => {
-          console.error(err)
+          console.error('updateTheme', err)
           this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_NOK' })
         }
       })
@@ -376,7 +376,7 @@ export class ThemeDesignerComponent implements OnInit {
         this.msgService.success({ summaryKey: 'ACTIONS.CREATE.MESSAGE.CREATE_OK' })
       },
       error: (err) => {
-        console.error(err)
+        console.error('createTheme', err)
         this.msgService.error({
           summaryKey: 'ACTIONS.CREATE.MESSAGE.CREATE_NOK',
           detailKey:
@@ -464,18 +464,18 @@ export class ThemeDesignerComponent implements OnInit {
       refType: refType,
       body: blob
     }
-    this.imageApi.getImage({ refId: name, refType: refType }).subscribe(
-      () => {
+    this.imageApi.getImage({ refId: name, refType: refType }).subscribe({
+      next: () => {
         this.imageApi.updateImage(saveRequestParameter).subscribe(() => {
           this.prepareImageResponse(name, refType)
         })
       },
-      (err) => {
+      error: () => {
         this.imageApi.uploadImage(saveRequestParameter).subscribe(() => {
           this.prepareImageResponse(name, refType)
         })
       }
-    )
+    })
   }
 
   private prepareImageResponse(name: string, refType: RefType): void {

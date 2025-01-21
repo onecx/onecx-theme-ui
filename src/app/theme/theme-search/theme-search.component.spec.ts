@@ -15,10 +15,7 @@ describe('ThemeSearchComponent', () => {
   let component: ThemeSearchComponent
   let fixture: ComponentFixture<ThemeSearchComponent>
 
-  //const themeApiSpy = jasmine.createSpyObj<ThemesAPIService>('ThemesAPIService', ['getThemes'])
-  const themeApiSpy = {
-    getThemes: jasmine.createSpy('getThemes').and.returnValue(of({}))
-  }
+  const themeApiSpy = { getThemes: jasmine.createSpy('getThemes').and.returnValue(of({})) }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -38,6 +35,10 @@ describe('ThemeSearchComponent', () => {
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents()
+    // to spy data: reset
+    themeApiSpy.getThemes.calls.reset()
+    // to spy data: refill with neutral data
+    themeApiSpy.getThemes.and.returnValue(of({}))
   }))
 
   beforeEach(() => {
@@ -123,8 +124,9 @@ describe('ThemeSearchComponent', () => {
   })
 
   it('should search themes but display error if API call fails', (done) => {
-    const err = { status: 403 }
-    themeApiSpy.getThemes.and.returnValue(throwError(() => err))
+    const errorResponse = { status: 403, statusText: 'No permissions' }
+    themeApiSpy.getThemes.and.returnValue(throwError(() => errorResponse))
+    spyOn(console, 'error')
 
     component.ngOnInit()
 
@@ -132,7 +134,8 @@ describe('ThemeSearchComponent', () => {
       next: (result) => {
         if (result) {
           expect(result.length).toBe(0)
-          expect(component.exceptionKey).toEqual('EXCEPTIONS.HTTP_STATUS_403.THEMES')
+          expect(console.error).toHaveBeenCalledWith('getThemes', errorResponse)
+          expect(component.exceptionKey).toEqual('EXCEPTIONS.HTTP_STATUS_' + errorResponse.status + '.THEMES')
         }
         done()
       },

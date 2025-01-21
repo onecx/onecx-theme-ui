@@ -28,6 +28,7 @@ describe('ThemeUseComponent', () => {
     fixture = TestBed.createComponent(ThemeUseComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
+    component.workspaceListEmitter.emit(['workspace'])
   })
 
   it('should create', () => {

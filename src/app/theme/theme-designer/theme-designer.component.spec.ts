@@ -1,6 +1,6 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from '@angular/core/testing'
-import { HttpResponse, HttpErrorResponse, provideHttpClient } from '@angular/common/http'
+import { HttpResponse, provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { By } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
@@ -436,10 +436,12 @@ describe('ThemeDesignerComponent', () => {
         statusText: 'Bad Request',
         status: 400
       }
-      themeApiSpy.createTheme.and.returnValue(throwError(() => new HttpErrorResponse(errorResponse)))
+      themeApiSpy.createTheme.and.returnValue(throwError(() => errorResponse))
+      spyOn(console, 'error')
 
       component.saveAsTheme('myTheme', 'myDisplayName')
 
+      expect(console.error).toHaveBeenCalledWith('createTheme', errorResponse)
       expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({
         summaryKey: 'ACTIONS.CREATE.MESSAGE.CREATE_NOK',
         detailKey: 'ACTIONS.CREATE.MESSAGE.THEME_ALREADY_EXISTS'
@@ -448,10 +450,12 @@ describe('ThemeDesignerComponent', () => {
 
     it('should display error message on theme save failure on creation', () => {
       const errorResponse = { error: 'Cannot create', statusText: 'Bad Request', status: 400 }
-      themeApiSpy.createTheme.and.returnValue(throwError(() => new HttpErrorResponse(errorResponse)))
+      themeApiSpy.createTheme.and.returnValue(throwError(() => errorResponse))
+      spyOn(console, 'error')
 
       component.saveAsTheme('myTheme', 'myDisplayName')
 
+      expect(console.error).toHaveBeenCalledWith('createTheme', errorResponse)
       expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({
         summaryKey: 'ACTIONS.CREATE.MESSAGE.CREATE_NOK',
         detailKey: errorResponse.error
@@ -464,7 +468,8 @@ describe('ThemeDesignerComponent', () => {
       component.themeName = validTheme.name
       const themeResponse = { resource: validTheme }
       themeApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
-      themeApiSpy.updateTheme.and.returnValue(throwError(() => new HttpErrorResponse(errorResponse)))
+      themeApiSpy.updateTheme.and.returnValue(throwError(() => errorResponse))
+      spyOn(console, 'error')
 
       component.changeMode = 'EDIT'
       component.basicForm.patchValue(validTheme)
@@ -475,6 +480,7 @@ describe('ThemeDesignerComponent', () => {
 
       expect(component.basicForm.valid).toBeTrue()
       expect(component.propertiesForm.valid).toBeTrue()
+      expect(console.error).toHaveBeenCalledWith('updateTheme', errorResponse)
       expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_NOK' })
     })
 

@@ -48,7 +48,7 @@ export class ThemeSearchComponent implements OnInit {
       map((data) => (data?.stream ? data.stream.sort(this.sortThemesByName) : [])),
       catchError((err) => {
         this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + err.status + '.THEMES'
-        console.error('getThemes():', err)
+        console.error('getThemes', err)
         return of([] as Theme[])
       }),
       finalize(() => (this.loading = false))
