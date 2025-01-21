@@ -1,8 +1,8 @@
-import { Component, Input } from '@angular/core'
-import { TranslateService } from '@ngx-translate/core'
+import { Component, EventEmitter, Input, Output } from '@angular/core'
+import { Observable } from 'rxjs'
 
 import { SlotService } from '@onecx/angular-remote-components'
-import { Observable } from 'rxjs'
+
 import { Theme } from 'src/app/shared/generated'
 
 @Component({
@@ -11,17 +11,23 @@ import { Theme } from 'src/app/shared/generated'
 })
 export class ThemeUseComponent {
   @Input() theme: Theme | undefined
+  @Output() used = new EventEmitter<boolean>()
+
+  public workspaceListEmitter = new EventEmitter<string[]>()
+
   public isListWorkspacesUsingThemeComponentDefined$: Observable<boolean> | undefined
   public listWorkspacesUsingThemeSlotName = 'onecx-theme-list-workspaces-using-theme'
 
   public operator = false
 
-  constructor(
-    private readonly translate: TranslateService,
-    private readonly slotService: SlotService
-  ) {
+  constructor(private readonly slotService: SlotService) {
     this.isListWorkspacesUsingThemeComponentDefined$ = this.slotService.isSomeComponentDefinedForSlot(
       this.listWorkspacesUsingThemeSlotName
     )
+
+    // get the list of workspaces which using the theme: if so then emit true
+    this.workspaceListEmitter.subscribe((list) => {
+      this.used.emit(list.length > 0)
+    })
   }
 }

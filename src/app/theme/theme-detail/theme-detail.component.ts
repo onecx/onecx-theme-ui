@@ -28,6 +28,7 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
   public showOperatorMessage = true // display initially only
   public loading = true
   public exceptionKey: string | undefined = undefined
+  public selectedTabIndex = 0
   public RefType = RefType
   public dateFormat = 'medium'
   // page header
@@ -59,14 +60,14 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
   }
 
   private getTheme() {
-    this.prepareActionButtons()
+    this.preparePageAction(true)
     if (!this.themeName) return
     this.loading = true
     this.theme$ = this.themeApi.getThemeByName({ name: this.themeName }).pipe(
       map((data) => {
         if (data.resource) this.theme = data.resource
         this.headerImageUrl = this.getImageUrl(this.theme, RefType.Logo)
-        this.prepareActionButtons()
+        this.preparePageAction(true)
         return data.resource
       }),
       catchError((err) => {
@@ -78,7 +79,7 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
     )
   }
 
-  private prepareActionButtons(): void {
+  public preparePageAction(inUse?: boolean): void {
     this.actions$ = this.translate
       .get([
         'ACTIONS.NAVIGATION.BACK',
@@ -129,7 +130,7 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
               show: 'asOverflow',
               permission: 'THEME#DELETE',
               conditional: true,
-              showCondition: this.theme !== undefined && !this.theme?.operator
+              showCondition: this.theme !== undefined && !this.theme?.operator && !inUse
             }
           ]
         })
@@ -164,7 +165,7 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
     this.showOperatorMessage = false
   }
 
-  onExportTheme(): void {
+  public onExportTheme(): void {
     if (this.theme?.name) {
       const exportThemeRequest: ExportThemeRequest = { names: [this.theme.name] }
       this.themeApi.exportThemes({ exportThemeRequest }).subscribe({
