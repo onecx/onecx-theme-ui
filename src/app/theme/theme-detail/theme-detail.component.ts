@@ -7,7 +7,7 @@ import FileSaver from 'file-saver'
 
 import { Action, PortalMessageService, UserService } from '@onecx/portal-integration-angular'
 
-import { bffImageUrl, getCurrentDateTime, limitText } from 'src/app/shared/utils'
+import { bffImageUrl, getCurrentDateTime } from 'src/app/shared/utils'
 import {
   ExportThemeRequest,
   ImagesInternalAPIService,
@@ -28,12 +28,12 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
   public showOperatorMessage = true // display initially only
   public loading = true
   public exceptionKey: string | undefined = undefined
+  public selectedTabIndex = 0
   public RefType = RefType
   public dateFormat = 'medium'
   // page header
   public actions$: Observable<Action[]> = of([])
   public headerImageUrl?: string
-  public limitText = limitText
 
   constructor(
     private readonly user: UserService,
@@ -59,26 +59,27 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
   }
 
   private getTheme() {
-    this.prepareActionButtons()
+    this.preparePageAction(true)
     if (!this.themeName) return
     this.loading = true
     this.theme$ = this.themeApi.getThemeByName({ name: this.themeName }).pipe(
       map((data) => {
         if (data.resource) this.theme = data.resource
         this.headerImageUrl = this.getImageUrl(this.theme, RefType.Logo)
-        this.prepareActionButtons()
+        this.preparePageAction(true)
         return data.resource
       }),
       catchError((err) => {
         this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + err.status + '.THEME'
-        console.error('getThemeByName():', err)
-        return of({} as Theme)
+        console.error('getThemeByName', err)
+        return of({})
       }),
       finalize(() => (this.loading = false))
     )
   }
 
-  private prepareActionButtons(): void {
+  // default: we guess the Theme is in use so that deletion is not offered
+  public preparePageAction(inUse?: boolean): void {
     this.actions$ = this.translate
       .get([
         'ACTIONS.NAVIGATION.BACK',
@@ -129,7 +130,7 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
               show: 'asOverflow',
               permission: 'THEME#DELETE',
               conditional: true,
-              showCondition: this.theme !== undefined && !this.theme?.operator
+              showCondition: this.theme !== undefined && !this.theme?.operator && !inUse
             }
           ]
         })
@@ -152,6 +153,7 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
         this.msgService.success({ summaryKey: 'ACTIONS.DELETE.THEME_OK' })
       },
       error: (err) => {
+        console.error('deleteTheme', err)
         this.msgService.error({ summaryKey: 'ACTIONS.DELETE.THEME_NOK', detailKey: err.error.message })
       }
     })
@@ -164,7 +166,7 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
     this.showOperatorMessage = false
   }
 
-  onExportTheme(): void {
+  public onExportTheme(): void {
     if (this.theme?.name) {
       const exportThemeRequest: ExportThemeRequest = { names: [this.theme.name] }
       this.themeApi.exportThemes({ exportThemeRequest }).subscribe({
@@ -176,7 +178,7 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
           )
         },
         error: (err) => {
-          console.error(err)
+          console.error('exportThemes', err)
           this.msgService.error({ summaryKey: 'ACTIONS.EXPORT.EXPORT_THEME_FAIL' })
         }
       })

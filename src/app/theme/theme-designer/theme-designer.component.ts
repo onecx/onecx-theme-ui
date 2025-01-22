@@ -25,12 +25,10 @@ import { themeVariables } from './theme-variables'
   providers: [ConfirmationService]
 })
 export class ThemeDesignerComponent implements OnInit {
-  @ViewChild('saveAsThemeName') saveAsThemeName: ElementRef | undefined
-  @ViewChild('saveAsThemeDisplayName') saveAsThemeDisplayName: ElementRef | undefined
   @ViewChild('selectedFileInputLogo') selectedFileInputLogo: ElementRef | undefined
   @ViewChild('selectedFileInputFavicon') selectedFileInputFavicon: ElementRef | undefined
 
-  RefType = RefType
+  public RefType = RefType
   public actions$: Observable<Action[]> | undefined
   public themes: Theme[] = []
   public theme: Theme | undefined
@@ -46,11 +44,13 @@ export class ThemeDesignerComponent implements OnInit {
   public imageFaviconUrlExists = false
 
   public changeMode: 'EDIT' | 'CREATE' = 'CREATE'
+  public isCurrentTheme = false
   public autoApply = false
-  public saveAsNewPopupDisplay = false
+  public displaySaveAsDialog = false
   public displayFileTypeErrorLogo = false
   public displayFileTypeErrorFavicon = false
 
+  public saveAsForm: FormGroup
   public fontForm: FormGroup
   public basicForm: FormGroup
   public sidebarForm: FormGroup
@@ -77,8 +77,12 @@ export class ThemeDesignerComponent implements OnInit {
     this.changeMode = route.snapshot.paramMap.has('name') ? 'EDIT' : 'CREATE'
     this.themeName = route.snapshot.paramMap.get('name')
     this.bffImagePath = this.imageApi.configuration.basePath
-    this.prepareActionButtons()
+    this.preparePageActions()
 
+    this.saveAsForm = new FormGroup({
+      themeName: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(100)]),
+      displayName: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(100)])
+    })
     this.fontForm = new FormGroup({})
     this.topbarForm = new FormGroup({})
     this.generalForm = new FormGroup({})
@@ -117,6 +121,7 @@ export class ThemeDesignerComponent implements OnInit {
       })
       this.generalForm.addControl(v, fc)
     })
+
     themeVariables.topbar.forEach((v: string) => {
       const fc = new FormControl<string | null>(null)
       fc.valueChanges.pipe(debounceTime(300)).subscribe((formVal) => {
@@ -152,7 +157,8 @@ export class ThemeDesignerComponent implements OnInit {
         this.basicForm.controls['name'].disable()
         this.propertiesForm.reset()
         this.propertiesForm.patchValue(this.theme.properties ?? {})
-        this.autoApply = this.theme.name === currentTheme.name
+        this.isCurrentTheme = this.theme.name === currentTheme.name
+        this.autoApply = this.isCurrentTheme
         // images
         this.fetchingLogoUrl = this.getImageUrl(this.theme, RefType.Logo)
         this.fetchingFaviconUrl = this.getImageUrl(this.theme, RefType.Favicon)
@@ -173,7 +179,7 @@ export class ThemeDesignerComponent implements OnInit {
     this.loadThemeTemplates()
   }
 
-  private prepareActionButtons(): void {
+  private preparePageActions(): void {
     this.actions$ = this.translate
       .get([
         'GENERAL.COPY_OF',
@@ -209,7 +215,7 @@ export class ThemeDesignerComponent implements OnInit {
             {
               label: data['ACTIONS.SAVE_AS'],
               title: data['ACTIONS.TOOLTIPS.SAVE_AS'],
-              actionCallback: () => this.onOpenSaveAsPopup(),
+              actionCallback: () => this.onDisplaySaveAsDialog(),
               icon: 'pi pi-plus-circle',
               show: 'always',
               conditional: true,
@@ -303,10 +309,10 @@ export class ThemeDesignerComponent implements OnInit {
     if (this.changeMode === 'EDIT') this.updateTheme()
   }
 
-  public saveAsTheme(newThemename: string, newDisplayName: string): void {
+  public onSaveAsTheme(): void {
     const newTheme: ThemeUpdateCreate = { ...this.basicForm.value }
-    newTheme.name = newThemename
-    newTheme.displayName = newDisplayName
+    newTheme.name = this.saveAsForm.controls['themeName'].value
+    newTheme.displayName = this.saveAsForm.controls['displayName'].value
     newTheme.properties = this.propertiesForm.value
     if (this.imageFaviconUrlExists) newTheme.faviconUrl = undefined
     if (this.imageLogoUrlExists) newTheme.logoUrl = undefined
@@ -314,14 +320,10 @@ export class ThemeDesignerComponent implements OnInit {
   }
 
   // SAVE AS => EDIT mode
-  public onOpenSaveAsPopup(): void {
-    this.saveAsNewPopupDisplay = true
-  }
-  public onShowSaveAsDialog(): void {
-    const basicFormName = this.basicForm.controls['name'].value
-    const basicFormDisplayName = this.basicForm.controls['displayName'].value
-    this.saveAsThemeName!.nativeElement.value = this.copyOfPrefix + basicFormName
-    this.saveAsThemeDisplayName!.nativeElement.value = this.copyOfPrefix + basicFormDisplayName
+  public onDisplaySaveAsDialog(): void {
+    this.saveAsForm.controls['themeName'].setValue(this.copyOfPrefix + this.basicForm.controls['name'].value)
+    this.saveAsForm.controls['displayName'].setValue(this.copyOfPrefix + this.basicForm.controls['displayName'].value)
+    this.displaySaveAsDialog = true
   }
 
   // EDIT
@@ -358,7 +360,7 @@ export class ThemeDesignerComponent implements OnInit {
           }
         },
         error: (err) => {
-          console.error(err)
+          console.error('updateTheme', err)
           this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_NOK' })
         }
       })
@@ -376,7 +378,7 @@ export class ThemeDesignerComponent implements OnInit {
         this.msgService.success({ summaryKey: 'ACTIONS.CREATE.MESSAGE.CREATE_OK' })
       },
       error: (err) => {
-        console.error(err)
+        console.error('createTheme', err)
         this.msgService.error({
           summaryKey: 'ACTIONS.CREATE.MESSAGE.CREATE_NOK',
           detailKey:
@@ -464,18 +466,18 @@ export class ThemeDesignerComponent implements OnInit {
       refType: refType,
       body: blob
     }
-    this.imageApi.getImage({ refId: name, refType: refType }).subscribe(
-      () => {
+    this.imageApi.getImage({ refId: name, refType: refType }).subscribe({
+      next: () => {
         this.imageApi.updateImage(saveRequestParameter).subscribe(() => {
           this.prepareImageResponse(name, refType)
         })
       },
-      (err) => {
+      error: () => {
         this.imageApi.uploadImage(saveRequestParameter).subscribe(() => {
           this.prepareImageResponse(name, refType)
         })
       }
-    )
+    })
   }
 
   private prepareImageResponse(name: string, refType: RefType): void {

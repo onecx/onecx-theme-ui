@@ -1,6 +1,5 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 
 import { ThemeColorBoxComponent } from './theme-color-box.component'
@@ -13,7 +12,6 @@ describe('ThemeColorBoxComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ThemeColorBoxComponent],
       imports: [
-        HttpClientTestingModule,
         TranslateTestingModule.withTranslations({
           de: require('src/assets/i18n/de.json'),
           en: require('src/assets/i18n/en.json')

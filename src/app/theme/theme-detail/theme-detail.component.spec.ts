@@ -1,7 +1,7 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { Location } from '@angular/common'
-import { HttpErrorResponse, provideHttpClient } from '@angular/common/http'
+import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ActivatedRoute, provideRouter, Router } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
@@ -17,7 +17,7 @@ import { bffImageUrl, getCurrentDateTime } from 'src/app/shared/utils'
 import { ThemeDetailComponent } from './theme-detail.component'
 
 const theme: Theme = {
-  id: 'theme-id',
+  id: 'themeId',
   name: 'themeName',
   displayName: 'themeDisplayName',
   operator: false
@@ -63,11 +63,13 @@ describe('ThemeDetailComponent', () => {
     }).compileComponents()
     msgServiceSpy.success.calls.reset()
     msgServiceSpy.error.calls.reset()
-    themesApiSpy.getThemeByName.and.returnValue(of({}) as any)
+    // to spy data: reset
     themesApiSpy.getThemeByName.calls.reset()
-    themesApiSpy.exportThemes.and.returnValue(of({}) as any)
     themesApiSpy.exportThemes.calls.reset()
     locationSpy.back.calls.reset()
+    // to spy data: refill with neutral data
+    themesApiSpy.getThemeByName.and.returnValue(of({}) as any)
+    themesApiSpy.exportThemes.and.returnValue(of({}) as any)
   }))
 
   beforeEach(() => {
@@ -110,7 +112,7 @@ describe('ThemeDetailComponent', () => {
       component.actions$!.subscribe((actions) => {
         expect(actions.length).toBe(4)
         if (actions.length > 0) {
-          expect(actions[3].showCondition).toBeTrue()
+          expect(actions[3].showCondition).toBeFalsy() // deletion
         }
       })
     })
@@ -139,10 +141,10 @@ describe('ThemeDetailComponent', () => {
   })
 
   it('should load theme and action translations on successful call', async () => {
-    spyOn(component, 'onClose')
-    spyOn(component, 'onExportTheme')
     const router = TestBed.inject(Router)
     spyOn(router, 'navigate')
+    spyOn(component, 'onClose')
+    spyOn(component, 'onExportTheme')
     component.themeName = 'dummy'
     component.themeDeleteVisible = false
 
@@ -197,9 +199,11 @@ describe('ThemeDetailComponent', () => {
 
   it('should display not found error and limited header actions', () => {
     const errorResponse = { error: 'Theme not found', status: 404, statusText: 'Not found' }
-    themesApiSpy.getThemeByName.and.returnValue(throwError(() => new HttpErrorResponse(errorResponse)))
+    themesApiSpy.getThemeByName.and.returnValue(throwError(() => errorResponse))
+    spyOn(console, 'error')
     component.exceptionKey = undefined
     component.themeName = 'dummy'
+
     component.ngOnInit()
 
     component.actions$!.subscribe((actions) => {
@@ -210,18 +214,21 @@ describe('ThemeDetailComponent', () => {
     })
 
     component.theme$?.subscribe(() => {
-      expect(component.exceptionKey).toBe('EXCEPTIONS.HTTP_STATUS_404.THEME')
+      expect(console.error).toHaveBeenCalledWith('getThemeByName', errorResponse)
+      expect(component.exceptionKey).toBe('EXCEPTIONS.HTTP_STATUS_' + errorResponse.status + '.THEME')
     })
   })
 
   it('should display permission error', () => {
     const errorResponse = { error: { message: 'No permissions' }, status: 403 }
-    themesApiSpy.getThemeByName.and.returnValue(throwError(() => new HttpErrorResponse(errorResponse)))
+    themesApiSpy.getThemeByName.and.returnValue(throwError(() => errorResponse))
+    spyOn(console, 'error')
     component.exceptionKey = undefined
 
     component.ngOnInit()
 
     component.theme$?.subscribe(() => {
+      expect(console.error).toHaveBeenCalledWith('getThemeByName', errorResponse)
       expect(component.exceptionKey).toBe('EXCEPTIONS.HTTP_STATUS_' + errorResponse.status + '.THEME')
     })
   })
@@ -281,12 +288,14 @@ describe('ThemeDetailComponent', () => {
 
     it('should hide dialog and display error on failed deletion', () => {
       const errorResponse = { error: { message: 'Error on deleting theme' }, status: 400 }
-      themesApiSpy.deleteTheme.and.returnValue(throwError(() => new HttpErrorResponse(errorResponse)))
+      themesApiSpy.deleteTheme.and.returnValue(throwError(() => errorResponse))
       component.themeDeleteVisible = true
+      spyOn(console, 'error')
 
       component.onConfirmThemeDeletion()
 
       expect(component.themeDeleteVisible).toBe(false)
+      expect(console.error).toHaveBeenCalledWith('deleteTheme', errorResponse)
       expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({
         summaryKey: 'ACTIONS.DELETE.THEME_NOK',
         detailKey: errorResponse.error.message
@@ -349,10 +358,12 @@ describe('ThemeDetailComponent', () => {
     it('should display error on theme export fail', () => {
       const errorResponse = { error: 'Error on exporting theme', status: 400 }
       themesApiSpy.exportThemes.and.returnValue(throwError(() => errorResponse))
+      spyOn(console, 'error')
       component.theme = theme
 
       component.onExportTheme()
 
+      expect(console.error).toHaveBeenCalledWith('exportThemes', errorResponse)
       expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EXPORT.EXPORT_THEME_FAIL' })
     })
 

@@ -3,6 +3,7 @@
     *ngIf="isListWorkspacesUsingThemeComponentDefined$ | async"
     [name]="listWorkspacesUsingThemeSlotName"
     [inputs]="{ themeName: theme?.name }"
+    [outputs]="{ workspaceList: workspaceListEmitter }"
   >
   </ocx-slot>
 </div>
