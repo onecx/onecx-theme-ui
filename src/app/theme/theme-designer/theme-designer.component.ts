@@ -25,8 +25,6 @@ import { themeVariables } from './theme-variables'
   providers: [ConfirmationService]
 })
 export class ThemeDesignerComponent implements OnInit {
-  @ViewChild('saveAsThemeName') saveAsThemeName: ElementRef | undefined
-  @ViewChild('saveAsThemeDisplayName') saveAsThemeDisplayName: ElementRef | undefined
   @ViewChild('selectedFileInputLogo') selectedFileInputLogo: ElementRef | undefined
   @ViewChild('selectedFileInputFavicon') selectedFileInputFavicon: ElementRef | undefined
 
@@ -48,10 +46,11 @@ export class ThemeDesignerComponent implements OnInit {
   public changeMode: 'EDIT' | 'CREATE' = 'CREATE'
   public isCurrentTheme = false
   public autoApply = false
-  public saveAsNewPopupDisplay = false
+  public displaySaveAsDialog = false
   public displayFileTypeErrorLogo = false
   public displayFileTypeErrorFavicon = false
 
+  public saveAsForm: FormGroup
   public fontForm: FormGroup
   public basicForm: FormGroup
   public sidebarForm: FormGroup
@@ -80,6 +79,10 @@ export class ThemeDesignerComponent implements OnInit {
     this.bffImagePath = this.imageApi.configuration.basePath
     this.preparePageActions()
 
+    this.saveAsForm = new FormGroup({
+      themeName: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(100)]),
+      displayName: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(100)])
+    })
     this.fontForm = new FormGroup({})
     this.topbarForm = new FormGroup({})
     this.generalForm = new FormGroup({})
@@ -212,7 +215,7 @@ export class ThemeDesignerComponent implements OnInit {
             {
               label: data['ACTIONS.SAVE_AS'],
               title: data['ACTIONS.TOOLTIPS.SAVE_AS'],
-              actionCallback: () => this.onOpenSaveAsPopup(),
+              actionCallback: () => this.onDisplaySaveAsDialog(),
               icon: 'pi pi-plus-circle',
               show: 'always',
               conditional: true,
@@ -306,10 +309,10 @@ export class ThemeDesignerComponent implements OnInit {
     if (this.changeMode === 'EDIT') this.updateTheme()
   }
 
-  public saveAsTheme(newThemename: string, newDisplayName: string): void {
+  public onSaveAsTheme(): void {
     const newTheme: ThemeUpdateCreate = { ...this.basicForm.value }
-    newTheme.name = newThemename
-    newTheme.displayName = newDisplayName
+    newTheme.name = this.saveAsForm.controls['themeName'].value
+    newTheme.displayName = this.saveAsForm.controls['displayName'].value
     newTheme.properties = this.propertiesForm.value
     if (this.imageFaviconUrlExists) newTheme.faviconUrl = undefined
     if (this.imageLogoUrlExists) newTheme.logoUrl = undefined
@@ -317,14 +320,10 @@ export class ThemeDesignerComponent implements OnInit {
   }
 
   // SAVE AS => EDIT mode
-  public onOpenSaveAsPopup(): void {
-    this.saveAsNewPopupDisplay = true
-  }
-  public onShowSaveAsDialog(): void {
-    const basicFormName = this.basicForm.controls['name'].value
-    const basicFormDisplayName = this.basicForm.controls['displayName'].value
-    this.saveAsThemeName!.nativeElement.value = this.copyOfPrefix + basicFormName
-    this.saveAsThemeDisplayName!.nativeElement.value = this.copyOfPrefix + basicFormDisplayName
+  public onDisplaySaveAsDialog(): void {
+    this.saveAsForm.controls['themeName'].setValue(this.copyOfPrefix + this.basicForm.controls['name'].value)
+    this.saveAsForm.controls['displayName'].setValue(this.copyOfPrefix + this.basicForm.controls['displayName'].value)
+    this.displaySaveAsDialog = true
   }
 
   // EDIT

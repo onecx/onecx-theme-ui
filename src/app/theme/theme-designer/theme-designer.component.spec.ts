@@ -24,21 +24,22 @@ import { RefType, ThemesAPIService, ImagesInternalAPIService } from 'src/app/sha
 import { ThemeDesignerComponent } from './theme-designer.component'
 import { themeVariables } from './theme-variables'
 
+const validTheme = {
+  id: 'id',
+  name: 'themeName',
+  displayName: 'themeDisplayName',
+  description: 'desc',
+  logoUrl: 'logo_url',
+  faviconUrl: 'fav_url',
+  properties: {
+    font: { 'font-family': 'myFont' },
+    general: { 'primary-color': 'rgb(0,0,0)' }
+  }
+}
+
 describe('ThemeDesignerComponent', () => {
   let component: ThemeDesignerComponent
   let fixture: ComponentFixture<ThemeDesignerComponent>
-  const validTheme = {
-    id: 'id',
-    name: 'themeName',
-    displayName: 'themeDisplayName',
-    description: 'desc',
-    logoUrl: 'logo_url',
-    faviconUrl: 'fav_url',
-    properties: {
-      font: { 'font-family': 'myFont' },
-      general: { 'primary-color': 'rgb(0,0,0)' }
-    }
-  }
 
   const msgServiceSpy = jasmine.createSpyObj<PortalMessageService>('PortalMessageService', ['success', 'error', 'info'])
   const themeServiceSpy = jasmine.createSpyObj<ThemeService>('ThemeService', ['apply'], {
@@ -60,9 +61,7 @@ describe('ThemeDesignerComponent', () => {
     getImage: jasmine.createSpy('getImage').and.returnValue(of({})),
     updateImage: jasmine.createSpy('updateImage').and.returnValue(of({})),
     uploadImage: jasmine.createSpy('uploadImage').and.returnValue(of({})),
-    configuration: {
-      basePath: 'basePath'
-    }
+    configuration: { basePath: 'basePath' }
   }
 
   beforeEach(waitForAsync(() => {
@@ -97,12 +96,14 @@ describe('ThemeDesignerComponent', () => {
     msgServiceSpy.success.calls.reset()
     msgServiceSpy.error.calls.reset()
     msgServiceSpy.info.calls.reset()
+    // reset data services
     themeApiSpy.getThemeById.calls.reset()
     themeApiSpy.getThemeByName.calls.reset()
     themeApiSpy.updateTheme.calls.reset()
     themeApiSpy.createTheme.calls.reset()
     themeApiSpy.getThemes.calls.reset()
     themeServiceSpy.apply.calls.reset()
+    // to spy data: refill with neutral data
     themeApiSpy.getThemes.and.returnValue(of({}) as any)
     themeApiSpy.updateTheme.and.returnValue(of({}) as any)
     themeApiSpy.createTheme.and.returnValue(of({}) as any)
@@ -118,7 +119,7 @@ describe('ThemeDesignerComponent', () => {
     fixture.detectChanges()
   }
 
-  describe('when constructing', () => {
+  describe('construction', () => {
     beforeEach(() => {})
 
     it('should have edit changeMode when id present in route', () => {
@@ -183,9 +184,9 @@ describe('ThemeDesignerComponent', () => {
         expect(component['onSaveTheme']).toHaveBeenCalledTimes(1)
 
         const saveAsAction = actions.filter((a) => a.label === 'actionSaveAs' && a.title === 'actionTooltipsSaveAs')[0]
-        spyOn(component, 'onOpenSaveAsPopup')
+        spyOn(component, 'onDisplaySaveAsDialog')
         saveAsAction.actionCallback()
-        expect(component.onOpenSaveAsPopup).toHaveBeenCalledTimes(1)
+        expect(component.onDisplaySaveAsDialog).toHaveBeenCalledTimes(1)
 
         done()
       })
@@ -332,6 +333,7 @@ describe('ThemeDesignerComponent', () => {
 
       expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
     })
+
     it('should display error when updating theme with invalid property form', () => {
       spyOnProperty(component.propertiesForm, 'invalid').and.returnValue(true)
 
@@ -430,66 +432,66 @@ describe('ThemeDesignerComponent', () => {
       })
     })
 
-    it('should display theme already exists message on theme save as failure', () => {
-      const errorResponse = {
-        error: { message: 'Theme already exists', errorCode: 'PERSIST_ENTITY_FAILED' },
-        statusText: 'Bad Request',
-        status: 400
-      }
-      themeApiSpy.createTheme.and.returnValue(throwError(() => errorResponse))
-      spyOn(console, 'error')
+    describe('save as errors', () => {
+      it('should display theme already exists message', () => {
+        const errorResponse = {
+          error: { message: 'Theme already exists', errorCode: 'PERSIST_ENTITY_FAILED' },
+          statusText: 'Bad Request',
+          status: 400
+        }
+        themeApiSpy.createTheme.and.returnValue(throwError(() => errorResponse))
+        spyOn(console, 'error')
 
-      component.saveAsTheme('myTheme', 'myDisplayName')
+        component.onSaveAsTheme()
 
-      expect(console.error).toHaveBeenCalledWith('createTheme', errorResponse)
-      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({
-        summaryKey: 'ACTIONS.CREATE.MESSAGE.CREATE_NOK',
-        detailKey: 'ACTIONS.CREATE.MESSAGE.THEME_ALREADY_EXISTS'
+        expect(console.error).toHaveBeenCalledWith('createTheme', errorResponse)
+        expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({
+          summaryKey: 'ACTIONS.CREATE.MESSAGE.CREATE_NOK',
+          detailKey: 'ACTIONS.CREATE.MESSAGE.THEME_ALREADY_EXISTS'
+        })
+      })
+
+      it('should display error message on theme save failure on creation', () => {
+        const errorResponse = { error: 'Cannot create', statusText: 'Bad Request', status: 400 }
+        themeApiSpy.createTheme.and.returnValue(throwError(() => errorResponse))
+        spyOn(console, 'error')
+
+        component.onSaveAsTheme()
+
+        expect(console.error).toHaveBeenCalledWith('createTheme', errorResponse)
+        expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({
+          summaryKey: 'ACTIONS.CREATE.MESSAGE.CREATE_NOK',
+          detailKey: errorResponse.error
+        })
+      })
+
+      it('should display error message on theme updating', () => {
+        const errorResponse = { error: 'Cannot update', statusText: 'Bad Request', status: 400 }
+        component.themeId = validTheme.id
+        component.themeName = validTheme.name
+        const themeResponse = { resource: validTheme }
+        themeApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
+        themeApiSpy.updateTheme.and.returnValue(throwError(() => errorResponse))
+        spyOn(console, 'error')
+
+        component.changeMode = 'EDIT'
+        component.basicForm.patchValue(validTheme)
+        component.fontForm.patchValue(validTheme.properties.font)
+        component.generalForm.patchValue(validTheme.properties.general)
+
+        component.onSaveTheme()
+
+        expect(component.basicForm.valid).toBeTrue()
+        expect(component.propertiesForm.valid).toBeTrue()
+        expect(console.error).toHaveBeenCalledWith('updateTheme', errorResponse)
+        expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_NOK' })
       })
     })
 
-    it('should display error message on theme save failure on creation', () => {
-      const errorResponse = { error: 'Cannot create', statusText: 'Bad Request', status: 400 }
-      themeApiSpy.createTheme.and.returnValue(throwError(() => errorResponse))
-      spyOn(console, 'error')
-
-      component.saveAsTheme('myTheme', 'myDisplayName')
-
-      expect(console.error).toHaveBeenCalledWith('createTheme', errorResponse)
-      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({
-        summaryKey: 'ACTIONS.CREATE.MESSAGE.CREATE_NOK',
-        detailKey: errorResponse.error
-      })
-    })
-
-    it('should display error message on theme updating', () => {
-      const errorResponse = { error: 'Cannot update', statusText: 'Bad Request', status: 400 }
-      component.themeId = validTheme.id
-      component.themeName = validTheme.name
-      const themeResponse = { resource: validTheme }
-      themeApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
-      themeApiSpy.updateTheme.and.returnValue(throwError(() => errorResponse))
-      spyOn(console, 'error')
-
-      component.changeMode = 'EDIT'
-      component.basicForm.patchValue(validTheme)
-      component.fontForm.patchValue(validTheme.properties.font)
-      component.generalForm.patchValue(validTheme.properties.general)
-
-      component.onSaveTheme()
-
-      expect(component.basicForm.valid).toBeTrue()
-      expect(component.propertiesForm.valid).toBeTrue()
-      expect(console.error).toHaveBeenCalledWith('updateTheme', errorResponse)
-      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_NOK' })
-    })
-
-    it('should display success message and route correctly in edit changeMode', () => {
+    it('should display success message and route correctly on update', () => {
       const router = TestBed.inject(Router)
       spyOn(router, 'navigate')
-
       const route = TestBed.inject(ActivatedRoute)
-
       const newBasicData = {
         name: 'newName',
         description: 'newDesc',
@@ -502,7 +504,8 @@ describe('ThemeDesignerComponent', () => {
       themeApiSpy.createTheme.and.returnValue(of({ resource: { name: 'myTheme' } }) as any)
 
       component.changeMode = 'EDIT'
-      component.saveAsTheme('myTheme', 'myDisplayName')
+      component.saveAsForm.patchValue({ themeName: 'myTheme', displayName: 'myDisplayName' })
+      component.onSaveAsTheme()
 
       const createArgs = themeApiSpy.createTheme.calls.mostRecent().args[0]
       expect(createArgs.createThemeRequest?.resource).toEqual(
@@ -586,7 +589,8 @@ describe('ThemeDesignerComponent', () => {
       component.imageFaviconUrlExists = true
       component.imageLogoUrlExists = true
 
-      component.saveAsTheme('myTheme', 'myDisplayName')
+      component.saveAsForm.patchValue({ themeName: 'myTheme', displayName: 'myDisplayName' })
+      component.onSaveAsTheme()
 
       const createArgs = themeApiSpy.createTheme.calls.mostRecent().args[0]
       expect(createArgs.createThemeRequest?.resource).toEqual(
@@ -630,44 +634,44 @@ describe('ThemeDesignerComponent', () => {
       themeApiSpy.createTheme.and.returnValue(of({ resource: { name: 'myTheme' } }) as any)
       component.changeMode = 'CREATE'
 
-      component.saveAsTheme('myTheme', 'myDisplayName')
+      component.saveAsForm.patchValue({ themeName: 'myTheme', displayName: 'myDisplayName' })
+      component.onSaveAsTheme()
 
       expect(router.navigate).toHaveBeenCalledOnceWith([`../myTheme`], jasmine.objectContaining({ relativeTo: route }))
     })
 
     it('should display save as new popup on save as click', (done: DoneFn) => {
-      component.saveAsNewPopupDisplay = false
+      component.displaySaveAsDialog = false
 
       component.actions$?.subscribe((actions) => {
         const saveAction = actions[2]
         saveAction.actionCallback()
-        expect(component.saveAsNewPopupDisplay).toBe(true)
+        expect(component.displaySaveAsDialog).toBe(true)
 
         done()
       })
     })
 
     it('should use form theme name in save as dialog while in create changeMode', () => {
-      component.saveAsThemeName = jasmine.createSpyObj('ElementRef', [], { nativeElement: { value: '' } })
-      component.saveAsThemeDisplayName = jasmine.createSpyObj('ElementRef', [], { nativeElement: { value: '' } })
-      component.basicForm.controls['name'].setValue('newThemeName')
-      component.basicForm.controls['displayName'].setValue('newThemeDisplayName')
+      component.basicForm.controls['name'].setValue('themeName')
+      component.basicForm.controls['displayName'].setValue('themeDisplayName')
       component.changeMode = 'CREATE'
 
-      component.onShowSaveAsDialog()
+      component.onDisplaySaveAsDialog()
 
-      expect(component.saveAsThemeName?.nativeElement.value).toBe(component.copyOfPrefix + 'newThemeName')
-      expect(component.saveAsThemeDisplayName?.nativeElement.value).toBe(component.copyOfPrefix + 'newThemeDisplayName')
+      expect(component.saveAsForm.controls['themeName'].value).toBe(component.copyOfPrefix + 'themeName')
+      expect(component.saveAsForm.controls['displayName'].value).toBe(component.copyOfPrefix + 'themeDisplayName')
     })
 
-    it('should use COPY_OF + form theme name in save as dialog while in EDIT changeMode', () => {
-      component.saveAsThemeName = jasmine.createSpyObj('ElementRef', [], { nativeElement: { value: '' } })
-      component.basicForm.controls['name'].setValue('newThemeName')
+    it('should use form theme name in save as dialog while in create changeMode', () => {
+      component.basicForm.controls['name'].setValue('themeName')
+      component.basicForm.controls['displayName'].setValue('themeDisplayName')
       component.changeMode = 'EDIT'
 
-      component.onShowSaveAsDialog()
+      component.onDisplaySaveAsDialog()
 
-      expect(component.saveAsThemeName?.nativeElement.value).toBe(component.copyOfPrefix + 'newThemeName')
+      expect(component.saveAsForm.controls['themeName'].value).toBe(component.copyOfPrefix + 'themeName')
+      expect(component.saveAsForm.controls['displayName'].value).toBe(component.copyOfPrefix + 'themeDisplayName')
     })
 
     it('should not upload a file if currThemeName is empty', () => {

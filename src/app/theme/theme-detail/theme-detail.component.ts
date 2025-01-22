@@ -7,7 +7,7 @@ import FileSaver from 'file-saver'
 
 import { Action, PortalMessageService, UserService } from '@onecx/portal-integration-angular'
 
-import { bffImageUrl, getCurrentDateTime, limitText } from 'src/app/shared/utils'
+import { bffImageUrl, getCurrentDateTime } from 'src/app/shared/utils'
 import {
   ExportThemeRequest,
   ImagesInternalAPIService,
@@ -34,7 +34,6 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
   // page header
   public actions$: Observable<Action[]> = of([])
   public headerImageUrl?: string
-  public limitText = limitText
 
   constructor(
     private readonly user: UserService,

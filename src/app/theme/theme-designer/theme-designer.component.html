@@ -299,44 +299,43 @@
 <!-- save as a new theme -->
 <p-dialog
   [header]="'ACTIONS.CREATE.THEME' | translate"
-  [(visible)]="saveAsNewPopupDisplay"
+  [(visible)]="displaySaveAsDialog"
   [modal]="true"
   [closable]="true"
   [draggable]="true"
   [resizable]="true"
-  [style]="{ width: '20vw' }"
-  (onShow)="onShowSaveAsDialog()"
+  [style]="{ width: '300px' }"
 >
-  <div class="mt-1 flex flex-column row-gap-4" errorTailor>
+  <div class="mt-1 flex flex-column row-gap-4" [formGroup]="saveAsForm" errorTailor>
     <span class="p-float-label" controlErrorAnchor>
       <input
-        #saveAsThemeName
         pInputText
-        id="th_saveas_new_theme_name"
+        id="th_saveas_form_theme_name"
         class="w-full"
         type="text"
-        aria-labelledby="th_saveas_new_theme_name"
+        formControlName="themeName"
+        [attr.aria-label]="'THEME.NAME' | translate"
         [placeholder]="'THEME.NAME' | translate"
         [pTooltip]="'THEME.TOOLTIPS.NAME' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
       />
-      <label for="th_saveas_new_theme_name" class="ocx-required-label"> {{ 'THEME.NAME' | translate }} </label>
+      <label for="th_saveas_form_theme_name" class="ocx-required-label"> {{ 'THEME.NAME' | translate }} </label>
     </span>
     <span class="p-float-label" controlErrorAnchor>
       <input
-        #saveAsThemeDisplayName
         pInputText
-        id="th_saveas_new_theme_display_name"
+        id="th_saveas_form_display_name"
         class="w-full"
         type="text"
-        aria-labelledby="th_saveas_new_theme_display_name"
+        formControlName="displayName"
+        [attr.aria-label]="'THEME.DISPLAY_NAME' | translate"
         [placeholder]="'THEME.DISPLAY_NAME' | translate"
         [pTooltip]="'THEME.TOOLTIPS.DISPLAY_NAME' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
       />
-      <label for="th_saveas_new_theme_display_name" class="ocx-required-label">
+      <label for="th_saveas_form_display_name" class="ocx-required-label">
         {{ 'THEME.DISPLAY_NAME' | translate }}
       </label>
     </span>
@@ -346,7 +345,7 @@
       <p-button
         icon="pi pi-times"
         styleClass="m-0"
-        (onClick)="saveAsNewPopupDisplay = false"
+        (onClick)="displaySaveAsDialog = false"
         [label]="'ACTIONS.CANCEL' | translate"
         [ariaLabel]="'ACTIONS.CANCEL' | translate"
         [pTooltip]="'ACTIONS.TOOLTIPS.CANCEL_AND_CLOSE' | translate"
@@ -356,8 +355,8 @@
       <p-button
         icon="pi pi-save"
         styleClass="m-0"
-        (onClick)="saveAsTheme(saveAsThemeName.value, saveAsThemeDisplayName.value)"
-        [disabled]="saveAsThemeName.value === '' || saveAsThemeDisplayName.value === ''"
+        (onClick)="onSaveAsTheme()"
+        [disabled]="!saveAsForm.valid"
         [label]="'ACTIONS.SAVE' | translate"
         [ariaLabel]="'ACTIONS.SAVE' | translate"
         [pTooltip]="'ACTIONS.TOOLTIPS.SAVE_AS' | translate"
