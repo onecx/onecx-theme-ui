@@ -11,10 +11,7 @@ import { TranslateTestingModule } from 'ngx-translate-testing'
 import { of, throwError } from 'rxjs'
 
 import { ConfirmationService } from 'primeng/api'
-import { DialogModule } from 'primeng/dialog'
-import { DropdownModule } from 'primeng/dropdown'
 import { InputSwitchModule } from 'primeng/inputswitch'
-import { OverlayPanelModule } from 'primeng/overlaypanel'
 import { ConfirmDialog, ConfirmDialogModule } from 'primeng/confirmdialog'
 
 import { PortalMessageService, ThemeService } from '@onecx/portal-integration-angular'
@@ -70,11 +67,8 @@ describe('ThemeDesignerComponent', () => {
       imports: [
         BrowserAnimationsModule,
         ConfirmDialogModule,
-        DialogModule,
-        DropdownModule,
         FormsModule,
         InputSwitchModule,
-        OverlayPanelModule,
         ReactiveFormsModule,
         TranslateTestingModule.withTranslations({
           de: require('src/assets/i18n/de.json'),

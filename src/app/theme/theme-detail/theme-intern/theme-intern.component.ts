@@ -1,8 +1,9 @@
 import { Component, Input, OnChanges } from '@angular/core'
 import { TranslateService } from '@ngx-translate/core'
+import { Observable } from 'rxjs'
 
 import { SlotService } from '@onecx/angular-remote-components'
-import { Observable } from 'rxjs'
+
 import { Theme } from 'src/app/shared/generated'
 
 @Component({

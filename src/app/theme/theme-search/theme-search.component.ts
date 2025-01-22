@@ -14,18 +14,19 @@ import { limitText, bffImageUrl } from 'src/app/shared/utils'
   styleUrls: ['./theme-search.component.scss']
 })
 export class ThemeSearchComponent implements OnInit {
-  public themes$!: Observable<Theme[]>
-  public actions$: Observable<Action[]> | undefined
+  // dialog
   public loading = false
   public exceptionKey: string | undefined = undefined
   public viewMode: 'list' | 'grid' = 'grid'
   public filter: string | undefined
   public sortField = 'displayName'
   public sortOrder = 1
-  public limitText = limitText
-
+  public actions$: Observable<Action[]> | undefined
   public importDialogVisible = false
   public dataViewControlsTranslations: DataViewControlTranslations = {}
+  public limitText = limitText
+  // data
+  public themes$!: Observable<Theme[]>
   @ViewChild(DataView) dv: DataView | undefined
 
   constructor(
