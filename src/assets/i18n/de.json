@@ -207,7 +207,8 @@
       "MAXIMUM_LENGTH": "Es sind nur {{chars}} Zeichen erlaubt.",
       "MINIMUM_LENGTH": "Es sind mindestens {{chars}} Zeichen erforderlich.",
       "PATTERN_ERROR": "Ihre Eingabe entspricht nicht dem benötigten Format.",
-      "FILETYPE_PATTERN_ERROR": "Ihre Datei entspricht nicht den erlaubten Formaten: .png, .jpg, .jpeg"
+      "FILETYPE_PATTERN_ERROR_1": "Ihre Datei entspricht nicht den erlaubten Format: .ico",
+      "FILETYPE_PATTERN_ERROR_2": "Ihre Datei entspricht nicht den erlaubten Formaten: .png, .jpg, .jpeg"
     }
   },
   "EXCEPTIONS": {

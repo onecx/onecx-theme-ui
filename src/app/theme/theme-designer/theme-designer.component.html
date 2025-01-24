@@ -124,7 +124,7 @@
               hidden
               #selectedFileInputFavicon
               (change)="onFileUpload($event, RefType.Favicon)"
-              accept=".png, .jpg, .jpeg"
+              accept=".ico"
             />
 
             <div class="field col-12 mb-3">
@@ -161,7 +161,7 @@
                   <label for="th_designer_field_logo_url">{{ 'LOGO.URL' | translate }}</label>
                 </span>
                 <label *ngIf="displayFileTypeErrorLogo" for="th_designer_field_logo_url" class="control-error">
-                  {{ 'VALIDATION.ERRORS.FILETYPE_PATTERN_ERROR' | translate }}
+                  {{ 'VALIDATION.ERRORS.FILETYPE_PATTERN_ERROR_2' | translate }}
                 </label>
               </div>
             </div>
@@ -203,7 +203,7 @@
                   for="th_designer_field_favicon_url"
                   class="control-error"
                 >
-                  {{ 'VALIDATION.ERRORS.FILETYPE_PATTERN_ERROR' | translate }}
+                  {{ 'VALIDATION.ERRORS.FILETYPE_PATTERN_ERROR_1' | translate }}
                 </label>
               </div>
             </div>

@@ -207,7 +207,8 @@
       "MAXIMUM_LENGTH": "Only {{chars}} characters are allowed.",
       "MINIMUM_LENGTH": "At least {{chars}} characters are required.",
       "PATTERN_ERROR": "Your input does not match the required pattern",
-      "FILETYPE_PATTERN_ERROR": "Your file does not match the allowed filetypes: .png, .jpg, .jpeg"
+      "FILETYPE_PATTERN_ERROR_1": "Your file does not match the allowed filetype: .ico",
+      "FILETYPE_PATTERN_ERROR_2": "Your file does not match the allowed filetypes: .png, .jpg, .jpeg"
     }
   },
   "EXCEPTIONS": {
