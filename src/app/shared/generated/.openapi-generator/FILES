@@ -19,6 +19,7 @@ model/image.ts
 model/imageInfo.ts
 model/importThemeResponse.ts
 model/importThemeResponseStatus.ts
+model/mimeType.ts
 model/models.ts
 model/pagingResponse.ts
 model/problemDetailInvalidParam.ts

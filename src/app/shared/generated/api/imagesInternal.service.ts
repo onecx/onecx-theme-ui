@@ -21,6 +21,8 @@ import { Observable }                                        from 'rxjs';
 // @ts-ignore
 import { ImageInfo } from '../model/imageInfo';
 // @ts-ignore
+import { MimeType } from '../model/mimeType';
+// @ts-ignore
 import { ProblemDetailResponse } from '../model/problemDetailResponse';
 // @ts-ignore
 import { RefType } from '../model/refType';
@@ -38,12 +40,14 @@ export interface GetImageRequestParams {
 export interface UpdateImageRequestParams {
     refId: string;
     refType: RefType;
+    mimeType: MimeType;
     body: Blob;
 }
 
 export interface UploadImageRequestParams {
     refId: string;
     refType: RefType;
+    mimeType: MimeType;
     body: Blob;
 }
 
@@ -183,6 +187,10 @@ export class ImagesInternalAPIService {
         if (refType === null || refType === undefined) {
             throw new Error('Required parameter refType was null or undefined when calling updateImage.');
         }
+        const mimeType = requestParameters.mimeType;
+        if (mimeType === null || mimeType === undefined) {
+            throw new Error('Required parameter mimeType was null or undefined when calling updateImage.');
+        }
         const body = requestParameters.body;
         if (body === null || body === undefined) {
             throw new Error('Required parameter body was null or undefined when calling updateImage.');
@@ -228,7 +236,7 @@ export class ImagesInternalAPIService {
             }
         }
 
-        let localVarPath = `/images/${this.configuration.encodeParam({name: "refId", value: refId, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "refType", value: refType, in: "path", style: "simple", explode: false, dataType: "RefType", dataFormat: undefined})}`;
+        let localVarPath = `/images/${this.configuration.encodeParam({name: "refId", value: refId, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "refType", value: refType, in: "path", style: "simple", explode: false, dataType: "RefType", dataFormat: undefined})}/${this.configuration.encodeParam({name: "mimeType", value: mimeType, in: "path", style: "simple", explode: false, dataType: "MimeType", dataFormat: undefined})}`;
         return this.httpClient.request<ImageInfo>('put', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
@@ -259,6 +267,10 @@ export class ImagesInternalAPIService {
         const refType = requestParameters.refType;
         if (refType === null || refType === undefined) {
             throw new Error('Required parameter refType was null or undefined when calling uploadImage.');
+        }
+        const mimeType = requestParameters.mimeType;
+        if (mimeType === null || mimeType === undefined) {
+            throw new Error('Required parameter mimeType was null or undefined when calling uploadImage.');
         }
         const body = requestParameters.body;
         if (body === null || body === undefined) {
@@ -305,7 +317,7 @@ export class ImagesInternalAPIService {
             }
         }
 
-        let localVarPath = `/images/${this.configuration.encodeParam({name: "refId", value: refId, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "refType", value: refType, in: "path", style: "simple", explode: false, dataType: "RefType", dataFormat: undefined})}`;
+        let localVarPath = `/images/${this.configuration.encodeParam({name: "refId", value: refId, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "refType", value: refType, in: "path", style: "simple", explode: false, dataType: "RefType", dataFormat: undefined})}/${this.configuration.encodeParam({name: "mimeType", value: mimeType, in: "path", style: "simple", explode: false, dataType: "MimeType", dataFormat: undefined})}`;
         return this.httpClient.request<ImageInfo>('post', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
