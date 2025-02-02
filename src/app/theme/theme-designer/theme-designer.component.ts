@@ -14,6 +14,8 @@ import {
   Theme,
   ThemesAPIService,
   ThemeUpdateCreate,
+  UpdateImageRequestParams,
+  UploadImageRequestParams,
   UpdateThemeResponse
 } from 'src/app/shared/generated'
 import { themeVariables } from './theme-variables'
@@ -464,16 +466,17 @@ export class ThemeDesignerComponent implements OnInit {
     const saveRequestParameter = {
       refId: name,
       refType: refType,
+      mimeType: files[0].type,
       body: blob
     }
     this.imageApi.getImage({ refId: name, refType: refType }).subscribe({
       next: () => {
-        this.imageApi.updateImage(saveRequestParameter).subscribe(() => {
+        this.imageApi.updateImage(saveRequestParameter as UpdateImageRequestParams).subscribe(() => {
           this.prepareImageResponse(name, refType)
         })
       },
       error: () => {
-        this.imageApi.uploadImage(saveRequestParameter).subscribe(() => {
+        this.imageApi.uploadImage(saveRequestParameter as UploadImageRequestParams).subscribe(() => {
           this.prepareImageResponse(name, refType)
         })
       }
