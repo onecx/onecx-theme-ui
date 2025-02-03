@@ -298,7 +298,6 @@ paths:
       application/json:
        schema:
         $ref: '#/components/schemas/ProblemDetailResponse'
- /images/{refId}/{refType}/{mimeType}:
   post:
    x-onecx:
     permissions:
@@ -308,6 +307,11 @@ paths:
     - imagesInternal
    description: Upload Images
    parameters:
+    - name: mimeType
+      in: header
+      required: true
+      schema:
+       $ref: "#/components/schemas/MimeType"
     - name: refId
       in: path
       required: true
@@ -318,11 +322,6 @@ paths:
       required: true
       schema:
        $ref: "#/components/schemas/RefType"
-    - name: mimeType
-      in: path
-      required: true
-      schema:
-       $ref: "#/components/schemas/MimeType"
    operationId: uploadImage
    requestBody:
     required: true
@@ -361,7 +360,7 @@ paths:
       schema:
        $ref: "#/components/schemas/RefType"
     - name: mimeType
-      in: path
+      in: header
       required: true
       schema:
        $ref: "#/components/schemas/MimeType"
