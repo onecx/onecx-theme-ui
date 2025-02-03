@@ -45,9 +45,9 @@ export interface UpdateImageRequestParams {
 }
 
 export interface UploadImageRequestParams {
+    mimeType: MimeType;
     refId: string;
     refType: RefType;
-    mimeType: MimeType;
     body: Blob;
 }
 
@@ -197,6 +197,9 @@ export class ImagesInternalAPIService {
         }
 
         let localVarHeaders = this.defaultHeaders;
+        if (mimeType !== undefined && mimeType !== null) {
+            localVarHeaders = localVarHeaders.set('mimeType', String(mimeType));
+        }
 
         let localVarHttpHeaderAcceptSelected: string | undefined = options && options.httpHeaderAccept;
         if (localVarHttpHeaderAcceptSelected === undefined) {
@@ -236,7 +239,7 @@ export class ImagesInternalAPIService {
             }
         }
 
-        let localVarPath = `/images/${this.configuration.encodeParam({name: "refId", value: refId, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "refType", value: refType, in: "path", style: "simple", explode: false, dataType: "RefType", dataFormat: undefined})}/${this.configuration.encodeParam({name: "mimeType", value: mimeType, in: "path", style: "simple", explode: false, dataType: "MimeType", dataFormat: undefined})}`;
+        let localVarPath = `/images/${this.configuration.encodeParam({name: "refId", value: refId, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "refType", value: refType, in: "path", style: "simple", explode: false, dataType: "RefType", dataFormat: undefined})}`;
         return this.httpClient.request<ImageInfo>('put', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
@@ -260,6 +263,10 @@ export class ImagesInternalAPIService {
     public uploadImage(requestParameters: UploadImageRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpResponse<ImageInfo>>;
     public uploadImage(requestParameters: UploadImageRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpEvent<ImageInfo>>;
     public uploadImage(requestParameters: UploadImageRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any> {
+        const mimeType = requestParameters.mimeType;
+        if (mimeType === null || mimeType === undefined) {
+            throw new Error('Required parameter mimeType was null or undefined when calling uploadImage.');
+        }
         const refId = requestParameters.refId;
         if (refId === null || refId === undefined) {
             throw new Error('Required parameter refId was null or undefined when calling uploadImage.');
@@ -268,16 +275,15 @@ export class ImagesInternalAPIService {
         if (refType === null || refType === undefined) {
             throw new Error('Required parameter refType was null or undefined when calling uploadImage.');
         }
-        const mimeType = requestParameters.mimeType;
-        if (mimeType === null || mimeType === undefined) {
-            throw new Error('Required parameter mimeType was null or undefined when calling uploadImage.');
-        }
         const body = requestParameters.body;
         if (body === null || body === undefined) {
             throw new Error('Required parameter body was null or undefined when calling uploadImage.');
         }
 
         let localVarHeaders = this.defaultHeaders;
+        if (mimeType !== undefined && mimeType !== null) {
+            localVarHeaders = localVarHeaders.set('mimeType', String(mimeType));
+        }
 
         let localVarHttpHeaderAcceptSelected: string | undefined = options && options.httpHeaderAccept;
         if (localVarHttpHeaderAcceptSelected === undefined) {
@@ -317,7 +323,7 @@ export class ImagesInternalAPIService {
             }
         }
 
-        let localVarPath = `/images/${this.configuration.encodeParam({name: "refId", value: refId, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "refType", value: refType, in: "path", style: "simple", explode: false, dataType: "RefType", dataFormat: undefined})}/${this.configuration.encodeParam({name: "mimeType", value: mimeType, in: "path", style: "simple", explode: false, dataType: "MimeType", dataFormat: undefined})}`;
+        let localVarPath = `/images/${this.configuration.encodeParam({name: "refId", value: refId, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "refType", value: refType, in: "path", style: "simple", explode: false, dataType: "RefType", dataFormat: undefined})}`;
         return this.httpClient.request<ImageInfo>('post', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
