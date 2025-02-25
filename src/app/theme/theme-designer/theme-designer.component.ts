@@ -14,9 +14,9 @@ import {
   Theme,
   ThemesAPIService,
   ThemeUpdateCreate,
-  UpdateImageRequestParams,
   UploadImageRequestParams,
-  UpdateThemeResponse
+  UpdateThemeResponse,
+  MimeType
 } from 'src/app/shared/generated'
 import { themeVariables } from './theme-variables'
 
@@ -40,10 +40,12 @@ export class ThemeDesignerComponent implements OnInit {
   public themeVars = themeVariables
   public themeTemplates!: SelectItem[]
   public bffImagePath: string | undefined
-  public fetchingLogoUrl?: string
-  public fetchingFaviconUrl?: string
+  public fetchingLogoUrl: string | undefined
+  public fetchingFaviconUrl: string | undefined
   public imageLogoUrlExists = false
   public imageFaviconUrlExists = false
+  public imageLogoExists = false
+  public imageFaviconExists = false
 
   public changeMode: 'EDIT' | 'CREATE' = 'CREATE'
   public isCurrentTheme = false
@@ -416,8 +418,44 @@ export class ThemeDesignerComponent implements OnInit {
       : null
   }
 
+  // Image component informs about image loading result
+  public onImageLoadResult(refType: RefType, loaded: boolean) {
+    if (refType === RefType.Logo) {
+      this.imageLogoExists = loaded
+      this.fetchingLogoUrl = loaded ? this.getImageUrl(this.theme, refType) : undefined
+    }
+    if (refType === RefType.Favicon) {
+      this.imageFaviconExists = loaded
+      this.fetchingFaviconUrl = loaded ? this.getImageUrl(this.theme, refType) : undefined
+    }
+  }
+
+  public onRemoveImage(refType: RefType) {
+    const currThemeName = this.basicForm.controls['name'].value
+    if (!currThemeName || currThemeName === '') {
+      this.msgService.error({ summaryKey: 'IMAGE.CONSTRAINT_FAILED', detailKey: 'IMAGE.CONSTRAINT_NAME' })
+      return
+    }
+    // delete only existing image
+    if ((refType === RefType.Logo && this.imageLogoExists) || (refType === RefType.Favicon && this.imageFaviconExists))
+      this.imageApi.deleteImage({ refId: currThemeName, refType: refType }).subscribe({
+        next: () => {
+          // reset - important to trigger the change in image-container UI
+          if (refType === RefType.Logo) {
+            this.fetchingLogoUrl = undefined
+            this.imageLogoExists = false
+          }
+          if (refType === RefType.Favicon) {
+            this.fetchingFaviconUrl = undefined
+            this.imageFaviconExists = false
+          }
+        },
+        error: (err) => console.error('deleteImage', err)
+      })
+  }
+
   // Image Files
-  public onFileUpload(ev: Event, fieldType: RefType): void {
+  public onFileUpload(ev: Event, refType: RefType): void {
     const currThemeName = this.basicForm.controls['name'].value
     if (!currThemeName || currThemeName === '') {
       this.msgService.error({
@@ -438,14 +476,14 @@ export class ThemeDesignerComponent implements OnInit {
             detailKey: 'IMAGE.CONSTRAINT_SIZE'
           })
         } else if (!/^.*.(ico|jpg|jpeg|png)$/.exec(files[0].name)) {
-          this.displayFileTypeErrorLogo = fieldType === RefType.Logo
-          this.displayFileTypeErrorFavicon = fieldType === RefType.Favicon
+          this.displayFileTypeErrorLogo = refType === RefType.Logo
+          this.displayFileTypeErrorFavicon = refType === RefType.Favicon
           this.msgService.error({
             summaryKey: 'IMAGE.CONSTRAINT_FAILED',
             detailKey: 'IMAGE.CONSTRAINT_FILE_TYPE'
           })
         } else {
-          this.saveImage(currThemeName, fieldType, files) // store image
+          this.saveImage(currThemeName, refType, files) // store image
         }
       }
     } else {
@@ -457,29 +495,18 @@ export class ThemeDesignerComponent implements OnInit {
   }
 
   private saveImage(name: string, refType: RefType, files: FileList) {
-    const blob = new Blob([files[0]], { type: files[0].type })
-    if (refType === RefType.Logo) {
-      this.fetchingLogoUrl = undefined
-    } else {
-      this.fetchingFaviconUrl = undefined
-    }
-    const saveRequestParameter = {
+    if (refType === RefType.Logo) this.fetchingLogoUrl = undefined
+    if (refType === RefType.Favicon) this.fetchingFaviconUrl = undefined
+
+    const saveRequestParameter: UploadImageRequestParams = {
       refId: name,
       refType: refType,
-      mimeType: files[0].type,
-      body: blob
+      mimeType: files[0].type as MimeType,
+      body: new Blob([files[0]], { type: files[0].type })
     }
-    this.imageApi.getImage({ refId: name, refType: refType }).subscribe({
-      next: () => {
-        this.imageApi.updateImage(saveRequestParameter as UpdateImageRequestParams).subscribe(() => {
-          this.prepareImageResponse(name, refType)
-        })
-      },
-      error: () => {
-        this.imageApi.uploadImage(saveRequestParameter as UploadImageRequestParams).subscribe(() => {
-          this.prepareImageResponse(name, refType)
-        })
-      }
+    this.imageApi.uploadImage(saveRequestParameter).subscribe({
+      next: () => this.prepareImageResponse(name, refType),
+      error: (err) => console.error('uploadImage', err)
     })
   }
 

@@ -71,13 +71,28 @@ describe('ImageContainerComponent', () => {
         }
       })
 
-      expect(component.displayDefaultLogo).toBeTrue()
+      expect(component.displayDefault).toBeTrue()
     })
   })
 
-  it('onImageError should set displayDefaultLogo to true', () => {
-    component.onImageError()
+  describe('image loading', () => {
+    it('should use default logo on error', () => {
+      spyOn(component.imageLoadResult, 'emit')
+      component.displayImageUrl = 'url'
 
-    expect(component.displayDefaultLogo).toBeTrue()
+      component.onImageLoadError()
+
+      expect(component.displayDefault).toBeTrue()
+      expect(component.imageLoadResult.emit).toHaveBeenCalledWith(false)
+    })
+
+    it('should inform caller on success', () => {
+      spyOn(component.imageLoadResult, 'emit')
+      component.displayImageUrl = 'url'
+
+      component.onImageLoadSuccess()
+
+      expect(component.imageLoadResult.emit).toHaveBeenCalledWith(true)
+    })
   })
 })

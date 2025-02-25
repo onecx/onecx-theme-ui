@@ -2,9 +2,9 @@ import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from '@angular/core/testing'
 import { HttpResponse, provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { ActivatedRoute, provideRouter, Router } from '@angular/router'
 import { TranslateService } from '@ngx-translate/core'
 import { TranslateTestingModule } from 'ngx-translate-testing'
@@ -17,7 +17,7 @@ import { ConfirmDialog, ConfirmDialogModule } from 'primeng/confirmdialog'
 import { PortalMessageService, ThemeService } from '@onecx/portal-integration-angular'
 import { CurrentThemeTopic } from '@onecx/integration-interface'
 
-import { RefType, ThemesAPIService, ImagesInternalAPIService } from 'src/app/shared/generated'
+import { MimeType, RefType, ThemesAPIService, ImagesInternalAPIService } from 'src/app/shared/generated'
 import { ThemeDesignerComponent } from './theme-designer.component'
 import { themeVariables } from './theme-variables'
 
@@ -56,7 +56,7 @@ describe('ThemeDesignerComponent', () => {
   ])
   const imgServiceSpy = {
     getImage: jasmine.createSpy('getImage').and.returnValue(of({})),
-    updateImage: jasmine.createSpy('updateImage').and.returnValue(of({})),
+    deleteImage: jasmine.createSpy('deleteImage').and.returnValue(of({})),
     uploadImage: jasmine.createSpy('uploadImage').and.returnValue(of({})),
     configuration: { basePath: 'basePath' }
   }
@@ -102,8 +102,8 @@ describe('ThemeDesignerComponent', () => {
     themeApiSpy.updateTheme.and.returnValue(of({}) as any)
     themeApiSpy.createTheme.and.returnValue(of({}) as any)
     themeApiSpy.getThemeById.and.returnValue(of({}) as any)
+    imgServiceSpy.deleteImage.and.returnValue(of({}))
     imgServiceSpy.getImage.and.returnValue(of({}))
-    imgServiceSpy.updateImage.and.returnValue(of({}))
     imgServiceSpy.uploadImage.and.returnValue(of({}))
   }))
 
@@ -668,134 +668,238 @@ describe('ThemeDesignerComponent', () => {
       expect(component.saveAsForm.controls['displayName'].value).toBe(component.copyOfPrefix + 'themeDisplayName')
     })
 
-    it('should not upload a file if currThemeName is empty', () => {
-      const event = { target: { files: ['file'] } }
-      component.basicForm.controls['name'].setValue('')
+    describe('file upload', () => {
+      describe('checks before upload', () => {
+        it('should not upload a file if currThemeName is empty', () => {
+          const event = { target: { files: ['file'] } }
+          component.basicForm.controls['name'].setValue('')
 
-      component.onFileUpload(event as any, RefType.Logo)
+          component.onFileUpload(event as any, RefType.Logo)
 
-      expect(msgServiceSpy.error).toHaveBeenCalledWith({
-        summaryKey: 'IMAGE.CONSTRAINT_FAILED',
-        detailKey: 'IMAGE.CONSTRAINT_NAME'
+          expect(msgServiceSpy.error).toHaveBeenCalledWith({
+            summaryKey: 'IMAGE.CONSTRAINT_FAILED',
+            detailKey: 'IMAGE.CONSTRAINT_NAME'
+          })
+        })
+
+        it('should not upload a file that is too large', () => {
+          const largeBlob = new Blob(['a'.repeat(120000)], { type: MimeType.Png })
+          const largeFile = new File([largeBlob], 'test.png', { type: MimeType.Png })
+          const event = { target: { files: [largeFile] } }
+          component.basicForm.controls['name'].setValue('name')
+
+          component.onFileUpload(event as any, RefType.Logo)
+
+          expect(msgServiceSpy.error).toHaveBeenCalledWith({
+            summaryKey: 'IMAGE.CONSTRAINT_FAILED',
+            detailKey: 'IMAGE.CONSTRAINT_SIZE'
+          })
+        })
+
+        it('should not upload a file without correct extension', () => {
+          imgServiceSpy.getImage.and.returnValue(throwError(() => new Error()))
+          const blob = new Blob(['a'.repeat(10)], { type: MimeType.Png })
+          const file = new File([blob], 'test.wrong', { type: MimeType.Png })
+          const event = { target: { files: [file] } }
+          component.basicForm.controls['name'].setValue('name')
+
+          component.onFileUpload(event as any, RefType.Logo)
+
+          expect(component.displayFileTypeErrorLogo).toBeTrue()
+        })
+
+        it('should display error if there are no files on upload image', () => {
+          const event = { target: { files: undefined } }
+          component.basicForm.controls['name'].setValue('name')
+
+          component.onFileUpload(event as any, RefType.Logo)
+
+          expect(msgServiceSpy.error).toHaveBeenCalledWith({
+            summaryKey: 'IMAGE.CONSTRAINT_FAILED',
+            detailKey: 'IMAGE.CONSTRAINT_FILE_MISSING'
+          })
+        })
+      })
+
+      describe('upload if file not exist', () => {
+        it('should upload logo', () => {
+          const mockHttpResponse: HttpResponse<Blob> = new HttpResponse({
+            body: new Blob([''], { type: MimeType.Png }),
+            status: 200
+          })
+          imgServiceSpy.getImage.and.returnValue(of(mockHttpResponse))
+          const blob = new Blob(['a'.repeat(10)], { type: MimeType.Png })
+          const file = new File([blob], 'test.png', { type: MimeType.Png })
+          const event = { target: { files: [file] } }
+          component.basicForm.controls['name'].setValue('name')
+
+          component.onFileUpload(event as any, RefType.Logo)
+
+          expect(msgServiceSpy.info).toHaveBeenCalledWith({ summaryKey: 'IMAGE.UPLOADED' })
+        })
+
+        it('should upload favicon', () => {
+          const mockHttpResponse: HttpResponse<Blob> = new HttpResponse({
+            body: new Blob([''], { type: MimeType.XIcon }),
+            status: 200
+          })
+          imgServiceSpy.getImage.and.returnValue(of(mockHttpResponse))
+          const blob = new Blob(['a'.repeat(10)], { type: MimeType.XIcon })
+          const file = new File([blob], 'test.ico', { type: MimeType.XIcon })
+          const event = { target: { files: [file] } }
+          component.basicForm.controls['name'].setValue('name')
+
+          component.onFileUpload(event as any, RefType.Favicon)
+
+          expect(msgServiceSpy.info).toHaveBeenCalledWith({ summaryKey: 'IMAGE.UPLOADED' })
+        })
+      })
+
+      it('should manage upload error', () => {
+        const errorResponse = { status: 400, statusText: 'error on uploading' }
+        imgServiceSpy.uploadImage.and.returnValue(throwError(() => errorResponse))
+        spyOn(console, 'error')
+        const blob = new Blob(['a'.repeat(10)], { type: MimeType.XIcon })
+        const file = new File([blob], 'test.ico', { type: MimeType.XIcon })
+        const event = { target: { files: [file] } }
+        component.basicForm.controls['name'].setValue('name')
+
+        component.onFileUpload(event as any, RefType.Favicon)
+
+        expect(console.error).toHaveBeenCalledWith('uploadImage', errorResponse)
       })
     })
 
-    it('should not upload a file that is too large', () => {
-      const largeBlob = new Blob(['a'.repeat(120000)], { type: 'image/png' })
-      const largeFile = new File([largeBlob], 'test.png', { type: 'image/png' })
-      const event = { target: { files: [largeFile] } }
-      component.basicForm.controls['name'].setValue('name')
-
-      component.onFileUpload(event as any, RefType.Logo)
-
-      expect(msgServiceSpy.error).toHaveBeenCalledWith({
-        summaryKey: 'IMAGE.CONSTRAINT_FAILED',
-        detailKey: 'IMAGE.CONSTRAINT_SIZE'
-      })
-    })
-
-    it('should not upload a file without correct extension', () => {
-      imgServiceSpy.getImage.and.returnValue(throwError(() => new Error()))
-      const blob = new Blob(['a'.repeat(10)], { type: 'image/png' })
-      const file = new File([blob], 'test.wrong', { type: 'image/png' })
-      const event = { target: { files: [file] } }
-      component.basicForm.controls['name'].setValue('name')
-
-      component.onFileUpload(event as any, RefType.Logo)
-
-      expect(component.displayFileTypeErrorLogo).toBeTrue()
-    })
-
-    it('should upload a file - update img: field type logo', () => {
-      const mockHttpResponse: HttpResponse<Blob> = new HttpResponse({
-        body: new Blob([''], { type: 'image/png' }),
-        status: 200
-      })
-      imgServiceSpy.getImage.and.returnValue(of(mockHttpResponse))
-      const blob = new Blob(['a'.repeat(10)], { type: 'image/png' })
-      const file = new File([blob], 'test.png', { type: 'image/png' })
-      const event = {
-        target: {
-          files: [file]
+    describe('image loading result', () => {
+      it('should load logo - failed', () => {
+        component.theme = {
+          id: 'id',
+          name: 'themeName',
+          logoUrl: 'path to logo',
+          faviconUrl: 'path to favicon'
         }
-      }
-      component.basicForm.controls['name'].setValue('name')
+        component.onImageLoadResult(RefType.Logo, false)
 
-      component.onFileUpload(event as any, RefType.Logo)
+        expect(component.imageLogoExists).toBeFalse()
+        expect(component.fetchingLogoUrl).toBeUndefined()
+      })
 
-      expect(msgServiceSpy.info).toHaveBeenCalledWith({
-        summaryKey: 'IMAGE.UPLOADED'
+      it('should load logo - success', () => {
+        component.theme = {
+          id: 'id',
+          name: 'themeName',
+          logoUrl: 'path to logo',
+          faviconUrl: 'path to favicon'
+        }
+        component.onImageLoadResult(RefType.Logo, true)
+
+        expect(component.imageLogoExists).toBeTrue()
+        expect(component.fetchingLogoUrl).toEqual(component.theme.logoUrl)
+      })
+
+      it('should load favicon - failed', () => {
+        component.theme = {
+          id: 'id',
+          name: 'themeName',
+          logoUrl: 'path to logo',
+          faviconUrl: 'path to favicon'
+        }
+        component.onImageLoadResult(RefType.Favicon, false)
+
+        expect(component.imageFaviconExists).toBeFalse()
+        expect(component.fetchingFaviconUrl).toBeUndefined()
+      })
+
+      it('should load favicon - success', () => {
+        component.theme = {
+          id: 'id',
+          name: 'themeName',
+          logoUrl: 'path to logo',
+          faviconUrl: 'path to favicon'
+        }
+        component.onImageLoadResult(RefType.Favicon, true)
+
+        expect(component.imageFaviconExists).toBeTrue()
+        expect(component.fetchingFaviconUrl).toEqual(component.theme.faviconUrl)
       })
     })
 
-    it('should upload a file - update image : field type favicon', () => {
-      const mockHttpResponse: HttpResponse<Blob> = new HttpResponse({
-        body: new Blob([''], { type: 'image/png' }),
-        status: 200
+    describe('remove image', () => {
+      it('should abort deletion if theme name is missing', () => {
+        component.basicForm.controls['name'].setValue('')
+
+        component.onRemoveImage(RefType.Logo)
+
+        expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({
+          summaryKey: 'IMAGE.CONSTRAINT_FAILED',
+          detailKey: 'IMAGE.CONSTRAINT_NAME'
+        })
       })
-      imgServiceSpy.getImage.and.returnValue(of(mockHttpResponse))
-      const blob = new Blob(['a'.repeat(10)], { type: 'image/png' })
-      const file = new File([blob], 'test.png', { type: 'image/png' })
-      const event = { target: { files: [file] } }
-      component.basicForm.controls['name'].setValue('name')
 
-      component.onFileUpload(event as any, RefType.Favicon)
+      it('should delete logo - successful', () => {
+        component.basicForm.controls['name'].setValue('theme')
+        component.imageLogoExists = true
+        imgServiceSpy.deleteImage.and.returnValue(of({}))
 
-      expect(msgServiceSpy.info).toHaveBeenCalledWith({
-        summaryKey: 'IMAGE.UPLOADED'
+        component.onRemoveImage(RefType.Logo)
+
+        expect(component.fetchingLogoUrl).toBeUndefined()
+        expect(component.imageLogoExists).toBeFalse()
+      })
+
+      it('should delete favicon - successful', () => {
+        component.basicForm.controls['name'].setValue('theme')
+        component.imageFaviconExists = true
+        imgServiceSpy.deleteImage.and.returnValue(of({}))
+
+        component.onRemoveImage(RefType.Favicon)
+
+        expect(component.fetchingFaviconUrl).toBeUndefined()
+        expect(component.imageFaviconExists).toBeFalse()
+      })
+
+      it('should delete favicon - failed', () => {
+        component.basicForm.controls['name'].setValue('theme')
+        component.imageFaviconExists = true
+        const errorResponse = { status: 400, statusText: 'error on uploading' }
+        imgServiceSpy.deleteImage.and.returnValue(throwError(() => errorResponse))
+        spyOn(console, 'error')
+
+        component.onRemoveImage(RefType.Favicon)
+
+        expect(component.imageFaviconExists).toBeTrue()
+        expect(console.error).toHaveBeenCalledWith('deleteImage', errorResponse)
       })
     })
 
-    it('should upload image if getImage call fails', () => {
-      imgServiceSpy.getImage.and.returnValue(throwError(() => new Error()))
-      const blob = new Blob(['a'.repeat(10)], { type: 'image/png' })
-      const file = new File([blob], 'test.png', { type: 'image/png' })
-      const event = { target: { files: [file] } }
-      component.basicForm.controls['name'].setValue('name')
+    describe('image url', () => {
+      it('should get logo img url: base url on empty logo url', () => {
+        const theme = {
+          id: 'id',
+          description: 'desc',
+          logoUrl: '',
+          faviconUrl: 'fav_url',
+          name: 'themeName'
+        }
 
-      component.onFileUpload(event as any, RefType.Favicon)
+        const result = component.getImageUrl(theme, RefType.Logo)
 
-      expect(msgServiceSpy.info).toHaveBeenCalledWith({ summaryKey: 'IMAGE.UPLOADED' })
-    })
-
-    it('should display error if there are no files on upload image', () => {
-      const event = { target: { files: undefined } }
-      component.basicForm.controls['name'].setValue('name')
-
-      component.onFileUpload(event as any, RefType.Logo)
-
-      expect(msgServiceSpy.error).toHaveBeenCalledWith({
-        summaryKey: 'IMAGE.CONSTRAINT_FAILED',
-        detailKey: 'IMAGE.CONSTRAINT_FILE_MISSING'
+        expect(result).toBe('basePath/images/themeName/logo')
       })
-    })
 
-    it('should get logo img url: base url on empty logo url', () => {
-      const theme = {
-        id: 'id',
-        description: 'desc',
-        logoUrl: '',
-        faviconUrl: 'fav_url',
-        name: 'themeName'
-      }
+      it('should get favicon img url: base url on empty favicon url', () => {
+        const theme = {
+          id: 'id',
+          description: 'desc',
+          logoUrl: 'logo_url',
+          faviconUrl: '',
+          name: 'name'
+        }
 
-      const result = component.getImageUrl(theme, RefType.Logo)
+        const result = component.getImageUrl(theme, RefType.Favicon)
 
-      expect(result).toBe('basePath/images/themeName/logo')
-    })
-
-    it('should get favicon img url: base url on empty favicon url', () => {
-      const theme = {
-        id: 'id',
-        description: 'desc',
-        logoUrl: 'logo_url',
-        faviconUrl: '',
-        name: 'name'
-      }
-
-      const result = component.getImageUrl(theme, RefType.Favicon)
-
-      expect(result).toBe('basePath/images/name/favicon')
+        expect(result).toBe('basePath/images/name/favicon')
+      })
     })
 
     it('should behave correctly onInputChange: logo url exists', fakeAsync(() => {
@@ -811,7 +915,6 @@ describe('ThemeDesignerComponent', () => {
       component.onInputChange(RefType.Logo)
 
       tick(1000)
-
       expect(component.fetchingLogoUrl).toBe('http://icon/path')
     }))
 
@@ -828,7 +931,6 @@ describe('ThemeDesignerComponent', () => {
       component.onInputChange(RefType.Favicon)
 
       tick(1000)
-
       expect(component.fetchingFaviconUrl).toBe('http://icon/path')
     }))
 
@@ -846,7 +948,6 @@ describe('ThemeDesignerComponent', () => {
       component.onInputChange(RefType.Logo)
 
       tick(1000)
-
       expect(component.fetchingLogoUrl).toBe('basePath/images/themeName/logo')
     }))
 
@@ -868,7 +969,6 @@ describe('ThemeDesignerComponent', () => {
       component.onInputChange(RefType.Favicon)
 
       tick(1000)
-
       expect(component.fetchingFaviconUrl).toBe('basePath/images/themeName/favicon')
     }))
 
@@ -877,7 +977,6 @@ describe('ThemeDesignerComponent', () => {
         { label: 'theme1', value: 'id1' },
         { label: 'myTheme', value: 'id2' }
       ]
-
       const translationData = {
         'GENERAL.COPY_OF': 'Copy of ',
         'THEME.TEMPLATE.CONFIRMATION.HEADER': 'themeTemplateConfirmationHeader',
@@ -887,7 +986,6 @@ describe('ThemeDesignerComponent', () => {
       }
       const translateService = TestBed.inject(TranslateService)
       spyOn(translateService, 'get').and.returnValue(of(translationData))
-
       const confirmdialog: ConfirmDialog = fixture.debugElement.query(By.css('p-confirmdialog')).componentInstance
 
       component.onThemeTemplateDropdownChange({ value: 'id2' })
@@ -908,10 +1006,8 @@ describe('ThemeDesignerComponent', () => {
         { label: 'theme1', value: 'id1' },
         { label: 'myTheme', value: 'id2' }
       ]
-
       const confirmdialog: ConfirmDialog = fixture.debugElement.query(By.css('p-confirmdialog')).componentInstance
       const reject = spyOn(confirmdialog, 'reject').and.callThrough()
-
       component.onThemeTemplateDropdownChange({ value: 'id2' })
       fixture.detectChanges()
       component = fixture.componentInstance
