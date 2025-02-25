@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core'
+import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core'
 import { map } from 'rxjs'
 
 import { AppStateService } from '@onecx/angular-integration-interface'
@@ -23,10 +23,11 @@ export class ImageContainerComponent implements OnChanges {
   @Input() public small = false
   @Input() public imageUrl: string | undefined
   @Input() public styleClass: string | undefined
+  @Output() public imageLoadResult = new EventEmitter<boolean>() // inform caller
 
   public displayImageUrl: string | undefined
   public defaultImageUrl = ''
-  public displayDefaultLogo = false
+  public displayDefault = false
 
   prepareUrlPath = prepareUrlPath
 
@@ -40,16 +41,26 @@ export class ImageContainerComponent implements OnChanges {
       .subscribe()
   }
 
-  public onImageError(): void {
-    this.displayDefaultLogo = true
-    this.displayImageUrl = undefined
+  ngOnChanges(changes: SimpleChanges): void {
+    // Hint: there are more changes (e.g. on title) => ignore them
+    if (changes['imageUrl']) {
+      if (this.imageUrl) {
+        this.displayDefault = false
+        this.displayImageUrl = this.imageUrl
+      } else this.displayDefault = true
+    }
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    this.displayDefaultLogo = false
-    if (changes['imageUrl']) {
-      if (this.imageUrl) this.displayImageUrl = this.imageUrl
-      else this.displayDefaultLogo = true
-    }
+  /**
+   * Image loading Results
+   */
+  public onImageLoadSuccess(): void {
+    if (this.displayImageUrl !== undefined) this.imageLoadResult.emit(true)
+  }
+
+  public onImageLoadError(): void {
+    if (this.displayImageUrl !== undefined) this.imageLoadResult.emit(false)
+    this.displayDefault = true
+    this.displayImageUrl = undefined
   }
 }

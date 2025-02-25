@@ -1,9 +1,10 @@
 <img
   [id]="id"
-  *ngIf="!displayDefaultLogo"
+  *ngIf="!displayDefault"
   [class]="'image-object image-' + (small ? 'sm' : 'lg') + ' sm:image-lg ' + (styleClass ? styleClass : '')"
   [ocxSrc]="displayImageUrl"
-  (error)="onImageError()"
+  (error)="onImageLoadError()"
+  (load)="onImageLoadSuccess()"
   [alt]="title"
   [pTooltip]="title"
   tooltipPosition="top"
@@ -11,7 +12,7 @@
 />
 <img
   [id]="id"
-  *ngIf="displayDefaultLogo"
+  *ngIf="displayDefault"
   [class]="'image-object image-' + (small ? 'sm' : 'lg') + ' sm:image-lg ' + (styleClass ? styleClass : '')"
   [src]="defaultImageUrl"
   [alt]="'LOGO.LABEL' | translate"

@@ -339,15 +339,15 @@ paths:
         $ref: '#/components/schemas/ImageInfo'
     "400":
      description: Bad Request
-  put:
+  delete:
    x-onecx:
     permissions:
      themes:
-      - write
+      - delete
    tags:
     - imagesInternal
-   description: update Images
-   operationId: updateImage
+   description: delete Image
+   operationId: deleteImage
    parameters:
     - name: refId
       in: path
@@ -359,31 +359,9 @@ paths:
       required: true
       schema:
        $ref: "#/components/schemas/RefType"
-    - name: mimeType
-      in: header
-      required: true
-      schema:
-       $ref: "#/components/schemas/MimeType"
-   requestBody:
-    required: true
-    content:
-     image/*:
-      schema:
-       type: string
-       format: binary
    responses:
-    "200":
-     description: OK
-     content:
-      application/json:
-       schema:
-        $ref: '#/components/schemas/ImageInfo'
-    "400":
-     description: Bad request
-     content:
-      application/json:
-       schema:
-        $ref: '#/components/schemas/ProblemDetailResponse'
+    "204":
+     description: No content
 components:
  schemas:
   RefType:

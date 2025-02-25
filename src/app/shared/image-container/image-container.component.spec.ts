@@ -71,13 +71,13 @@ describe('ImageContainerComponent', () => {
         }
       })
 
-      expect(component.displayDefaultLogo).toBeTrue()
+      expect(component.displayDefault).toBeTrue()
     })
   })
 
   it('onImageError should set displayDefaultLogo to true', () => {
-    component.onImageError()
+    component.onImageLoadError()
 
-    expect(component.displayDefaultLogo).toBeTrue()
+    expect(component.displayDefault).toBeTrue()
   })
 })

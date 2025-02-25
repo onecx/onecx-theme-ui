@@ -3,8 +3,6 @@
     [header]="theme ? theme.displayName : 'Theme Designer'"
     [subheader]="'THEME.DESIGNER.' + changeMode + '.SUBHEADER' | translate"
     [actions]="(actions$ | async) ?? []"
-    [figureImage]="fetchingLogoUrl"
-    [figureBackground]="!fetchingLogoUrl"
   ></ocx-page-header>
   <ocx-page-content>
     <div>
@@ -130,15 +128,28 @@
             <div class="field col-12 mb-3">
               <div class="flex flex-wrap sm:flex-nowrap align-items-center pb-2 row-gap-2 column-gap-4">
                 <app-image-container
-                  id="th_designer_field_logo_url_image"
+                  id="th_designer_logo_url_image"
                   [styleClass]="'w-5rem'"
                   [imageUrl]="fetchingLogoUrl"
                   [small]="true"
                   [title]="(fetchingLogoUrl ? 'LOGO.IMAGE' : 'IMAGE.TOOLTIPS.PLACEHOLDER') | translate"
+                  (imageLoadResult)="onImageLoadResult(RefType.Logo, $event)"
                 ></app-image-container>
                 <button
                   pButton
-                  id="th_designer_field_logo_upload"
+                  id="th_designer_action_remove_logo"
+                  icon="pi pi-times"
+                  [disabled]="changeMode === 'CREATE' || !imageLogoExists"
+                  class="action-button p-button-icon-only"
+                  (click)="onRemoveImage(RefType.Logo)"
+                  [attr.aria-label]="'IMAGE.TOOLTIPS.REMOVE' | translate"
+                  [pTooltip]="'IMAGE.TOOLTIPS.REMOVE' | translate"
+                  tooltipPosition="top"
+                  tooltipEvent="hover"
+                ></button>
+                <button
+                  pButton
+                  id="th_designer_action_logo_upload"
                   icon="pi pi-upload"
                   [disabled]="changeMode === 'CREATE'"
                   class="action-button p-button-icon-only"
@@ -168,15 +179,28 @@
             <div class="field col-12 mb-0">
               <div class="flex flex-wrap sm:flex-nowrap align-items-center row-gap-2 column-gap-4">
                 <app-image-container
-                  id="th_designer_field_favicon_url_image"
+                  id="th_designer_favicon_url_image"
                   [styleClass]="'w-5rem'"
                   [imageUrl]="fetchingFaviconUrl"
                   [small]="true"
-                  [title]="(fetchingLogoUrl ? 'FAVICON.IMAGE' : 'IMAGE.TOOLTIPS.PLACEHOLDER') | translate"
+                  [title]="(fetchingFaviconUrl ? 'FAVICON.IMAGE' : 'IMAGE.TOOLTIPS.PLACEHOLDER') | translate"
+                  (imageLoadResult)="onImageLoadResult(RefType.Favicon, $event)"
                 ></app-image-container>
                 <button
                   pButton
-                  id="th_designer_field_favicon_upload"
+                  id="th_designer_action_remove_favicon"
+                  icon="pi pi-times"
+                  [disabled]="changeMode === 'CREATE' || !imageFaviconExists"
+                  class="action-button p-button-icon-only"
+                  (click)="onRemoveImage(RefType.Favicon)"
+                  [attr.aria-label]="'IMAGE.TOOLTIPS.REMOVE' | translate"
+                  [pTooltip]="'IMAGE.TOOLTIPS.REMOVE' | translate"
+                  tooltipPosition="top"
+                  tooltipEvent="hover"
+                ></button>
+                <button
+                  pButton
+                  id="th_designer_action_favicon_upload"
                   icon="pi pi-upload"
                   [disabled]="changeMode === 'CREATE'"
                   class="action-button p-button-icon-only"
@@ -198,11 +222,7 @@
                   />
                   <label for="th_designer_field_favicon_url">{{ 'FAVICON.URL' | translate }}</label>
                 </span>
-                <label
-                  *ngIf="this.displayFileTypeErrorFavicon"
-                  for="th_designer_field_favicon_url"
-                  class="control-error"
-                >
+                <label *ngIf="displayFileTypeErrorFavicon" for="th_designer_field_favicon_url" class="control-error">
                   {{ 'VALIDATION.ERRORS.FILETYPE_PATTERN_ERROR_1' | translate }}
                 </label>
               </div>

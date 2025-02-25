@@ -115,6 +115,7 @@
       "IMAGE": "Logo",
       "PLACEHOLDER": "Logo Placeholder",
       "URL": "As an alternative to uploading, a URL to an image can be specified here",
+      "REMOVE": "Remove Image",
       "UPLOAD": "Select and upload image"
     }
   },
