@@ -59,11 +59,13 @@
     "SEARCH": {
       "ERROR": "Daten nicht abrufbar",
       "NO_DATA": "Keine Daten",
+      "OF": "von",
       "RELOAD": "Daten neu laden",
       "RELOAD.OK": "Daten erfolgreich geladen"
     },
     "CANCEL": "Abbrechen",
     "CHOOSE": "Auswählen",
+    "COPY_OF": "Kopie von ",
     "LOADING": "...wird geladen",
     "SAVE": "Speichern",
     "SAVE_AS": "Speichern als ...",
@@ -96,13 +98,20 @@
       "OPERATOR": "Wenn gesetzt, dann kann das Theme nicht gelöscht werden und alle Änderungen gehen beim beim nächsten Deployment verloren."
     }
   },
-  "GENERAL": {
-    "COPY_OF": "Kopie von ",
-    "OF": "von",
-    "TOOLTIP": {
+  "DIALOG": {
+    "DATAVIEW": {
+      "FILTER": "Filter",
+      "PRODUCT_FILTER_TOOLTIP": "Filtern nach Applikation und Klassifikation",
+      "FILTER_OF": "Filter für ",
+      "FILTER_CLEAR": "Filter entfernen",
+      "FILTER_PLACEHOLDER": "Filter",
+      "SORT_BY": "Sortiert nach",
+      "SORT_DIRECTION_ASC": "aufsteigend",
+      "SORT_DIRECTION_DESC": "absteigend",
       "VIEW_MODE_GRID": "Kachelansicht",
       "VIEW_MODE_LIST": "Listenansicht",
-      "VIEW_MODE_TABLE": "Tabellenansicht"
+      "VIEW_MODE_TABLE": "Tabellenansicht",
+      "VIEW_MODE_TREE": "Baumansicht"
     }
   },
   "IMAGE": {
@@ -118,8 +127,8 @@
       "IMAGE": "Logo",
       "PLACEHOLDER": "Platzhalter",
       "REMOVE": "Bild löschen",
-      "URL": "Als Alternative zum Hochladen kann hier eine URL zu einem Bild angegeben werden",
-      "UPLOAD": "Bild auswählen und hochladen"
+      "UPLOAD": "Bild auswählen und hochladen",
+      "URL": "Als Alternative zum Hochladen kann hier eine URL zu einem Bild angegeben werden"
     }
   },
   "LOGO": {
@@ -131,13 +140,6 @@
     "LABEL": "Favoriten Icon",
     "URL": "Externe Favicon URL",
     "IMAGE": "Favoriten/Lesezeichen Icon"
-  },
-  "SEARCH": {
-    "FILTER": "Filter",
-    "FILTER_OF": "Filter für ",
-    "SORT_BY": "Sortiert nach",
-    "SORT_DIRECTION_ASC": "aufsteigend",
-    "SORT_DIRECTION_DESC": "absteigend"
   },
   "THEME": {
     "SEARCH.HEADER": "Theme Verwaltung",
@@ -230,7 +232,7 @@
       "THEME": "Theme nicht gefunden werden."
     },
     "HTTP_STATUS_500": {
-      "MENUS": "Unbekanntes Server-Problem beim Abrufen des Themes - Bitte versuchen sie es noch einmal."
+      "THEME": "Unbekanntes Server-Problem beim Abrufen des Themes - Bitte versuchen sie es noch einmal."
     }
   }
 }

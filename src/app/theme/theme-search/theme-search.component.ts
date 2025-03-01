@@ -23,11 +23,11 @@ export class ThemeSearchComponent implements OnInit {
   public sortOrder = 1
   public actions$: Observable<Action[]> | undefined
   public importDialogVisible = false
-  public dataViewControlsTranslations: DataViewControlTranslations = {}
   public limitText = limitText
   // data
   public themes$!: Observable<Theme[]>
   @ViewChild(DataView) dv: DataView | undefined
+  public dataViewControlsTranslations$: Observable<DataViewControlTranslations> | undefined
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -60,38 +60,25 @@ export class ThemeSearchComponent implements OnInit {
   }
 
   private prepareTranslations() {
-    this.translate
+    this.dataViewControlsTranslations$ = this.translate
       .get([
         'THEME.NAME',
         'THEME.DISPLAY_NAME',
-        'SEARCH.SORT_BY',
-        'SEARCH.FILTER',
-        'SEARCH.FILTER_OF',
-        'SEARCH.SORT_DIRECTION_ASC',
-        'SEARCH.SORT_DIRECTION_DESC',
-        'GENERAL.TOOLTIP.VIEW_MODE_GRID',
-        'GENERAL.TOOLTIP.VIEW_MODE_LIST',
-        'GENERAL.TOOLTIP.VIEW_MODE_TABLE'
+        'DIALOG.DATAVIEW.FILTER',
+        'DIALOG.DATAVIEW.FILTER_OF',
+        'DIALOG.DATAVIEW.SORT_BY'
       ])
       .pipe(
         map((data) => {
-          this.dataViewControlsTranslations = {
-            sortDropdownPlaceholder: data['SEARCH.SORT_BY'],
-            filterInputPlaceholder: data['SEARCH.FILTER'],
-            filterInputTooltip: data['SEARCH.FILTER_OF'] + data['THEME.DISPLAY_NAME'] + ', ' + data['THEME.NAME'],
-            viewModeToggleTooltips: {
-              grid: data['GENERAL.TOOLTIP.VIEW_MODE_GRID'],
-              list: data['GENERAL.TOOLTIP.VIEW_MODE_LIST']
-            },
-            sortOrderTooltips: {
-              ascending: data['SEARCH.SORT_DIRECTION_ASC'],
-              descending: data['SEARCH.SORT_DIRECTION_DESC']
-            },
-            sortDropdownTooltip: data['SEARCH.SORT_BY']
-          }
+          return {
+            filterInputPlaceholder: data['DIALOG.DATAVIEW.FILTER'],
+            filterInputTooltip:
+              data['DIALOG.DATAVIEW.FILTER_OF'] + data['THEME.NAME'] + ', ' + data['THEME.DISPLAY_NAME'],
+            sortDropdownTooltip: data['DIALOG.DATAVIEW.SORT_BY'],
+            sortDropdownPlaceholder: data['DIALOG.DATAVIEW.SORT_BY']
+          } as DataViewControlTranslations
         })
       )
-      .subscribe()
   }
 
   private prepareActionButtons(): void {

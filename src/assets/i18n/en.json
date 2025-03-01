@@ -59,11 +59,13 @@
     "SEARCH": {
       "ERROR": "Data not available",
       "NO_DATA": "No Data",
+      "OF": "of",
       "RELOAD": "Reload data",
       "RELOAD.OK": "Data successfully reloaded"
     },
     "CANCEL": "Cancel",
     "CHOOSE": "Choose",
+    "COPY_OF": "Copy of ",
     "LOADING": "...is loading",
     "SAVE": "Save",
     "SAVE_AS": "Save as ...",
@@ -96,13 +98,20 @@
       "OPERATOR": "If set, the Theme cannot be deleted and all changes will be lost during the next deployment."
     }
   },
-  "GENERAL": {
-    "COPY_OF": "Copy of ",
-    "OF": "of",
-    "TOOLTIP": {
+  "DIALOG": {
+    "DATAVIEW": {
+      "FILTER": "Filter",
+      "PRODUCT_FILTER_TOOLTIP": "Filter by Application and Classification",
+      "FILTER_OF": "Filter of ",
+      "FILTER_CLEAR": "Clear Filter",
+      "FILTER_PLACEHOLDER": "Filter",
+      "SORT_BY": "Sort By",
+      "SORT_DIRECTION_ASC": "ascending",
+      "SORT_DIRECTION_DESC": "descending",
       "VIEW_MODE_GRID": "Tile view",
       "VIEW_MODE_LIST": "List view",
-      "VIEW_MODE_TABLE": "Table view"
+      "VIEW_MODE_TABLE": "Table view",
+      "VIEW_MODE_TREE": "Tree view"
     }
   },
   "IMAGE": {
@@ -117,9 +126,9 @@
     "TOOLTIPS": {
       "IMAGE": "Logo",
       "PLACEHOLDER": "Logo Placeholder",
-      "URL": "As an alternative to uploading, a URL to an image can be specified here",
       "REMOVE": "Remove Image",
-      "UPLOAD": "Select and upload image"
+      "UPLOAD": "Select and upload image",
+      "URL": "As an alternative to uploading, a URL to an image can be specified here"
     }
   },
   "LOGO": {
@@ -131,13 +140,6 @@
     "LABEL": "Favorite Icon",
     "URL": "External Favicon URL",
     "IMAGE": "Favorite/Bookmark Icon"
-  },
-  "SEARCH": {
-    "FILTER": "Filter",
-    "FILTER_OF": "Filter for ",
-    "SORT_BY": "Sort By",
-    "SORT_DIRECTION_ASC": "ascending",
-    "SORT_DIRECTION_DESC": "descending"
   },
   "THEME": {
     "SEARCH.HEADER": "Theme Management",
@@ -218,19 +220,19 @@
   },
   "EXCEPTIONS": {
     "HTTP_STATUS_0": {
-      "MENUS": "Unknown problem retrieving Theme data - please try again."
+      "THEME": "Unknown problem retrieving Theme data - please try again."
     },
     "HTTP_STATUS_401": {
-      "MENUS": "You are not authorized to see Themes."
+      "THEME": "You are not authorized to see Themes."
     },
     "HTTP_STATUS_403": {
-      "MENUS": "You have no permissions to see Themes."
+      "THEME": "You have no permissions to see Themes."
     },
     "HTTP_STATUS_404": {
-      "MENUS": "Theme could not be found."
+      "THEME": "Theme could not be found."
     },
     "HTTP_STATUS_500": {
-      "MENUS": "Unknown server problem retrieving the Theme - please try again."
+      "THEME": "Unknown server problem retrieving the Theme - please try again."
     }
   }
 }

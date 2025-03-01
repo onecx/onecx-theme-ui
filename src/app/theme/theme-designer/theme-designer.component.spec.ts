@@ -979,7 +979,7 @@ describe('ThemeDesignerComponent', () => {
         { label: 'myTheme', value: 'id2' }
       ]
       const translationData = {
-        'GENERAL.COPY_OF': 'Copy of ',
+        'ACTIONS.COPY_OF': 'Copy of ',
         'THEME.TEMPLATE.CONFIRMATION.HEADER': 'themeTemplateConfirmationHeader',
         'THEME.TEMPLATE.CONFIRMATION.MESSAGE': '{{ITEM}} themeTemplateConfirmationMessage',
         'ACTIONS.CONFIRMATION.YES': 'actionsConfirmationYes',
@@ -1028,7 +1028,7 @@ describe('ThemeDesignerComponent', () => {
       component.onThemeTemplateDropdownChange({ value: 'id2' })
 
       const translationData = {
-        'GENERAL.COPY_OF': 'Copy of ',
+        'ACTIONS.COPY_OF': 'Copy of ',
         'THEME.TEMPLATE.CONFIRMATION.HEADER': 'themeTemplateConfirmationHeader',
         'THEME.TEMPLATE.CONFIRMATION.MESSAGE': '{{ITEM}} themeTemplateConfirmationMessage',
         'ACTIONS.CONFIRMATION.YES': 'actionsConfirmationYes',
@@ -1093,7 +1093,7 @@ describe('ThemeDesignerComponent', () => {
       ]
 
       const translationData = {
-        'GENERAL.COPY_OF': 'Copy of ',
+        'ACTIONS.COPY_OF': 'Copy of ',
         'THEME.TEMPLATE.CONFIRMATION.HEADER': 'themeTemplateConfirmationHeader',
         'THEME.TEMPLATE.CONFIRMATION.MESSAGE': '{{ITEM}} themeTemplateConfirmationMessage',
         'ACTIONS.CONFIRMATION.YES': 'actionsConfirmationYes',
