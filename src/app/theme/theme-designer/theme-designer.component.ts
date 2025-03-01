@@ -319,6 +319,7 @@ export class ThemeDesignerComponent implements OnInit {
     const newTheme: ThemeUpdateCreate = { ...this.basicForm.value }
     newTheme.name = this.saveAsForm.controls['themeName'].value
     newTheme.displayName = this.saveAsForm.controls['displayName'].value
+    newTheme.mandatory = false
     newTheme.properties = this.propertiesForm.value
     if (this.imageFaviconUrlExists) newTheme.faviconUrl = undefined
     if (this.imageLogoUrlExists) newTheme.logoUrl = undefined
@@ -364,6 +365,7 @@ export class ThemeDesignerComponent implements OnInit {
           if (this.autoApply) {
             this.themeService.apply(data as object)
           }
+          this.onClose()
         },
         error: (err) => {
           console.error('updateTheme', err)
