@@ -34,7 +34,7 @@
       [sortField]="sortField"
       [sortOrder]="sortOrder"
       [showCurrentPageReport]="true"
-      currentPageReportTemplate="{first} - {last} {{ 'GENERAL.OF' | translate }} {totalRecords}"
+      currentPageReportTemplate="{first} - {last} {{ 'ACTIONS.SEARCH.OF' | translate }} {totalRecords}"
     >
       <ng-template pTemplate="header">
         <ocx-data-view-controls
@@ -53,7 +53,7 @@
           [filterColumns]="['THEME.DISPLAY_NAME' | translate, 'THEME.NAME' | translate]"
           (sortChange)="onSortChange($event)"
           (sortDirectionChange)="onSortDirChange($event)"
-          [translations]="dataViewControlsTranslations"
+          [translations]="(dataViewControlsTranslations$ | async) ?? {}"
         >
         </ocx-data-view-controls>
       </ng-template>

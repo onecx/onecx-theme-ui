@@ -187,7 +187,7 @@ export class ThemeDesignerComponent implements OnInit {
   private preparePageActions(): void {
     this.actions$ = this.translate
       .get([
-        'GENERAL.COPY_OF',
+        'ACTIONS.COPY_OF',
         'ACTIONS.CANCEL',
         'ACTIONS.TOOLTIPS.CANCEL_AND_CLOSE',
         'ACTIONS.SAVE',
@@ -197,7 +197,7 @@ export class ThemeDesignerComponent implements OnInit {
       ])
       .pipe(
         map((data) => {
-          this.copyOfPrefix = data['GENERAL.COPY_OF']
+          this.copyOfPrefix = data['ACTIONS.COPY_OF']
           return [
             {
               label: data['ACTIONS.CANCEL'],
@@ -256,7 +256,7 @@ export class ThemeDesignerComponent implements OnInit {
   private confirmTemplateTheme(name: string, id: string) {
     this.translate
       .get([
-        'GENERAL.COPY_OF',
+        'ACTIONS.COPY_OF',
         'THEME.TEMPLATE.CONFIRMATION.HEADER',
         'THEME.TEMPLATE.CONFIRMATION.MESSAGE',
         'ACTIONS.CONFIRMATION.YES',
@@ -267,7 +267,7 @@ export class ThemeDesignerComponent implements OnInit {
           this.confirmUseThemeAsTemplate(name, data, () => {
             this.getThemeById(id).subscribe((result) => {
               if (this.changeMode === 'CREATE') {
-                this.basicForm.controls['name'].setValue(data['GENERAL.COPY_OF'] + result.resource.name)
+                this.basicForm.controls['name'].setValue(data['ACTIONS.COPY_OF'] + result.resource.name)
                 this.basicForm.controls['mandatory'].setValue(null)
                 this.basicForm.controls['displayName'].setValue(result.resource.displayName)
                 this.basicForm.controls['description'].setValue(result.resource.description)

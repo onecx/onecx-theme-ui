@@ -62,14 +62,9 @@ describe('ThemeSearchComponent', () => {
     const generalTranslations = {
       'THEME.NAME': 'themeName',
       'THEME.DESCRIPTION': 'themeDescription',
-      'SEARCH.SORT_BY': 'searchSort',
-      'SEARCH.FILTER': 'searchFilter',
-      'SEARCH.FILTER_OF': 'searchFilterOf',
-      'SEARCH.SORT_DIRECTION_ASC': 'searchSortDirectionsAsc',
-      'SEARCH.SORT_DIRECTION_DESC': 'searchSortDirectionDesc',
-      'GENERAL.TOOLTIP.VIEW_MODE_GRID': 'generalTooltipViewModeGrid',
-      'GENERAL.TOOLTIP.VIEW_MODE_LIST': 'generalTooltipViewModeList',
-      'GENERAL.TOOLTIP.VIEW_MODE_TABLE': 'generalTooltipViewModeTable'
+      'DIALOG.DATAVIEW.SORT_BY': 'searchSort',
+      'DIALOG.DATAVIEW.FILTER': 'searchFilter',
+      'DIALOG.DATAVIEW.FILTER_OF': 'searchFilterOf'
     }
     spyOn(translateService, 'get').and.returnValues(of(actionsTranslations), of(generalTranslations))
     const themesResponse = {
