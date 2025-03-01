@@ -27,5 +27,6 @@ export interface ThemeUpdateCreate {
     previewImageUrl?: string;
     assetsUpdateDate?: string;
     properties?: object;
+    mandatory?: boolean;
 }
 

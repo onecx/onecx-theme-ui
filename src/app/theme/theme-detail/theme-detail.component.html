@@ -41,7 +41,7 @@
           severity="warn"
           [text]="'INTERNAL.OPERATOR_MESSAGE' | translate"
         ></p-message>
-        <div class="surface-section mb-1 mt-2 mx-3">
+        <div class="surface-section mb-1 mt-3 mx-3">
           <div class="flex flex-wrap flex-column row-gap-4 w-12 md:w-10 lg:w-8 xl:w-6">
             <span class="p-float-label">
               <input
@@ -145,7 +145,14 @@
   >
     <div class="flex column-gap-3 row-gap-1 justify-content-start align-items-center">
       <div class="pi pi-question-circle text-3xl danger-action-text"></div>
-      <div>
+      <p-message
+        *ngIf="theme?.mandatory"
+        id="th_delete_reject_message"
+        severity="info"
+        styleClass="p-2"
+        [text]="'ACTIONS.DELETE.MESSAGE_REJECT' | translate"
+      ></p-message>
+      <div *ngIf="!theme?.mandatory">
         <div id="th_delete_message_text" class="font-bold">{{ 'ACTIONS.DELETE.THEME_MESSAGE' | translate }}</div>
         <div id="th_delete_theme_display_name" class="my-2 font-bold danger-action-text text-center">
           {{ theme?.displayName }}
@@ -156,6 +163,17 @@
     <ng-template pTemplate="footer">
       <div class="flex flex-wrap column-gap-2 row-gap-1 justify-content-end">
         <p-button
+          *ngIf="theme?.mandatory"
+          icon="pi pi-times"
+          id="th_delete_action_close"
+          (onClick)="themeDeleteVisible = false"
+          [label]="'ACTIONS.NAVIGATION.CLOSE' | translate"
+          [pTooltip]="'ACTIONS.NAVIGATION.CLOSE.TOOLTIP' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
+        ></p-button>
+        <p-button
+          *ngIf="!theme?.mandatory"
           icon="pi pi-times"
           id="th_delete_action_no"
           (onClick)="themeDeleteVisible = false"
@@ -165,6 +183,7 @@
           tooltipEvent="hover"
         ></p-button>
         <p-button
+          *ngIf="!theme?.mandatory"
           icon="pi pi-check"
           id="th_delete_action_yes"
           (onClick)="onConfirmThemeDeletion()"

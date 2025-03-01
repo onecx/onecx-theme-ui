@@ -1,5 +1,4 @@
 import { Component, Input, OnChanges } from '@angular/core'
-import { TranslateService } from '@ngx-translate/core'
 import { Observable } from 'rxjs'
 
 import { SlotService } from '@onecx/angular-remote-components'
@@ -18,18 +17,19 @@ export class ThemeInternComponent implements OnChanges {
   public isListWorkspacesUsingThemeComponentDefined$: Observable<boolean> | undefined
   public listWorkspacesUsingThemeSlotName = 'onecx-theme-list-workspaces-using-theme'
 
+  public mandatory = false
   public operator = false
 
-  constructor(
-    private readonly translate: TranslateService,
-    private readonly slotService: SlotService
-  ) {
+  constructor(private readonly slotService: SlotService) {
     this.isListWorkspacesUsingThemeComponentDefined$ = this.slotService.isSomeComponentDefinedForSlot(
       this.listWorkspacesUsingThemeSlotName
     )
   }
 
   public ngOnChanges(): void {
-    if (this.theme) this.operator = this.theme.operator ?? false
+    if (this.theme) {
+      this.mandatory = this.theme.mandatory ?? false
+      this.operator = this.theme.operator ?? false
+    }
   }
 }

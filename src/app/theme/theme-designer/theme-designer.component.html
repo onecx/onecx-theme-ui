@@ -5,8 +5,8 @@
     [actions]="(actions$ | async) ?? []"
   ></ocx-page-header>
   <ocx-page-content>
-    <div>
-      <div class="flex flex-wrap justify-content-between align-items-center my-2 mx-4 pt-2 row-gap-2 column-gap-3">
+    <div class="pt-3 px-3 flex flex-column row-gap-3">
+      <div class="ml-2 flex flex-wrap justify-content-between align-items-center row-gap-2 column-gap-3">
         <div
           class="field mb-0 flex flex-wrap sm:flex-nowrap align-items-center row-gap-1 column-gap-3"
           [pTooltip]="'THEME.DETAIL.AUTO_APPLY.TOOLTIP' | translate"
@@ -53,29 +53,33 @@
         </div>
       </div>
 
-      <form [formGroup]="propertiesForm" class="mx-3 mb-3">
-        <p-fieldset [toggleable]="false" [collapsed]="false" styleClass="py-0 px-3">
-          <ng-template pTemplate="header">
-            <span>{{ 'THEME.GROUPS.BASE' | translate }}</span>
-          </ng-template>
-          <div [formGroup]="basicForm" class="grid grid-nogutter formgrid p-fluid mx-1">
-            <div *ngIf="changeMode === 'CREATE'" class="field col-12 mb-4">
-              <span class="p-float-label" controlErrorAnchor>
-                <input
-                  pInputText
-                  minlength="2"
-                  maxlength="255"
-                  type="text"
-                  id="th_designer_field_name"
-                  formControlName="name"
-                  [pTooltip]="'THEME.TOOLTIPS.NAME' | translate"
-                  tooltipPosition="top"
-                  tooltipEvent="hover"
-                />
-                <label class="ocx-required-label" for="th_designer_field_name"> {{ 'THEME.NAME' | translate }} </label>
-              </span>
-            </div>
-            <div class="field col-12 mb-4">
+      <p-fieldset [toggleable]="false" [collapsed]="false" styleClass="px-1">
+        <ng-template pTemplate="header">
+          <span>{{ 'THEME.GROUPS.BASE' | translate }}</span>
+        </ng-template>
+        <div [formGroup]="basicForm" class="flex flex-column row-gap-4">
+          <div *ngIf="changeMode === 'CREATE'" class="flex-grow-1">
+            <span class="p-float-label" controlErrorAnchor>
+              <input
+                pInputText
+                minlength="2"
+                maxlength="255"
+                type="text"
+                id="th_designer_field_name"
+                class="w-full"
+                formControlName="name"
+                [pTooltip]="'THEME.TOOLTIPS.NAME' | translate"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+              />
+              <label class="ocx-required-label" for="th_designer_field_name"> {{ 'THEME.NAME' | translate }} </label>
+            </span>
+          </div>
+
+          <div
+            class="flex flex-row flex-wrap justify-content-start align-items-center column-gap-4 sm:column-gap-5 md:column-gap-6 lg:column-gap-7"
+          >
+            <div class="flex-grow-1">
               <span class="p-float-label" controlErrorAnchor>
                 <input
                   pInputText
@@ -83,6 +87,7 @@
                   maxlength="255"
                   type="text"
                   id="th_designer_field_display_name"
+                  class="w-full"
                   formControlName="displayName"
                   [pTooltip]="'THEME.TOOLTIPS.DISPLAY_NAME' | translate"
                   tooltipPosition="top"
@@ -93,20 +98,37 @@
                 </label>
               </span>
             </div>
-            <div class="field col-12 mb-4">
-              <span class="p-float-label">
-                <input
-                  pInputText
-                  type="text"
-                  id="th_designer_field_description"
-                  formControlName="description"
-                  [pTooltip]="'THEME.TOOLTIPS.DESCRIPTION' | translate"
-                  tooltipPosition="top"
-                  tooltipEvent="hover"
-                />
-                <label for="th_designer_field_description"> {{ 'THEME.DESCRIPTION' | translate }} </label>
-              </span>
+            <div class="md:10rem lg:12rem xl:w-13rem">
+              <p-checkbox
+                type="text"
+                id="th_designer_field_mandatory"
+                styleClass="cursor-auto shadow-none"
+                formControlName="mandatory"
+                [binary]="true"
+                [label]="'INTERNAL.MANDATORY' | translate"
+                [ariaLabel]="'INTERNAL.MANDATORY' | translate"
+                [pTooltip]="'INTERNAL.TOOLTIPS.MANDATORY' | translate"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+              ></p-checkbox>
             </div>
+          </div>
+          <div class="flex-grow-1">
+            <span class="p-float-label">
+              <input
+                pInputText
+                type="text"
+                id="th_designer_field_description"
+                class="w-full"
+                formControlName="description"
+                [pTooltip]="'THEME.TOOLTIPS.DESCRIPTION' | translate"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+              />
+              <label for="th_designer_field_description"> {{ 'THEME.DESCRIPTION' | translate }} </label>
+            </span>
+          </div>
+          <div class="flex-grow-1">
             <!-- helper inputs because p-fileupload does not work inside inputgroup -->
             <input
               hidden
@@ -124,194 +146,198 @@
               (change)="onFileUpload($event, RefType.Favicon)"
               accept=".png, .jpg, .jpeg, .ico"
             />
-
-            <div class="field col-12 mb-3">
-              <div class="flex flex-wrap sm:flex-nowrap align-items-center pb-2 row-gap-2 column-gap-4">
-                <app-image-container
-                  id="th_designer_logo_url_image"
-                  [styleClass]="'w-5rem'"
-                  [imageUrl]="fetchingLogoUrl"
-                  [small]="true"
-                  [title]="(fetchingLogoUrl ? 'LOGO.IMAGE' : 'IMAGE.TOOLTIPS.PLACEHOLDER') | translate"
-                  (imageLoadResult)="onImageLoadResult(RefType.Logo, $event)"
-                ></app-image-container>
-                <button
-                  pButton
-                  id="th_designer_action_remove_logo"
-                  icon="pi pi-times"
-                  [disabled]="changeMode === 'CREATE' || !imageLogoExists"
-                  class="action-button p-button-icon-only"
-                  (click)="onRemoveImage(RefType.Logo)"
-                  [attr.aria-label]="'IMAGE.TOOLTIPS.REMOVE' | translate"
-                  [pTooltip]="'IMAGE.TOOLTIPS.REMOVE' | translate"
+            <div class="flex flex-wrap sm:flex-nowrap align-items-center row-gap-2 column-gap-4">
+              <app-image-container
+                id="th_designer_logo_url_image"
+                [styleClass]="'w-5rem'"
+                [imageUrl]="fetchingLogoUrl"
+                [small]="true"
+                [title]="(fetchingLogoUrl ? 'LOGO.IMAGE' : 'IMAGE.TOOLTIPS.PLACEHOLDER') | translate"
+                (imageLoadResult)="onImageLoadResult(RefType.Logo, $event)"
+              ></app-image-container>
+              <button
+                pButton
+                id="th_designer_action_remove_logo"
+                icon="pi pi-times"
+                [disabled]="changeMode === 'CREATE' || !imageLogoExists"
+                class="action-button p-button-icon-only"
+                (click)="onRemoveImage(RefType.Logo)"
+                [attr.aria-label]="'IMAGE.TOOLTIPS.REMOVE' | translate"
+                [pTooltip]="'IMAGE.TOOLTIPS.REMOVE' | translate"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+              ></button>
+              <button
+                pButton
+                id="th_designer_action_logo_upload"
+                icon="pi pi-upload"
+                [disabled]="changeMode === 'CREATE'"
+                class="action-button p-button-icon-only"
+                (click)="selectedFileInputLogo.click()"
+                [pTooltip]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+              ></button>
+              <span class="p-float-label w-full">
+                <input
+                  pInputText
+                  type="text"
+                  id="th_designer_field_logo_url"
+                  class="w-full"
+                  formControlName="logoUrl"
+                  (input)="onInputChange(RefType.Logo)"
+                  [pTooltip]="'IMAGE.TOOLTIPS.URL' | translate"
                   tooltipPosition="top"
                   tooltipEvent="hover"
-                ></button>
-                <button
-                  pButton
-                  id="th_designer_action_logo_upload"
-                  icon="pi pi-upload"
-                  [disabled]="changeMode === 'CREATE'"
-                  class="action-button p-button-icon-only"
-                  (click)="selectedFileInputLogo.click()"
-                  [pTooltip]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
-                  tooltipPosition="top"
-                  tooltipEvent="hover"
-                ></button>
-                <span class="p-float-label w-full">
-                  <input
-                    pInputText
-                    type="text"
-                    id="th_designer_field_logo_url"
-                    formControlName="logoUrl"
-                    (input)="onInputChange(RefType.Logo)"
-                    [pTooltip]="'IMAGE.TOOLTIPS.URL' | translate"
-                    tooltipPosition="top"
-                    tooltipEvent="hover"
-                  />
-                  <label for="th_designer_field_logo_url">{{ 'LOGO.URL' | translate }}</label>
-                </span>
-                <label *ngIf="displayFileTypeErrorLogo" for="th_designer_field_logo_url" class="control-error">
-                  {{ 'VALIDATION.ERRORS.FILETYPE_PATTERN_ERROR_2' | translate }}
-                </label>
-              </div>
-            </div>
-            <div class="field col-12 mb-0">
-              <div class="flex flex-wrap sm:flex-nowrap align-items-center row-gap-2 column-gap-4">
-                <app-image-container
-                  id="th_designer_favicon_url_image"
-                  [styleClass]="'w-5rem'"
-                  [imageUrl]="fetchingFaviconUrl"
-                  [small]="true"
-                  [title]="(fetchingFaviconUrl ? 'FAVICON.IMAGE' : 'IMAGE.TOOLTIPS.PLACEHOLDER') | translate"
-                  (imageLoadResult)="onImageLoadResult(RefType.Favicon, $event)"
-                ></app-image-container>
-                <button
-                  pButton
-                  id="th_designer_action_remove_favicon"
-                  icon="pi pi-times"
-                  [disabled]="changeMode === 'CREATE' || !imageFaviconExists"
-                  class="action-button p-button-icon-only"
-                  (click)="onRemoveImage(RefType.Favicon)"
-                  [attr.aria-label]="'IMAGE.TOOLTIPS.REMOVE' | translate"
-                  [pTooltip]="'IMAGE.TOOLTIPS.REMOVE' | translate"
-                  tooltipPosition="top"
-                  tooltipEvent="hover"
-                ></button>
-                <button
-                  pButton
-                  id="th_designer_action_favicon_upload"
-                  icon="pi pi-upload"
-                  [disabled]="changeMode === 'CREATE'"
-                  class="action-button p-button-icon-only"
-                  (click)="selectedFileInputFavicon.click()"
-                  [pTooltip]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
-                  tooltipPosition="top"
-                  tooltipEvent="hover"
-                ></button>
-                <span class="p-float-label w-full">
-                  <input
-                    pInputText
-                    type="text"
-                    id="th_designer_field_favicon_url"
-                    formControlName="faviconUrl"
-                    (input)="onInputChange(RefType.Favicon)"
-                    [pTooltip]="'IMAGE.TOOLTIPS.URL' | translate"
-                    tooltipPosition="top"
-                    tooltipEvent="hover"
-                  />
-                  <label for="th_designer_field_favicon_url">{{ 'FAVICON.URL' | translate }}</label>
-                </span>
-                <label *ngIf="displayFileTypeErrorFavicon" for="th_designer_field_favicon_url" class="control-error">
-                  {{ 'VALIDATION.ERRORS.FILETYPE_PATTERN_ERROR_1' | translate }}
-                </label>
-              </div>
+                />
+                <label for="th_designer_field_logo_url">{{ 'LOGO.URL' | translate }}</label>
+              </span>
+              <label *ngIf="displayFileTypeErrorLogo" for="th_designer_field_logo_url" class="control-error">
+                {{ 'VALIDATION.ERRORS.FILETYPE_PATTERN_ERROR_2' | translate }}
+              </label>
             </div>
           </div>
-        </p-fieldset>
-
-        <p-fieldset [toggleable]="false" [collapsed]="false" styleClass="py-0 px-2 mt-3">
-          <ng-template pTemplate="header">
-            <span>{{ 'THEME.GROUPS.FONT' | translate }}</span>
-          </ng-template>
-          <div [formGroup]="fontForm" class="grid grid-nogutter grid-row-gap formgrid p-fluid">
-            <div class="col-12 sm:col-9 md:col-9 lg:col-9 xl:9">
-              <div class="p-inputgroup px-3">
-                <span class="p-float-label">
-                  <input
-                    pInputText
-                    type="text"
-                    id="th_designer_font-family"
-                    formControlName="font-family"
-                    class="w-full"
-                    [pTooltip]="'THEME.TOOLTIPS.FONT_FAMILY' | translate"
-                    tooltipPosition="top"
-                    tooltipEvent="hover"
-                  />
-                  <label for="th_designer_font-family">font-family</label>
-                </span>
-              </div>
-            </div>
-            <div class="col-12 sm:col-3 md:col-3 lg:col-3 xl:3">
-              <div class="p-inputgroup px-3">
-                <span class="p-float-label">
-                  <input
-                    pInputText
-                    type="text"
-                    id="th_designer_font-size"
-                    formControlName="font-size"
-                    class="w-full"
-                    [pTooltip]="'THEME.TOOLTIPS.FONT_SIZE' | translate"
-                    tooltipPosition="top"
-                    tooltipEvent="hover"
-                  />
-                  <label for="th_designer_font-size">font-size</label>
-                </span>
-              </div>
-            </div>
-          </div>
-        </p-fieldset>
-
-        <p-fieldset *ngFor="let group of groups" [toggleable]="false" [collapsed]="false" styleClass="py-0 px-2 mt-3">
-          <ng-template pTemplate="header">
-            <span [title]="group.title">{{ group.title }}</span>
-          </ng-template>
-          <div [formGroup]="group.formGroup" class="grid grid-nogutter grid-row-gap formgrid p-fluid">
-            <div class="col-12 sm:col-6 md:col-4 lg:col-4 xl:col-3" *ngFor="let item of themeVars[group.key]">
-              <div class="p-inputgroup px-3">
-                <span class="p-float-label">
-                  <input
-                    pInputText
-                    id="th_designer_item_color_{{ item }}"
-                    [formControlName]="item"
-                    [value]="group.formGroup.value[item]"
-                  />
-                  <label for="th_designer_item_color_{{ item }}">{{ item }}</label>
-                </span>
-                <p-overlayPanel #op>
-                  <ng-template pTemplate>
-                    <div style="width: 240px; display: inline-block">
-                      <color-sketch [width]="220" [formControlName]="item"> </color-sketch>
-                    </div>
-                  </ng-template>
-                </p-overlayPanel>
-                <a
-                  tabindex="0"
-                  id="th_designer_item_color_{{ item }}_toggle"
-                  class="p-inputgroup-addon cursor-pointer"
-                  (click)="op.toggle($event)"
-                  (keyup)="op.toggle($event)"
-                  [ngStyle]="{ 'background-color': group.formGroup.value[item] }"
-                  [pTooltip]="'THEME.TOOLTIPS.ITEM_COLOR_PICKER' | translate"
+          <div class="flex-grow-1">
+            <div class="flex flex-wrap sm:flex-nowrap align-items-center row-gap-2 column-gap-4">
+              <app-image-container
+                id="th_designer_favicon_url_image"
+                [styleClass]="'w-5rem'"
+                [imageUrl]="fetchingFaviconUrl"
+                [small]="true"
+                [title]="(fetchingFaviconUrl ? 'FAVICON.IMAGE' : 'IMAGE.TOOLTIPS.PLACEHOLDER') | translate"
+                (imageLoadResult)="onImageLoadResult(RefType.Favicon, $event)"
+              ></app-image-container>
+              <button
+                pButton
+                id="th_designer_action_remove_favicon"
+                icon="pi pi-times"
+                [disabled]="changeMode === 'CREATE' || !imageFaviconExists"
+                class="action-button p-button-icon-only"
+                (click)="onRemoveImage(RefType.Favicon)"
+                [attr.aria-label]="'IMAGE.TOOLTIPS.REMOVE' | translate"
+                [pTooltip]="'IMAGE.TOOLTIPS.REMOVE' | translate"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+              ></button>
+              <button
+                pButton
+                id="th_designer_action_favicon_upload"
+                icon="pi pi-upload"
+                [disabled]="changeMode === 'CREATE'"
+                class="action-button p-button-icon-only"
+                (click)="selectedFileInputFavicon.click()"
+                [pTooltip]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+              ></button>
+              <span class="p-float-label w-full">
+                <input
+                  pInputText
+                  type="text"
+                  id="th_designer_field_favicon_url"
+                  class="w-full"
+                  formControlName="faviconUrl"
+                  (input)="onInputChange(RefType.Favicon)"
+                  [pTooltip]="'IMAGE.TOOLTIPS.URL' | translate"
                   tooltipPosition="top"
                   tooltipEvent="hover"
-                >
-                </a>
-              </div>
+                />
+                <label for="th_designer_field_favicon_url">{{ 'FAVICON.URL' | translate }}</label>
+              </span>
+              <label *ngIf="displayFileTypeErrorFavicon" for="th_designer_field_favicon_url" class="control-error">
+                {{ 'VALIDATION.ERRORS.FILETYPE_PATTERN_ERROR_1' | translate }}
+              </label>
             </div>
           </div>
-        </p-fieldset>
-      </form>
+        </div>
+      </p-fieldset>
+
+      <p-fieldset [toggleable]="false" [collapsed]="false" styleClass="px-1">
+        <ng-template pTemplate="header">
+          <span>{{ 'THEME.GROUPS.FONT' | translate }}</span>
+        </ng-template>
+        <div [formGroup]="fontForm" class="flex flex-column row-gap-4">
+          <div class="flex-grow-1">
+            <div class="p-inputgroup">
+              <span class="p-float-label">
+                <input
+                  pInputText
+                  type="text"
+                  id="th_designer_font-family"
+                  formControlName="font-family"
+                  class="w-full"
+                  [pTooltip]="'THEME.TOOLTIPS.FONT_FAMILY' | translate"
+                  tooltipPosition="top"
+                  tooltipEvent="hover"
+                />
+                <label for="th_designer_font-family">font-family</label>
+              </span>
+            </div>
+          </div>
+          <div class="flex-grow-1">
+            <div class="p-inputgroup">
+              <span class="p-float-label">
+                <input
+                  pInputText
+                  type="text"
+                  id="th_designer_font-size"
+                  formControlName="font-size"
+                  class="w-full"
+                  [pTooltip]="'THEME.TOOLTIPS.FONT_SIZE' | translate"
+                  tooltipPosition="top"
+                  tooltipEvent="hover"
+                />
+                <label for="th_designer_font-size">font-size</label>
+              </span>
+            </div>
+          </div>
+        </div>
+      </p-fieldset>
+
+      <p-fieldset
+        *ngFor="let group of groups"
+        [toggleable]="false"
+        [collapsed]="false"
+        styleClass="px-1 color-form-group "
+      >
+        <ng-template pTemplate="header">
+          <span [title]="group.title">{{ group.title }}</span>
+        </ng-template>
+        <div [formGroup]="group.formGroup" class="grid grid-nogutter grid-row-gap">
+          <div class="col-12 sm:col-6 md:col-4 lg:col-4 xl:col-3" *ngFor="let item of themeVars[group.key]">
+            <div class="p-inputgroup px-3">
+              <span class="p-float-label">
+                <input
+                  pInputText
+                  id="th_designer_item_color_{{ item }}"
+                  [formControlName]="item"
+                  [value]="group.formGroup.value[item]"
+                />
+                <label for="th_designer_item_color_{{ item }}">{{ item }}</label>
+              </span>
+              <p-overlayPanel #op>
+                <ng-template pTemplate>
+                  <div style="width: 240px; display: inline-block">
+                    <color-sketch [width]="220" [formControlName]="item"> </color-sketch>
+                  </div>
+                </ng-template>
+              </p-overlayPanel>
+              <a
+                tabindex="0"
+                id="th_designer_item_color_{{ item }}_toggle"
+                class="p-inputgroup-addon cursor-pointer"
+                (click)="op.toggle($event)"
+                (keyup)="op.toggle($event)"
+                [ngStyle]="{ 'background-color': group.formGroup.value[item] }"
+                [pTooltip]="'THEME.TOOLTIPS.ITEM_COLOR_PICKER' | translate"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+              >
+              </a>
+            </div>
+          </div>
+        </div>
+      </p-fieldset>
     </div>
   </ocx-page-content>
 </ocx-portal-page>

@@ -1,18 +1,33 @@
 <div class="surface-section my-1 mx-3">
   <div class="flex flex-wrap flex-column row-gap-4 w-12 sm:w-10 md:w-8 lg:w-6 xl:w-6">
-    <p-checkbox
-      type="text"
-      inputId="th_detail_item_operator"
-      styleClass="ml-3 cursor-auto shadow-none"
-      [(ngModel)]="operator"
-      [binary]="true"
-      [disabled]="true"
-      [label]="'INTERNAL.OPERATOR' | translate"
-      [ariaLabel]="'INTERNAL.OPERATOR' | translate"
-      [pTooltip]="'INTERNAL.TOOLTIPS.OPERATOR' | translate"
-      tooltipPosition="top"
-      tooltipEvent="hover"
-    ></p-checkbox>
+    <div class="ml-3 flex flex-row flex-wrap justify-content-start align-items-center column-gap-8 row-gap-2">
+      <p-checkbox
+        type="text"
+        inputId="ws_detail_intern_item_operator"
+        styleClass="cursor-auto shadow-none"
+        [(ngModel)]="operator"
+        [binary]="true"
+        [disabled]="true"
+        [label]="'INTERNAL.OPERATOR' | translate"
+        [ariaLabel]="'INTERNAL.OPERATOR' | translate"
+        [pTooltip]="'INTERNAL.TOOLTIPS.OPERATOR' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      ></p-checkbox>
+      <p-checkbox
+        type="text"
+        inputId="ws_detail_intern_item_mandatory"
+        styleClass="cursor-auto shadow-none"
+        [(ngModel)]="mandatory"
+        [binary]="true"
+        [disabled]="true"
+        [label]="'INTERNAL.MANDATORY' | translate"
+        [ariaLabel]="'INTERNAL.MANDATORY' | translate"
+        [pTooltip]="'INTERNAL.TOOLTIPS.MANDATORY' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      ></p-checkbox>
+    </div>
 
     <div class="w-12">
       <span class="p-float-label">

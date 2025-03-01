@@ -8,9 +8,11 @@
     .p-fieldset-legend {
       background-color: transparent;
       padding: 0.3rem 0.4rem;
+      margin-left: 0.8rem;
     }
-    .p-fieldset-content {
-      padding: 0.7rem 0;
-    }
+  }
+  .color-form-group.p-fieldset .p-fieldset-content {
+    padding-left: 0;
+    padding-right: 0;
   }
 }
