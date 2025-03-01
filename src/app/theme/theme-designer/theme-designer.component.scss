@@ -1,3 +1,8 @@
+@import 'src/app/_th-mixins.scss';
+
+@include displaying-text-responsive;
+@include dropdown-zebra-rows;
+
 :host ::ng-deep {
   .grid.grid-row-gap {
     grid-row-gap: 1.5rem;

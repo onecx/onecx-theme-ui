@@ -25,6 +25,7 @@ const validTheme = {
   id: 'id',
   name: 'themeName',
   displayName: 'themeDisplayName',
+  mandatory: false,
   description: 'desc',
   logoUrl: 'logo_url',
   faviconUrl: 'fav_url',
@@ -1040,6 +1041,7 @@ describe('ThemeDesignerComponent', () => {
       const basicFormBeforeFetch = {
         name: 'n',
         displayName: 'ndisplay',
+        mandatory: false,
         description: 'd',
         faviconUrl: 'f',
         logoUrl: 'l'
@@ -1104,6 +1106,7 @@ describe('ThemeDesignerComponent', () => {
       const basicFormBeforeFetch = {
         name: 'n',
         displayName: 'n',
+        mandatory: null,
         description: 'd',
         faviconUrl: 'f',
         logoUrl: 'l'
@@ -1138,6 +1141,7 @@ describe('ThemeDesignerComponent', () => {
       expect(accept).toHaveBeenCalled()
       expect(component.basicForm.value).toEqual({
         name: 'Copy of fetchedName',
+        mandatory: null,
         displayName: 'fetchedNamedisplay',
         description: 'fetchedDesc',
         faviconUrl: 'fetchedFavUrl',

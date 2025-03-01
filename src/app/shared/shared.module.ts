@@ -1,4 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA, NgModule } from '@angular/core'
+import { NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
@@ -14,6 +14,7 @@ import { DataViewModule } from 'primeng/dataview'
 import { DialogModule } from 'primeng/dialog'
 import { DynamicDialogModule } from 'primeng/dynamicdialog'
 import { DropdownModule } from 'primeng/dropdown'
+import { FieldsetModule } from 'primeng/fieldset'
 import { FileUploadModule } from 'primeng/fileupload'
 import { InputTextModule } from 'primeng/inputtext'
 import { InputTextareaModule } from 'primeng/inputtextarea'
@@ -49,6 +50,7 @@ import { ThemeColorBoxComponent } from './theme-color-box/theme-color-box.compon
     DialogModule,
     DropdownModule,
     DynamicDialogModule,
+    FieldsetModule,
     FileUploadModule,
     FormsModule,
     InputTextModule,
@@ -77,6 +79,7 @@ import { ThemeColorBoxComponent } from './theme-color-box/theme-color-box.compon
     DialogModule,
     DropdownModule,
     DynamicDialogModule,
+    FieldsetModule,
     FileUploadModule,
     FormsModule,
     ImageContainerComponent,
@@ -121,7 +124,6 @@ import { ThemeColorBoxComponent } from './theme-color-box/theme-color-box.compon
         )
       }
     })
-  ],
-  schemas: [NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA]
+  ]
 })
 export class SharedModule {}

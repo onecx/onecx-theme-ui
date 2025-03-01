@@ -5,7 +5,7 @@
     [actions]="(actions$ | async) ?? []"
   ></ocx-page-header>
   <ocx-page-content>
-    <div class="pt-3 px-3 flex flex-column row-gap-3">
+    <div class="pt-3 px-3 mb-3 flex flex-column row-gap-3">
       <div class="ml-2 flex flex-wrap justify-content-between align-items-center row-gap-2 column-gap-3">
         <div
           class="field mb-0 flex flex-wrap sm:flex-nowrap align-items-center row-gap-1 column-gap-3"
@@ -100,6 +100,7 @@
             </div>
             <div class="md:10rem lg:12rem xl:w-13rem">
               <p-checkbox
+                ngDefaultControl
                 type="text"
                 id="th_designer_field_mandatory"
                 styleClass="cursor-auto shadow-none"
@@ -256,7 +257,7 @@
         <ng-template pTemplate="header">
           <span>{{ 'THEME.GROUPS.FONT' | translate }}</span>
         </ng-template>
-        <div [formGroup]="fontForm" class="flex flex-column row-gap-4">
+        <div [formGroup]="fontForm" class="flex flex-column row-gap-4 md:flex-row md:column-gap-4 align-items-center">
           <div class="flex-grow-1">
             <div class="p-inputgroup">
               <span class="p-float-label">
@@ -265,7 +266,7 @@
                   type="text"
                   id="th_designer_font-family"
                   formControlName="font-family"
-                  class="w-full"
+                  class="w-full text-responsive"
                   [pTooltip]="'THEME.TOOLTIPS.FONT_FAMILY' | translate"
                   tooltipPosition="top"
                   tooltipEvent="hover"
@@ -282,7 +283,7 @@
                   type="text"
                   id="th_designer_font-size"
                   formControlName="font-size"
-                  class="w-full"
+                  class="w-full text-responsive"
                   [pTooltip]="'THEME.TOOLTIPS.FONT_SIZE' | translate"
                   tooltipPosition="top"
                   tooltipEvent="hover"
