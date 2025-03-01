@@ -23,5 +23,6 @@ export interface EximTheme {
     assetsUpdateDate?: string;
     properties?: object;
     images?: { [key: string]: Image; };
+    mandatory?: boolean;
 }
 

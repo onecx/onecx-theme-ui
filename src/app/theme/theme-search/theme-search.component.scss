@@ -1,5 +1,7 @@
 @import 'src/app/_th-mixins.scss';
 
+@include card-badges;
+@include danger-action;
 @include correct-select-button;
 @include correct-dataview-header;
 @include correct-data-view-control;

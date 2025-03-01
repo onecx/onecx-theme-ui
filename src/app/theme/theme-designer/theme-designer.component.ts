@@ -105,6 +105,7 @@ export class ThemeDesignerComponent implements OnInit {
 
     this.basicForm = this.fb.group({
       name: new FormControl<string>('', [Validators.required]),
+      mandatory: new FormControl<boolean | null>(null),
       displayName: new FormControl<string>('', [Validators.required]),
       description: new FormControl<string | null>(null),
       logoUrl: new FormControl<string | null>(null),
@@ -267,6 +268,7 @@ export class ThemeDesignerComponent implements OnInit {
             this.getThemeById(id).subscribe((result) => {
               if (this.changeMode === 'CREATE') {
                 this.basicForm.controls['name'].setValue(data['GENERAL.COPY_OF'] + result.resource.name)
+                this.basicForm.controls['mandatory'].setValue(null)
                 this.basicForm.controls['displayName'].setValue(result.resource.displayName)
                 this.basicForm.controls['description'].setValue(result.resource.description)
                 this.basicForm.controls['logoUrl'].setValue(result.resource.logoUrl)
@@ -317,6 +319,7 @@ export class ThemeDesignerComponent implements OnInit {
     const newTheme: ThemeUpdateCreate = { ...this.basicForm.value }
     newTheme.name = this.saveAsForm.controls['themeName'].value
     newTheme.displayName = this.saveAsForm.controls['displayName'].value
+    newTheme.mandatory = false
     newTheme.properties = this.propertiesForm.value
     if (this.imageFaviconUrlExists) newTheme.faviconUrl = undefined
     if (this.imageLogoUrlExists) newTheme.logoUrl = undefined
@@ -362,6 +365,7 @@ export class ThemeDesignerComponent implements OnInit {
           if (this.autoApply) {
             this.themeService.apply(data as object)
           }
+          this.onClose()
         },
         error: (err) => {
           console.error('updateTheme', err)

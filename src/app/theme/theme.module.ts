@@ -1,10 +1,5 @@
-import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA, NgModule } from '@angular/core'
-import { CommonModule } from '@angular/common'
-import { FormsModule } from '@angular/forms'
+import { NgModule } from '@angular/core'
 import { RouterModule, Routes } from '@angular/router'
-import { FieldsetModule } from 'primeng/fieldset'
-import { ConfirmDialogModule } from 'primeng/confirmdialog'
-import { ConfirmationService } from 'primeng/api'
 
 import { PortalCoreModule } from '@onecx/portal-integration-angular'
 import { addInitializeModuleGuard, InitializeModuleGuard } from '@onecx/angular-integration-interface'
@@ -63,16 +58,11 @@ const routes: Routes = [
     ThemeUseComponent
   ],
   imports: [
-    CommonModule,
-    ConfirmDialogModule,
-    FieldsetModule,
-    FormsModule,
     PortalCoreModule.forMicroFrontend(),
     [RouterModule.forChild(addInitializeModuleGuard(routes))],
     SharedModule
   ],
-  providers: [ConfirmationService, InitializeModuleGuard],
-  schemas: [NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA]
+  providers: [InitializeModuleGuard]
 })
 export class ThemeModule {
   constructor() {

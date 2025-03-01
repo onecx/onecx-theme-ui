@@ -1,7 +1,7 @@
 <div class="sm:pt-2 pb-2 sm:pb-3 px-3">
   <ocx-slot
-    *ngIf="isListWorkspacesUsingThemeComponentDefined$ | async"
-    [name]="listWorkspacesUsingThemeSlotName"
+    *ngIf="isComponentDefined$ | async"
+    [name]="slotName"
     [inputs]="{ themeName: theme?.name }"
     [outputs]="{ workspaceList: workspaceListEmitter }"
   >

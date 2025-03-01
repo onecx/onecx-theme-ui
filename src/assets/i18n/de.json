@@ -20,6 +20,7 @@
       "TOOLTIP": "Theme löschen",
       "THEME_MESSAGE": "Möchten Sie dieses Theme löschen?",
       "MESSAGE_INFO": "Diese Aktion kann nicht rückgängig gemacht werden!",
+      "MESSAGE_REJECT": "Das Theme ist gekennzeichnet als erforderlich für den Betrieb und kann deshalb nicht gelöscht werden.",
       "THEME_NOK": "Theme konnte nicht gelöscht werden",
       "THEME_OK": "Theme erfolgreich gelöscht"
     },
@@ -83,6 +84,7 @@
     "CREATION_USER": "Erstellt von",
     "MODIFICATION_DATE": "Geändert am",
     "MODIFICATION_USER": "Geändert von",
+    "MANDATORY": "Notwendig",
     "OPERATOR": "Automatisiert erstellt",
     "OPERATOR_MESSAGE": "Dieses Theme wurde automatisiert erstellt. Alle Änderungen gehen beim nächsten Deployment verloren.",
     "TOOLTIPS": {
@@ -90,6 +92,7 @@
       "CREATION_USER": "Name des Benutzers der Erstellung",
       "MODIFICATION_DATE": "Zeitpunkt der letzten Änderung",
       "MODIFICATION_USER": "Name des Benutzers der letzten Änderung",
+      "MANDATORY": "Wenn gesetzt, dann ist dieses Theme notwendig für den Betrieb. Das Theme kann somit nicht gelöscht werden.",
       "OPERATOR": "Wenn gesetzt, dann kann das Theme nicht gelöscht werden und alle Änderungen gehen beim beim nächsten Deployment verloren."
     }
   },
@@ -196,6 +199,7 @@
       "ITEM_COLOR_PICKER": "Wähle eine Farbe mit dem Farbwähler",
       "VERSION": "Version des Themes",
       "DESCRIPTION": "Beschreibung des Themes",
+      "MANDATORY": "Das Theme ist notwendig für den Betrieb.",
       "CSS_FILE": "CSS Datei"
     }
   },

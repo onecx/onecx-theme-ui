@@ -114,9 +114,18 @@
           <div *ngFor="let theme of themes; index as i" class="col-6 md:col-4 xl:col-3 p-2 md:p-3">
             <div
               [id]="'th_search_data_grid_row_' + i"
-              class="card px-2 p-1 sm:p-2 flex flex-column gap-1 sm:gap-2 justify-content-between text-center hover:bg-gray-200 cursor-pointer"
+              class="card block relative px-2 p-1 sm:p-2 flex flex-column gap-1 sm:gap-2 justify-content-between text-center hover:bg-gray-200 cursor-pointer"
               [routerLink]="['./', theme.name]"
             >
+              <span
+                *ngIf="theme.mandatory"
+                [id]="'th_search_data_grid_row_' + i + '_mandatory'"
+                class="card-badge-left badge-1 font-bold text-lg pi pi-shield"
+                [attr.aria-label]="'INTERNAL.MANDATORY' | translate"
+                [pTooltip]="'THEME.TOOLTIPS.MANDATORY' | translate"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+              ></span>
               <app-image-container
                 [id]="'th_search_data_grid_row_' + i + '_logo'"
                 [small]="false"

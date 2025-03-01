@@ -29,5 +29,6 @@ export interface Theme {
     assetsUpdateDate?: string;
     properties?: object;
     operator?: boolean;
+    mandatory?: boolean;
 }
 

@@ -15,15 +15,13 @@ export class ThemeUseComponent {
 
   public workspaceListEmitter = new EventEmitter<string[]>()
 
-  public isListWorkspacesUsingThemeComponentDefined$: Observable<boolean> | undefined
-  public listWorkspacesUsingThemeSlotName = 'onecx-theme-list-workspaces-using-theme'
+  public isComponentDefined$: Observable<boolean> | undefined
+  public slotName = 'onecx-theme-list-workspaces-using-theme'
 
   public operator = false
 
   constructor(private readonly slotService: SlotService) {
-    this.isListWorkspacesUsingThemeComponentDefined$ = this.slotService.isSomeComponentDefinedForSlot(
-      this.listWorkspacesUsingThemeSlotName
-    )
+    this.isComponentDefined$ = this.slotService.isSomeComponentDefinedForSlot(this.slotName)
 
     // get the list of workspaces which using the theme: if so then emit true
     this.workspaceListEmitter.subscribe((list) => {

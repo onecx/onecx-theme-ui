@@ -410,6 +410,9 @@ components:
      type: object
     operator:
      type: boolean
+    mandatory:
+     type: boolean
+     default: false
   ThemeUpdateCreate:
    type: object
    properties:
@@ -446,7 +449,9 @@ components:
      type: string
     properties:
      type: object
-
+    mandatory:
+     type: boolean
+     default: false
   GetThemeResponse:
    required:
     - resource
@@ -625,6 +630,9 @@ components:
      type: object
     images:
      $ref: '#/components/schemas/Images'
+    mandatory:
+     type: boolean
+     default: false
   Images:
    type: object
    nullable: false
