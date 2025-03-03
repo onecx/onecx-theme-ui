@@ -112,7 +112,7 @@ describe('ThemeDetailComponent', () => {
       component.actions$!.subscribe((actions) => {
         expect(actions.length).toBe(4)
         if (actions.length > 0) {
-          expect(actions[3].showCondition).toBeFalsy() // deletion
+          expect(actions[3].showCondition).toBeTruthy() // deletion
         }
       })
     })

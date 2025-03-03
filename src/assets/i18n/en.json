@@ -20,7 +20,9 @@
       "TOOLTIP": "Delete Theme",
       "THEME_MESSAGE": "Do you want to delete this Theme?",
       "MESSAGE_INFO": "This action cannot be undone!",
-      "MESSAGE_REJECT": "The Theme is marked as required for operation and therefore cannot be deleted.",
+      "MESSAGE_INFO_OPERATOR": "This Theme was created by automation. It is deletable but it will be recreated by automation.",
+      "MESSAGE_REJECT_MANDATORY": "The Theme is marked as required for operation and therefore cannot be deleted.",
+      "MESSAGE_REJECT_USE": "The Theme is used by Workspaces and therefore cannot be deleted.",
       "THEME_NOK": "Theme could not be deleted",
       "THEME_OK": "Theme deleted successfully"
     },

@@ -14,16 +14,14 @@ export class ThemeInternComponent implements OnChanges {
   @Input() theme: Theme | undefined
   @Input() dateFormat = 'medium'
 
-  public isListWorkspacesUsingThemeComponentDefined$: Observable<boolean> | undefined
-  public listWorkspacesUsingThemeSlotName = 'onecx-theme-list-workspaces-using-theme'
+  public isComponentDefined$: Observable<boolean> | undefined
+  public slotName = 'onecx-theme-list-workspaces-using-theme'
 
   public mandatory = false
   public operator = false
 
   constructor(private readonly slotService: SlotService) {
-    this.isListWorkspacesUsingThemeComponentDefined$ = this.slotService.isSomeComponentDefinedForSlot(
-      this.listWorkspacesUsingThemeSlotName
-    )
+    this.isComponentDefined$ = this.slotService.isSomeComponentDefinedForSlot(this.slotName)
   }
 
   public ngOnChanges(): void {
