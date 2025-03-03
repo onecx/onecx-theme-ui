@@ -257,40 +257,36 @@
         <ng-template pTemplate="header">
           <span>{{ 'THEME.GROUPS.FONT' | translate }}</span>
         </ng-template>
-        <div [formGroup]="fontForm" class="flex flex-column row-gap-4 md:flex-row md:column-gap-4 align-items-center">
+        <div [formGroup]="fontForm" class="flex flex-column md:flex-row gap-4">
           <div class="flex-grow-1">
-            <div class="p-inputgroup">
-              <span class="p-float-label">
-                <input
-                  pInputText
-                  type="text"
-                  id="th_designer_font-family"
-                  formControlName="font-family"
-                  class="w-full text-responsive"
-                  [pTooltip]="'THEME.TOOLTIPS.FONT_FAMILY' | translate"
-                  tooltipPosition="top"
-                  tooltipEvent="hover"
-                />
-                <label for="th_designer_font-family">font-family</label>
-              </span>
-            </div>
+            <span class="p-float-label">
+              <input
+                pInputText
+                type="text"
+                id="th_designer_font-family"
+                formControlName="font-family"
+                class="w-full text-responsive"
+                [pTooltip]="'THEME.TOOLTIPS.FONT_FAMILY' | translate"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+              />
+              <label for="th_designer_font-family">font-family</label>
+            </span>
           </div>
           <div class="flex-grow-1">
-            <div class="p-inputgroup">
-              <span class="p-float-label">
-                <input
-                  pInputText
-                  type="text"
-                  id="th_designer_font-size"
-                  formControlName="font-size"
-                  class="w-full text-responsive"
-                  [pTooltip]="'THEME.TOOLTIPS.FONT_SIZE' | translate"
-                  tooltipPosition="top"
-                  tooltipEvent="hover"
-                />
-                <label for="th_designer_font-size">font-size</label>
-              </span>
-            </div>
+            <span class="p-float-label">
+              <input
+                pInputText
+                type="text"
+                id="th_designer_font-size"
+                formControlName="font-size"
+                class="w-full text-responsive"
+                [pTooltip]="'THEME.TOOLTIPS.FONT_SIZE' | translate"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+              />
+              <label for="th_designer_font-size">font-size</label>
+            </span>
           </div>
         </div>
       </p-fieldset>
