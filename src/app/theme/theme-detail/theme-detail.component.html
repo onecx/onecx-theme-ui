@@ -145,21 +145,38 @@
   >
     <div class="flex column-gap-3 row-gap-1 justify-content-start align-items-center">
       <div class="pi pi-question-circle text-3xl danger-action-text"></div>
-      <p-message
-        *ngIf="theme?.mandatory"
-        id="th_delete_reject_message"
-        severity="info"
-        styleClass="p-2"
-        [text]="'ACTIONS.DELETE.MESSAGE_REJECT' | translate"
-      ></p-message>
-      <div *ngIf="!theme?.mandatory">
-        <div id="th_delete_message_text" class="font-bold">{{ 'ACTIONS.DELETE.THEME_MESSAGE' | translate }}</div>
-        <div id="th_delete_theme_display_name" class="my-2 font-bold danger-action-text text-center">
-          {{ theme?.displayName }}
+      <div class="flex flex-column row-gap-3">
+        <p-message
+          *ngIf="theme?.mandatory"
+          id="th_delete_reject_mandatory_message"
+          severity="info"
+          styleClass="p-2"
+          [text]="'ACTIONS.DELETE.MESSAGE_REJECT_MANDATORY' | translate"
+        ></p-message>
+        <p-message
+          *ngIf="isThemeUsedByWorkspace"
+          id="th_delete_reject_use_message"
+          severity="info"
+          styleClass="p-2"
+          [text]="'ACTIONS.DELETE.MESSAGE_REJECT_USE' | translate"
+        ></p-message>
+        <div *ngIf="!(theme?.mandatory || isThemeUsedByWorkspace)">
+          <div id="th_delete_message_text" class="font-bold">{{ 'ACTIONS.DELETE.THEME_MESSAGE' | translate }}</div>
+          <div id="th_delete_theme_display_name" class="my-2 font-bold danger-action-text text-center">
+            {{ theme?.displayName }}
+          </div>
+          <div *ngIf="!theme?.operator" class="mt-2">{{ 'ACTIONS.DELETE.MESSAGE_INFO' | translate }}</div>
+          <p-message
+            *ngIf="theme?.operator"
+            id="th_delete_operator_hint"
+            severity="info"
+            styleClass="mt-1 p-2"
+            [text]="'ACTIONS.DELETE.MESSAGE_INFO_OPERATOR' | translate"
+          ></p-message>
         </div>
-        <div class="mt-2">{{ 'ACTIONS.DELETE.MESSAGE_INFO' | translate }}</div>
       </div>
     </div>
+
     <ng-template pTemplate="footer">
       <div class="flex flex-wrap column-gap-2 row-gap-1 justify-content-end">
         <p-button

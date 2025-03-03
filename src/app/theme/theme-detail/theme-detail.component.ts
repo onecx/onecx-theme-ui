@@ -34,6 +34,7 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
   // page header
   public actions$: Observable<Action[]> = of([])
   public headerImageUrl?: string
+  public isThemeUsedByWorkspace = false
 
   constructor(
     private readonly user: UserService,
@@ -79,7 +80,8 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
   }
 
   // default: we guess the Theme is in use so that deletion is not offered
-  public preparePageAction(inUse?: boolean): void {
+  public preparePageAction(inUse: boolean): void {
+    this.isThemeUsedByWorkspace = inUse
     this.actions$ = this.translate
       .get([
         'ACTIONS.NAVIGATION.BACK',
@@ -130,7 +132,7 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
               show: 'asOverflow',
               permission: 'THEME#DELETE',
               conditional: true,
-              showCondition: this.theme !== undefined && !this.theme?.operator && !inUse
+              showCondition: this.theme !== undefined
             }
           ]
         })
