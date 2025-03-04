@@ -13,12 +13,11 @@ export class ThemeUseComponent {
   @Input() theme: Theme | undefined
   @Output() used = new EventEmitter<boolean>()
 
+  // receive the slot output
   public workspaceListEmitter = new EventEmitter<string[]>()
 
   public isComponentDefined$: Observable<boolean> | undefined
   public slotName = 'onecx-theme-list-workspaces-using-theme'
-
-  public operator = false
 
   constructor(private readonly slotService: SlotService) {
     this.isComponentDefined$ = this.slotService.isSomeComponentDefinedForSlot(this.slotName)
