@@ -20,7 +20,7 @@
       "TOOLTIP": "Theme löschen",
       "THEME_MESSAGE": "Möchten Sie dieses Theme löschen?",
       "MESSAGE_INFO": "Diese Aktion kann nicht rückgängig gemacht werden!",
-      "MESSAGE_INFO_OPERATOR": "Dieses Theme wurde automatisiert erstellt. Es ist löschbar aber es wird automatisiert wiederhergestellt.",
+      "MESSAGE_INFO_OPERATOR": "Dieses Theme wurde automatisiert erstellt. Es ist löschbar wird aber automatisiert wiederhergestellt.",
       "MESSAGE_REJECT_MANDATORY": "Das Theme ist gekennzeichnet als erforderlich für den Betrieb und kann deshalb nicht gelöscht werden.",
       "MESSAGE_REJECT_USE": "Das Theme wird von Workspaces benutzt und kann deshalb nicht gelöscht werden.",
       "THEME_NOK": "Theme konnte nicht gelöscht werden",
@@ -223,6 +223,9 @@
   "EXCEPTIONS": {
     "HTTP_STATUS_0": {
       "THEME": "Unbekanntes Problem beim Abrufen des Themes - Bitte versuchen sie es noch einmal."
+    },
+    "HTTP_STATUS_400": {
+      "Theme": "Ihre Anfrage konnte nicht bearbeitet werden."
     },
     "HTTP_STATUS_401": {
       "THEME": "Sie sind nicht authorisiert um Themes zu sehen."

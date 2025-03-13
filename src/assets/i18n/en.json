@@ -224,6 +224,9 @@
     "HTTP_STATUS_0": {
       "THEME": "Unknown problem retrieving Theme data - please try again."
     },
+    "HTTP_STATUS_400": {
+      "Theme": "Your request could not be processed."
+    },
     "HTTP_STATUS_401": {
       "THEME": "You are not authorized to see Themes."
     },
