@@ -25,7 +25,8 @@ const themes: Theme[] = [theme1, theme2]
 
 describe('OneCXThemeInfosComponent', () => {
   const themeApiSpy = {
-    searchThemes: jasmine.createSpy('searchThemes').and.returnValue(of({}))
+    searchThemes: jasmine.createSpy('searchThemes').and.returnValue(of({})),
+    getThemeByName: jasmine.createSpy('getThemeByName').and.returnValue(of({}))
   }
 
   function setUp() {
@@ -66,6 +67,7 @@ describe('OneCXThemeInfosComponent', () => {
 
     baseUrlSubject.next('base_url_mock')
     themeApiSpy.searchThemes.calls.reset()
+    themeApiSpy.getThemeByName.calls.reset()
   })
 
   describe('initialize', () => {
@@ -107,6 +109,7 @@ describe('OneCXThemeInfosComponent', () => {
       const { component } = setUp()
       const mockResponse: SearchThemeResponse = { stream: themes }
       themeApiSpy.searchThemes.and.returnValue(of(mockResponse))
+      component.dataType = 'themes'
 
       component.ngOnChanges()
 
@@ -125,6 +128,7 @@ describe('OneCXThemeInfosComponent', () => {
       const { component } = setUp()
       const mockResponse: SearchThemeResponse = { stream: [] }
       themeApiSpy.searchThemes.and.returnValue(of(mockResponse))
+      component.dataType = 'themes'
 
       component.ngOnChanges()
 
@@ -143,6 +147,7 @@ describe('OneCXThemeInfosComponent', () => {
       const { component } = setUp()
       const mockResponse: SearchThemeResponse = { stream: undefined }
       themeApiSpy.searchThemes.and.returnValue(of(mockResponse))
+      component.dataType = 'themes'
 
       component.ngOnChanges()
 
@@ -161,6 +166,7 @@ describe('OneCXThemeInfosComponent', () => {
       const { component } = setUp()
       const errorResponse = { status: 400, statusText: 'Error on getting themes' }
       themeApiSpy.searchThemes.and.returnValue(throwError(() => errorResponse))
+      component.dataType = 'themes'
       spyOn(console, 'error')
 
       component.ngOnChanges()
@@ -176,54 +182,99 @@ describe('OneCXThemeInfosComponent', () => {
     })
   })
 
-  describe('sorting', () => {
-    it('should return negative value when first product name comes before second alphabetically', () => {
+  describe('getting theme', () => {
+    it('should get theme - successful with data', () => {
       const { component } = setUp()
-      const themeA = { id: 'a', name: 'name', displayName: 'Admin' }
-      const themeB = { id: 'b', name: 'name', displayName: 'User' }
-      expect(component['sortByDisplayName'](themeA, themeB)).toBeLessThan(0)
+      component.dataType = 'theme'
+      themeApiSpy.getThemeByName.and.returnValue(of(theme1))
+
+      component.ngOnChanges()
+
+      expect(themeApiSpy.getThemeByName).not.toHaveBeenCalled()
     })
 
-    it('should return positive value when first product name comes after second alphabetically', () => {
+    it('should get theme - successful with data', (done) => {
       const { component } = setUp()
-      const themeA = { id: 'a', name: 'name', displayName: 'User' }
-      const themeB = { id: 'b', name: 'name', displayName: 'Admin' }
-      expect(component['sortByDisplayName'](themeA, themeB)).toBeGreaterThan(0)
+      themeApiSpy.getThemeByName.and.returnValue(of(theme1))
+      component.dataType = 'theme'
+      component.themeName = theme1.name
+
+      component.ngOnChanges()
+
+      component.theme$?.subscribe({
+        next: (data) => {
+          if (data) {
+            expect(data).toEqual(theme1)
+          }
+          done()
+        },
+        error: done.fail
+      })
     })
 
-    it('should return zero when product names are the same', () => {
+    it('should get theme - failed', (done) => {
       const { component } = setUp()
-      const themeA = { id: 'a', name: 'name', displayName: 'Admin' }
-      const themeB = { id: 'b', name: 'name', displayName: 'Admin' }
-      expect(component['sortByDisplayName'](themeA, themeB)).toBe(0)
+      const errorResponse = { status: 400, statusText: 'Error on getting themes' }
+      themeApiSpy.getThemeByName.and.returnValue(throwError(() => errorResponse))
+      component.dataType = 'theme'
+      component.themeName = theme1.name
+      spyOn(console, 'error')
+
+      component.ngOnChanges()
+
+      component.theme$?.subscribe({
+        next: (data) => {
+          if (data) {
+            expect(console.error).toHaveBeenCalledWith('onecx-theme-infos.getThemeByName', errorResponse)
+          }
+          done()
+        },
+        error: done.fail
+      })
+    })
+  })
+
+  describe('provide logo', () => {
+    it('should load - successfully', () => {
+      const { component } = setUp()
+      component.onImageLoad()
     })
 
-    it('should be case-insensitive', () => {
+    it('should load - failed', () => {
       const { component } = setUp()
-      const themeA = { id: 'a', name: 'name', displayName: 'admin' }
-      const themeB = { id: 'b', name: 'name', displayName: 'Admin' }
-      expect(component['sortByDisplayName'](themeA, themeB)).toBe(0)
+      component.dataType = 'logo'
+
+      component.onImageLoadError()
     })
 
-    it('should handle undefined names', () => {
+    it('should load - failed - use default logo', () => {
       const { component } = setUp()
-      const themeA = { id: 'a', name: 'name', displayName: undefined }
-      const themeB = { id: 'b', name: 'name', displayName: 'Admin' }
-      expect(component['sortByDisplayName'](themeA, themeB)).toBeLessThan(0)
+      component.dataType = 'logo'
+      component.useDefaultLogo = true
+
+      component.onImageLoadError()
     })
 
-    it('should handle empty string names', () => {
+    it('should get url - from input', () => {
       const { component } = setUp()
-      const themeA = { id: 'a', name: 'name', displayName: '' }
-      const themeB = { id: 'b', name: 'name', displayName: 'Admin' }
-      expect(component['sortByDisplayName'](themeA, themeB)).toBeLessThan(0)
+      component.dataType = 'logo'
+      component.themeName = theme1.name
+      component.imageUrl = '/url'
+
+      const url = component.getImageUrl(theme1.name)
+
+      expect(url).toBe(component.imageUrl)
     })
 
-    it('should handle both names being undefined', () => {
+    it('should get url - complete', () => {
       const { component } = setUp()
-      const themeA = { id: 'a', name: 'name', displayName: undefined }
-      const themeB = { id: 'b', name: 'name', displayName: undefined }
-      expect(component['sortByDisplayName'](themeA, themeB)).toBe(0)
+      component.dataType = 'logo'
+      component.themeName = theme1.name
+      component.imageUrl = undefined
+
+      const url = component.getImageUrl(theme1.name)
+
+      expect(url).toBe('base_url/bff/images/theme1/logo')
     })
   })
 })

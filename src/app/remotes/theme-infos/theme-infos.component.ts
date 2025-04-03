@@ -55,20 +55,20 @@ export class OneCXThemeInfosComponent implements ocxRemoteComponent, ocxRemoteWe
   @Input() refresh: boolean | undefined = false // on any change here a reload is triggered
   @Input() dataType: DataType | undefined = undefined // which response data is expected
   @Input() themeName: string | undefined = undefined // search parameter
-  @Input() themeImageUrl: string | undefined = undefined
+  @Input() imageUrl: string | undefined = undefined
   @Input() imageStyleClass = ''
-  @Input() useDefaultLogo = false
+  @Input() useDefaultLogo = false // used if logo loading failed
   @Input() set ocxRemoteComponentConfig(config: RemoteComponentConfig) {
     this.ocxInitRemoteComponent(config)
   }
   // output
   @Input() themes = new EventEmitter<Theme[]>()
   @Input() theme = new EventEmitter<Theme>()
-  @Input() logoLoadingFailed = new EventEmitter<boolean>()
+  @Input() imageLoadingFailed = new EventEmitter<boolean>()
 
-  private themes$: Observable<Theme[]> | undefined
-  private theme$: Observable<Theme> | undefined
-  public themeImageUrl$: Observable<string | undefined> = of(undefined)
+  public themes$: Observable<Theme[]> | undefined
+  public theme$: Observable<Theme> | undefined
+  public imageUrl$: Observable<string | undefined> = of(undefined)
   private defaultImageUrl: string | undefined = undefined
 
   constructor(
@@ -91,7 +91,7 @@ export class OneCXThemeInfosComponent implements ocxRemoteComponent, ocxRemoteWe
   public ngOnChanges(): void {
     if (this.dataType === 'themes') this.getThemes()
     if (this.dataType === 'theme') this.getTheme()
-    this.themeImageUrl$ = of(this.getLogoUrl(this.themeName, false))
+    this.imageUrl$ = of(this.getImageUrl(this.themeName))
   }
 
   /**
@@ -130,20 +130,19 @@ export class OneCXThemeInfosComponent implements ocxRemoteComponent, ocxRemoteWe
   }
 
   /**
-   * LOGO
+   * Image
    */
-  public onLogoLoad() {
-    this.logoLoadingFailed.emit(false)
+  public onImageLoad() {
+    this.imageLoadingFailed.emit(false)
   }
-  public onLogoLoadError(): void {
-    this.themeImageUrl$ = of(this.useDefaultLogo ? this.getLogoUrl(this.themeName, true) : undefined)
-    this.logoLoadingFailed.emit(true)
+  public onImageLoadError(): void {
+    this.imageUrl$ = of(this.useDefaultLogo ? this.defaultImageUrl : undefined)
+    this.imageLoadingFailed.emit(true)
   }
-  public getLogoUrl(themeName: string | undefined, useDefault: boolean = false): string | undefined {
+  public getImageUrl(themeName: string | undefined): string | undefined {
     if (this.dataType !== 'logo' && this.dataType !== 'favicon') return undefined
-    if (useDefault) return this.defaultImageUrl
-    if (this.themeImageUrl != null && this.themeImageUrl != '') {
-      return this.themeImageUrl
+    if (this.imageUrl != null && this.imageUrl != '') {
+      return this.imageUrl
     }
     return bffImageUrl(this.themeApi.configuration.basePath, themeName, RefType.Logo)
   }
