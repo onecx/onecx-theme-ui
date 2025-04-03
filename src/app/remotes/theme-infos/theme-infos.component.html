@@ -1,0 +1,13 @@
+<img
+  *ngIf="imageUrl$ | async as url"
+  [id]="'th_' + themeName + '_logo'"
+  [class]="imageStyleClass"
+  [ocxSrc]="url"
+  alt="theme logo"
+  aria-label="Theme Logo"
+  pTooltip="Theme Logo"
+  tooltipPosition="top"
+  tooltipEvent="hover"
+  (error)="onImageLoadError()"
+  (load)="onImageLoad()"
+/>

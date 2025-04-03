@@ -29,13 +29,11 @@ export class ImageContainerComponent implements OnChanges {
   public defaultImageUrl = ''
   public displayDefault = false
 
-  prepareUrlPath = prepareUrlPath
-
   constructor(private readonly appState: AppStateService) {
     appState.currentMfe$
       .pipe(
         map((mfe) => {
-          this.defaultImageUrl = this.prepareUrlPath(mfe.remoteBaseUrl, environment.DEFAULT_LOGO_PATH)
+          this.defaultImageUrl = prepareUrlPath(mfe.remoteBaseUrl, environment.DEFAULT_LOGO_PATH)
         })
       )
       .subscribe()

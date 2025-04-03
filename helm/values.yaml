@@ -22,6 +22,20 @@ app:
           endpoints:
             - name: theme-detail
               path: /{theme-name}
+        theme-infos:
+          exposedModule: "./OneCXThemeInfosComponent"
+          description: "Provide theme data: themes, theme, logo"
+          type: COMPONENT
+          technology: WEBCOMPONENTMODULE
+          remoteName: onecx-theme
+          tagName: ocx-theme-infos-component
+    # Slot
+    slot:
+      enabled: true
+      specs:
+        onecx-theme-list-workspaces-using-theme:
+          name: 'onecx-theme-list-workspaces-using-theme'
+          description: 'List of Workspaces using the given Theme'
     # Permission
     permission:
       enabled: true
@@ -36,11 +50,3 @@ app:
             VIEW: View mode for theme
             IMPORT: Import theme
             EXPORT: Export theme
-    slot:
-      enabled: true
-      specs:
-        onecx-theme-list-workspaces-using-theme:
-          name: 'onecx-theme-list-workspaces-using-theme'
-          description: 'List of Workspaces using the given Theme'
-
-# PIPE Config
