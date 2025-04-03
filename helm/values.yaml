@@ -24,7 +24,7 @@ app:
               path: /{theme-name}
         theme-infos:
           exposedModule: "./OneCXThemeInfosComponent"
-          description: "Provide theme data: themes, theme, logo"
+          description: "Provide theme data like themes, theme, logo"
           type: COMPONENT
           technology: WEBCOMPONENTMODULE
           remoteName: onecx-theme
