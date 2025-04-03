@@ -22,6 +22,13 @@ app:
           endpoints:
             - name: theme-detail
               path: /{theme-name}
+        theme-infos:
+          exposedModule: "./OneCXThemeInfosComponent"
+          description: "Provide theme data: themes, theme, logo"
+          type: COMPONENT
+          technology: WEBCOMPONENTMODULE
+          remoteName: onecx-theme
+          tagName: ocx-theme-infos-component
     # Permission
     permission:
       enabled: true
