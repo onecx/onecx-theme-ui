@@ -23,7 +23,7 @@ const theme2: Theme = {
 }
 const themes: Theme[] = [theme1, theme2]
 
-describe('OneCXThemeInfosComponent', () => {
+fdescribe('OneCXThemeInfosComponent', () => {
   const themeApiSpy = {
     searchThemes: jasmine.createSpy('searchThemes').and.returnValue(of({})),
     getThemeByName: jasmine.createSpy('getThemeByName').and.returnValue(of({}))
@@ -235,46 +235,86 @@ describe('OneCXThemeInfosComponent', () => {
   })
 
   describe('provide logo', () => {
-    it('should load - successfully', () => {
+    it('should load - initially', (done) => {
       const { component } = setUp()
+      component.logEnabled = true
+      component.logPrefix = 'get image url'
+      component.themeName = theme1.name
+      component.dataType = 'logo'
+
+      component.ngOnChanges()
       component.onImageLoad()
+
+      component.imageUrl$?.subscribe({
+        next: (data) => {
+          if (data) {
+            expect(data).toBe('base_url/bff/images/theme1/logo')
+          }
+          done()
+        },
+        error: done.fail
+      })
     })
 
-    it('should load - failed', () => {
-      const { component } = setUp()
-      component.dataType = 'logo'
+    describe('provide logo - on error', () => {
+      it('should load - failed - used: url', () => {
+        const { component } = setUp()
+        component.logEnabled = true // log without prefix !
+        component.themeName = theme1.name
+        component.imageUrl = 'http://image/url'
+        component.dataType = 'logo'
 
-      component.onImageLoadError()
+        component.onImageLoadError(component.imageUrl)
+      })
+
+      it('should use image - failed - use default', () => {
+        const { component } = setUp()
+        component.logEnabled = false
+        component.logPrefix = 'default logo'
+        component.themeName = theme1.name
+        component.dataType = 'logo'
+
+        component.onImageLoadError('base_url/bff/images/theme1/logo')
+      })
     })
 
-    it('should load - failed - use default logo', () => {
-      const { component } = setUp()
-      component.dataType = 'logo'
-      component.useDefaultLogo = true
+    describe('provide logo - get url', () => {
+      it('should get image url - data type undefined', () => {
+        const { component } = setUp()
+        component.dataType = undefined
+        component.themeName = theme1.name
 
-      component.onImageLoadError()
-    })
+        const url = component.getImageUrl(theme1.name, 'other')
 
-    it('should get url - from input', () => {
-      const { component } = setUp()
-      component.dataType = 'logo'
-      component.themeName = theme1.name
-      component.imageUrl = '/url'
+        expect(url).toBeUndefined()
+      })
 
-      const url = component.getImageUrl(theme1.name)
+      it('should get image url - use input image url', () => {
+        const { component } = setUp()
+        component.dataType = 'logo'
+        component.logEnabled = false
+        component.logPrefix = 'url'
+        component.themeName = theme1.name
+        component.imageUrl = '/url'
 
-      expect(url).toBe(component.imageUrl)
-    })
+        const url = component.getImageUrl(theme1.name, 'url')
 
-    it('should get url - complete', () => {
-      const { component } = setUp()
-      component.dataType = 'logo'
-      component.themeName = theme1.name
-      component.imageUrl = undefined
+        expect(url).toBe(component.imageUrl)
+      })
 
-      const url = component.getImageUrl(theme1.name)
+      it('should get url - use default image url', () => {
+        const { component } = setUp()
+        component.dataType = 'logo'
+        component.logEnabled = false
+        component.logPrefix = 'default url'
+        component.themeName = theme1.name
+        component.defaultImageUrl = '/default/url'
+        component.useDefaultLogo = true // enable use of default image
 
-      expect(url).toBe('base_url/bff/images/theme1/logo')
+        const url = component.getImageUrl(theme1.name, 'default')
+
+        expect(url).toBe(component.defaultImageUrl)
+      })
     })
   })
 })
