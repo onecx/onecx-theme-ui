@@ -55,8 +55,9 @@ export class OneCXThemeInfosComponent implements ocxRemoteComponent, ocxRemoteWe
   @Input() refresh: boolean | undefined = false // on any change here a reload is triggered
   @Input() dataType: DataType | undefined = undefined // which response data is expected
   @Input() themeName: string | undefined = undefined // search parameter
+  @Input() imageId: string | undefined = undefined
   @Input() imageUrl: string | undefined = undefined
-  @Input() imageStyleClass = ''
+  @Input() imageStyleClass: string | undefined = undefined
   @Input() useDefaultLogo = false // used if logo loading failed
   @Input() logPrefix: string | undefined = undefined
   @Input() logEnabled = false

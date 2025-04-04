@@ -139,7 +139,7 @@
     "IMAGE": "Logo"
   },
   "FAVICON": {
-    "LABEL": "Favorite Icon",
+    "LABEL": "Favicon",
     "URL": "External Favicon URL",
     "IMAGE": "Favorite/Bookmark Icon"
   },

@@ -1,7 +1,7 @@
 <img
   *ngIf="imageUrl$ | async as url"
-  [id]="'th_' + themeName + '_logo'"
-  [class]="imageStyleClass"
+  [id]="imageId ?? 'th_' + themeName + '_logo'"
+  [class]="'border-round-sm ' + (imageStyleClass ?? '')"
   [ocxSrc]="url"
   alt="theme logo"
   aria-label="Theme Logo"

@@ -18,9 +18,8 @@ import { prepareUrlPath } from 'src/app/shared/utils'
   templateUrl: './image-container.component.html'
 })
 export class ImageContainerComponent implements OnChanges {
-  @Input() public id = ''
-  @Input() public title = ''
-  @Input() public small = false
+  @Input() public id: string | undefined = undefined
+  @Input() public title: string | undefined = undefined
   @Input() public imageUrl: string | undefined
   @Input() public styleClass: string | undefined
   @Output() public imageLoadResult = new EventEmitter<boolean>() // inform caller

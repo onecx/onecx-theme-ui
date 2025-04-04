@@ -1,7 +1,7 @@
 <img
   [id]="id"
   *ngIf="!displayDefault"
-  [class]="'image-object image-' + (small ? 'sm' : 'lg') + ' sm:image-lg ' + (styleClass ? styleClass : '')"
+  [class]="'object-fit vertical-align-middle border-round-sm ' + (styleClass ?? '')"
   [ocxSrc]="displayImageUrl"
   (error)="onImageLoadError()"
   (load)="onImageLoadSuccess()"
@@ -13,7 +13,7 @@
 <img
   [id]="id"
   *ngIf="displayDefault"
-  [class]="'image-object image-' + (small ? 'sm' : 'lg') + ' sm:image-lg ' + (styleClass ? styleClass : '')"
+  [class]="'object-fit vertical-align-middle border-round-sm ' + (styleClass ?? '')"
   [src]="defaultImageUrl"
   [alt]="'LOGO.LABEL' | translate"
   [pTooltip]="title"
