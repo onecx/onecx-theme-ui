@@ -150,9 +150,8 @@
             <div class="flex flex-wrap sm:flex-nowrap align-items-center row-gap-2 column-gap-4">
               <app-image-container
                 id="th_designer_logo_url_image"
-                [styleClass]="'w-5rem'"
+                styleClass="h-3rem max-h-3rem max-w-10rem"
                 [imageUrl]="fetchingLogoUrl"
-                [small]="true"
                 [title]="(fetchingLogoUrl ? 'LOGO.IMAGE' : 'IMAGE.TOOLTIPS.PLACEHOLDER') | translate"
                 (imageLoadResult)="onImageLoadResult(RefType.Logo, $event)"
               ></app-image-container>
@@ -202,9 +201,8 @@
             <div class="flex flex-wrap sm:flex-nowrap align-items-center row-gap-2 column-gap-4">
               <app-image-container
                 id="th_designer_favicon_url_image"
-                [styleClass]="'w-5rem'"
+                styleClass="h-3rem max-h-3rem max-w-10rem"
                 [imageUrl]="fetchingFaviconUrl"
-                [small]="true"
                 [title]="(fetchingFaviconUrl ? 'FAVICON.IMAGE' : 'IMAGE.TOOLTIPS.PLACEHOLDER') | translate"
                 (imageLoadResult)="onImageLoadResult(RefType.Favicon, $event)"
               ></app-image-container>

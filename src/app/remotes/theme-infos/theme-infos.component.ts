@@ -55,9 +55,12 @@ export class OneCXThemeInfosComponent implements ocxRemoteComponent, ocxRemoteWe
   @Input() refresh: boolean | undefined = false // on any change here a reload is triggered
   @Input() dataType: DataType | undefined = undefined // which response data is expected
   @Input() themeName: string | undefined = undefined // search parameter
+  @Input() imageId: string | undefined = undefined
   @Input() imageUrl: string | undefined = undefined
-  @Input() imageStyleClass = ''
+  @Input() imageStyleClass: string | undefined = undefined
   @Input() useDefaultLogo = false // used if logo loading failed
+  @Input() logPrefix: string | undefined = undefined
+  @Input() logEnabled = false
   @Input() set ocxRemoteComponentConfig(config: RemoteComponentConfig) {
     this.ocxInitRemoteComponent(config)
   }
@@ -69,7 +72,7 @@ export class OneCXThemeInfosComponent implements ocxRemoteComponent, ocxRemoteWe
   public themes$: Observable<Theme[]> | undefined
   public theme$: Observable<Theme> | undefined
   public imageUrl$: Observable<string | undefined> = of(undefined)
-  private defaultImageUrl: string | undefined = undefined
+  public defaultImageUrl: string | undefined = undefined
 
   constructor(
     @Inject(BASE_URL) private readonly baseUrl: ReplaySubject<string>,
@@ -89,9 +92,13 @@ export class OneCXThemeInfosComponent implements ocxRemoteComponent, ocxRemoteWe
    * Prepare searches on each change
    */
   public ngOnChanges(): void {
+    this.log('start => ' + this.dataType)
     if (this.dataType === 'themes') this.getThemes()
     if (this.dataType === 'theme') this.getTheme()
-    this.imageUrl$ = of(this.getImageUrl(this.themeName))
+    if (this.dataType === 'logo') {
+      // start image existence life cycle here: url => image => default (opt)
+      this.imageUrl$ = of(this.getImageUrl(this.themeName, 'url'))
+    }
   }
 
   /**
@@ -133,17 +140,41 @@ export class OneCXThemeInfosComponent implements ocxRemoteComponent, ocxRemoteWe
    * Image
    */
   public onImageLoad() {
+    this.log('onImageLoad => ok')
     this.imageLoadingFailed.emit(false)
   }
-  public onImageLoadError(): void {
-    this.imageUrl$ = of(this.useDefaultLogo ? this.defaultImageUrl : undefined)
-    this.imageLoadingFailed.emit(true)
-  }
-  public getImageUrl(themeName: string | undefined): string | undefined {
-    if (this.dataType !== 'logo' && this.dataType !== 'favicon') return undefined
-    if (this.imageUrl != null && this.imageUrl != '') {
-      return this.imageUrl
+
+  // try next prio level depending on previous used URL
+  public onImageLoadError(usedUrl: string): void {
+    this.log('onImageLoadError using => ' + usedUrl)
+    if (usedUrl === this.imageUrl) {
+      this.imageUrl$ = of(this.getImageUrl(this.themeName, 'image'))
+    } else if (usedUrl === this.getImageUrl(this.themeName, 'image')) {
+      this.imageUrl$ = of(this.getImageUrl(this.themeName, 'default'))
     }
-    return bffImageUrl(this.themeApi.configuration.basePath, themeName, RefType.Logo)
+  }
+
+  public getImageUrl(themeName: string | undefined, prioType: string): string | undefined {
+    if (!prioType || !['logo', 'favicon'].includes(this.dataType ?? 'unknown')) return undefined
+    this.log('getImageUrl on prioType => ' + prioType)
+
+    // if URL exist
+    if (['url'].includes(prioType) && this.imageUrl && this.imageUrl !== '') {
+      this.log('getImageUrl => ' + this.imageUrl)
+      return this.imageUrl
+    } else if (['url', 'image'].includes(prioType)) {
+      this.log('getImageUrl => ' + bffImageUrl(this.themeApi.configuration.basePath, themeName, RefType.Logo))
+      return bffImageUrl(this.themeApi.configuration.basePath, themeName, RefType.Logo)
+    } else if (['url', 'image', 'default'].includes(prioType) && this.useDefaultLogo && this.defaultImageUrl !== '') {
+      // if user wants to have the default (as asset)
+      return this.defaultImageUrl
+    }
+    this.log('getImageUrl => stop')
+    this.imageLoadingFailed.emit(true) // finally inform caller about impossibility
+    return undefined
+  }
+
+  private log(text: string) {
+    if (this.logEnabled) console.log('onecx-theme-infos: ' + (this.logPrefix ?? '') + ' => ' + text)
   }
 }
