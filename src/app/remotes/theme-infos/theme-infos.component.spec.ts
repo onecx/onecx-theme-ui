@@ -23,7 +23,7 @@ const theme2: Theme = {
 }
 const themes: Theme[] = [theme1, theme2]
 
-fdescribe('OneCXThemeInfosComponent', () => {
+describe('OneCXThemeInfosComponent', () => {
   const themeApiSpy = {
     searchThemes: jasmine.createSpy('searchThemes').and.returnValue(of({})),
     getThemeByName: jasmine.createSpy('getThemeByName').and.returnValue(of({}))
