@@ -2,6 +2,7 @@
   *ngIf="imageUrl$ | async as url"
   [id]="imageId ?? 'th_logo_' + themeName"
   [class]="'border-round-sm ' + (imageStyleClass ?? '')"
+  alt="Theme Logo"
   [ocxSrc]="url"
   aria-label="Theme Logo"
   (error)="onImageLoadError(url)"
