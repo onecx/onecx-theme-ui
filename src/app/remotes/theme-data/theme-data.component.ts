@@ -3,7 +3,7 @@ import { CommonModule, Location } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
 import { UntilDestroy } from '@ngneat/until-destroy'
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
-import { catchError, map, Observable, of, ReplaySubject } from 'rxjs'
+import { BehaviorSubject, catchError, map, Observable, of, ReplaySubject } from 'rxjs'
 
 import {
   AngularRemoteComponentsModule,
@@ -30,8 +30,8 @@ import { environment } from 'src/environments/environment'
 type DataType = 'logo' | 'favicon' | 'themes' | 'theme'
 
 @Component({
-  selector: 'app-theme-infos',
-  templateUrl: './theme-infos.component.html',
+  selector: 'app-theme-data',
+  templateUrl: './theme-data.component.html',
   standalone: true,
   imports: [AngularRemoteComponentsModule, CommonModule, PortalCoreModule, TranslateModule, SharedModule],
   providers: [
@@ -50,7 +50,7 @@ type DataType = 'logo' | 'favicon' | 'themes' | 'theme'
   ]
 })
 @UntilDestroy()
-export class OneCXThemeInfosComponent implements ocxRemoteComponent, ocxRemoteWebcomponent, OnChanges {
+export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWebcomponent, OnChanges {
   // input
   @Input() refresh: boolean | undefined = false // on any change here a reload is triggered
   @Input() dataType: DataType | undefined = undefined // which response data is expected
@@ -71,7 +71,7 @@ export class OneCXThemeInfosComponent implements ocxRemoteComponent, ocxRemoteWe
 
   public themes$: Observable<Theme[]> | undefined
   public theme$: Observable<Theme> | undefined
-  public imageUrl$: Observable<string | undefined> = of(undefined)
+  public imageUrl$ = new BehaviorSubject<string | undefined>(undefined)
   public defaultImageUrl: string | undefined = undefined
 
   constructor(
@@ -92,12 +92,11 @@ export class OneCXThemeInfosComponent implements ocxRemoteComponent, ocxRemoteWe
    * Prepare searches on each change
    */
   public ngOnChanges(): void {
-    this.log('start => ' + this.dataType)
     if (this.dataType === 'themes') this.getThemes()
     if (this.dataType === 'theme') this.getTheme()
     if (this.dataType === 'logo') {
       // start image existence life cycle here: url => image => default (opt)
-      this.imageUrl$ = of(this.getImageUrl(this.themeName, 'url'))
+      this.imageUrl$.next(this.getImageUrl(this.themeName, 'url'))
     }
   }
 
@@ -114,7 +113,7 @@ export class OneCXThemeInfosComponent implements ocxRemoteComponent, ocxRemoteWe
         return response.stream?.sort(sortByDisplayName) ?? []
       }),
       catchError((err) => {
-        console.error('onecx-theme-infos.searchThemes', err)
+        console.error('onecx-theme-data.searchThemes', err)
         return of([])
       })
     )
@@ -129,7 +128,7 @@ export class OneCXThemeInfosComponent implements ocxRemoteComponent, ocxRemoteWe
     this.theme$ = this.themeApi.getThemeByName({ name: this.themeName }).pipe(
       map((data) => data.resource),
       catchError((err) => {
-        console.error('onecx-theme-infos.getThemeByName', err)
+        console.error('onecx-theme-data.getThemeByName', err)
         return of({})
       })
     )
@@ -148,9 +147,9 @@ export class OneCXThemeInfosComponent implements ocxRemoteComponent, ocxRemoteWe
   public onImageLoadError(usedUrl: string): void {
     this.log('onImageLoadError using => ' + usedUrl)
     if (usedUrl === this.imageUrl) {
-      this.imageUrl$ = of(this.getImageUrl(this.themeName, 'image'))
+      this.imageUrl$.next(this.getImageUrl(this.themeName, 'image'))
     } else if (usedUrl === this.getImageUrl(this.themeName, 'image')) {
-      this.imageUrl$ = of(this.getImageUrl(this.themeName, 'default'))
+      this.imageUrl$.next(this.getImageUrl(this.themeName, 'default'))
     }
   }
 
@@ -175,6 +174,6 @@ export class OneCXThemeInfosComponent implements ocxRemoteComponent, ocxRemoteWe
   }
 
   private log(text: string) {
-    if (this.logEnabled) console.log('onecx-theme-infos: ' + (this.logPrefix ?? '') + ' => ' + text)
+    if (this.logEnabled) console.log('onecx-theme-data: ' + (this.logPrefix ?? '') + ' => ' + text)
   }
 }
