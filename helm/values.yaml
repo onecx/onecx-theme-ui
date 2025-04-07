@@ -29,6 +29,10 @@ app:
           technology: WEBCOMPONENTMODULE
           remoteName: onecx-theme
           tagName: ocx-theme-data-component
+    # Microservice
+    microservice:
+        name: OneCX Theme UI
+        description: OneCX Theme Frontend
     # Slot
     slot:
       enabled: true
