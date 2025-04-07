@@ -9,7 +9,7 @@ import { of, ReplaySubject, throwError } from 'rxjs'
 import { BASE_URL, RemoteComponentConfig } from '@onecx/angular-remote-components'
 
 import { Theme, SearchThemeResponse, ThemesAPIService } from 'src/app/shared/generated'
-import { OneCXThemeInfosComponent } from './theme-infos.component'
+import { OneCXThemeDataComponent } from './theme-data.component'
 
 const theme1: Theme = {
   id: 't1',
@@ -23,14 +23,14 @@ const theme2: Theme = {
 }
 const themes: Theme[] = [theme1, theme2]
 
-describe('OneCXThemeInfosComponent', () => {
+describe('OneCXThemeDataComponent', () => {
   const themeApiSpy = {
     searchThemes: jasmine.createSpy('searchThemes').and.returnValue(of({})),
     getThemeByName: jasmine.createSpy('getThemeByName').and.returnValue(of({}))
   }
 
   function setUp() {
-    const fixture = TestBed.createComponent(OneCXThemeInfosComponent)
+    const fixture = TestBed.createComponent(OneCXThemeDataComponent)
     const component = fixture.componentInstance
     fixture.detectChanges()
     return { fixture, component }
@@ -57,7 +57,7 @@ describe('OneCXThemeInfosComponent', () => {
         }
       ]
     })
-      .overrideComponent(OneCXThemeInfosComponent, {
+      .overrideComponent(OneCXThemeDataComponent, {
         set: {
           imports: [TranslateTestingModule, CommonModule],
           providers: [{ provide: ThemesAPIService, useValue: themeApiSpy }]
@@ -173,7 +173,7 @@ describe('OneCXThemeInfosComponent', () => {
       component.themes$?.subscribe({
         next: (data) => {
           if (data) {
-            expect(console.error).toHaveBeenCalledWith('onecx-theme-infos.searchThemes', errorResponse)
+            expect(console.error).toHaveBeenCalledWith('onecx-theme-data.searchThemes', errorResponse)
           }
           done()
         },
@@ -225,7 +225,7 @@ describe('OneCXThemeInfosComponent', () => {
       component.theme$?.subscribe({
         next: (data) => {
           if (data) {
-            expect(console.error).toHaveBeenCalledWith('onecx-theme-infos.getThemeByName', errorResponse)
+            expect(console.error).toHaveBeenCalledWith('onecx-theme-data.getThemeByName', errorResponse)
           }
           done()
         },
