@@ -105,7 +105,7 @@ describe('ThemeDetailComponent', () => {
 
     component.theme$?.subscribe((data) => {
       expect(data).toBe(theme)
-      expect(component.themeName).toBe(theme.name!)
+      expect(component.urlThemeName).toBe(theme.name!)
       expect(component.theme?.displayName).toBe(theme.displayName!)
       expect(component.dateFormat).toBe('medium')
       expect(themesApiSpy.getThemeByName).toHaveBeenCalled()
@@ -145,7 +145,7 @@ describe('ThemeDetailComponent', () => {
     spyOn(router, 'navigate')
     spyOn(component, 'onClose')
     spyOn(component, 'onExportTheme')
-    component.themeName = 'dummy'
+    component.urlThemeName = 'dummy'
     component.themeDeleteVisible = false
 
     component.actions$!.subscribe((actions) => {
@@ -202,7 +202,7 @@ describe('ThemeDetailComponent', () => {
     themesApiSpy.getThemeByName.and.returnValue(throwError(() => errorResponse))
     spyOn(console, 'error')
     component.exceptionKey = undefined
-    component.themeName = 'dummy'
+    component.urlThemeName = 'dummy'
 
     component.ngOnInit()
 

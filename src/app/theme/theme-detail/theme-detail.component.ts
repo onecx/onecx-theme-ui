@@ -23,7 +23,8 @@ import {
 export class ThemeDetailComponent implements OnInit, AfterViewInit {
   public theme: Theme | undefined
   public theme$!: Observable<Theme>
-  public themeName: string | null
+  public urlThemeName: string | null
+  public themeForUse: Theme | undefined
   public themeDeleteVisible = false
   public showOperatorMessage = true // display initially only
   public loading = true
@@ -47,7 +48,7 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
     private readonly imageApi: ImagesInternalAPIService,
     private readonly cd: ChangeDetectorRef
   ) {
-    this.themeName = this.route.snapshot.paramMap.get('name')
+    this.urlThemeName = this.route.snapshot.paramMap.get('name')
     this.dateFormat = this.user.lang$.getValue() === 'de' ? 'dd.MM.yyyy HH:mm:ss' : 'medium'
   }
 
@@ -61,9 +62,9 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
 
   private getTheme() {
     this.preparePageAction(true)
-    if (!this.themeName) return
+    if (!this.urlThemeName) return
     this.loading = true
-    this.theme$ = this.themeApi.getThemeByName({ name: this.themeName }).pipe(
+    this.theme$ = this.themeApi.getThemeByName({ name: this.urlThemeName }).pipe(
       map((data) => {
         if (data.resource) this.theme = data.resource
         this.headerImageUrl = this.getImageUrl(this.theme, RefType.Logo)
@@ -164,8 +165,12 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
   /**
    * UI EVENTS
    */
-  public onTabChange($event: any) {
-    this.showOperatorMessage = false
+  public onTabChange($event: any, theme: Theme) {
+    if (theme) {
+      this.showOperatorMessage = false
+      this.selectedTabIndex = $event.index
+      if (this.selectedTabIndex === 2) this.themeForUse = theme
+    }
   }
 
   public onExportTheme(): void {

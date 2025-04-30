@@ -42,6 +42,9 @@ app:
         onecx-theme-list-workspaces-using-theme:
           name: 'onecx-theme-list-workspaces-using-theme'
           description: 'List of Workspaces using the given Theme'
+        onecx-workspace-data:
+          name: 'onecx-workspace-data'
+          description: 'Getting data from Workspaces for the current Theme'
     # Permission
     permission:
       enabled: true

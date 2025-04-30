@@ -25,7 +25,11 @@
       [text]="exceptionKey | translate"
     ></p-message>
 
-    <p-tabView *ngIf="!loading && !exceptionKey" (onChange)="onTabChange($event)" [(activeIndex)]="selectedTabIndex">
+    <p-tabView
+      *ngIf="!loading && !exceptionKey"
+      (onChange)="onTabChange($event, theme)"
+      [(activeIndex)]="selectedTabIndex"
+    >
       <p-tabPanel
         id="th_detail_panel_props"
         [header]="'THEME.TABS.PROPERTIES' | translate"
@@ -116,7 +120,7 @@
         tooltipPosition="top"
         tooltipEvent="hover"
       >
-        <app-theme-use [theme]="theme" (used)="preparePageAction($event)"></app-theme-use>
+        <app-theme-use [themeName]="themeForUse?.name" (used)="preparePageAction($event)"></app-theme-use>
       </p-tabPanel>
 
       <p-tabPanel

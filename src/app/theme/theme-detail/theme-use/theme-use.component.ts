@@ -1,30 +1,48 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core'
-import { Observable } from 'rxjs'
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
+import { BehaviorSubject, Observable } from 'rxjs'
 
 import { SlotService } from '@onecx/angular-remote-components'
 
-import { Theme } from 'src/app/shared/generated'
+export type Workspace = {
+  name: string
+  displayName: string
+  description?: string
+  theme?: string
+  homePage?: string
+  baseUrl?: string
+  companyName?: string
+  phoneNumber?: string
+  rssFeedUrl?: string
+  footerLabel?: string
+  logoUrl?: string
+  //address?: WorkspaceAddress
+  mandatory?: boolean
+  operator?: boolean
+  disabled?: boolean
+}
 
 @Component({
   selector: 'app-theme-use',
   templateUrl: './theme-use.component.html'
 })
-export class ThemeUseComponent {
-  @Input() theme: Theme | undefined
+export class ThemeUseComponent implements OnInit {
+  @Input() themeName: string | undefined
   @Output() used = new EventEmitter<boolean>()
 
   // receive the slot output
-  public workspaceListEmitter = new EventEmitter<string[]>()
-
+  public slotName = 'onecx-workspace-data'
+  public slotEmitter = new EventEmitter<Workspace[]>()
+  public workspaceData$ = new BehaviorSubject<Workspace[] | undefined>(undefined)
   public isComponentDefined$: Observable<boolean> | undefined
-  public slotName = 'onecx-theme-list-workspaces-using-theme'
 
   constructor(private readonly slotService: SlotService) {
     this.isComponentDefined$ = this.slotService.isSomeComponentDefinedForSlot(this.slotName)
+  }
 
-    // get the list of workspaces which using the theme: if so then emit true
-    this.workspaceListEmitter.subscribe((list) => {
-      this.used.emit(list.length > 0)
+  public ngOnInit(): void {
+    this.slotEmitter.subscribe((res) => {
+      this.workspaceData$.next(res)
+      if (res.length > 0) this.used.emit(true)
     })
   }
 }

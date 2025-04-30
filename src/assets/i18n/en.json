@@ -164,6 +164,10 @@
       "VARIABLES": "Theme Variables",
       "VARIABLES_TOOLTIP": "JSON representation of Theme Variables"
     },
+    "WORKSPACES_USING_THEME": {
+      "USED": "The Theme is used by the following Workspaces: ",
+      "UNUSED": "The Theme is not used by any Workspace."
+    },
     "IMPORT": {
       "HEADER": "Import Theme",
       "IMPORT_THEME_SUCCESS": "The Theme was sucessfully imported.",
