@@ -1,5 +1,6 @@
-<ng-container *ngIf="themeName && (isComponentDefined$ | async)">
+<ng-container *ngIf="themeName">
   <ocx-slot
+    *ngIf="isComponentDefined$ | async; else SlotNotConfigured"
     [name]="slotName"
     [inputs]="{ dataType: 'workspaces', themeName: themeName, logEnabled: true, logPrefix: 'theme-use' }"
     [outputs]="{ workspaces: slotEmitter }"
@@ -14,4 +15,7 @@
       </ul>
     </ng-template>
   </div>
+  <ng-template #SlotNotConfigured>
+    <div class="sm:pt-2 pb-2 sm:pb-3 px-3">{{ 'THEME.WORKSPACES_USING_THEME.MISSING_COMPONENT' | translate }}</div>
+  </ng-template>
 </ng-container>
