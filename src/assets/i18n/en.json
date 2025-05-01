@@ -165,7 +165,7 @@
       "VARIABLES_TOOLTIP": "JSON representation of Theme Variables"
     },
     "WORKSPACES_USING_THEME": {
-      "MISSING_COMPONENT": "Informationen zur Verwendung des Themes in einem Workspace konnten nicht abgerufen werden.",
+      "MISSING_COMPONENT": "Information on using the Theme in a Workspace could not be obtained.",
       "USED": "The Theme is used by the following Workspaces: ",
       "UNUSED": "The Theme is not used by any Workspace."
     },
