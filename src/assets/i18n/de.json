@@ -165,9 +165,9 @@
       "VARIABLES_TOOLTIP": "JSON-Darstellung der Theme-Variablen"
     },
     "WORKSPACES_USING_THEME": {
-      "MISSING_COMPONENT": "Information on using the Theme in a Workspace could not be obtained.",
-      "USED": "The Theme is used by the following Workspaces: ",
-      "UNUSED": "The Theme is not used by any Workspace."
+      "MISSING_COMPONENT": "Informationen zur Verwendung des Themes in einem Workspace konnten nicht abgerufen werden.",
+      "USED": "Das Theme wird von folgenden Workspaces verwendet: ",
+      "UNUSED": "Das Theme wird von keinem Workspace verwendet."
     },
     "IMPORT": {
       "HEADER": "Import Theme",
