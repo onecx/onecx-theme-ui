@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 
-import { ThemeUseComponent } from './theme-use.component'
+import { ThemeUseComponent, Workspace } from './theme-use.component'
 
 describe('ThemeUseComponent', () => {
   let component: ThemeUseComponent
@@ -28,7 +28,7 @@ describe('ThemeUseComponent', () => {
     fixture = TestBed.createComponent(ThemeUseComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
-    component.workspaceListEmitter.emit(['workspace'])
+    component.slotEmitter.emit([{ name: 'name' } as Workspace])
   })
 
   it('should create', () => {
