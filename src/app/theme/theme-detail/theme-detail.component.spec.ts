@@ -119,12 +119,13 @@ describe('ThemeDetailComponent', () => {
   })
 
   it('should set showOperatorMessage to false', async () => {
-    const event = { index: 1 }
+    const event = { index: 2 }
 
     await component.ngOnInit()
-    component.onTabChange(event)
+    component.onTabChange(event, theme)
 
     expect(component.showOperatorMessage).toBeFalsy()
+    expect(component.themeForUse).toEqual(theme)
   })
 
   it('should create with default dateFormat', async () => {
