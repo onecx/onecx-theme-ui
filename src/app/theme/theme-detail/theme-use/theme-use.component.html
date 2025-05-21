@@ -2,7 +2,7 @@
   <ocx-slot
     *ngIf="isComponentDefined$ | async; else SlotNotConfigured"
     [name]="slotName"
-    [inputs]="{ dataType: 'workspaces', themeName: themeName, logEnabled: true, logPrefix: 'theme-use' }"
+    [inputs]="{ dataType: 'workspaces', themeName: themeName, logEnabled: false, logPrefix: 'theme-use' }"
     [outputs]="{ workspaces: slotEmitter }"
   >
   </ocx-slot>
