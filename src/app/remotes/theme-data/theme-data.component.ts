@@ -13,7 +13,8 @@ import {
   ocxRemoteWebcomponent,
   provideTranslateServiceForRoot
 } from '@onecx/angular-remote-components'
-import { PortalCoreModule, createRemoteComponentTranslateLoader } from '@onecx/portal-integration-angular'
+import { createRemoteComponentTranslateLoader } from '@onecx/angular-accelerator'
+import { PortalCoreModule } from '@onecx/portal-integration-angular'
 
 import {
   Configuration,
@@ -174,6 +175,6 @@ export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWeb
   }
 
   private log(text: string) {
-    if (this.logEnabled) console.log('onecx-theme-data: ' + (this.logPrefix ?? '') + ' => ' + text)
+    if (this.logEnabled) console.info('onecx-theme-data: ' + (this.logPrefix ?? '') + ' => ' + text)
   }
 }

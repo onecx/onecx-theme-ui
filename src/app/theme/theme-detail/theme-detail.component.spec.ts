@@ -9,7 +9,7 @@ import { TranslateTestingModule } from 'ngx-translate-testing'
 import { of, throwError } from 'rxjs'
 import FileSaver from 'file-saver'
 
-import { ConfigurationService, PortalMessageService, UserService } from '@onecx/portal-integration-angular'
+import { ConfigurationService, PortalMessageService, UserService } from '@onecx/angular-integration-interface'
 
 import { RefType, Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { bffImageUrl, getCurrentDateTime } from 'src/app/shared/utils'

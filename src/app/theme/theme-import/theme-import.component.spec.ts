@@ -7,7 +7,7 @@ import { provideRouter, Router } from '@angular/router'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 import { of, throwError } from 'rxjs'
 
-import { PortalMessageService } from '@onecx/portal-integration-angular'
+import { PortalMessageService } from '@onecx/angular-integration-interface'
 
 import { Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeImportComponent } from './theme-import.component'

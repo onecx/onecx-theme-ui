@@ -13,7 +13,7 @@ import { TranslateService } from '@ngx-translate/core'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 
-import { PortalMessageService } from '@onecx/portal-integration-angular'
+import { PortalMessageService } from '@onecx/angular-integration-interface'
 
 import { Theme, ThemesAPIService, ThemeSnapshot } from 'src/app/shared/generated'
 import { FileSelectEvent } from 'primeng/fileupload'
