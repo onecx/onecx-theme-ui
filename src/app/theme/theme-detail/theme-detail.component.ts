@@ -5,7 +5,8 @@ import { TranslateService } from '@ngx-translate/core'
 import { Observable, catchError, finalize, map, of } from 'rxjs'
 import FileSaver from 'file-saver'
 
-import { Action, PortalMessageService, UserService } from '@onecx/portal-integration-angular'
+import { PortalMessageService, UserService } from '@onecx/angular-integration-interface'
+import { Action } from '@onecx/angular-accelerator'
 
 import { bffImageUrl, getCurrentDateTime } from 'src/app/shared/utils'
 import {

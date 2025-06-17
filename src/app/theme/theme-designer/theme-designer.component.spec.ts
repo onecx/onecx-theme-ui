@@ -14,8 +14,8 @@ import { ConfirmationService } from 'primeng/api'
 import { InputSwitchModule } from 'primeng/inputswitch'
 import { ConfirmDialog, ConfirmDialogModule } from 'primeng/confirmdialog'
 
-import { PortalMessageService, ThemeService } from '@onecx/portal-integration-angular'
 import { CurrentThemeTopic } from '@onecx/integration-interface'
+import { PortalMessageService, ThemeService } from '@onecx/angular-integration-interface'
 
 import { MimeType, RefType, ThemesAPIService, ImagesInternalAPIService } from 'src/app/shared/generated'
 import { ThemeDesignerComponent } from './theme-designer.component'

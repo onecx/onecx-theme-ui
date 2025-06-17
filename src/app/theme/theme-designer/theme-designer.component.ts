@@ -5,8 +5,9 @@ import { Observable, combineLatest, debounceTime, first, map, switchMap } from '
 import { TranslateService } from '@ngx-translate/core'
 import { ConfirmationService, SelectItem } from 'primeng/api'
 
-import { Action, PortalMessageService, ThemeService } from '@onecx/portal-integration-angular'
-import { bffImageUrl, dropDownSortItemsByLabel, dropDownGetLabelByValue } from 'src/app/shared/utils'
+import { PortalMessageService, ThemeService } from '@onecx/angular-integration-interface'
+import { Action } from '@onecx/angular-accelerator'
+
 import {
   GetThemeResponse,
   ImagesInternalAPIService,
@@ -18,6 +19,7 @@ import {
   UpdateThemeResponse,
   MimeType
 } from 'src/app/shared/generated'
+import { bffImageUrl, dropDownSortItemsByLabel, dropDownGetLabelByValue } from 'src/app/shared/utils'
 import { themeVariables } from './theme-variables'
 
 @Component({
