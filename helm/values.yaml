@@ -12,8 +12,8 @@ app:
       enabled: true
       specs:
         main:
-          exposedModule: "./OneCXThemeModule"
-          description: "OneCX Theme UI"
+          exposedModule: ./OneCXThemeModule
+          description: 'OneCX Theme UI'
           note: "OneCX Theme UI auto import via MF operator"
           type: MODULE
           technology: WEBCOMPONENTMODULE
@@ -23,12 +23,19 @@ app:
             - name: theme-detail
               path: /{theme-name}
         theme-data:
-          exposedModule: "./OneCXThemeDataComponent"
-          description: "Provide theme data like themes, theme, logo"
+          exposedModule: ./OneCXThemeDataComponent
+          description: 'Provide theme data like themes, theme, logo for given theme name(s)'
           type: COMPONENT
           technology: WEBCOMPONENTMODULE
           remoteName: onecx-theme
           tagName: ocx-theme-data-component
+        theme-logo:
+          exposedModule: ./OneCXCurrentThemeLogoComponent
+          description: 'Display the logo of the current theme. Use imageStyleClass as slot input parameter to adjust the image style.'
+          type: COMPONENT
+          technology: WEBCOMPONENTMODULE
+          remoteName: onecx-theme
+          tagName: ocx-current-theme-logo-component
     # Microservice
     microservice:
       enabled: true
