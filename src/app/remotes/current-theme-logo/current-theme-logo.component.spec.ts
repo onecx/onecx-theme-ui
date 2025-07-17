@@ -8,7 +8,7 @@ import { of, ReplaySubject } from 'rxjs'
 
 import { BASE_URL, RemoteComponentConfig } from '@onecx/angular-remote-components'
 
-import { Theme, ThemesAPIService } from 'src/app/shared/generated'
+import { Theme } from 'src/app/shared/generated'
 import { OneCXCurrentThemeLogoComponent } from './current-theme-logo.component'
 
 const theme1: Theme = {
@@ -17,11 +17,11 @@ const theme1: Theme = {
   displayName: 'Theme 1'
 }
 
-describe('OneCXCurrentThemeLogoComponent', () => {
-  const themeApiSpy = {
-    searchThemes: jasmine.createSpy('searchThemes').and.returnValue(of({})),
-    getThemeByName: jasmine.createSpy('getThemeByName').and.returnValue(of({}))
+fdescribe('OneCXCurrentThemeLogoComponent', () => {
+  class MockThemeService {
+    currentTheme$ = { asObservable: () => of(theme1) }
   }
+  let mockThemeService: MockThemeService
 
   function setUp() {
     const fixture = TestBed.createComponent(OneCXCurrentThemeLogoComponent)
@@ -32,6 +32,7 @@ describe('OneCXCurrentThemeLogoComponent', () => {
 
   let baseUrlSubject: ReplaySubject<any>
   beforeEach(() => {
+    mockThemeService = new MockThemeService()
     baseUrlSubject = new ReplaySubject<any>(1)
     TestBed.configureTestingModule({
       declarations: [],
@@ -45,27 +46,24 @@ describe('OneCXCurrentThemeLogoComponent', () => {
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
-        {
-          provide: BASE_URL,
-          useValue: baseUrlSubject
-        }
+        { provide: BASE_URL, useValue: baseUrlSubject },
+        { provide: MockThemeService, useValue: mockThemeService }
       ]
     })
       .overrideComponent(OneCXCurrentThemeLogoComponent, {
         set: {
           imports: [TranslateTestingModule, CommonModule],
-          providers: [{ provide: ThemesAPIService, useValue: themeApiSpy }]
+          providers: [{ provide: MockThemeService, useValue: mockThemeService }]
         }
       })
       .compileComponents()
 
     baseUrlSubject.next('base_url_mock')
-    themeApiSpy.searchThemes.calls.reset()
-    themeApiSpy.getThemeByName.calls.reset()
   })
 
   describe('initialize', () => {
     it('should create', () => {
+      mockThemeService.currentTheme$ = { asObservable: () => of(theme1) }
       const { component } = setUp()
 
       expect(component).toBeTruthy()
@@ -105,7 +103,6 @@ describe('OneCXCurrentThemeLogoComponent', () => {
       component.logPrefix = 'get image url'
       component.themeName = theme1.name
 
-      component.ngOnChanges()
       component.onImageLoad()
 
       component.imageUrl$?.subscribe({

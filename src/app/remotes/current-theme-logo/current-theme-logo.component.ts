@@ -90,7 +90,6 @@ export class OneCXCurrentThemeLogoComponent implements ocxRemoteComponent, ocxRe
   }
 
   public getImageUrl(themeName: string | undefined, prioType: string): string | undefined {
-    if (!prioType) return undefined
     this.log('getImageUrl on prioType => ' + prioType)
 
     // if URL exist
