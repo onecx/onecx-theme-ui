@@ -7,6 +7,7 @@ import { TranslateTestingModule } from 'ngx-translate-testing'
 import { of, ReplaySubject } from 'rxjs'
 
 import { BASE_URL, RemoteComponentConfig } from '@onecx/angular-remote-components'
+import { ThemeService } from '@onecx/angular-integration-interface'
 
 import { Theme } from 'src/app/shared/generated'
 import { OneCXCurrentThemeLogoComponent } from './current-theme-logo.component'
@@ -17,7 +18,7 @@ const theme1: Theme = {
   displayName: 'Theme 1'
 }
 
-fdescribe('OneCXCurrentThemeLogoComponent', () => {
+describe('OneCXCurrentThemeLogoComponent', () => {
   class MockThemeService {
     currentTheme$ = { asObservable: () => of(theme1) }
   }
@@ -47,13 +48,13 @@ fdescribe('OneCXCurrentThemeLogoComponent', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: BASE_URL, useValue: baseUrlSubject },
-        { provide: MockThemeService, useValue: mockThemeService }
+        { provide: ThemeService, useValue: mockThemeService }
       ]
     })
       .overrideComponent(OneCXCurrentThemeLogoComponent, {
         set: {
           imports: [TranslateTestingModule, CommonModule],
-          providers: [{ provide: MockThemeService, useValue: mockThemeService }]
+          providers: [{ provide: ThemeService, useValue: mockThemeService }]
         }
       })
       .compileComponents()
@@ -108,7 +109,7 @@ fdescribe('OneCXCurrentThemeLogoComponent', () => {
       component.imageUrl$?.subscribe({
         next: (data) => {
           if (data) {
-            expect(data).toBe('base_url/bff/images/theme1/logo')
+            expect(data).toBe('http://onecx-theme-bff:8080/images/theme1/logo')
           }
           done()
         },
@@ -132,7 +133,7 @@ fdescribe('OneCXCurrentThemeLogoComponent', () => {
         component.logPrefix = 'default logo'
         component.themeName = theme1.name
 
-        component.onImageLoadError('base_url/bff/images/theme1/logo')
+        component.onImageLoadError('http://onecx-theme-bff:8080/images/theme1/logo')
       })
     })
 
@@ -160,6 +161,19 @@ fdescribe('OneCXCurrentThemeLogoComponent', () => {
         const url = component.getImageUrl(theme1.name, 'default')
 
         expect(url).toBe(component.defaultImageUrl)
+      })
+
+      it('should get url - unknown prio type', () => {
+        const { component } = setUp()
+        component.logEnabled = false
+        component.logPrefix = 'default url'
+        component.themeName = theme1.name
+        component.defaultImageUrl = '/default/url'
+        component.useDefaultLogo = false // enable use of default image
+
+        const url = component.getImageUrl(theme1.name, 'unknown')
+
+        expect(url).toBeUndefined()
       })
     })
   })

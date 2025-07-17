@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Inject, Input } from '@angular/core'
+import { Component, EventEmitter, Inject, Input, NO_ERRORS_SCHEMA } from '@angular/core'
 import { CommonModule, Location } from '@angular/common'
 import { UntilDestroy } from '@ngneat/until-destroy'
 import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs'
@@ -27,7 +27,8 @@ import { environment } from 'src/environments/environment'
       provide: BASE_URL,
       useValue: new ReplaySubject<string>(1)
     }
-  ]
+  ],
+  schemas: [NO_ERRORS_SCHEMA]
 })
 @UntilDestroy()
 export class OneCXCurrentThemeLogoComponent implements ocxRemoteComponent, ocxRemoteWebcomponent {
@@ -83,8 +84,10 @@ export class OneCXCurrentThemeLogoComponent implements ocxRemoteComponent, ocxRe
   public onImageLoadError(usedUrl: string): void {
     this.log('onImageLoadError using => ' + usedUrl)
     if (usedUrl === this.imageUrl) {
+      this.log('onImageLoadError using => 1')
       this.imageUrl$.next(this.getImageUrl(this.themeName, 'image'))
     } else if (usedUrl === this.getImageUrl(this.themeName, 'image')) {
+      this.log('onImageLoadError using => 2')
       this.imageUrl$.next(this.getImageUrl(this.themeName, 'default'))
     }
   }
