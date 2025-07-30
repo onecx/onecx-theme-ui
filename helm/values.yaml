@@ -22,9 +22,6 @@ app:
           endpoints:
             - name: theme-detail
               path: /{theme-name}
-        theme-infos:
-          exposedModule: ./OneCXThemeInfosComponent
-          undeployed: true
         theme-data:
           exposedModule: ./OneCXThemeDataComponent
           description: 'Provide theme data like themes, theme, logo for given theme name(s)'
