@@ -14,7 +14,7 @@ app:
         main:
           exposedModule: ./OneCXThemeModule
           description: 'OneCX Theme UI'
-          note: "OneCX Theme UI auto import via MF operator"
+          note: 'OneCX Theme UI auto import via MF operator'
           type: MODULE
           technology: WEBCOMPONENTMODULE
           remoteName: onecx-theme
@@ -22,6 +22,9 @@ app:
           endpoints:
             - name: theme-detail
               path: /{theme-name}
+        theme-infos:
+          exposedModule: ./OneCXThemeInfosComponent
+          undeployed: true
         theme-data:
           exposedModule: ./OneCXThemeDataComponent
           description: 'Provide theme data like themes, theme, logo for given theme name(s)'
