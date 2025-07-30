@@ -24,12 +24,7 @@ app:
               path: /{theme-name}
         theme-infos:
           exposedModule: ./OneCXThemeInfosComponent
-          description: 'Provide theme data like themes, theme, logo'
-          type: COMPONENT
-          technology: WEBCOMPONENTMODULE
-          remoteName: onecx-theme
-          tagName: ocx-theme-infos-component
-          deprecated: true
+          undeployed: true
         theme-data:
           exposedModule: ./OneCXThemeDataComponent
           description: 'Provide theme data like themes, theme, logo for given theme name(s)'
