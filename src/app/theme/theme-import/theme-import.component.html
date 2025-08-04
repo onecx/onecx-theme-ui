@@ -25,7 +25,7 @@
     [cancelLabel]="'ACTIONS.CANCEL' | translate"
     [chooseLabel]="'ACTIONS.CHOOSE' | translate"
   ></p-fileUpload>
-  <div
+  <form
     *ngIf="themeSnapshot"
     [formGroup]="formGroup"
     class="flex flex-wrap justify-content-start align-items-center gap-3 mt-4"
@@ -39,11 +39,14 @@
         class="w-full pt-3 pb-2 text-responsive"
         formControlName="themeName"
         (keyup)="onThemeNameChange()"
+        [attr.aria-label]="'THEME.THEME_NAME' | translate"
         [pTooltip]="'THEME.THEME_NAME' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
       />
-      <label class="ocx-required-label" for="th_import_theme_name">{{ 'THEME.THEME_NAME' | translate }}</label>
+      <label class="ocx-required-label" for="th_import_theme_name" aria-hidden="true">
+        {{ 'THEME.THEME_NAME' | translate }}
+      </label>
     </span>
     <span class="p-float-label w-full md:w-15rem" controlErrorAnchor>
       <input
@@ -53,17 +56,23 @@
         class="w-full pt-3 pb-2 text-responsive"
         formControlName="displayName"
         (keyup)="onThemeNameChange()"
+        [attr.aria-label]="'THEME.DISPLAY_NAME' | translate"
         [pTooltip]="'THEME.DISPLAY_NAME' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
       />
-      <label class="ocx-required-label" for="th_import_theme_display_name">
+      <label class="ocx-required-label" for="th_import_theme_display_name" aria-hidden="true">
         {{ 'THEME.DISPLAY_NAME' | translate }}
       </label>
     </span>
-    <app-theme-color-box *ngIf="properties" [properties]="properties" styleClass="h-inputtext w-15rem" />
-    <div *ngIf="!properties">{{ 'THEME.NO_PROPERTIES' | translate }}</div>
-  </div>
+    <app-theme-color-box
+      *ngIf="properties"
+      [properties]="properties"
+      styleClass="h-inputtext w-15rem"
+      aria-hidden="true"
+    />
+    <div *ngIf="!properties" role="note">{{ 'THEME.NO_PROPERTIES' | translate }}</div>
+  </form>
 
   <p-message
     *ngIf="themeSnapshot && themeNameExists"
