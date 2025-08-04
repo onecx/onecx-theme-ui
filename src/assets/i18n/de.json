@@ -149,6 +149,7 @@
     "SEARCH.SUBHEADER": "Erstellung und Bearbeitung von Themes",
     "DESIGNER.EDIT.SUBHEADER": "Theme Details ändern",
     "DESIGNER.CREATE.SUBHEADER": "Ein neues Theme erstellen",
+    "DESIGNER.TOP.SECTION": "Theme anwenden und Vorlage wählen",
     "DETAIL.SUBHEADER": "Theme Details",
     "DETAIL.AUTO_APPLY": "Änderungen automatisch anwenden",
     "DETAIL.AUTO_APPLY.TOOLTIP": "Wenn diese Option eingeschaltet ist, dann werden alle Änderungen (Schriftart, Farben) automatisch auf die aktuelle Seite angewendet.",
