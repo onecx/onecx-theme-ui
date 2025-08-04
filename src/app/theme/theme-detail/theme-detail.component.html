@@ -61,11 +61,12 @@
               class="w-full pt-3 pb-2 text-responsive"
               id="th_detail_props_item_display_name"
               [value]="theme?.displayName"
+              [attr.aria-label]="'THEME.TOOLTIPS.DISPLAY_NAME' | translate"
               [pTooltip]="'THEME.TOOLTIPS.DISPLAY_NAME' | translate"
               tooltipPosition="top"
               tooltipEvent="hover"
             />
-            <label for="th_detail_item_display_name">{{ 'THEME.DISPLAY_NAME' | translate }}</label>
+            <label for="th_detail_item_display_name" aria-hidden="true">{{ 'THEME.DISPLAY_NAME' | translate }}</label>
           </span>
           <span class="p-float-label">
             <textarea
@@ -76,30 +77,34 @@
               rows="3"
               id="th_detail_props_item_description"
               [ngModel]="theme?.description"
+              [attr.aria-label]="'THEME.DESCRIPTION' | translate"
               [pTooltip]="'THEME.DESCRIPTION' | translate"
               tooltipPosition="top"
               tooltipEvent="hover"
             ></textarea>
-            <label for="th_detail_item_description">{{ 'THEME.DESCRIPTION' | translate }}</label>
+            <label for="th_detail_item_description" aria-hidden="true">{{ 'THEME.DESCRIPTION' | translate }}</label>
           </span>
 
           <div class="flex flex-wrap sm:flex-nowrap justify-content-around align-items-center gap-2">
             <div class="flex flex-nowrap align-items-center column-gap-2">
-              <label for="th_detail_item_logo" class="flex font-medium text-600"> {{ 'LOGO.LABEL' | translate }}</label>
+              <label for="th_detail_item_logo" class="flex font-medium text-600" aria-hidden="true">
+                {{ 'LOGO.LABEL' | translate }}
+              </label>
               <app-image-container
                 id="th_detail_props_item_logo"
-                styleClass="max-h-2rem sm:max-h-3rem md:max-h-4rem max-w-6rem sm:max-w-8rem"
+                styleClass="max-h-2rem sm:max-h-3rem md:max-h-4rem max-w-6rem sm:max-w-8rem  border-round-sm"
                 [imageUrl]="getImageUrl(theme, RefType.Logo)"
               ></app-image-container>
             </div>
             <div class="flex flex-nowrap align-items-center column-gap-2">
-              <label for="th_detail_item_favicon" class="flex font-medium text-600">
-                {{ 'FAVICON.LABEL' | translate }}</label
-              >
+              <label for="th_detail_item_favicon" class="flex font-medium text-600" aria-hidden="true">
+                {{ 'FAVICON.LABEL' | translate }}
+              </label>
               <app-image-container
                 id="th_detail_props_item_favicon"
-                styleClass="max-h-2rem sm:max-h-3rem md:max-h-4rem max-w-6rem sm:max-w-8rem"
+                styleClass="max-h-2rem sm:max-h-3rem md:max-h-4rem max-w-6rem sm:max-w-8rem  border-round-sm"
                 [imageUrl]="getImageUrl(theme, RefType.Favicon)"
+                [title]="'FAVICON.IMAGE' | translate"
               ></app-image-container>
             </div>
           </div>
