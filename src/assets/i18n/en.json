@@ -90,6 +90,7 @@
     "MODIFICATION_USER": "Changed by",
     "MANDATORY": "Mandatory",
     "OPERATOR": "Created by automation",
+    "OPERATOR_HINT": "Hint",
     "OPERATOR_MESSAGE": "This Theme was created by automation. All changes will be lost during the next deployment.",
     "TOOLTIPS": {
       "CREATION_DATE": "Timestamp of the creation",
@@ -148,6 +149,7 @@
     "SEARCH.SUBHEADER": "Creation and editing of Themes",
     "DESIGNER.EDIT.SUBHEADER": "Change Theme Details",
     "DESIGNER.CREATE.SUBHEADER": "Create a new Theme",
+    "DESIGNER.TOP.SECTION": "Theme applying and template selection",
     "DETAIL.SUBHEADER": "Theme Details",
     "DETAIL.AUTO_APPLY": "Auto apply changes",
     "DETAIL.AUTO_APPLY.TOOLTIP": "If this option is switched on, then all changes (font, colors) are automatically applied to the current page.",

@@ -90,6 +90,7 @@
     "MODIFICATION_USER": "Geändert von",
     "MANDATORY": "Notwendig",
     "OPERATOR": "Automatisiert erstellt",
+    "OPERATOR_HINT": "Hinweis",
     "OPERATOR_MESSAGE": "Dieses Theme wurde automatisiert erstellt. Alle Änderungen gehen beim nächsten Deployment verloren.",
     "TOOLTIPS": {
       "CREATION_DATE": "Zeitpunkt der Erstellung",
@@ -148,6 +149,7 @@
     "SEARCH.SUBHEADER": "Erstellung und Bearbeitung von Themes",
     "DESIGNER.EDIT.SUBHEADER": "Theme Details ändern",
     "DESIGNER.CREATE.SUBHEADER": "Ein neues Theme erstellen",
+    "DESIGNER.TOP.SECTION": "Theme anwenden und Vorlage wählen",
     "DETAIL.SUBHEADER": "Theme Details",
     "DETAIL.AUTO_APPLY": "Änderungen automatisch anwenden",
     "DETAIL.AUTO_APPLY.TOOLTIP": "Wenn diese Option eingeschaltet ist, dann werden alle Änderungen (Schriftart, Farben) automatisch auf die aktuelle Seite angewendet.",

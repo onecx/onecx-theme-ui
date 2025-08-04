@@ -1,6 +1,7 @@
 @import 'src/app/_th-mixins.scss';
 
 @include danger-action;
+@include displaying-text-responsive;
 @include dialog-footer-buttons;
 @include dialog-non-full-size-modal;
 @include readable-disabled-components;

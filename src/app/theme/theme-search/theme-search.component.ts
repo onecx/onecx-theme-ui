@@ -109,12 +109,8 @@ export class ThemeSearchComponent implements OnInit {
   }
 
   getLogoUrl(theme: Theme | undefined): string | undefined {
-    if (!theme) {
-      return undefined
-    }
-    if (theme.logoUrl != null && theme.logoUrl != '') {
-      return theme.logoUrl
-    }
+    if (!theme) return undefined
+    if (theme.logoUrl !== null && theme.logoUrl !== '') return theme.logoUrl
     return bffImageUrl(this.imageApi.configuration.basePath, theme.name, RefType.Logo)
   }
 

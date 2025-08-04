@@ -38,79 +38,88 @@
         tooltipPosition="top"
         tooltipEvent="hover"
       >
-        <p-message
-          *ngIf="theme?.operator && showOperatorMessage"
-          id="th_detail_operator_message"
-          styleClass="absolute z-1 max-w-11 fadeout animation-duration-1000 animation-delay-3000 animation-iteration-1 animation-fill-forwards"
-          severity="warn"
-          [text]="'INTERNAL.OPERATOR_MESSAGE' | translate"
-        ></p-message>
-        <div class="surface-section mb-1 mt-3 mx-3">
-          <div class="flex flex-wrap flex-column row-gap-4 w-12 md:w-10 lg:w-8 xl:w-6">
-            <span class="p-float-label">
-              <input
-                pInputText
-                type="text"
-                readonly
-                class="w-full"
-                id="th_detail_props_item_display_name"
-                [value]="theme?.displayName"
-                [pTooltip]="'THEME.TOOLTIPS.DISPLAY_NAME' | translate"
-                tooltipPosition="top"
-                tooltipEvent="hover"
-              />
-              <label for="th_detail_item_display_name">{{ 'THEME.DISPLAY_NAME' | translate }}</label>
-            </span>
-            <span class="p-float-label">
-              <textarea
-                pInputTextarea
-                readonly
-                class="w-full"
-                autoresize="true"
-                rows="3"
-                id="th_detail_props_item_description"
-                [ngModel]="theme?.description"
-                [pTooltip]="'THEME.DESCRIPTION' | translate"
-                tooltipPosition="top"
-                tooltipEvent="hover"
-              ></textarea>
-              <label for="th_detail_item_description">{{ 'THEME.DESCRIPTION' | translate }}</label>
-            </span>
+        <!-- showOperatorMessage -->
+        <ng-container *ocxIfPermission="'THEME#EDIT'">
+          <!-- PrimeNG  17: Using p-messages uses the correct alert role (aria)
+               PrimeNG >17: Try again with p-message - check correct use of aria role
+          -->
+          <p-messages
+            *ngIf="theme?.operator && showOperatorMessage"
+            [(value)]="messages"
+            [enableService]="false"
+            [style]="{ 'margin-top': '-20px' }"
+            styleClass="absolute z-1 max-w-11"
+          >
+          </p-messages>
+        </ng-container>
+        <div class="mt-2 mx-2 sm:mx-3 flex flex-wrap flex-column row-gap-4 md:w-10 lg:w-9 xl:w-7">
+          <span class="p-float-label">
+            <input
+              pInputText
+              type="text"
+              readonly
+              class="w-full pt-3 pb-2 text-responsive"
+              id="th_detail_props_item_display_name"
+              [value]="theme?.displayName"
+              [attr.aria-label]="'THEME.TOOLTIPS.DISPLAY_NAME' | translate"
+              [pTooltip]="'THEME.TOOLTIPS.DISPLAY_NAME' | translate"
+              tooltipPosition="top"
+              tooltipEvent="hover"
+            />
+            <label for="th_detail_item_display_name" aria-hidden="true">{{ 'THEME.DISPLAY_NAME' | translate }}</label>
+          </span>
+          <span class="p-float-label">
+            <textarea
+              pInputTextarea
+              readonly
+              class="w-full"
+              autoresize="true"
+              rows="3"
+              id="th_detail_props_item_description"
+              [ngModel]="theme?.description"
+              [attr.aria-label]="'THEME.DESCRIPTION' | translate"
+              [pTooltip]="'THEME.DESCRIPTION' | translate"
+              tooltipPosition="top"
+              tooltipEvent="hover"
+            ></textarea>
+            <label for="th_detail_item_description" aria-hidden="true">{{ 'THEME.DESCRIPTION' | translate }}</label>
+          </span>
 
-            <div class="flex flex-wrap sm:flex-nowrap justify-content-around align-items-center row-gap-1">
-              <div class="flex flex-nowrap align-items-center column-gap-2">
-                <label for="th_detail_item_logo" class="flex font-medium text-600">
-                  {{ 'LOGO.LABEL' | translate }}</label
-                >
-                <app-image-container
-                  id="th_detail_props_item_logo"
-                  styleClass="h-2rem sm:h-3rem md:h-4rem max-h-2rem sm:max-h-3rem md:max-h-4rem max-w-10rem"
-                  [imageUrl]="getImageUrl(theme, RefType.Logo)"
-                ></app-image-container>
-              </div>
-              <div class="flex flex-nowrap align-items-center column-gap-2">
-                <label for="th_detail_item_favicon" class="flex font-medium text-600">
-                  {{ 'FAVICON.LABEL' | translate }}</label
-                >
-                <app-image-container
-                  id="th_detail_props_item_favicon"
-                  styleClass="h-2rem sm:h-3rem md:h-4rem max-h-2rem sm:max-h-3rem md:max-h-4rem max-w-10rem"
-                  [imageUrl]="getImageUrl(theme, RefType.Favicon)"
-                ></app-image-container>
-              </div>
+          <div class="flex flex-wrap sm:flex-nowrap justify-content-around align-items-center gap-2">
+            <div class="flex flex-nowrap align-items-center column-gap-2">
+              <label for="th_detail_item_logo" class="flex font-medium text-600" aria-hidden="true">
+                {{ 'LOGO.LABEL' | translate }}
+              </label>
+              <app-image-container
+                id="th_detail_props_item_logo"
+                styleClass="max-h-2rem sm:max-h-3rem md:max-h-4rem max-w-6rem sm:max-w-8rem  border-round-sm"
+                [imageUrl]="getImageUrl(theme, RefType.Logo)"
+              ></app-image-container>
+            </div>
+            <div class="flex flex-nowrap align-items-center column-gap-2">
+              <label for="th_detail_item_favicon" class="flex font-medium text-600" aria-hidden="true">
+                {{ 'FAVICON.LABEL' | translate }}
+              </label>
+              <app-image-container
+                id="th_detail_props_item_favicon"
+                styleClass="max-h-2rem sm:max-h-3rem md:max-h-4rem max-w-6rem sm:max-w-8rem  border-round-sm"
+                [imageUrl]="getImageUrl(theme, RefType.Favicon)"
+                [title]="'FAVICON.IMAGE' | translate"
+              ></app-image-container>
             </div>
           </div>
         </div>
       </p-tabPanel>
 
       <p-tabPanel
-        [header]="'THEME.TABS.INTERN' | translate"
-        [attr.aria-label]="'THEME.TABS.INTERN' | translate"
-        [tooltip]="'THEME.TABS.INTERN_TOOLTIP' | translate"
+        id="th_detail_panel_variables"
+        [header]="'THEME.TABS.VARIABLES' | translate"
+        [attr.aria-label]="'THEME.TABS.VARIABLES' | translate"
+        [tooltip]="'THEME.TABS.VARIABLES_TOOLTIP' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
       >
-        <app-theme-intern [theme]="theme" [dateFormat]="dateFormat"></app-theme-intern>
+        <pre class="my-0 pt-1 pb-0 card surface-50">{{ theme?.properties | json }}</pre>
       </p-tabPanel>
 
       <p-tabPanel
@@ -124,14 +133,13 @@
       </p-tabPanel>
 
       <p-tabPanel
-        id="th_detail_panel_variables"
-        [header]="'THEME.TABS.VARIABLES' | translate"
-        [attr.aria-label]="'THEME.TABS.VARIABLES' | translate"
-        [tooltip]="'THEME.TABS.VARIABLES_TOOLTIP' | translate"
+        [header]="'THEME.TABS.INTERN' | translate"
+        [attr.aria-label]="'THEME.TABS.INTERN' | translate"
+        [tooltip]="'THEME.TABS.INTERN_TOOLTIP' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
       >
-        <pre class="my-0 pt-1 pb-0 card surface-50">{{ theme?.properties | json }}</pre>
+        <app-theme-intern [theme]="theme" [dateFormat]="dateFormat"></app-theme-intern>
       </p-tabPanel>
     </p-tabView>
   </ocx-page-content>

@@ -1,11 +1,11 @@
 <img
   [id]="id"
   *ngIf="!displayDefault"
-  [class]="'object-fit vertical-align-middle border-round-sm ' + (styleClass ?? '')"
+  [class]="'object-fit max-w-full ' + (styleClass ?? '')"
   [ocxSrc]="displayImageUrl"
   (error)="onImageLoadError()"
   (load)="onImageLoadSuccess()"
-  [alt]="title"
+  [alt]="title ?? 'LOGO.LABEL' | translate"
   [pTooltip]="title"
   tooltipPosition="top"
   tooltipEvent="hover"
@@ -13,10 +13,11 @@
 <img
   [id]="id"
   *ngIf="displayDefault"
-  [class]="'object-fit vertical-align-middle border-round-sm ' + (styleClass ?? '')"
+  [class]="'object-fit max-w-full ' + (styleClass ?? '')"
   [src]="defaultImageUrl"
-  [alt]="'LOGO.LABEL' | translate"
+  [alt]="title ?? 'IMAGE.TOOLTIPS.PLACEHOLDER' | translate"
   [pTooltip]="title"
   tooltipPosition="top"
   tooltipEvent="hover"
+  aria-hidden="true"
 />
