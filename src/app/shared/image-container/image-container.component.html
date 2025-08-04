@@ -1,7 +1,7 @@
 <img
   [id]="id"
   *ngIf="!displayDefault"
-  [class]="'object-fit vertical-align-middle border-round-sm ' + (styleClass ?? '')"
+  [class]="'object-fit max-w-full ' + (styleClass ?? '')"
   [ocxSrc]="displayImageUrl"
   (error)="onImageLoadError()"
   (load)="onImageLoadSuccess()"
@@ -13,7 +13,7 @@
 <img
   [id]="id"
   *ngIf="displayDefault"
-  [class]="'object-fit vertical-align-middle border-round-sm ' + (styleClass ?? '')"
+  [class]="'object-fit max-w-full ' + (styleClass ?? '')"
   [src]="defaultImageUrl"
   [alt]="'LOGO.LABEL' | translate"
   [pTooltip]="title"

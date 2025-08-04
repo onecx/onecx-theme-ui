@@ -90,6 +90,7 @@
     "MODIFICATION_USER": "Geändert von",
     "MANDATORY": "Notwendig",
     "OPERATOR": "Automatisiert erstellt",
+    "OPERATOR_HINT": "Hinweis",
     "OPERATOR_MESSAGE": "Dieses Theme wurde automatisiert erstellt. Alle Änderungen gehen beim nächsten Deployment verloren.",
     "TOOLTIPS": {
       "CREATION_DATE": "Zeitpunkt der Erstellung",

@@ -6,9 +6,9 @@
   ></ocx-page-header>
   <ocx-page-content>
     <div class="pt-3 px-3 mb-3 flex flex-column row-gap-3">
-      <div class="ml-2 flex flex-wrap justify-content-between align-items-center row-gap-2 column-gap-3">
+      <div class="sm:ml-2 sm:mr-1 flex flex-wrap justify-content-between align-items-center row-gap-2 column-gap-3">
         <div
-          class="field mb-0 flex flex-wrap sm:flex-nowrap align-items-center row-gap-1 column-gap-3"
+          class="field mb-0 flex flex-wrap sm:flex-nowrap align-items-center row-gap-3 column-gap-3"
           [pTooltip]="'THEME.DETAIL.AUTO_APPLY.TOOLTIP' | translate"
           tooltipPosition="top"
           tooltipEvent="hover"
@@ -22,7 +22,9 @@
             tooltipPosition="top"
             tooltipEvent="hover"
           ></p-inputSwitch>
-          <label for="th_designer_header_is_current_theme">{{ 'THEME.DETAIL.AUTO_APPLY' | translate }}</label>
+          <label for="th_designer_header_is_current_theme" aria-hidden="true">
+            {{ 'THEME.DETAIL.AUTO_APPLY' | translate }}
+          </label>
         </div>
         <span
           *ngIf="isCurrentTheme"
@@ -32,7 +34,7 @@
           tooltipEvent="hover"
         >
         </span>
-        <div class="field mb-0 w-20rem">
+        <div class="field mb-0 w-full sm:w-20rem">
           <span class="p-float-label">
             <p-dropdown
               #themeTemplate
@@ -46,9 +48,9 @@
               tooltipPosition="top"
               tooltipEvent="hover"
             ></p-dropdown>
-            <label for="th_designer_fields_selected_theme" class="white-space-nowrap">
-              {{ 'THEME.TEMPLATE.SELECTOR' | translate }}</label
-            >
+            <label for="th_designer_fields_selected_theme" class="white-space-nowrap" aria-hidden="true">
+              {{ 'THEME.TEMPLATE.SELECTOR' | translate }}
+            </label>
           </span>
         </div>
       </div>
@@ -66,39 +68,39 @@
                 maxlength="255"
                 type="text"
                 id="th_designer_field_name"
-                class="w-full"
+                class="w-full pt-3 pb-2 text-responsive"
                 formControlName="name"
                 [pTooltip]="'THEME.TOOLTIPS.NAME' | translate"
                 tooltipPosition="top"
                 tooltipEvent="hover"
               />
-              <label class="ocx-required-label" for="th_designer_field_name"> {{ 'THEME.NAME' | translate }} </label>
+              <label class="ocx-required-label" for="th_designer_field_name" aria-hidden="true">
+                {{ 'THEME.NAME' | translate }}
+              </label>
             </span>
           </div>
 
           <div
-            class="flex flex-row flex-wrap justify-content-start align-items-center column-gap-4 sm:column-gap-5 md:column-gap-6 lg:column-gap-7"
+            class="flex flex-row flex-wrap justify-content-start align-items-center column-gap-4 sm:column-gap-5 md:column-gap-6 row-gap-2"
           >
-            <div class="flex-grow-1">
-              <span class="p-float-label" controlErrorAnchor>
-                <input
-                  pInputText
-                  minlength="2"
-                  maxlength="255"
-                  type="text"
-                  id="th_designer_field_display_name"
-                  class="w-full"
-                  formControlName="displayName"
-                  [pTooltip]="'THEME.TOOLTIPS.DISPLAY_NAME' | translate"
-                  tooltipPosition="top"
-                  tooltipEvent="hover"
-                />
-                <label class="ocx-required-label" for="th_designer_field_display_name">
-                  {{ 'THEME.DISPLAY_NAME' | translate }}
-                </label>
-              </span>
-            </div>
-            <div class="md:10rem lg:12rem xl:w-13rem">
+            <span class="p-float-label flex-grow-1" controlErrorAnchor>
+              <input
+                pInputText
+                minlength="2"
+                maxlength="255"
+                type="text"
+                id="th_designer_field_display_name"
+                class="w-full pt-3 pb-2 text-responsive"
+                formControlName="displayName"
+                [pTooltip]="'THEME.TOOLTIPS.DISPLAY_NAME' | translate"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+              />
+              <label class="ocx-required-label" for="th_designer_field_display_name" aria-hidden="true">
+                {{ 'THEME.DISPLAY_NAME' | translate }}
+              </label>
+            </span>
+            <div class="md:w-10rem">
               <p-checkbox
                 ngDefaultControl
                 type="text"
@@ -120,13 +122,15 @@
                 pInputText
                 type="text"
                 id="th_designer_field_description"
-                class="w-full"
+                class="w-full pt-3 pb-2 text-responsive"
                 formControlName="description"
                 [pTooltip]="'THEME.TOOLTIPS.DESCRIPTION' | translate"
                 tooltipPosition="top"
                 tooltipEvent="hover"
               />
-              <label for="th_designer_field_description"> {{ 'THEME.DESCRIPTION' | translate }} </label>
+              <label for="th_designer_field_description" aria-hidden="true">
+                {{ 'THEME.DESCRIPTION' | translate }}
+              </label>
             </span>
           </div>
           <div class="flex-grow-1">
@@ -147,10 +151,10 @@
               (change)="onFileUpload($event, RefType.Favicon)"
               accept=".png, .jpg, .jpeg, .ico"
             />
-            <div class="flex flex-wrap sm:flex-nowrap align-items-center row-gap-2 column-gap-4">
+            <div class="flex flex-wrap sm:flex-nowrap align-items-center row-gap-3 column-gap-4">
               <app-image-container
                 id="th_designer_logo_url_image"
-                styleClass="h-3rem max-h-3rem max-w-10rem"
+                styleClass="max-h-3rem max-w-8rem"
                 [imageUrl]="fetchingLogoUrl"
                 [title]="(fetchingLogoUrl ? 'LOGO.IMAGE' : 'IMAGE.TOOLTIPS.PLACEHOLDER') | translate"
                 (imageLoadResult)="onImageLoadResult(RefType.Logo, $event)"
@@ -183,25 +187,30 @@
                   pInputText
                   type="text"
                   id="th_designer_field_logo_url"
-                  class="w-full"
+                  class="w-full pt-3 pb-2 text-responsive"
                   formControlName="logoUrl"
                   (input)="onInputChange(RefType.Logo)"
                   [pTooltip]="'IMAGE.TOOLTIPS.URL' | translate"
                   tooltipPosition="top"
                   tooltipEvent="hover"
                 />
-                <label for="th_designer_field_logo_url">{{ 'LOGO.URL' | translate }}</label>
+                <label for="th_designer_field_logo_url" aria-hidden="true">{{ 'LOGO.URL' | translate }}</label>
               </span>
-              <label *ngIf="displayFileTypeErrorLogo" for="th_designer_field_logo_url" class="control-error">
+              <label
+                *ngIf="displayFileTypeErrorLogo"
+                for="th_designer_field_logo_url"
+                class="control-error"
+                role="note"
+              >
                 {{ 'VALIDATION.ERRORS.FILETYPE_PATTERN_ERROR_2' | translate }}
               </label>
             </div>
           </div>
           <div class="flex-grow-1">
-            <div class="flex flex-wrap sm:flex-nowrap align-items-center row-gap-2 column-gap-4">
+            <div class="flex flex-wrap sm:flex-nowrap align-items-center row-gap-3 column-gap-4">
               <app-image-container
                 id="th_designer_favicon_url_image"
-                styleClass="h-3rem max-h-3rem max-w-10rem"
+                styleClass="max-h-3rem max-w-8rem"
                 [imageUrl]="fetchingFaviconUrl"
                 [title]="(fetchingFaviconUrl ? 'FAVICON.IMAGE' : 'IMAGE.TOOLTIPS.PLACEHOLDER') | translate"
                 (imageLoadResult)="onImageLoadResult(RefType.Favicon, $event)"
@@ -234,16 +243,21 @@
                   pInputText
                   type="text"
                   id="th_designer_field_favicon_url"
-                  class="w-full"
+                  class="w-full pt-3 pb-2 text-responsive"
                   formControlName="faviconUrl"
                   (input)="onInputChange(RefType.Favicon)"
                   [pTooltip]="'IMAGE.TOOLTIPS.URL' | translate"
                   tooltipPosition="top"
                   tooltipEvent="hover"
                 />
-                <label for="th_designer_field_favicon_url">{{ 'FAVICON.URL' | translate }}</label>
+                <label for="th_designer_field_favicon_url" aria-hidden="true">{{ 'FAVICON.URL' | translate }}</label>
               </span>
-              <label *ngIf="displayFileTypeErrorFavicon" for="th_designer_field_favicon_url" class="control-error">
+              <label
+                *ngIf="displayFileTypeErrorFavicon"
+                for="th_designer_field_favicon_url"
+                class="control-error"
+                role="note"
+              >
                 {{ 'VALIDATION.ERRORS.FILETYPE_PATTERN_ERROR_1' | translate }}
               </label>
             </div>
@@ -263,12 +277,12 @@
                 type="text"
                 id="th_designer_font-family"
                 formControlName="font-family"
-                class="w-full text-responsive"
+                class="w-full pt-3 pb-2 text-responsive"
                 [pTooltip]="'THEME.TOOLTIPS.FONT_FAMILY' | translate"
                 tooltipPosition="top"
                 tooltipEvent="hover"
               />
-              <label for="th_designer_font-family">font-family</label>
+              <label for="th_designer_font-family" aria-hidden="true">font-family</label>
             </span>
           </div>
           <div class="flex-grow-1">
@@ -278,12 +292,12 @@
                 type="text"
                 id="th_designer_font-size"
                 formControlName="font-size"
-                class="w-full text-responsive"
+                class="w-full pt-3 pb-2 text-responsive"
                 [pTooltip]="'THEME.TOOLTIPS.FONT_SIZE' | translate"
                 tooltipPosition="top"
                 tooltipEvent="hover"
               />
-              <label for="th_designer_font-size">font-size</label>
+              <label for="th_designer_font-size" aria-hidden="true">font-size</label>
             </span>
           </div>
         </div>
@@ -304,11 +318,12 @@
               <span class="p-float-label">
                 <input
                   pInputText
-                  id="th_designer_item_color_{{ item }}"
+                  [id]="'th_designer_item_color_' + item"
+                  class="text-responsive"
                   [formControlName]="item"
                   [value]="group.formGroup.value[item]"
                 />
-                <label for="th_designer_item_color_{{ item }}">{{ item }}</label>
+                <label [for]="'th_designer_item_color_' + item" aria-hidden="true"> {{ item }} </label>
               </span>
               <p-overlayPanel #op>
                 <ng-template pTemplate>
@@ -319,7 +334,7 @@
               </p-overlayPanel>
               <a
                 tabindex="0"
-                id="th_designer_item_color_{{ item }}_toggle"
+                [id]="'th_designer_item_color_' + item + '_toggle'"
                 class="p-inputgroup-addon cursor-pointer"
                 (click)="op.toggle($event)"
                 (keyup)="op.toggle($event)"
@@ -361,7 +376,9 @@
         tooltipPosition="top"
         tooltipEvent="hover"
       />
-      <label for="th_saveas_form_theme_name" class="ocx-required-label"> {{ 'THEME.NAME' | translate }} </label>
+      <label for="th_saveas_form_theme_name" class="ocx-required-label" aria-hidden="true">
+        {{ 'THEME.NAME' | translate }}
+      </label>
     </span>
     <span class="p-float-label" controlErrorAnchor>
       <input
@@ -376,7 +393,7 @@
         tooltipPosition="top"
         tooltipEvent="hover"
       />
-      <label for="th_saveas_form_display_name" class="ocx-required-label">
+      <label for="th_saveas_form_display_name" class="ocx-required-label" aria-hidden="true">
         {{ 'THEME.DISPLAY_NAME' | translate }}
       </label>
     </span>

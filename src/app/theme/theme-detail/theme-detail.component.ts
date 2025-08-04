@@ -3,6 +3,7 @@ import { Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateService } from '@ngx-translate/core'
 import { Observable, catchError, finalize, map, of } from 'rxjs'
+import { Message } from 'primeng/api'
 import FileSaver from 'file-saver'
 
 import { PortalMessageService, UserService } from '@onecx/angular-integration-interface'
@@ -37,6 +38,8 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
   public actions$: Observable<Action[]> = of([])
   public headerImageUrl?: string
   public isThemeUsedByWorkspace = false
+  private translations$: Observable<Message[]> | undefined
+  public messages: Message[] = []
 
   constructor(
     private readonly user: UserService,
@@ -54,6 +57,7 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    this.prepareDialogTranslations()
     this.getTheme()
   }
 
@@ -204,5 +208,23 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
       return theme.faviconUrl
     }
     return bffImageUrl(this.imageApi.configuration.basePath, theme.name, refType)
+  }
+
+  private prepareDialogTranslations(): void {
+    this.translations$ = this.translate.get(['INTERNAL.OPERATOR_MESSAGE', 'INTERNAL.OPERATOR_HINT']).pipe(
+      map((data) => {
+        return [
+          {
+            id: 'ws_detail_operator_message',
+            severity: 'warn',
+            life: 5000,
+            closable: true,
+            summary: data['INTERNAL.OPERATOR_HINT'],
+            detail: data['INTERNAL.OPERATOR_MESSAGE']
+          }
+        ]
+      })
+    )
+    this.translations$.subscribe((data) => (this.messages = data))
   }
 }

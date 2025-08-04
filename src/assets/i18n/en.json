@@ -90,6 +90,7 @@
     "MODIFICATION_USER": "Changed by",
     "MANDATORY": "Mandatory",
     "OPERATOR": "Created by automation",
+    "OPERATOR_HINT": "Hint",
     "OPERATOR_MESSAGE": "This Theme was created by automation. All changes will be lost during the next deployment.",
     "TOOLTIPS": {
       "CREATION_DATE": "Timestamp of the creation",
