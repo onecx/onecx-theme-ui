@@ -95,8 +95,8 @@ export class ThemeDesignerComponent implements OnInit {
     this.sidebarForm = new FormGroup({})
     this.groups = [
       { key: 'general', title: 'General Colors', formGroup: this.generalForm },
-      { key: 'topbar', title: 'Topbar - Workspace Header', formGroup: this.topbarForm },
-      { key: 'sidebar', title: 'Sidebar / Menu', formGroup: this.sidebarForm }
+      { key: 'topbar', title: 'Topbar Colors', formGroup: this.topbarForm },
+      { key: 'sidebar', title: 'Menu Colors', formGroup: this.sidebarForm }
     ]
     this.propertiesForm = this.fb.group({
       font: this.fontForm,

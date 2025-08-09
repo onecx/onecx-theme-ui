@@ -36,6 +36,16 @@
     *ngIf="properties.topbar"
     class="theme-color"
     [ngStyle]="{
+      'background-color': properties.topbar['topbar-menu-button-text-color']
+    }"
+    [pTooltip]="'THEME.IMPORT.THEME_COLOR_TOP_MENU' | translate"
+    tooltipPosition="top"
+    tooltipEvent="hover"
+  ></div>
+  <div
+    *ngIf="properties.topbar"
+    class="theme-color"
+    [ngStyle]="{
       'background-color': properties.topbar['topbar-menu-button-bg-color']
     }"
     [pTooltip]="'THEME.IMPORT.THEME_COLOR_TOP_MENU' | translate"

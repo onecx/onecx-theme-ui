@@ -14,6 +14,7 @@ export const themeVariables: ThemeVariablesType = {
     'topbar-left-bg-color',
     'topbar-item-text-hover-bg-color',
     'topbar-menu-button-bg-color',
+    'topbar-menu-button-text-color',
     'logo-color'
   ],
 

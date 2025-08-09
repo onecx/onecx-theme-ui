@@ -16,6 +16,7 @@ export class ThemeColorBoxComponent {
     topbar: {
       'topbar-text-color': 'gray',
       'topbar-bg-color': 'lightgray',
+      'topbar-menu-button-text-color': 'black',
       'topbar-menu-button-bg-color': 'silver',
       'topbar-left-bg-color': ' lightgray'
     }

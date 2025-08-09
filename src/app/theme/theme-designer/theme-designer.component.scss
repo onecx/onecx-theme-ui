@@ -5,19 +5,21 @@
 
 :host ::ng-deep {
   .grid.grid-row-gap {
-    grid-row-gap: 1.5rem;
+    grid-row-gap: 0.5rem;
   }
 
   .p-fieldset {
     background-color: var(--body-bg-color) !important;
     .p-fieldset-legend {
       background-color: transparent;
-      padding: 0.3rem 0.4rem;
+      padding: 0rem 0.4rem;
       margin-left: 0.8rem;
+    }
+    .p-fieldset-content {
+      padding-bottom: 0.3rem;
     }
   }
   .color-form-group.p-fieldset .p-fieldset-content {
-    padding-left: 0;
-    padding-right: 0;
+    padding-bottom: 0rem;
   }
 }
