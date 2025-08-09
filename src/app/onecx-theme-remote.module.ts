@@ -6,7 +6,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { TranslateLoader, TranslateModule, MissingTranslationHandler } from '@ngx-translate/core'
 
 import { AngularAuthModule } from '@onecx/angular-auth'
-import { createTranslateLoader, TRANSLATION_PATH, translationPathFactory } from '@onecx/angular-utils'
+import { createTranslateLoader, provideTranslationPathFromMeta } from '@onecx/angular-utils'
 import { createAppEntrypoint, initializeRouter, startsWith } from '@onecx/angular-webcomponents'
 import { addInitializeModuleGuard, AppStateService, ConfigurationService } from '@onecx/angular-integration-interface'
 import {
@@ -53,13 +53,8 @@ const routes: Routes = [
       multi: true,
       deps: [Router, AppStateService]
     },
-    {
-      provide: TRANSLATION_PATH,
-      useFactory: (appStateService: AppStateService) => translationPathFactory('assets/i18n/')(appStateService),
-      multi: true,
-      deps: [AppStateService]
-    },
     { provide: SLOT_SERVICE, useExisting: SlotService },
+    provideTranslationPathFromMeta(import.meta.url, 'assets/i18n/'),
     provideHttpClient(withInterceptorsFromDi())
   ]
 })

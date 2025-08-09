@@ -319,18 +319,18 @@
         *ngFor="let group of groups"
         [toggleable]="false"
         [collapsed]="false"
-        styleClass="px-1 color-form-group "
+        styleClass="px-1 color-form-group"
       >
         <ng-template pTemplate="header">
           <span [title]="group.title">{{ group.title }}</span>
         </ng-template>
-        <form [formGroup]="group.formGroup" class="grid grid-nogutter grid-row-gap">
+        <form [formGroup]="group.formGroup" class="grid grid-row-gap">
           <article
             class="col-12 sm:col-6 md:col-4 lg:col-4 xl:col-3"
             *ngFor="let item of themeVars[group.key]"
             [attr.aria-label]="('THEME.TOOLTIPS.ITEM_COLOR' | translate) + ': ' + item"
           >
-            <div class="p-inputgroup px-3">
+            <div class="p-inputgroup">
               <span class="p-float-label">
                 <input
                   pInputText
