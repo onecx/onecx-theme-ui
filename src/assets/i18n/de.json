@@ -89,6 +89,7 @@
     "MODIFICATION_DATE": "Geändert am",
     "MODIFICATION_USER": "Geändert von",
     "MANDATORY": "Notwendig",
+    "MANDATORY_TRUE": "Dieses Theme ist notwendig für den Betrieb. Das Theme kann somit nicht gelöscht werden.",
     "OPERATOR": "Automatisiert erstellt",
     "OPERATOR_HINT": "Hinweis",
     "OPERATOR_MESSAGE": "Dieses Theme wurde automatisiert erstellt. Alle Änderungen gehen beim nächsten Deployment verloren.",
@@ -102,6 +103,10 @@
     }
   },
   "DIALOG": {
+    "SEARCH": {
+      "CRITERIA": "Suchfelder",
+      "RESULTS": "Suchergebnisse"
+    },
     "DATAVIEW": {
       "FILTER": "Filter",
       "PRODUCT_FILTER_TOOLTIP": "Filtern nach Applikation und Klassifikation",
