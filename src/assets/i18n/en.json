@@ -89,6 +89,7 @@
     "MODIFICATION_DATE": "Changed on",
     "MODIFICATION_USER": "Changed by",
     "MANDATORY": "Mandatory",
+    "MANDATORY_TRUE": "This Theme is required for operation. Therefore, it cannot be deleted.",
     "OPERATOR": "Created by automation",
     "OPERATOR_HINT": "Hint",
     "OPERATOR_MESSAGE": "This Theme was created by automation. All changes will be lost during the next deployment.",
@@ -97,11 +98,15 @@
       "CREATION_USER": "Name of the user of the creation",
       "MODIFICATION_DATE": "Timestamp of the last change",
       "MODIFICATION_USER": "Name of the user of the last change",
-      "MANDATORY": "If set then this Theme is necessary for operation and therefore the Theme cannot be deleted.",
+      "MANDATORY": "If set then this Theme is required for operation and therefore the Theme cannot be deleted.",
       "OPERATOR": "If set, the Theme cannot be deleted and all changes will be lost during the next deployment."
     }
   },
   "DIALOG": {
+    "SEARCH": {
+      "CRITERIA": "Search Criteria",
+      "RESULTS": "Search Results"
+    },
     "DATAVIEW": {
       "FILTER": "Filter",
       "PRODUCT_FILTER_TOOLTIP": "Filter by Application and Classification",
