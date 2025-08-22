@@ -114,7 +114,7 @@
     "ngx-translate-testing": "^7.0.0",
     "postcss": "8.5.3",
     "postcss-import": "~16.1.0",
-    "postcss-preset-env": "~10.1.3",
+    "postcss-preset-env": "~10.3.0",
     "postcss-url": "~10.1.3",
     "prettier": "^3.5.3",
     "sonar-scanner": "^3.1.0",
