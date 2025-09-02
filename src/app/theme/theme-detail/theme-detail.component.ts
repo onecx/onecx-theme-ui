@@ -133,7 +133,7 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
             {
               label: data['ACTIONS.DELETE.LABEL'],
               title: data['ACTIONS.DELETE.TOOLTIP'],
-              actionCallback: () => (this.themeDeleteVisible = true),
+              actionCallback: () => this.onDeleteTheme(),
               icon: 'pi pi-trash',
               show: 'asOverflow',
               permission: 'THEME#DELETE',
@@ -147,6 +147,11 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
 
   public onClose(): void {
     this.location.back()
+  }
+
+  public onDeleteTheme(): void {
+    this.themeForUse = this.theme // force checking use in workspaces
+    this.themeDeleteVisible = true
   }
 
   public onConfirmThemeDeletion(): void {

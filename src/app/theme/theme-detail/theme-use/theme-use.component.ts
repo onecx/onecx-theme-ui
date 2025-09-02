@@ -43,6 +43,7 @@ export class ThemeUseComponent implements OnInit {
     this.slotEmitter.subscribe((res) => {
       this.workspaceData$.next(res)
       if (res.length > 0) this.used.emit(true)
+      else this.used.emit(false)
     })
   }
 }

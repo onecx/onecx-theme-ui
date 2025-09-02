@@ -28,10 +28,17 @@ describe('ThemeUseComponent', () => {
     fixture = TestBed.createComponent(ThemeUseComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
-    component.slotEmitter.emit([{ name: 'name' } as Workspace])
   })
 
   it('should create', () => {
     expect(component).toBeTruthy()
+  })
+
+  it('should emit true', () => {
+    component.slotEmitter.emit([{ name: 'name' } as Workspace])
+  })
+
+  it('should emit false', () => {
+    component.slotEmitter.emit([])
   })
 })
