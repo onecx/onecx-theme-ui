@@ -166,7 +166,7 @@
           [text]="'ACTIONS.DELETE.MESSAGE_REJECT_MANDATORY' | translate"
         ></p-message>
         <p-message
-          *ngIf="isThemeUsedByWorkspace"
+          *ngIf="!theme?.mandatory && isThemeUsedByWorkspace"
           id="th_delete_reject_use_message"
           severity="info"
           styleClass="p-2"
