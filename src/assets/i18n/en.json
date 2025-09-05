@@ -237,7 +237,7 @@
       "THEME": "Unknown problem retrieving Theme data - please try again."
     },
     "HTTP_STATUS_400": {
-      "Theme": "Your request could not be processed."
+      "THEME": "Your request could not be processed."
     },
     "HTTP_STATUS_401": {
       "THEME": "You are not authorized to see Themes."
@@ -249,7 +249,7 @@
       "THEME": "Theme could not be found."
     },
     "HTTP_STATUS_500": {
-      "THEME": "Unknown server problem retrieving the Theme - please try again."
+      "THEME": "Unknown server problem retrieving Theme data - please try again."
     }
   }
 }

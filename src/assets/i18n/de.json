@@ -234,7 +234,7 @@
   },
   "EXCEPTIONS": {
     "HTTP_STATUS_0": {
-      "THEME": "Unbekanntes Problem beim Abrufen des Themes - Bitte versuchen sie es noch einmal."
+      "THEME": "Unbekanntes Problem beim Abrufen von Theme Daten - Bitte versuchen sie es noch einmal."
     },
     "HTTP_STATUS_400": {
       "Theme": "Ihre Anfrage konnte nicht bearbeitet werden."
@@ -249,7 +249,7 @@
       "THEME": "Theme nicht gefunden werden."
     },
     "HTTP_STATUS_500": {
-      "THEME": "Unbekanntes Server-Problem beim Abrufen des Themes - Bitte versuchen sie es noch einmal."
+      "THEME": "Unbekanntes Server-Problem beim Abrufen von Theme Daten - Bitte versuchen sie es noch einmal."
     }
   }
 }

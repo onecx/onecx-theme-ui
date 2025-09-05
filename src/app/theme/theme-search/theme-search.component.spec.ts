@@ -102,39 +102,61 @@ describe('ThemeSearchComponent', () => {
     expect(component.onImportThemeClick).toHaveBeenCalledTimes(1)
   })
 
-  it('should search themes without results', (done) => {
-    themeApiSpy.getThemes.and.returnValue(of({ stream: [] } as GetThemesResponse))
+  describe('search on init', () => {
+    it('should manage no themes exists', (done) => {
+      themeApiSpy.getThemes.and.returnValue(of({ stream: [] } as GetThemesResponse))
 
-    component.ngOnInit()
+      component.ngOnInit()
 
-    component.themes$.subscribe({
-      next: (result) => {
-        if (result) {
-          expect(result.length).toBe(0)
-        }
-        done()
-      },
-      error: done.fail
+      component.themes$.subscribe({
+        next: (result) => {
+          if (result) {
+            expect(result.length).toBe(0)
+          }
+          done()
+        },
+        error: done.fail
+      })
     })
-  })
 
-  it('should search themes but display error if API call fails', (done) => {
-    const errorResponse = { status: 403, statusText: 'No permissions' }
-    themeApiSpy.getThemes.and.returnValue(throwError(() => errorResponse))
-    spyOn(console, 'error')
+    it('should manage known server error', (done) => {
+      const errorResponse = { status: 403, statusText: 'No permissions' }
+      themeApiSpy.getThemes.and.returnValue(throwError(() => errorResponse))
+      spyOn(console, 'error')
 
-    component.ngOnInit()
+      component.ngOnInit()
 
-    component.themes$.subscribe({
-      next: (result) => {
-        if (result) {
-          expect(result.length).toBe(0)
-          expect(console.error).toHaveBeenCalledWith('getThemes', errorResponse)
-          expect(component.exceptionKey).toEqual('EXCEPTIONS.HTTP_STATUS_' + errorResponse.status + '.THEMES')
-        }
-        done()
-      },
-      error: done.fail
+      component.themes$.subscribe({
+        next: (result) => {
+          if (result) {
+            expect(result.length).toBe(0)
+            expect(console.error).toHaveBeenCalledWith('getThemes', errorResponse)
+            expect(component.exceptionKey).toEqual('EXCEPTIONS.HTTP_STATUS_' + errorResponse.status + '.THEME')
+          }
+          done()
+        },
+        error: done.fail
+      })
+    })
+
+    it('should manage unknown server error', (done) => {
+      const errorResponse = { status: 405, statusText: 'something went wrong' }
+      themeApiSpy.getThemes.and.returnValue(throwError(() => errorResponse))
+      spyOn(console, 'error')
+
+      component.ngOnInit()
+
+      component.themes$.subscribe({
+        next: (result) => {
+          if (result) {
+            expect(result.length).toBe(0)
+            expect(console.error).toHaveBeenCalledWith('getThemes', errorResponse)
+            expect(component.exceptionKey).toEqual('EXCEPTIONS.HTTP_STATUS_0.THEME')
+          }
+          done()
+        },
+        error: done.fail
+      })
     })
   })
 

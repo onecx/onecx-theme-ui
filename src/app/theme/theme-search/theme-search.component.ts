@@ -7,7 +7,7 @@ import { DataView } from 'primeng/dataview'
 import { Action, DataViewControlTranslations } from '@onecx/portal-integration-angular'
 
 import { ImagesInternalAPIService, RefType, Theme, ThemesAPIService } from 'src/app/shared/generated'
-import { limitText, bffImageUrl } from 'src/app/shared/utils'
+import { limitText, bffImageUrl, mapping_error_status } from 'src/app/shared/utils'
 
 @Component({
   templateUrl: './theme-search.component.html',
@@ -48,7 +48,7 @@ export class ThemeSearchComponent implements OnInit {
     this.themes$ = this.themeApi.getThemes({}).pipe(
       map((data) => (data?.stream ? data.stream.sort(this.sortThemesByName) : [])),
       catchError((err) => {
-        this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + err.status + '.THEMES'
+        this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + mapping_error_status(err.status) + '.THEME'
         console.error('getThemes', err)
         return of([] as Theme[])
       }),

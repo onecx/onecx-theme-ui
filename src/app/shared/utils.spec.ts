@@ -1,6 +1,7 @@
 import { SelectItem } from 'primeng/api'
 import {
   dropDownSortItemsByLabel,
+  mapping_error_status,
   filterObject,
   limitText,
   prepareUrlPath,
@@ -11,6 +12,19 @@ import {
 import { RefType } from './generated'
 
 describe('util functions', () => {
+  describe('http error status', () => {
+    it('should map known status', () => {
+      const status = mapping_error_status(404)
+
+      expect(status).toEqual(404)
+    })
+    it('should map unknown status', () => {
+      const status = mapping_error_status(405)
+
+      expect(status).toEqual(0)
+    })
+  })
+
   describe('limitText', () => {
     it('should truncate text that exceeds the specified limit', () => {
       const result = limitText('hello', 4)
