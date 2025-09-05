@@ -8,14 +8,14 @@ import { TranslateTestingModule } from 'ngx-translate-testing'
 import { of, throwError } from 'rxjs'
 import { DataViewModule } from 'primeng/dataview'
 
-import { GetThemesResponse, ThemesAPIService } from 'src/app/shared/generated'
+import { SearchThemeResponse, ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeSearchComponent } from './theme-search.component'
 
 describe('ThemeSearchComponent', () => {
   let component: ThemeSearchComponent
   let fixture: ComponentFixture<ThemeSearchComponent>
 
-  const themeApiSpy = { getThemes: jasmine.createSpy('getThemes').and.returnValue(of({})) }
+  const themeApiSpy = { searchThemes: jasmine.createSpy('searchThemes').and.returnValue(of({})) }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -36,9 +36,9 @@ describe('ThemeSearchComponent', () => {
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents()
     // to spy data: reset
-    themeApiSpy.getThemes.calls.reset()
+    themeApiSpy.searchThemes.calls.reset()
     // to spy data: refill with neutral data
-    themeApiSpy.getThemes.and.returnValue(of({}))
+    themeApiSpy.searchThemes.and.returnValue(of({}))
   }))
 
   beforeEach(() => {
@@ -73,7 +73,7 @@ describe('ThemeSearchComponent', () => {
         { name: 'theme2', displayName: 'Theme 2' }
       ]
     }
-    themeApiSpy.getThemes.and.returnValue(of(themesResponse as GetThemesResponse))
+    themeApiSpy.searchThemes.and.returnValue(of(themesResponse as SearchThemeResponse))
 
     component.ngOnInit()
 
@@ -104,7 +104,7 @@ describe('ThemeSearchComponent', () => {
 
   describe('search on init', () => {
     it('should manage no themes exists', (done) => {
-      themeApiSpy.getThemes.and.returnValue(of({ stream: [] } as GetThemesResponse))
+      themeApiSpy.searchThemes.and.returnValue(of({ stream: [] } as SearchThemeResponse))
 
       component.ngOnInit()
 
@@ -121,7 +121,7 @@ describe('ThemeSearchComponent', () => {
 
     it('should manage known server error', (done) => {
       const errorResponse = { status: 403, statusText: 'No permissions' }
-      themeApiSpy.getThemes.and.returnValue(throwError(() => errorResponse))
+      themeApiSpy.searchThemes.and.returnValue(throwError(() => errorResponse))
       spyOn(console, 'error')
 
       component.ngOnInit()
@@ -130,7 +130,7 @@ describe('ThemeSearchComponent', () => {
         next: (result) => {
           if (result) {
             expect(result.length).toBe(0)
-            expect(console.error).toHaveBeenCalledWith('getThemes', errorResponse)
+            expect(console.error).toHaveBeenCalledWith('searchThemes', errorResponse)
             expect(component.exceptionKey).toEqual('EXCEPTIONS.HTTP_STATUS_' + errorResponse.status + '.THEME')
           }
           done()
@@ -141,7 +141,7 @@ describe('ThemeSearchComponent', () => {
 
     it('should manage unknown server error', (done) => {
       const errorResponse = { status: 405, statusText: 'something went wrong' }
-      themeApiSpy.getThemes.and.returnValue(throwError(() => errorResponse))
+      themeApiSpy.searchThemes.and.returnValue(throwError(() => errorResponse))
       spyOn(console, 'error')
 
       component.ngOnInit()
@@ -150,7 +150,7 @@ describe('ThemeSearchComponent', () => {
         next: (result) => {
           if (result) {
             expect(result.length).toBe(0)
-            expect(console.error).toHaveBeenCalledWith('getThemes', errorResponse)
+            expect(console.error).toHaveBeenCalledWith('searchThemes', errorResponse)
             expect(component.exceptionKey).toEqual('EXCEPTIONS.HTTP_STATUS_0.THEME')
           }
           done()
