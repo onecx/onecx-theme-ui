@@ -9,7 +9,7 @@ import FileSaver from 'file-saver'
 import { PortalMessageService, UserService } from '@onecx/angular-integration-interface'
 import { Action } from '@onecx/angular-accelerator'
 
-import { bffImageUrl, getCurrentDateTime } from 'src/app/shared/utils'
+import { bffImageUrl, getCurrentDateTime, mapping_error_status } from 'src/app/shared/utils'
 import {
   ExportThemeRequest,
   ImagesInternalAPIService,
@@ -77,7 +77,7 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
         return data.resource
       }),
       catchError((err) => {
-        this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + err.status + '.THEME'
+        this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + mapping_error_status(err.status) + '.THEME'
         console.error('getThemeByName', err)
         return of({})
       }),

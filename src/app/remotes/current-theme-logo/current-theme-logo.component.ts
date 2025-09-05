@@ -84,10 +84,10 @@ export class OneCXCurrentThemeLogoComponent implements ocxRemoteComponent, ocxRe
   public onImageLoadError(usedUrl: string): void {
     this.log('onImageLoadError using => ' + usedUrl)
     if (usedUrl === this.imageUrl) {
-      this.log('onImageLoadError using => 1')
+      this.log('onImageLoadError using => image')
       this.imageUrl$.next(this.getImageUrl(this.themeName, 'image'))
     } else if (usedUrl === this.getImageUrl(this.themeName, 'image')) {
-      this.log('onImageLoadError using => 2')
+      this.log('onImageLoadError using => default')
       this.imageUrl$.next(this.getImageUrl(this.themeName, 'default'))
     }
   }

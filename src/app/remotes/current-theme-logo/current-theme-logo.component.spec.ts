@@ -109,7 +109,7 @@ describe('OneCXCurrentThemeLogoComponent', () => {
       component.imageUrl$?.subscribe({
         next: (data) => {
           if (data) {
-            expect(data).toBe('http://onecx-theme-bff:8080/images/theme1/logo')
+            expect(data).toBe('http://onecx-theme-bff:8080/images/' + theme1.name + '/logo')
           }
           done()
         },
@@ -133,7 +133,7 @@ describe('OneCXCurrentThemeLogoComponent', () => {
         component.logPrefix = 'default logo'
         component.themeName = theme1.name
 
-        component.onImageLoadError('http://onecx-theme-bff:8080/images/theme1/logo')
+        component.onImageLoadError('http://onecx-theme-bff:8080/images/' + theme1.name + '/logo')
       })
     })
 

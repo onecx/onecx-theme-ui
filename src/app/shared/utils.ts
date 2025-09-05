@@ -2,6 +2,10 @@ import { SelectItem } from 'primeng/api'
 import { Location } from '@angular/common'
 import { RefType } from 'src/app/shared/generated'
 
+export function mapping_error_status(status: number): number {
+  return [0, 400, 401, 403, 404, 500].includes(status) ? status : 0
+}
+
 export function limitText(text: string | null, limit: number): string {
   if (text) {
     return text.length < limit ? text : text.substring(0, limit) + '...'
