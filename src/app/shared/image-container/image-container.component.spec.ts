@@ -42,55 +42,53 @@ describe('ImageContainerComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy()
-    expect(component.defaultImageUrl).toEqual('/base/assets/images/logo.png')
+    expect(component.defaultImageUrl).toBe('/base/assets/images/logo.png')
   })
 
-  describe('ngOnChanges', () => {
-    it('should not modify imageUrl if it starts with http/https', () => {
-      const testUrl = 'http://path/to/image.jpg'
-      component.imageUrl = testUrl
-      component.ngOnChanges({
-        imageUrl: {
-          currentValue: testUrl,
-          previousValue: null,
-          firstChange: true,
-          isFirstChange: () => true
-        }
-      })
-
-      expect(component.imageUrl).toBe(testUrl)
+  describe('on changes', () => {
+    beforeEach(() => {
+      component.imageUrl = 'https://host/path-to-image'
     })
 
-    it('should display default logo if there is no image url', () => {
-      component.imageUrl = ''
+    it('should use imageUrl as URL if was set', () => {
       component.ngOnChanges({
         imageUrl: {
-          currentValue: '',
+          currentValue: component.imageUrl,
           previousValue: undefined,
           firstChange: true,
           isFirstChange: () => true
         }
       })
+      expect(component.url).toBe(component.imageUrl)
+    })
 
-      expect(component.displayDefault).toBeTrue()
+    it('should use default image as URL if imageURL was not set', () => {
+      component.ngOnChanges({
+        imageUrl: {
+          currentValue: undefined,
+          previousValue: component.imageUrl,
+          firstChange: true,
+          isFirstChange: () => true
+        }
+      })
+      expect(component.url).toBe(component.defaultImageUrl)
     })
   })
 
-  describe('image loading', () => {
-    it('should use default logo on error', () => {
+  describe('loading results', () => {
+    it('should emit an error if image could not be loaded', () => {
       spyOn(component.imageLoadResult, 'emit')
-      component.displayImageUrl = 'url'
 
+      component.imageUrl = '/url'
       component.onImageLoadError()
 
-      expect(component.displayDefault).toBeTrue()
       expect(component.imageLoadResult.emit).toHaveBeenCalledWith(false)
     })
 
-    it('should inform caller on success', () => {
+    it('should emit a success if image could be loaded', () => {
       spyOn(component.imageLoadResult, 'emit')
-      component.displayImageUrl = 'url'
 
+      component.imageUrl = '/url'
       component.onImageLoadSuccess()
 
       expect(component.imageLoadResult.emit).toHaveBeenCalledWith(true)

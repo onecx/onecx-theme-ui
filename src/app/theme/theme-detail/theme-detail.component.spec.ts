@@ -11,7 +11,7 @@ import FileSaver from 'file-saver'
 
 import { ConfigurationService, PortalMessageService, UserService } from '@onecx/angular-integration-interface'
 
-import { RefType, Theme, ThemesAPIService } from 'src/app/shared/generated'
+import { ImagesInternalAPIService, RefType, Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { bffImageUrl, getCurrentDateTime } from 'src/app/shared/utils'
 
 import { ThemeDetailComponent } from './theme-detail.component'
@@ -31,13 +31,13 @@ describe('ThemeDetailComponent', () => {
   const mockUserService = { lang$: { getValue: jasmine.createSpy('getValue').and.returnValue('en') } }
   const msgServiceSpy = jasmine.createSpyObj<PortalMessageService>('PortalMessageService', ['success', 'error'])
   const locationSpy = jasmine.createSpyObj<Location>('Location', ['back'])
-
   const configServiceSpy = { getProperty: jasmine.createSpy('getProperty').and.returnValue('123'), lang: 'en' }
   const themesApiSpy = jasmine.createSpyObj<ThemesAPIService>('ThemesAPIService', [
     'getThemeByName',
     'deleteTheme',
     'exportThemes'
   ])
+  const imgServiceSpy = { configuration: { basePath: '/basePath' } }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -57,7 +57,8 @@ describe('ThemeDetailComponent', () => {
         { provide: PortalMessageService, useValue: msgServiceSpy },
         { provide: ConfigurationService, useValue: configServiceSpy },
         { provide: Location, useValue: locationSpy },
-        { provide: ThemesAPIService, useValue: themesApiSpy }
+        { provide: ThemesAPIService, useValue: themesApiSpy },
+        { provide: ImagesInternalAPIService, useValue: imgServiceSpy }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents()
@@ -367,20 +368,27 @@ describe('ThemeDetailComponent', () => {
       expect(console.error).toHaveBeenCalledWith('exportThemes', errorResponse)
       expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EXPORT.EXPORT_THEME_FAIL' })
     })
+  })
 
-    it('should get correct favicon URL', () => {
+  describe('get image URL', () => {
+    it('should get correct URLs', () => {
       const theme: Theme = {
         modificationCount: 0,
         name: 'themeName',
-        faviconUrl: 'faviconUrl'
+        logoUrl: 'https://host/path-to-logo',
+        smallLogoUrl: 'https://host/path-to-small-logo',
+        faviconUrl: 'https://host/path-to-favicon'
       }
-      expect(component.getImageUrl(theme, RefType.Favicon)).toBe('faviconUrl')
+      expect(component.getImageUrl(theme, RefType.Logo)).toBe(theme.logoUrl)
+      expect(component.getImageUrl(theme, RefType.LogoSmall)).toBe(theme.smallLogoUrl)
+      expect(component.getImageUrl(theme, RefType.Favicon)).toBe(theme.faviconUrl)
 
-      const configBasePath = 'http://onecx-theme-bff:8080'
-      theme.faviconUrl = ''
-      expect(component.getImageUrl(theme, RefType.Favicon)).toBe(
-        bffImageUrl(configBasePath, theme.name, RefType.Favicon)
-      )
+      const base = '/basePath'
+      const theme2: Theme = { ...theme, logoUrl: undefined, smallLogoUrl: undefined, faviconUrl: undefined }
+
+      expect(component.getImageUrl(theme2, RefType.Logo)).toBe(bffImageUrl(base, theme.name, RefType.Logo))
+      expect(component.getImageUrl(theme2, RefType.LogoSmall)).toBe(bffImageUrl(base, theme.name, RefType.LogoSmall))
+      expect(component.getImageUrl(theme2, RefType.Favicon)).toBe(bffImageUrl(base, theme.name, RefType.Favicon))
     })
   })
 })

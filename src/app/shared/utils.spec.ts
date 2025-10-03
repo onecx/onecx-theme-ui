@@ -1,6 +1,5 @@
 import { SelectItem } from 'primeng/api'
 import {
-  dropDownSortItemsByLabel,
   mapping_error_status,
   filterObject,
   limitText,
@@ -137,31 +136,6 @@ describe('util functions', () => {
       const itemA = { id: 'a', name: 'name', displayName: undefined }
       const itemB = { id: 'b', name: 'name', displayName: undefined }
       expect(sortByDisplayName(itemA, itemB)).toBe(0)
-    })
-  })
-
-  describe('dropDownSortItemsByLabel', () => {
-    it('should correctly sort items by label', () => {
-      const items: SelectItem[] = [
-        { label: 'label2', value: 2 },
-        { label: 'label1', value: 1 }
-      ]
-
-      const sortedItems = items.sort(dropDownSortItemsByLabel)
-
-      expect(sortedItems[0].label).toEqual('label1')
-    })
-
-    it("should treat falsy values for SelectItem.label as ''", () => {
-      const items: SelectItem[] = [
-        { label: undefined, value: 1 },
-        { label: undefined, value: 2 },
-        { label: 'label1', value: 2 }
-      ]
-
-      const sortedItems = items.sort(dropDownSortItemsByLabel)
-
-      expect(sortedItems[0].label).toEqual(undefined)
     })
   })
 

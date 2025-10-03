@@ -11,8 +11,8 @@
       "THEME.TOOLTIP": "Ein neues Theme erstellen",
       "MESSAGE": {
         "THEME_ALREADY_EXISTS": "Ein Theme mit diesem Namen existert schon",
-        "CREATE_OK": "Das Theme wurde erfolgreich erstellt",
-        "CREATE_NOK": "Ein Fehler ist aufgetreten. Das Theme wurde nicht erstellt."
+        "OK": "Das Theme wurde erfolgreich erstellt",
+        "NOK": "Ein Fehler ist aufgetreten. Das Theme wurde nicht erstellt."
       }
     },
     "DELETE": {
@@ -30,10 +30,8 @@
       "LABEL": "Bearbeiten",
       "TOOLTIP": "Die Eigenschaften bearbeiten",
       "MESSAGE": {
-        "CHANGE_OK": "Das Theme wurde erfolgreich geändert",
-        "CHANGE_NOK": "Ein Fehler ist aufgetreten. Das Theme wurde nicht geändert.",
-        "IMAGE_CONSTRAINT": "Ein Fehler ist aufgetreten. Bitte füge einen Namen hinzu bevor das Bild geladen wird.",
-        "IMAGE_CONSTRAINT_SIZE": "Ein Fehler ist aufgetreten. Das Bild ist zu groß."
+        "OK": "Das Theme wurde erfolgreich geändert",
+        "NOK": "Ein Fehler ist aufgetreten. Das Theme wurde nicht geändert."
       }
     },
     "EXPORT": {
@@ -123,20 +121,56 @@
     }
   },
   "IMAGE": {
-    "UPLOADED": "Datei hochgeladen",
-    "UPLOAD_FAIL": "Die Datei wurde nicht erfolgreich hochgeladen",
-    "UPLOAD_SUCCESS": "Die Datei wurde erfolgreich hochgeladen",
+    "FAVICON": "Favicon",
+    "FAVICON_URL": "Externe Favicon URL",
+    "LOGO": "Logo",
+    "LOGO_SMALL": "Logo (klein)",
+    "LOGO_URL": "Externe Logo URL",
+    "UPLOAD": {
+      "OK": "Die Datei wurde erfolgreich hochgeladen",
+      "NOK": "Die Datei wurde nicht erfolgreich hochgeladen"
+    },
+    "CONSTRAINT": {
+      "FILE_MISSING": "Keine Datei ausgewählt.",
+      "FILE_TYPE": "Die folgenden Bildformate werden akzeptiert: jpg, jpeg, png, svg",
+      "FILE_TYPE.FAVICON": "Die folgenden Bildformate werden akzeptiert: jpg, jpeg, ico, png, svg",
+      "FAILED": "Bedingung zum Hochladen nicht erfüllt:",
+      "NAME": "Bitte füge einen Namen hinzu bevor das Bild geladen wird.",
+      "SIZE": "Die Größe der Bilddatei übersteigt die maximale Lönge von 100.000 Bytes."
+    },
+    "TOOLTIPS": {
+      "FAVICON": "Lesezeichen/Favoriten-Icon",
+      "LOGO": "Logo in Standardgröße",
+      "LOGO_SMALL": "Logo in reduzierter Größe, z.b. für Verwendung im Slim Menü",
+      "PLACEHOLDER": "Logo Platzhalter",
+      "REMOVE": "Bild löschen",
+      "REMOVE.URL": "Eintrag entfernen",
+      "UPLOAD": "Bild auswählen und hochladen",
+      "URL": "Als Alternative zum Hochladen kann hier eine URL zu einem Bild angegeben werden."
+    }
+  },
+  "IMAGE_ALT": {
+    "FAVICON": "Favicon",
+    "LOGO": "Logo",
+    "LOGO_SMALL": "Logo (klein)",
+    "LOGO_URL": "Externe Logo URL",
+    "UPLOAD": {
+      "OK": "Die Datei wurde erfolgreich hochgeladen",
+      "NOK": "Die Datei wurde nicht erfolgreich hochgeladen"
+    },
     "CONSTRAINT_FILE_MISSING": "Keine Datei ausgewählt.",
-    "CONSTRAINT_FILE_TYPE": "Die folgenden Bildformate werden akzeptiert: jpg, jpeg, png",
+    "CONSTRAINT_FILE_TYPE": "Die folgenden Bildformate werden akzeptiert: jpg, jpeg, png, svg",
     "CONSTRAINT_FAILED": "Bedingung zum Hochladen nicht erfüllt:",
     "CONSTRAINT_NAME": "Bitte füge einen Namen hinzu bevor das Bild geladen wird.",
     "CONSTRAINT_SIZE": "Die Größe der Bilddatei übersteigt die maximale Lönge von 100.000 Bytes.",
     "TOOLTIPS": {
-      "IMAGE": "Logo",
-      "PLACEHOLDER": "Platzhalter",
+      "FAVICON": "Lesezeichen/Favoriten-Icon",
+      "LOGO": "Logo in Standardgröße",
+      "LOGO_SMALL": "Logo in reduzierter Größe, z.b. für Verwendung im Slim Menü",
+      "PLACEHOLDER": "Logo Platzhalter",
       "REMOVE": "Bild löschen",
       "UPLOAD": "Bild auswählen und hochladen",
-      "URL": "Als Alternative zum Hochladen kann hier eine URL zu einem Bild angegeben werden"
+      "URL": "Als Alternative zum Hochladen kann hier eine URL zu einem Bild angegeben werden."
     }
   },
   "LOGO": {
@@ -191,8 +225,8 @@
     "TEMPLATE": {
       "SELECTOR": "Theme-Vorlage wählen",
       "SELECTOR.TOOLTIP": "Ein vorhandenes Theme als Vorlage verwenden",
-      "CONFIRMATION.HEADER": "Theme als Vorlage benutzen",
-      "CONFIRMATION.MESSAGE": "Sollen alle vorhandenen Werte durch die Werte von \"{{ITEM}}\" ersetzt werden?"
+      "CONFIRMATION.HEADER": "Themewerte ersetzen",
+      "CONFIRMATION.MESSAGE": "Sollen alle Werte durch die Werte von \"{{ITEM}}\" ersetzt werden?"
     },
     "GROUPS": {
       "BASE": "Basis",
@@ -228,8 +262,11 @@
       "MAXIMUM_LENGTH": "Es sind nur {{chars}} Zeichen erlaubt.",
       "MINIMUM_LENGTH": "Es sind mindestens {{chars}} Zeichen erforderlich.",
       "PATTERN_ERROR": "Ihre Eingabe entspricht nicht dem benötigten Format.",
-      "FILETYPE_PATTERN_ERROR_1": "Ihre Datei entspricht nicht den erlaubten Format: .ico",
-      "FILETYPE_PATTERN_ERROR_2": "Ihre Datei entspricht nicht den erlaubten Formaten: .png, .jpg, .jpeg"
+      "FILETYPE_PATTERN_ERROR_1": "Ihre Datei entspricht nicht den erlaubten Formaten: jpg, jpeg, png, svg",
+      "FILETYPE_PATTERN_ERROR_2": "Ihre Datei entspricht nicht den erlaubten Formaten: ico, jpg, jpeg, png, svg"
+    },
+    "HINTS": {
+      "FORMAT_URL": "Format: "
     }
   },
   "EXCEPTIONS": {
@@ -246,7 +283,7 @@
       "THEME": "Sie haben keine Rechte um Themes zu sehen."
     },
     "HTTP_STATUS_404": {
-      "THEME": "Theme nicht gefunden werden."
+      "THEME": "Theme konnte nicht gefunden werden."
     },
     "HTTP_STATUS_500": {
       "THEME": "Unbekanntes Server-Problem beim Abrufen von Theme Daten - Bitte versuchen sie es noch einmal."

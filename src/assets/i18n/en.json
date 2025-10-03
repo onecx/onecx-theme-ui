@@ -11,8 +11,8 @@
       "THEME.TOOLTIP": "Create a new Theme",
       "MESSAGE": {
         "THEME_ALREADY_EXISTS": "A Theme with that name already exists",
-        "CREATE_OK": "The Theme was created successfully",
-        "CREATE_NOK": "An error has occurred. The Theme was not created."
+        "OK": "The Theme was created successfully",
+        "NOK": "An error has occurred. The Theme was not created."
       }
     },
     "DELETE": {
@@ -30,10 +30,8 @@
       "LABEL": "Edit",
       "TOOLTIP": "Edit properties",
       "MESSAGE": {
-        "CHANGE_OK": "The Theme was changed successfully",
-        "CHANGE_NOK": "An error has occurred. The Theme was not changed.",
-        "IMAGE_CONSTRAINT": "An error has occurred. Please add a Theme name before uploading a file.",
-        "IMAGE_CONSTRAINT_SIZE": "An error has occurred. The image is too large."
+        "OK": "The Theme was changed successfully",
+        "NOK": "An error has occurred. The Theme was not changed."
       }
     },
     "EXPORT": {
@@ -123,20 +121,55 @@
     }
   },
   "IMAGE": {
-    "UPLOADED": "File uploaded",
-    "UPLOAD_FAIL": " The file was not uploaded successfully",
-    "UPLOAD_SUCCESS": "The file was uploaded successfully",
+    "FAVICON": "Favicon",
+    "FAVICON_URL": "External Favicon URL",
+    "LOGO": "Logo",
+    "LOGO_SMALL": "Logo (small)",
+    "LOGO_URL": "External Logo URL",
+    "UPLOAD": {
+      "OK": "The file was uploaded successfully",
+      "NOK": "The file was not uploaded successfully."
+    },
+    "CONSTRAINT": {
+      "FILE_MISSING": "No file selected.",
+      "FILE_TYPE": "The following image formats are accepted: jpg, jpeg, png, svg",
+      "FILE_TYPE.FAVICON": "The following image formats are accepted: jpg, jpeg, ico, png, svg",
+      "FAILED": "File upload condition check failed:",
+      "NAME": "Please add a Workspace name before uploading a file.",
+      "SIZE": "The image file size exceeds the maximum length of 100,000 bytes."
+    },
+    "TOOLTIPS": {
+      "FAVICON": "Bookmark/Favorite Icon",
+      "LOGO": "Logo - standard size",
+      "LOGO_SMALL": "Logo - reduced size, e.g. for use in slim menu",
+      "PLACEHOLDER": "Logo Placeholder",
+      "REMOVE": "Remove Image",
+      "REMOVE.URL": "Clear",
+      "UPLOAD": "Select and upload image",
+      "URL": "As an alternative to uploading, a URL to an image can be specified here."
+    }
+  },
+  "IMAGE_ALT": {
+    "LOGO": "Logo",
+    "LOGO_SMALL": "Logo (small)",
+    "LOGO_URL": "External Logo URL",
+    "UPLOAD": {
+      "OK": "The file was uploaded successfully",
+      "NOK": "The file was not uploaded successfully."
+    },
     "CONSTRAINT_FILE_MISSING": "No file selected.",
-    "CONSTRAINT_FILE_TYPE": "The following image formats are accepted: jpg, jpeg, png",
+    "CONSTRAINT_FILE_TYPE": "The following image formats are accepted: jpg, jpeg, png, svg",
     "CONSTRAINT_FAILED": "File upload condition check failed:",
     "CONSTRAINT_NAME": "Please add a Workspace name before uploading a file.",
     "CONSTRAINT_SIZE": "The image file size exceeds the maximum length of 100,000 bytes.",
     "TOOLTIPS": {
-      "IMAGE": "Logo",
+      "FAVICON": "Bookmark icon",
+      "LOGO": "Logo - standard size",
+      "LOGO_SMALL": "Logo - reduced size, e.g. for use in slim menu",
       "PLACEHOLDER": "Logo Placeholder",
       "REMOVE": "Remove Image",
       "UPLOAD": "Select and upload image",
-      "URL": "As an alternative to uploading, a URL to an image can be specified here"
+      "URL": "As an alternative to uploading, a URL to an image can be specified here."
     }
   },
   "LOGO": {
@@ -191,7 +224,7 @@
     "TEMPLATE": {
       "SELECTOR": "Select Theme template",
       "SELECTOR.TOOLTIP": "Choose an existing Theme and use it as a template",
-      "CONFIRMATION.HEADER": "Use a Theme as Template",
+      "CONFIRMATION.HEADER": "Replace Theme values",
       "CONFIRMATION.MESSAGE": "Should all values be replaced by the values of \"{{ITEM}}\"?"
     },
     "GROUPS": {
@@ -230,6 +263,9 @@
       "PATTERN_ERROR": "Your input does not match the required pattern",
       "FILETYPE_PATTERN_ERROR_1": "Your file does not match the allowed filetype: .ico",
       "FILETYPE_PATTERN_ERROR_2": "Your file does not match the allowed filetypes: .png, .jpg, .jpeg"
+    },
+    "HINTS": {
+      "FORMAT_URL": "Format: "
     }
   },
   "EXCEPTIONS": {

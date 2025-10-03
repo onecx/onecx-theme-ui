@@ -1,23 +1,12 @@
 <img
   [id]="id"
-  *ngIf="!displayDefault"
-  [class]="'object-fit max-w-full ' + (styleClass ?? '')"
-  [ocxSrc]="displayImageUrl"
+  [class]="'max-w-full ' + (styleClass ?? '')"
+  [ocxSrc]="url"
   (error)="onImageLoadError()"
   (load)="onImageLoadSuccess()"
-  [alt]="title ?? 'LOGO.LABEL' | translate"
+  [alt]="'Logo Theme'"
+  [attr.aria-label]="'Logo Theme'"
   [pTooltip]="title"
   tooltipPosition="top"
   tooltipEvent="hover"
-/>
-<img
-  [id]="id"
-  *ngIf="displayDefault"
-  [class]="'object-fit max-w-full ' + (styleClass ?? '')"
-  [src]="defaultImageUrl"
-  [alt]="title ?? 'IMAGE.TOOLTIPS.PLACEHOLDER' | translate"
-  [pTooltip]="title"
-  tooltipPosition="top"
-  tooltipEvent="hover"
-  aria-hidden="true"
 />

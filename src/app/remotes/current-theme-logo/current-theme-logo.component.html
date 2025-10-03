@@ -5,7 +5,7 @@
   [class]="'border-round-sm ' + (imageStyleClass ?? '')"
   [ocxSrc]="url"
   [alt]="'Logo Theme ' + themeName"
-  [aria-label]="'Logo Theme ' + themeName"
+  [attr.aria-label]="'Logo Theme ' + themeName"
   (error)="onImageLoadError(url)"
   (load)="onImageLoad()"
 />

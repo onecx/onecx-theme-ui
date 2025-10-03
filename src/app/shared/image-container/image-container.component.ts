@@ -1,5 +1,5 @@
-import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core'
-import { map } from 'rxjs'
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core'
+import { Observable, map } from 'rxjs'
 
 import { AppStateService } from '@onecx/angular-integration-interface'
 
@@ -14,50 +14,42 @@ import { prepareUrlPath } from 'src/app/shared/utils'
  */
 @Component({
   selector: 'app-image-container',
-  styleUrls: ['./image-container.component.scss'],
   templateUrl: './image-container.component.html'
 })
 export class ImageContainerComponent implements OnChanges {
-  @Input() public id: string | undefined = undefined
-  @Input() public title: string | undefined = undefined
+  @Input() public id = 'th_image_container'
+  @Input() public title: string | undefined
+  @Input() public small = false
   @Input() public imageUrl: string | undefined
   @Input() public styleClass: string | undefined
   @Output() public imageLoadResult = new EventEmitter<boolean>() // inform caller
 
-  public displayImageUrl: string | undefined
-  public defaultImageUrl = ''
-  public displayDefault = false
+  public url: string | undefined
+  public defaultImageUrl: string | undefined
+  public defaultImageUrl$: Observable<string>
 
-  constructor(private readonly appState: AppStateService) {
-    appState.currentMfe$
-      .pipe(
-        map((mfe) => {
-          this.defaultImageUrl = prepareUrlPath(mfe.remoteBaseUrl, environment.DEFAULT_LOGO_PATH)
-        })
-      )
-      .subscribe()
+  constructor(appState: AppStateService) {
+    this.defaultImageUrl$ = appState.currentMfe$.pipe(
+      map((mfe) => prepareUrlPath(mfe.remoteBaseUrl, environment.DEFAULT_LOGO_PATH))
+    )
+    this.defaultImageUrl$.subscribe((data) => (this.defaultImageUrl = data))
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // Hint: there are more changes (e.g. on title) => ignore them
     if (changes['imageUrl']) {
-      if (this.imageUrl) {
-        this.displayDefault = false
-        this.displayImageUrl = this.imageUrl
-      } else this.displayDefault = true
+      if (changes['imageUrl'].currentValue) this.url = this.imageUrl
+      if (!changes['imageUrl'].currentValue && changes['imageUrl'].previousValue) this.url = this.defaultImageUrl
     }
   }
 
   /**
-   * Image loading Results
+   * Emit image loading results
    */
   public onImageLoadSuccess(): void {
-    if (this.displayImageUrl !== undefined) this.imageLoadResult.emit(true)
+    if (this.imageUrl !== undefined) this.imageLoadResult.emit(true)
   }
 
   public onImageLoadError(): void {
-    if (this.displayImageUrl !== undefined) this.imageLoadResult.emit(false)
-    this.displayDefault = true
-    this.displayImageUrl = undefined
+    if (this.imageUrl !== undefined) this.imageLoadResult.emit(false)
   }
 }

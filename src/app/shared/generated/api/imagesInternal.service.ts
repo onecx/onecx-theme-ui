@@ -1,6 +1,6 @@
 /**
  * onecx-theme-bff
- * OneCx theme Bff
+ * Backend-For-Frontend (BFF) service for onecx-theme. This API provides endpoints to manage Themes and related Images
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -115,7 +115,7 @@ export class ImagesInternalAPIService {
     }
 
     /**
-     * delete Image
+     * Delete an image by its reference id and type
      * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
@@ -177,7 +177,7 @@ export class ImagesInternalAPIService {
     }
 
     /**
-     * Get Image by id
+     * Get an image by its reference id and type
      * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
@@ -230,7 +230,7 @@ export class ImagesInternalAPIService {
     }
 
     /**
-     * Upload Images
+     * Upload an image by its reference id and type
      * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.

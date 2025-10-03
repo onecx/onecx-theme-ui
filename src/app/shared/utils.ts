@@ -14,15 +14,6 @@ export function limitText(text: string | null, limit: number): string {
   }
 }
 
-export function dropDownSortItemsByLabel(a: SelectItem, b: SelectItem): number {
-  return (a.label ? a.label.toUpperCase() : '').localeCompare(b.label ? b.label.toUpperCase() : '')
-}
-export function dropDownGetLabelByValue(ddArray: SelectItem[], val: string): string {
-  const a: any = ddArray.find((item: SelectItem) => {
-    return item?.value == val
-  })
-  return a.label
-}
 export function sortByLocale(a: any, b: any): number {
   return a.toUpperCase().localeCompare(b.toUpperCase())
 }

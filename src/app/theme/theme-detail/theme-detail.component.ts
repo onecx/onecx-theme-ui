@@ -203,15 +203,10 @@ export class ThemeDetailComponent implements OnInit, AfterViewInit {
   }
 
   public getImageUrl(theme: Theme | undefined, refType: RefType): string | undefined {
-    if (!theme) {
-      return undefined
-    }
-    if (refType === RefType.Logo && theme.logoUrl !== null && theme.logoUrl !== '') {
-      return theme.logoUrl
-    }
-    if (refType === RefType.Favicon && theme.faviconUrl !== null && theme.faviconUrl !== '') {
-      return theme.faviconUrl
-    }
+    if (!theme) return undefined
+    if (refType === RefType.Logo && theme.logoUrl) return theme.logoUrl
+    if (refType === RefType.LogoSmall && theme?.smallLogoUrl) return theme.smallLogoUrl
+    if (refType === RefType.Favicon && theme?.faviconUrl) return theme.faviconUrl
     return bffImageUrl(this.imageApi.configuration.basePath, theme.name, refType)
   }
 

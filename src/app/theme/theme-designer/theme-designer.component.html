@@ -3,6 +3,8 @@
     [header]="theme ? theme.displayName : 'Theme Designer'"
     [subheader]="'THEME.DESIGNER.' + changeMode + '.SUBHEADER' | translate"
     [actions]="(actions$ | async) ?? []"
+    [figureImage]="headerImageUrl"
+    [figureBackground]="!headerImageUrl"
   ></ocx-page-header>
   <ocx-page-content>
     <div class="pt-3 px-3 mb-3 flex flex-column row-gap-3">
@@ -43,11 +45,14 @@
         <div class="field mb-0 w-full sm:w-20rem">
           <span class="p-float-label">
             <p-dropdown
+              *ngIf="themes$ | async as themes"
               #themeTemplate
-              inputId="th_designer_template_"
-              [options]="themeTemplates"
+              inputId="th_designer_theme_template"
+              [options]="themes ?? []"
+              optionLabel="displayName"
+              optionValue="name"
               styleClass="w-full"
-              (onChange)="onThemeTemplateDropdownChange($event)"
+              (onChange)="onSelectThemeTemplate($event, themes)"
               [showClear]="false"
               [autoDisplayFirst]="false"
               [ariaLabel]="'THEME.TEMPLATE.SELECTOR' | translate"
@@ -67,17 +72,16 @@
           <span [attr.aria-label]="'THEME.GROUPS.BASE' | translate">{{ 'THEME.GROUPS.BASE' | translate }}</span>
         </ng-template>
         <form [formGroup]="basicForm" class="flex flex-column row-gap-4">
+          <!-- THEME BASICs -->
           <div *ngIf="changeMode === 'CREATE'" class="flex-grow-1">
             <span class="p-float-label" controlErrorAnchor>
               <input
                 pInputText
-                minlength="2"
-                maxlength="255"
                 type="text"
                 id="th_designer_field_name"
                 class="w-full pt-3 pb-2 text-responsive"
                 formControlName="name"
-                [attr.aria-label]="'THEME.NAME' | translate"
+                [ariaLabel]="'THEME.NAME' | translate"
                 [pTooltip]="'THEME.TOOLTIPS.NAME' | translate"
                 tooltipPosition="top"
                 tooltipEvent="hover"
@@ -87,7 +91,6 @@
               </label>
             </span>
           </div>
-
           <div
             class="flex flex-row flex-wrap justify-content-start align-items-center column-gap-4 sm:column-gap-5 md:column-gap-6 row-gap-2"
           >
@@ -100,7 +103,7 @@
                 id="th_designer_field_display_name"
                 class="w-full pt-3 pb-2 text-responsive"
                 formControlName="displayName"
-                [attr.aria-label]="'THEME.DISPLAY_NAME' | translate"
+                [ariaLabel]="'THEME.DISPLAY_NAME' | translate"
                 [pTooltip]="'THEME.TOOLTIPS.DISPLAY_NAME' | translate"
                 tooltipPosition="top"
                 tooltipEvent="hover"
@@ -132,7 +135,7 @@
               id="th_designer_field_description"
               class="w-full pt-3 pb-2 text-responsive"
               formControlName="description"
-              [attr.aria-label]="'THEME.TOOLTIPS.DESCRIPTION' | translate"
+              [ariaLabel]="'THEME.TOOLTIPS.DESCRIPTION' | translate"
               [pTooltip]="'THEME.TOOLTIPS.DESCRIPTION' | translate"
               tooltipPosition="top"
               tooltipEvent="hover"
@@ -141,40 +144,36 @@
               {{ 'THEME.DESCRIPTION' | translate }}
             </label>
           </div>
-          <div class="flex-grow-1">
+
+          <!-- LOGO -->
+          <div *ngIf="changeMode !== 'CREATE'" class="flex-grow-1 sm:h-4rem">
             <!-- helper inputs because p-fileupload does not work inside inputgroup -->
-            <input
-              hidden
-              type="file"
-              hidden
-              #selectedFileInputLogo
-              (change)="onFileUpload($event, RefType.Logo)"
-              accept=".png, .jpg, .jpeg"
-            />
-            <input
-              hidden
-              type="file"
-              hidden
-              #selectedFileInputFavicon
-              (change)="onFileUpload($event, RefType.Favicon)"
-              accept=".png, .jpg, .jpeg, .ico"
-            />
+            <input #fileUploadLogo hidden type="file" accept="image/*" (change)="onFileUpload($event, RefType.Logo)" />
             <div class="flex flex-wrap sm:flex-nowrap align-items-center row-gap-3 column-gap-4">
+              <section
+                class="w-4rem pl-2"
+                style="color: var(--emphasis-medium)"
+                [pTooltip]="'IMAGE.TOOLTIPS.LOGO' | translate"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+                aria-hidden="true"
+              >
+                {{ 'IMAGE.LOGO' | translate }}
+              </section>
               <app-image-container
                 id="th_designer_logo_url_image"
-                styleClass="max-h-3rem max-w-5rem  border-round-sm"
-                [imageUrl]="fetchingLogoUrl"
-                [title]="(fetchingLogoUrl ? 'LOGO.IMAGE' : 'IMAGE.TOOLTIPS.PLACEHOLDER') | translate"
-                (imageLoadResult)="onImageLoadResult(RefType.Logo, $event)"
+                styleClass="max-h-3rem max-w-5rem border-round-sm"
+                [imageUrl]="imageUrl[RefType.Logo]"
+                (imageLoadResult)="onImageLoadResult($event, RefType.Logo)"
               ></app-image-container>
               <button
                 pButton
                 id="th_designer_action_remove_logo"
-                icon="pi pi-times"
-                [disabled]="changeMode === 'CREATE' || !imageLogoExists"
+                icon="pi pi-trash"
                 class="action-button p-button-icon-only"
+                [disabled]="!(imageUrl[RefType.Logo] && !imageUrlExists[RefType.Logo])"
                 (click)="onRemoveImage(RefType.Logo)"
-                [attr.aria-label]="'IMAGE.TOOLTIPS.REMOVE' | translate"
+                [ariaLabel]="'IMAGE.TOOLTIPS.REMOVE' | translate"
                 [pTooltip]="'IMAGE.TOOLTIPS.REMOVE' | translate"
                 tooltipPosition="top"
                 tooltipEvent="hover"
@@ -183,56 +182,191 @@
                 pButton
                 id="th_designer_action_logo_upload"
                 icon="pi pi-upload"
-                [disabled]="changeMode === 'CREATE'"
+                [disabled]=""
                 class="action-button p-button-icon-only"
-                (click)="selectedFileInputLogo.click()"
-                [attr.aria-label]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
+                [disabled]="imageUrlExists[RefType.Logo]"
+                (click)="fileUploadLogo.click()"
+                [ariaLabel]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
                 [pTooltip]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
                 tooltipPosition="top"
                 tooltipEvent="hover"
               ></button>
-              <span class="p-float-label w-full">
-                <input
-                  pInputText
-                  type="text"
-                  id="th_designer_field_logo_url"
-                  class="w-full pt-3 pb-2 text-responsive"
-                  formControlName="logoUrl"
-                  (input)="onInputChange(RefType.Logo)"
-                  [attr.aria-label]="('LOGO.LABEL' | translate) + ':  ' + ('IMAGE.TOOLTIPS.URL' | translate)"
-                  [pTooltip]="'IMAGE.TOOLTIPS.URL' | translate"
-                  tooltipPosition="top"
-                  tooltipEvent="hover"
-                />
-                <label for="th_designer_field_logo_url" aria-hidden="true">{{ 'LOGO.URL' | translate }}</label>
-              </span>
-              <label
-                *ngIf="displayFileTypeErrorLogo"
-                for="th_designer_field_logo_url"
-                class="control-error"
-                role="note"
-              >
-                {{ 'VALIDATION.ERRORS.FILETYPE_PATTERN_ERROR_2' | translate }}
-              </label>
+              <div class="flex flex-column row-gap-1 flex-grow-1">
+                <div class="p-inputgroup">
+                  <span class="p-float-label w-full">
+                    <input
+                      pInputText
+                      type="text"
+                      id="th_designer_field_logo_url"
+                      class="w-full pt-3 pb-2 text-responsive"
+                      formControlName="logoUrl"
+                      (input)="onInputChange($event, RefType.Logo)"
+                      [ariaLabel]="('IMAGE.LOGO' | translate) + ':  ' + ('IMAGE.TOOLTIPS.URL' | translate)"
+                      [pTooltip]="'IMAGE.TOOLTIPS.URL' | translate"
+                      tooltipPosition="top"
+                      tooltipEvent="hover"
+                    />
+                    <label for="th_designer_field_logo_url" aria-hidden="true">{{
+                      'IMAGE.LOGO_URL' | translate
+                    }}</label>
+                  </span>
+                  <button
+                    id="ws_detail_props_item_logo_url_remove"
+                    class="p-inputgroup-addon bg-primary pseudo-button"
+                    [ngClass]="changeMode === 'EDIT' && imageUrlExists[RefType.Logo] ? 'cursor-pointer' : 'p-disabled'"
+                    (click)="onRemoveImageUrl(RefType.Logo)"
+                    [attr.aria-label]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
+                    [pTooltip]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
+                    tooltipPosition="right"
+                    tooltipEvent="hover"
+                  >
+                    <span class="pi pi-trash" aria-hidden="true"></span>
+                  </button>
+                </div>
+                <label
+                  *ngIf="changeMode === 'EDIT'"
+                  class="ocx-control-hint block"
+                  style="color: var(--emphasis-medium)"
+                  for="ws_detail_props_item_logo_url"
+                  aria-hidden="true"
+                >
+                  {{ ('VALIDATION.HINTS.FORMAT_URL' | translate) + urlPatternAbsolute }}
+                </label>
+              </div>
             </div>
           </div>
-          <div class="flex-grow-1">
+
+          <!-- LOGO SMALL -->
+          <div *ngIf="changeMode !== 'CREATE'" class="flex-grow-1 sm:h-4rem">
+            <!-- helper inputs because p-fileupload does not work inside inputgroup -->
+            <input
+              #fileUploadLogoSmall
+              hidden
+              type="file"
+              accept="image/*"
+              (change)="onFileUpload($event, RefType.LogoSmall)"
+            />
             <div class="flex flex-wrap sm:flex-nowrap align-items-center row-gap-3 column-gap-4">
+              <section
+                class="w-4rem pl-2"
+                style="color: var(--emphasis-medium)"
+                [pTooltip]="'IMAGE.TOOLTIPS.LOGO_SMALL' | translate"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+                aria-hidden="true"
+              >
+                {{ 'IMAGE.LOGO_SMALL' | translate }}
+              </section>
+              <app-image-container
+                id="th_designer_logo_small_url_image"
+                styleClass="max-h-3rem max-w-5rem border-round-sm"
+                [imageUrl]="imageUrl[RefType.LogoSmall]"
+                (imageLoadResult)="onImageLoadResult($event, RefType.LogoSmall)"
+              ></app-image-container>
+              <button
+                pButton
+                id="th_designer_action_remove_logo"
+                icon="pi pi-trash"
+                class="action-button p-button-icon-only"
+                [disabled]="!(imageUrl[RefType.LogoSmall] && !imageUrlExists[RefType.LogoSmall])"
+                (click)="onRemoveImage(RefType.LogoSmall)"
+                [ariaLabel]="'IMAGE.TOOLTIPS.REMOVE' | translate"
+                [pTooltip]="'IMAGE.TOOLTIPS.REMOVE' | translate"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+              ></button>
+              <button
+                pButton
+                id="th_designer_action_logo_small_upload"
+                icon="pi pi-upload"
+                [disabled]=""
+                class="action-button p-button-icon-only"
+                [disabled]="imageUrlExists[RefType.LogoSmall]"
+                (click)="fileUploadLogoSmall.click()"
+                [ariaLabel]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
+                [pTooltip]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+              ></button>
+              <div class="flex flex-column row-gap-1 flex-grow-1">
+                <div class="p-inputgroup">
+                  <span class="p-float-label w-full">
+                    <input
+                      pInputText
+                      type="text"
+                      id="th_designer_field_logo_small_url"
+                      class="w-full pt-3 pb-2 text-responsive"
+                      formControlName="smallLogoUrl"
+                      (input)="onInputChange($event, RefType.LogoSmall)"
+                      [ariaLabel]="('IMAGE.LOGO_SMALL' | translate) + ':  ' + ('IMAGE.TOOLTIPS.URL' | translate)"
+                      [pTooltip]="'IMAGE.TOOLTIPS.URL' | translate"
+                      tooltipPosition="top"
+                      tooltipEvent="hover"
+                    />
+                    <label for="th_designer_field_logo_small_url" aria-hidden="true">{{
+                      'IMAGE.LOGO_URL' | translate
+                    }}</label>
+                  </span>
+                  <button
+                    id="ws_detail_props_item_logo_small_url_remove"
+                    class="p-inputgroup-addon bg-primary pseudo-button"
+                    [ngClass]="changeMode === 'EDIT' && imageUrlExists[RefType.Logo] ? 'cursor-pointer' : 'p-disabled'"
+                    (click)="onRemoveImageUrl(RefType.LogoSmall)"
+                    [attr.aria-label]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
+                    [pTooltip]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
+                    tooltipPosition="right"
+                    tooltipEvent="hover"
+                  >
+                    <span class="pi pi-trash" aria-hidden="true"></span>
+                  </button>
+                </div>
+                <label
+                  class="ocx-control-hint block"
+                  style="color: var(--emphasis-medium)"
+                  for="ws_detail_props_item_logo_small_url"
+                  aria-hidden="true"
+                >
+                  {{ ('VALIDATION.HINTS.FORMAT_URL' | translate) + urlPatternAbsolute }}
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- FAVICON -->
+          <div *ngIf="changeMode !== 'CREATE'" class="flex-grow-1 sm:h-4rem">
+            <!-- helper inputs because p-fileupload does not work inside inputgroup -->
+            <input
+              #fileUploadFavicon
+              hidden
+              type="file"
+              accept="image/*"
+              (change)="onFileUpload($event, RefType.Favicon)"
+            />
+            <div class="flex flex-wrap sm:flex-nowrap align-items-center row-gap-3 column-gap-4">
+              <section
+                class="w-4rem pl-2"
+                style="color: var(--emphasis-medium)"
+                [pTooltip]="'IMAGE.TOOLTIPS.FAVICON' | translate"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+                aria-hidden="true"
+              >
+                {{ 'IMAGE.FAVICON' | translate }}
+              </section>
               <app-image-container
                 id="th_designer_favicon_url_image"
-                styleClass="max-h-3rem max-w-5rem  border-round-sm"
-                [imageUrl]="fetchingFaviconUrl"
-                [title]="(fetchingFaviconUrl ? 'FAVICON.IMAGE' : 'IMAGE.TOOLTIPS.PLACEHOLDER') | translate"
-                (imageLoadResult)="onImageLoadResult(RefType.Favicon, $event)"
+                styleClass="max-h-3rem max-w-5rem border-round-sm"
+                [imageUrl]="imageUrl[RefType.Favicon]"
+                (imageLoadResult)="onImageLoadResult($event, RefType.Favicon)"
               ></app-image-container>
               <button
                 pButton
                 id="th_designer_action_remove_favicon"
-                icon="pi pi-times"
-                [disabled]="changeMode === 'CREATE' || !imageFaviconExists"
+                icon="pi pi-trash"
                 class="action-button p-button-icon-only"
+                [disabled]="!(imageUrl[RefType.Favicon] && !imageUrlExists[RefType.Favicon])"
                 (click)="onRemoveImage(RefType.Favicon)"
-                [attr.aria-label]="'IMAGE.TOOLTIPS.REMOVE' | translate"
+                [ariaLabel]="'IMAGE.TOOLTIPS.REMOVE' | translate"
                 [pTooltip]="'IMAGE.TOOLTIPS.REMOVE' | translate"
                 tooltipPosition="top"
                 tooltipEvent="hover"
@@ -241,37 +375,55 @@
                 pButton
                 id="th_designer_action_favicon_upload"
                 icon="pi pi-upload"
-                [disabled]="changeMode === 'CREATE'"
                 class="action-button p-button-icon-only"
-                (click)="selectedFileInputFavicon.click()"
-                [attr.aria-label]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
+                [disabled]="imageUrlExists[RefType.Favicon]"
+                (click)="fileUploadFavicon.click()"
+                [ariaLabel]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
                 [pTooltip]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
                 tooltipPosition="top"
                 tooltipEvent="hover"
               ></button>
-              <span class="p-float-label w-full">
-                <input
-                  pInputText
-                  type="text"
-                  id="th_designer_field_favicon_url"
-                  class="w-full pt-3 pb-2 text-responsive"
-                  formControlName="faviconUrl"
-                  (input)="onInputChange(RefType.Favicon)"
-                  [attr.aria-label]="('FAVICON.LABEL' | translate) + ':  ' + ('IMAGE.TOOLTIPS.URL' | translate)"
-                  [pTooltip]="'IMAGE.TOOLTIPS.URL' | translate"
-                  tooltipPosition="top"
-                  tooltipEvent="hover"
-                />
-                <label for="th_designer_field_favicon_url" aria-hidden="true">{{ 'FAVICON.URL' | translate }}</label>
-              </span>
-              <label
-                *ngIf="displayFileTypeErrorFavicon"
-                for="th_designer_field_favicon_url"
-                class="control-error"
-                role="note"
-              >
-                {{ 'VALIDATION.ERRORS.FILETYPE_PATTERN_ERROR_1' | translate }}
-              </label>
+              <div class="flex flex-column row-gap-1 flex-grow-1">
+                <div class="p-inputgroup">
+                  <span class="p-float-label w-full">
+                    <input
+                      pInputText
+                      type="text"
+                      id="th_designer_field_favicon_url"
+                      class="w-full pt-3 pb-2 text-responsive"
+                      formControlName="faviconUrl"
+                      (input)="onInputChange($event, RefType.Favicon)"
+                      [ariaLabel]="('IMAGE.FAVICON' | translate) + ':  ' + ('IMAGE.TOOLTIPS.URL' | translate)"
+                      [pTooltip]="'IMAGE.TOOLTIPS.URL' | translate"
+                      tooltipPosition="top"
+                      tooltipEvent="hover"
+                    />
+                    <label for="th_designer_field_favicon_url" aria-hidden="true">
+                      {{ 'IMAGE.FAVICON_URL' | translate }}</label
+                    >
+                  </span>
+                  <button
+                    id="ws_detail_props_item_favicon_url_remove"
+                    class="p-inputgroup-addon bg-primary pseudo-button"
+                    [ngClass]="imageUrlExists[RefType.Favicon] ? 'cursor-pointer' : 'p-disabled'"
+                    (click)="onRemoveImageUrl(RefType.Favicon)"
+                    [attr.aria-label]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
+                    [pTooltip]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
+                    tooltipPosition="right"
+                    tooltipEvent="hover"
+                  >
+                    <span class="pi pi-trash" aria-hidden="true"></span>
+                  </button>
+                </div>
+                <label
+                  class="ocx-control-hint block"
+                  style="color: var(--emphasis-medium)"
+                  for="ws_detail_props_item_favicon_url"
+                  aria-hidden="true"
+                >
+                  {{ ('VALIDATION.HINTS.FORMAT_URL' | translate) + urlPatternAbsolute }}
+                </label>
+              </div>
             </div>
           </div>
         </form>
@@ -338,7 +490,7 @@
                   class="text-responsive"
                   [formControlName]="item"
                   [value]="group.formGroup.value[item]"
-                  [attr.aria-label]="item"
+                  [ariaLabel]="item"
                 />
                 <label [for]="'th_designer_item_color_' + item" aria-hidden="true"> {{ item }} </label>
               </span>
@@ -356,7 +508,7 @@
                 (click)="op.toggle($event)"
                 (keyup)="op.toggle($event)"
                 [ngStyle]="{ 'background-color': group.formGroup.value[item] }"
-                [attr.aria-label]="'THEME.TOOLTIPS.ITEM_COLOR_PICKER' | translate"
+                [ariaLabel]="'THEME.TOOLTIPS.ITEM_COLOR_PICKER' | translate"
                 [pTooltip]="'THEME.TOOLTIPS.ITEM_COLOR_PICKER' | translate"
                 tooltipPosition="top"
                 tooltipEvent="hover"
@@ -387,7 +539,7 @@
         class="w-full"
         type="text"
         formControlName="themeName"
-        [attr.aria-label]="'THEME.NAME' | translate"
+        [ariaLabel]="'THEME.NAME' | translate"
         [placeholder]="'THEME.NAME' | translate"
         [pTooltip]="'THEME.TOOLTIPS.NAME' | translate"
         tooltipPosition="top"
@@ -404,7 +556,7 @@
         class="w-full"
         type="text"
         formControlName="displayName"
-        [attr.aria-label]="'THEME.DISPLAY_NAME' | translate"
+        [ariaLabel]="'THEME.DISPLAY_NAME' | translate"
         [placeholder]="'THEME.DISPLAY_NAME' | translate"
         [pTooltip]="'THEME.TOOLTIPS.DISPLAY_NAME' | translate"
         tooltipPosition="top"

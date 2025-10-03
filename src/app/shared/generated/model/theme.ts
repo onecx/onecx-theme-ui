@@ -1,6 +1,6 @@
 /**
  * onecx-theme-bff
- * OneCx theme Bff
+ * Backend-For-Frontend (BFF) service for onecx-theme. This API provides endpoints to manage Themes and related Images
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -24,6 +24,7 @@ export interface Theme {
     description?: string;
     assetsUrl?: string;
     logoUrl?: string;
+    smallLogoUrl?: string;
     faviconUrl?: string;
     previewImageUrl?: string;
     assetsUpdateDate?: string;

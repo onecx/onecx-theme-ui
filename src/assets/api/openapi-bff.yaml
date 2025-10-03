@@ -2,42 +2,17 @@
 openapi: 3.0.3
 info:
  title: onecx-theme-bff
- description: OneCx theme Bff
+ description: Backend-For-Frontend (BFF) service for onecx-theme. This API provides endpoints to manage Themes and related Images
  version: '1.0'
 servers:
  - url: http://onecx-theme-bff:8080/
 tags:
- - name: theme
+ - name: themes
+   description: Managing Themes
  - name: imagesInternal
+   description: Managing Theme related Images like Favicons and Logos
 paths:
  /themes:
-  get:
-   x-onecx:
-    permissions:
-     themes:
-      - read
-   tags:
-    - themes
-   description: Find all themes
-   operationId: getThemes
-   parameters:
-    - $ref: '#/components/parameters/pageNumber'
-    - $ref: '#/components/parameters/pageSize'
-   responses:
-    "200":
-     description: OK
-     content:
-      application/json:
-       schema:
-        $ref: '#/components/schemas/GetThemesResponse'
-    "400":
-     description: Bad request
-     content:
-      application/json:
-       schema:
-        $ref: '#/components/schemas/ProblemDetailResponse'
-    "404":
-     description: Not found
   post:
    x-onecx:
     permissions:
@@ -45,7 +20,7 @@ paths:
       - write
    tags:
     - themes
-   description: Create theme
+   description: Create a new theme
    operationId: createTheme
    requestBody:
     content:
@@ -54,21 +29,17 @@ paths:
        $ref: '#/components/schemas/CreateThemeRequest'
    responses:
     "201":
-     description: Created
+     description: Theme created successfully
      content:
       application/json:
        schema:
         $ref: '#/components/schemas/CreateThemeResponse'
-    "204":
-     description: No Content
     "400":
      description: Bad Request
      content:
       application/json:
        schema:
         $ref: '#/components/schemas/ProblemDetailResponse'
-    "404":
-     description: Not Found
  /themes/{id}:
   get:
    x-onecx:
@@ -77,13 +48,13 @@ paths:
       - read
    tags:
     - themes
-   description: Find theme by id
+   description: Get a theme by its id
    operationId: getThemeById
    parameters:
     - $ref: '#/components/parameters/id'
    responses:
     "200":
-     description: OK
+     description: Theme retrieved successfully
      content:
       application/json:
        schema:
@@ -95,7 +66,7 @@ paths:
        schema:
         $ref: '#/components/schemas/ProblemDetailResponse'
     "404":
-     description: Not Found
+     description: Theme not found
   put:
    x-onecx:
     permissions:
@@ -103,7 +74,7 @@ paths:
       - write
    tags:
     - themes
-   description: Update theme
+   description: Update a theme by its id
    operationId: updateTheme
    parameters:
     - $ref: '#/components/parameters/id'
@@ -114,7 +85,7 @@ paths:
        $ref: '#/components/schemas/UpdateThemeRequest'
    responses:
     "200":
-     description: Ok
+     description: Theme updated successfully
      content:
       application/json:
        schema:
@@ -128,7 +99,7 @@ paths:
        schema:
         $ref: '#/components/schemas/ProblemDetailResponse'
     "404":
-     description: Not Found
+     description: Theme not found
   delete:
    x-onecx:
     permissions:
@@ -136,13 +107,13 @@ paths:
       - delete
    tags:
     - themes
-   description: Delete theme
+   description: Delete a theme by its id
    operationId: deleteTheme
    parameters:
     - $ref: '#/components/parameters/id'
    responses:
     "204":
-     description: No Content
+     description: Theme deleted successfully
     "400":
      description: Bad Request
      content:
@@ -157,13 +128,13 @@ paths:
       - read
    tags:
     - themes
-   description: Find theme by name including workspace
+   description: Get a theme by its name
    operationId: getThemeByName
    parameters:
     - $ref: '#/components/parameters/name'
    responses:
     "200":
-     description: OK
+     description: Theme retrieved successfully
      content:
       application/json:
        schema:
@@ -175,7 +146,7 @@ paths:
        schema:
         $ref: '#/components/schemas/ProblemDetailResponse'
     "404":
-     description: Not Found
+     description: Theme not found
  /themes/search:
   post:
    x-onecx:
@@ -184,7 +155,7 @@ paths:
       - read
    tags:
     - themes
-   description: Search themes by criteria
+   description: Search themes by search criteria
    operationId: searchThemes
    requestBody:
     required: true
@@ -194,21 +165,17 @@ paths:
        $ref: '#/components/schemas/SearchThemeRequest'
    responses:
     "200":
-     description: Ok
+     description: Theme search results retrieved successfully
      content:
       application/json:
        schema:
         $ref: '#/components/schemas/SearchThemeResponse'
-    "204":
-     description: No Content
     "400":
      description: Bad Request
      content:
       application/json:
        schema:
         $ref: '#/components/schemas/ProblemDetailResponse'
-    "404":
-     description: Not Found
  /themes/export:
   post:
    x-onecx:
@@ -217,7 +184,7 @@ paths:
       - read
    tags:
     - themes
-   description: Export list of themes
+   description: Export a list of themes
    operationId: exportThemes
    requestBody:
     required: true
@@ -227,13 +194,13 @@ paths:
        $ref: '#/components/schemas/ExportThemeRequest'
    responses:
     "200":
-     description: OK
+     description: Themes exported successfully
      content:
       application/json:
        schema:
         $ref: '#/components/schemas/ThemeSnapshot'
     "404":
-     description: No themes founds
+     description: Themes not found
  /themes/import:
   post:
    x-onecx:
@@ -242,7 +209,7 @@ paths:
       - write
    tags:
     - themes
-   description: Import themes
+   description: Import a list of themes
    operationId: importThemes
    requestBody:
     required: true
@@ -252,7 +219,7 @@ paths:
        $ref: '#/components/schemas/ThemeSnapshot'
    responses:
     "200":
-     description: Import result
+     description: Themes imported successfully
      content:
       application/json:
        schema:
@@ -271,7 +238,7 @@ paths:
       - read
    tags:
     - imagesInternal
-   description: Get Image by id
+   description: Get an image by its reference id and type
    operationId: getImage
    parameters:
     - name: refId
@@ -286,7 +253,7 @@ paths:
        $ref: "#/components/schemas/RefType"
    responses:
     "200":
-     description: OK
+     description: Image retrieved successfully
      content:
       image/*:
        schema:
@@ -305,7 +272,7 @@ paths:
       - write
    tags:
     - imagesInternal
-   description: Upload Images
+   description: Upload an image by its reference id and type
    parameters:
     - name: mimeType
       in: header
@@ -332,7 +299,7 @@ paths:
        format: binary
    responses:
     "201":
-     description: CREATED
+     description: Image uploaded successfully
      content:
       application/json:
        schema:
@@ -346,7 +313,7 @@ paths:
       - delete
    tags:
     - imagesInternal
-   description: delete Image
+   description: Delete an image by its reference id and type
    operationId: deleteImage
    parameters:
     - name: refId
@@ -361,15 +328,15 @@ paths:
        $ref: "#/components/schemas/RefType"
    responses:
     "204":
-     description: No content
+     description: Image deleted successfully
 components:
  schemas:
   RefType:
    type: string
-   enum: [ logo, favicon ]
+   enum: [ logo, logo-small, favicon ]
   MimeType:
    type: string
-   enum: [ "image/x-icon", "image/png", "image/jpg", "image/jpeg" ]
+   enum: [ "image/x-icon", "image/svg+xml", "image/png", "image/jpg", "image/jpeg" ]
   Theme:
    type: object
    properties:
@@ -399,6 +366,8 @@ components:
     assetsUrl:
      type: string
     logoUrl:
+     type: string
+    smallLogoUrl:
      type: string
     faviconUrl:
      type: string
@@ -440,6 +409,8 @@ components:
     assetsUrl:
      type: string
     logoUrl:
+     type: string
+    smallLogoUrl:
      type: string
     faviconUrl:
      type: string
@@ -619,6 +590,8 @@ components:
     assetsUrl:
      type: string
     logoUrl:
+     type: string
+    smallLogoUrl:
      type: string
     faviconUrl:
      type: string

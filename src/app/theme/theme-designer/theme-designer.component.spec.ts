@@ -17,7 +17,7 @@ import { ConfirmDialog, ConfirmDialogModule } from 'primeng/confirmdialog'
 import { CurrentThemeTopic } from '@onecx/integration-interface'
 import { PortalMessageService, ThemeService } from '@onecx/angular-integration-interface'
 
-import { MimeType, RefType, ThemesAPIService, ImagesInternalAPIService } from 'src/app/shared/generated'
+import { MimeType, RefType, ThemesAPIService, ImagesInternalAPIService, Theme } from 'src/app/shared/generated'
 import { ThemeDesignerComponent } from './theme-designer.component'
 import { themeVariables } from './theme-variables'
 
@@ -27,8 +27,9 @@ const validTheme = {
   displayName: 'themeDisplayName',
   mandatory: false,
   description: 'desc',
-  logoUrl: 'logo_url',
-  faviconUrl: 'fav_url',
+  logoUrl: 'https://host/path-to-logo',
+  smallLogoUrl: 'https://host/path-to-small_logo',
+  faviconUrl: 'https://host/path-to-favicon',
   properties: {
     font: { 'font-family': 'myFont' },
     general: { 'primary-color': 'rgb(0,0,0)' }
@@ -39,7 +40,7 @@ describe('ThemeDesignerComponent', () => {
   let component: ThemeDesignerComponent
   let fixture: ComponentFixture<ThemeDesignerComponent>
 
-  const msgServiceSpy = jasmine.createSpyObj<PortalMessageService>('PortalMessageService', ['success', 'error', 'info'])
+  const msgServiceSpy = jasmine.createSpyObj<PortalMessageService>('PortalMessageService', ['success', 'error'])
   const themeServiceSpy = jasmine.createSpyObj<ThemeService>('ThemeService', ['apply'], {
     currentTheme$: of({
       isInitializedPromise: Promise.resolve(true),
@@ -49,17 +50,23 @@ describe('ThemeDesignerComponent', () => {
     }) as unknown as CurrentThemeTopic
   })
   const themeApiSpy = jasmine.createSpyObj<ThemesAPIService>('ThemesAPIService', [
-    'getThemes',
-    'updateTheme',
-    'createTheme',
     'getThemeById',
-    'getThemeByName'
+    'getThemeByName',
+    'createTheme',
+    'updateTheme',
+    'searchThemes'
   ])
   const imgServiceSpy = {
     getImage: jasmine.createSpy('getImage').and.returnValue(of({})),
     deleteImage: jasmine.createSpy('deleteImage').and.returnValue(of({})),
     uploadImage: jasmine.createSpy('uploadImage').and.returnValue(of({})),
     configuration: { basePath: 'basePath' }
+  }
+
+  function initTestComponent(): void {
+    fixture = TestBed.createComponent(ThemeDesignerComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
   }
 
   beforeEach(waitForAsync(() => {
@@ -88,31 +95,28 @@ describe('ThemeDesignerComponent', () => {
         ConfirmationService
       ]
     }).compileComponents()
+  }))
+
+  beforeEach(() => {
     msgServiceSpy.success.calls.reset()
     msgServiceSpy.error.calls.reset()
-    msgServiceSpy.info.calls.reset()
     // reset data services
     themeApiSpy.getThemeById.calls.reset()
     themeApiSpy.getThemeByName.calls.reset()
     themeApiSpy.updateTheme.calls.reset()
     themeApiSpy.createTheme.calls.reset()
-    themeApiSpy.getThemes.calls.reset()
+    themeApiSpy.searchThemes.calls.reset()
     themeServiceSpy.apply.calls.reset()
     // to spy data: refill with neutral data
-    themeApiSpy.getThemes.and.returnValue(of({}) as any)
+    themeApiSpy.searchThemes.and.returnValue(of({}) as any)
     themeApiSpy.updateTheme.and.returnValue(of({}) as any)
     themeApiSpy.createTheme.and.returnValue(of({}) as any)
     themeApiSpy.getThemeById.and.returnValue(of({}) as any)
+    themeApiSpy.getThemeByName.and.returnValue(of({}) as any)
     imgServiceSpy.deleteImage.and.returnValue(of({}))
     imgServiceSpy.getImage.and.returnValue(of({}))
     imgServiceSpy.uploadImage.and.returnValue(of({}))
-  }))
-
-  function initializeComponent(): void {
-    fixture = TestBed.createComponent(ThemeDesignerComponent)
-    component = fixture.componentInstance
-    fixture.detectChanges()
-  }
+  })
 
   describe('construction', () => {
     beforeEach(() => {})
@@ -121,7 +125,7 @@ describe('ThemeDesignerComponent', () => {
       const activatedRoute = TestBed.inject(ActivatedRoute)
       spyOn(activatedRoute.snapshot.paramMap, 'has').and.returnValue(true)
 
-      initializeComponent()
+      initTestComponent()
 
       expect(component.changeMode).toBe('EDIT')
     })
@@ -130,7 +134,7 @@ describe('ThemeDesignerComponent', () => {
       const activatedRoute = TestBed.inject(ActivatedRoute)
       spyOn(activatedRoute.snapshot.paramMap, 'has').and.returnValue(false)
 
-      initializeComponent()
+      initTestComponent()
 
       expect(component.changeMode).toBe('CREATE')
     })
@@ -139,7 +143,7 @@ describe('ThemeDesignerComponent', () => {
       const activatedRoute = TestBed.inject(ActivatedRoute)
       spyOn(activatedRoute.snapshot.paramMap, 'get').and.returnValue('themeName')
 
-      initializeComponent()
+      initTestComponent()
 
       expect(component.themeName).toBe('themeName')
       expect(component.autoApply).toBeFalse()
@@ -161,7 +165,7 @@ describe('ThemeDesignerComponent', () => {
       }
       spyOn(translateService, 'get').and.returnValue(of(actionsTranslations))
 
-      initializeComponent()
+      initTestComponent()
 
       // simulate async pipe
       component.actions$?.subscribe((actions) => {
@@ -188,7 +192,7 @@ describe('ThemeDesignerComponent', () => {
     })
 
     it('should update document style on form changes', fakeAsync(() => {
-      initializeComponent()
+      initTestComponent()
 
       component.autoApply = true
 
@@ -229,82 +233,13 @@ describe('ThemeDesignerComponent', () => {
     }))
   })
 
-  describe('after component initialization', () => {
+  describe('initialization', () => {
     beforeEach(() => {
-      initializeComponent()
+      initTestComponent()
     })
 
     it('should initialize component', () => {
       expect(component).toBeTruthy()
-    })
-
-    it('should populate form with theme data in edit changeMode', () => {
-      const themeResponse = { resource: validTheme }
-      themeApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
-      component.changeMode = 'EDIT'
-      component.themeName = 'themeName'
-
-      component.ngOnInit()
-
-      expect(component.theme).toBe(validTheme)
-      expect(themeApiSpy.getThemeByName).toHaveBeenCalledOnceWith({ name: 'themeName' })
-      expect(component.basicForm.controls['name'].value).toBe(validTheme.name)
-      expect(component.basicForm.controls['description'].value).toBe(validTheme.description)
-      expect(component.basicForm.controls['logoUrl'].value).toBe(validTheme.logoUrl)
-      expect(component.basicForm.controls['faviconUrl'].value).toBe(validTheme.faviconUrl)
-      expect(component.fontForm.controls['font-family'].value).toBe('myFont')
-      expect(component.generalForm.controls['primary-color'].value).toBe('rgb(0,0,0)')
-      expect(component.themeId).toBe('id')
-    })
-
-    it('should fetch logo and favicon from external source on edit changeMode when http[s] present', () => {
-      const themeData = {
-        logoUrl: 'http://myWeb.com/logo_url',
-        faviconUrl: 'https://otherWeb.de/fav_url'
-      }
-      const themeResponse = {
-        resource: themeData
-      }
-      themeApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
-      component.changeMode = 'EDIT'
-      component.themeName = 'themeName'
-
-      component.ngOnInit()
-
-      expect(component.fetchingLogoUrl).toBe(themeData.logoUrl)
-      expect(component.fetchingFaviconUrl).toBe(themeData.faviconUrl)
-    })
-
-    it('should populate forms with default values if not in edit changeMode', () => {
-      const documentStyle = getComputedStyle(document.documentElement).getPropertyValue('--font-family')
-
-      component.ngOnInit()
-
-      expect(component.fontForm.controls['font-family'].value).toBe(documentStyle)
-    })
-
-    it('should load all templates basic data on initialization', () => {
-      const themeArr = [
-        {
-          id: 'id1',
-          name: 'theme1',
-          displayName: 'themeDisplay1',
-          description: 'desc1'
-        },
-        {
-          id: 'id2',
-          name: 'myTheme',
-          displayName: 'themeDisplay2',
-          description: 'desc2'
-        }
-      ]
-      themeApiSpy.getThemes.and.returnValue(of({ stream: themeArr }) as any)
-
-      component.ngOnInit()
-      expect(component.themeTemplates).toEqual([
-        { label: 'themeDisplay1', value: 'id1' },
-        { label: 'themeDisplay2', value: 'id2' }
-      ])
     })
 
     it('should navigate back on close', (done: DoneFn) => {
@@ -320,21 +255,41 @@ describe('ThemeDesignerComponent', () => {
         }, 0)
       })
     })
+  })
 
-    it('should display error when updating theme with invalid basic form', () => {
-      spyOnProperty(component.basicForm, 'invalid').and.returnValue(true)
-
-      component.onSaveTheme()
-
-      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
+  describe('form', () => {
+    beforeEach(() => {
+      initTestComponent()
     })
 
-    it('should display error when updating theme with invalid property form', () => {
-      spyOnProperty(component.propertiesForm, 'invalid').and.returnValue(true)
+    it('should populate form with theme data in edit changeMode', () => {
+      themeApiSpy.getThemeByName.and.returnValue(of({ resource: validTheme }) as any)
+      component.changeMode = 'EDIT'
+      component.themeName = validTheme.name
 
-      component.onSaveTheme()
+      component.ngOnInit()
 
-      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
+      expect(component.theme).toBe(validTheme)
+      expect(themeApiSpy.getThemeByName).toHaveBeenCalledOnceWith({ name: validTheme.name })
+      expect(component.basicForm.controls['name'].value).toBe(validTheme.name)
+      expect(component.basicForm.controls['description'].value).toBe(validTheme.description)
+      expect(component.basicForm.controls['logoUrl'].value).toBe(validTheme.logoUrl)
+      expect(component.basicForm.controls['faviconUrl'].value).toBe(validTheme.faviconUrl)
+      expect(component.fontForm.controls['font-family'].value).toBe('myFont')
+      expect(component.generalForm.controls['primary-color'].value).toBe('rgb(0,0,0)')
+      expect(component.themeId).toBe('id')
+
+      expect(component.imageUrl[RefType.Logo]).toBe(validTheme.logoUrl)
+      expect(component.imageUrl[RefType.LogoSmall]).toBe(validTheme.smallLogoUrl)
+      expect(component.imageUrl[RefType.Favicon]).toBe(validTheme.faviconUrl)
+    })
+
+    it('should populate forms with default values if not in edit changeMode', () => {
+      const documentStyle = getComputedStyle(document.documentElement).getPropertyValue('--font-family')
+
+      component.ngOnInit()
+
+      expect(component.fontForm.controls['font-family'].value).toBe(documentStyle)
     })
 
     it('should display error when theme data are not ready', (done: DoneFn) => {
@@ -356,39 +311,58 @@ describe('ThemeDesignerComponent', () => {
         done()
       })
     })
+  })
 
-    // on save
-    it('should only update properties and base theme data and show success when updating theme call is successful', () => {
-      component.themeId = 'id'
-      const themeResponse = { resource: validTheme }
-      themeApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
+  describe('save theme', () => {
+    beforeEach(() => {
+      initTestComponent()
+    })
+
+    it('should display error when updating theme with invalid basic form', () => {
+      spyOnProperty(component.basicForm, 'invalid').and.returnValue(true)
+
+      component.onSaveTheme()
+
+      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
+    })
+
+    it('should display error when updating theme with invalid property form', () => {
+      spyOnProperty(component.basicForm, 'valid').and.returnValue(true)
+      spyOnProperty(component.propertiesForm, 'invalid').and.returnValue(true)
+
+      component.onSaveTheme()
+
+      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
+    })
+
+    it('should update theme base and property data with logo URLs - successful', () => {
+      component.changeMode = 'EDIT'
+      component.themeName = validTheme.name
+      themeApiSpy.getThemeByName.and.returnValue(of({ resource: validTheme }) as any)
+      themeApiSpy.updateTheme.and.returnValue(of({}) as any)
+
+      component.ngOnInit()
 
       // updating forms with different data
       component.fontForm.patchValue({ 'font-family': 'updatedFont' })
       component.generalForm.patchValue({ 'primary-color': 'rgb(255,255,255)' })
-      const newBasicData = {
-        name: 'updatedName',
-        displayName: 'updatedDisplayName',
-        description: 'updatedDesc',
-        logoUrl: 'updated_logo_url',
-        faviconUrl: 'updated_favicon_url'
+      const basicData = {
+        displayName: 'new display name',
+        description: 'new desc',
+        logoUrl: 'https://newhost/path-to-logo'
       }
-      component.basicForm.patchValue(newBasicData)
-      component.imageFaviconUrlExists = true
-      component.imageLogoUrlExists = true
+      component.basicForm.patchValue(basicData)
 
-      themeApiSpy.updateTheme.and.returnValue(of({}) as any)
+      expect(component.imageUrlExists[RefType.Logo]).toBeTrue()
+      expect(component.basicForm.valid).toBeTrue()
 
-      component.changeMode = 'EDIT'
       component.onSaveTheme()
 
-      expect(msgServiceSpy.success).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_OK' })
+      expect(msgServiceSpy.success).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.OK' })
       expect(themeApiSpy.updateTheme).toHaveBeenCalledTimes(1)
       const updateArgs = themeApiSpy.updateTheme.calls.mostRecent().args[0]
-      expect(updateArgs.updateThemeRequest?.resource.name).toBe(newBasicData.name)
-      expect(updateArgs.updateThemeRequest?.resource.description).toBe(newBasicData.description)
-      expect(updateArgs.updateThemeRequest?.resource.logoUrl).toBe(newBasicData.logoUrl)
-      expect(updateArgs.updateThemeRequest?.resource.faviconUrl).toBe(newBasicData.faviconUrl)
+      expect(updateArgs.updateThemeRequest?.resource.description).toBe(basicData.description)
+      expect(updateArgs.updateThemeRequest?.resource.logoUrl).toBe(basicData.logoUrl)
       expect(updateArgs.updateThemeRequest?.resource.properties).toEqual(
         jasmine.objectContaining({
           font: jasmine.objectContaining({ 'font-family': 'updatedFont' }),
@@ -397,242 +371,96 @@ describe('ThemeDesignerComponent', () => {
       )
     })
 
-    it('should apply changes when updating current theme is successful', (done: DoneFn) => {
-      component.themeId = 'id'
-      const themeResponse = { resource: validTheme }
-      themeApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
+    it('should update theme base and property data without logo URLs - successful', () => {
+      component.changeMode = 'EDIT'
+      component.themeName = validTheme.name
+      const theme: Theme = { ...validTheme, logoUrl: undefined, smallLogoUrl: undefined, faviconUrl: undefined }
+      themeApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
+      themeApiSpy.updateTheme.and.returnValue(of({}) as any)
+
+      component.ngOnInit()
+
+      // updating forms with different data
+      component.fontForm.patchValue({ 'font-family': 'updatedFont' })
+      component.generalForm.patchValue({ 'primary-color': 'rgb(255,255,255)' })
+      const basicData = {
+        displayName: 'new display name',
+        description: 'new desc',
+        logoUrl: 'https://newhost/path-to-logo'
+      }
+      component.basicForm.patchValue(basicData)
+
+      expect(component.imageUrlExists[RefType.Logo]).toBeFalse()
+      expect(component.basicForm.valid).toBeTrue()
+
+      component.onSaveTheme()
+
+      expect(msgServiceSpy.success).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.OK' })
+      expect(themeApiSpy.updateTheme).toHaveBeenCalledTimes(1)
+      const updateArgs = themeApiSpy.updateTheme.calls.mostRecent().args[0]
+      expect(updateArgs.updateThemeRequest?.resource.description).toBe(basicData.description)
+      expect(updateArgs.updateThemeRequest?.resource.logoUrl).toBe(basicData.logoUrl)
+      expect(updateArgs.updateThemeRequest?.resource.properties).toEqual(
+        jasmine.objectContaining({
+          font: jasmine.objectContaining({ 'font-family': 'updatedFont' }),
+          general: jasmine.objectContaining({ 'primary-color': 'rgb(255,255,255)' })
+        })
+      )
+    })
+
+    it('should apply changes when updating theme is successful', () => {
+      component.changeMode = 'EDIT'
+      component.themeName = validTheme.name
+      themeApiSpy.getThemeByName.and.returnValue(of({ resource: validTheme }) as any)
+
+      component.ngOnInit()
+      component.autoApply = true
+
+      expect(component.theme).toEqual(validTheme)
 
       component.fontForm.patchValue({ 'font-family': 'updatedFont' })
       component.generalForm.patchValue({ 'primary-color': 'rgb(255,255,255)' })
       const newBasicData = {
-        name: 'updatedName',
-        displayName: 'updatedDisplayName',
-        description: 'updatedDesc',
-        logoUrl: 'updated_logo_url',
-        faviconUrl: 'updated_favicon_url'
+        displayName: 'new display name',
+        description: 'new description',
+        logoUrl: 'https://new-host-name/path-to-logo'
       }
       component.basicForm.patchValue(newBasicData)
 
-      const updateThemeData = { resource: validTheme }
+      const updateThemeData = { resource: { ...validTheme, ...newBasicData } }
       themeApiSpy.updateTheme.and.returnValue(of(updateThemeData) as any)
 
-      component.autoApply = true
-      component.changeMode = 'EDIT'
-
-      component.actions$?.subscribe((actions) => {
-        const saveThemeAction = actions[1]
-        saveThemeAction.actionCallback()
-        expect(themeServiceSpy.apply).toHaveBeenCalledOnceWith(updateThemeData as any)
-        done()
-      })
-    })
-
-    describe('save as errors', () => {
-      it('should display theme already exists message', () => {
-        const errorResponse = {
-          error: { message: 'Theme already exists', errorCode: 'PERSIST_ENTITY_FAILED' },
-          statusText: 'Bad Request',
-          status: 400
-        }
-        themeApiSpy.createTheme.and.returnValue(throwError(() => errorResponse))
-        spyOn(console, 'error')
-
-        component.onSaveAsTheme()
-
-        expect(console.error).toHaveBeenCalledWith('createTheme', errorResponse)
-        expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({
-          summaryKey: 'ACTIONS.CREATE.MESSAGE.CREATE_NOK',
-          detailKey: 'ACTIONS.CREATE.MESSAGE.THEME_ALREADY_EXISTS'
-        })
-      })
-
-      it('should display error message on theme save failure on creation', () => {
-        const errorResponse = { error: 'Cannot create', statusText: 'Bad Request', status: 400 }
-        themeApiSpy.createTheme.and.returnValue(throwError(() => errorResponse))
-        spyOn(console, 'error')
-
-        component.onSaveAsTheme()
-
-        expect(console.error).toHaveBeenCalledWith('createTheme', errorResponse)
-        expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({
-          summaryKey: 'ACTIONS.CREATE.MESSAGE.CREATE_NOK',
-          detailKey: errorResponse.error
-        })
-      })
-
-      it('should display error message on theme updating', () => {
-        const errorResponse = { error: 'Cannot update', statusText: 'Bad Request', status: 400 }
-        component.themeId = validTheme.id
-        component.themeName = validTheme.name
-        const themeResponse = { resource: validTheme }
-        themeApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
-        themeApiSpy.updateTheme.and.returnValue(throwError(() => errorResponse))
-        spyOn(console, 'error')
-
-        component.changeMode = 'EDIT'
-        component.basicForm.patchValue(validTheme)
-        component.fontForm.patchValue(validTheme.properties.font)
-        component.generalForm.patchValue(validTheme.properties.general)
-
-        component.onSaveTheme()
-
-        expect(component.basicForm.valid).toBeTrue()
-        expect(component.propertiesForm.valid).toBeTrue()
-        expect(console.error).toHaveBeenCalledWith('updateTheme', errorResponse)
-        expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.CHANGE_NOK' })
-      })
-    })
-
-    it('should display success message and route correctly on update', () => {
-      const router = TestBed.inject(Router)
-      spyOn(router, 'navigate')
-      const route = TestBed.inject(ActivatedRoute)
-      const newBasicData = {
-        name: 'newName',
-        description: 'newDesc',
-        logoUrl: 'new_logo_url',
-        faviconUrl: 'new_favicon_url'
-      }
-      component.basicForm.patchValue(newBasicData)
-      component.fontForm.patchValue({ 'font-family': 'newFont' })
-      component.generalForm.patchValue({ 'primary-color': 'rgb(255,255,255)' })
-      themeApiSpy.createTheme.and.returnValue(of({ resource: { name: 'myTheme' } }) as any)
-
-      component.changeMode = 'EDIT'
-      component.saveAsForm.patchValue({ themeName: 'myTheme', displayName: 'myDisplayName' })
-      component.onSaveAsTheme()
-
-      const createArgs = themeApiSpy.createTheme.calls.mostRecent().args[0]
-      expect(createArgs.createThemeRequest?.resource).toEqual(
-        jasmine.objectContaining({
-          name: 'myTheme',
-          displayName: 'myDisplayName',
-          description: newBasicData.description,
-          logoUrl: newBasicData.logoUrl,
-          faviconUrl: newBasicData.faviconUrl,
-          properties: jasmine.objectContaining({
-            font: jasmine.objectContaining({
-              'font-family': 'newFont'
-            }),
-            general: jasmine.objectContaining({
-              'primary-color': 'rgb(255,255,255)'
-            })
-          })
-        })
-      )
-      expect(router.navigate).toHaveBeenCalledOnceWith(
-        [`../../myTheme`],
-        jasmine.objectContaining({ relativeTo: route })
-      )
-    })
-
-    it('should display success message in create changeMode', () => {
-      const router = TestBed.inject(Router)
-      spyOn(router, 'navigate')
-
-      component.basicForm.patchValue(validTheme)
-      component.fontForm.patchValue(validTheme.properties.font)
-      component.generalForm.patchValue(validTheme.properties.general)
-      themeApiSpy.createTheme.and.returnValue(of({ resource: { name: 'myTheme' } }) as any)
-
-      component.changeMode = 'CREATE'
       component.onSaveTheme()
 
-      const createArgs = themeApiSpy.createTheme.calls.mostRecent().args[0]
-      expect(createArgs.createThemeRequest?.resource).toEqual(
-        jasmine.objectContaining({
-          name: validTheme.name,
-          displayName: validTheme.displayName,
-          description: validTheme.description,
-          logoUrl: validTheme.logoUrl,
-          faviconUrl: validTheme.faviconUrl,
-          properties: jasmine.objectContaining({
-            font: jasmine.objectContaining(validTheme.properties.font),
-            general: jasmine.objectContaining(validTheme.properties.general)
-          })
-        })
-      )
+      expect(msgServiceSpy.success).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.OK' })
+      expect(themeServiceSpy.apply).toHaveBeenCalled()
     })
 
-    it('should set faviconUrl and logoUrl to undefined if they already exist', () => {
-      const router = TestBed.inject(Router)
-      spyOn(router, 'navigate')
-
-      const route = TestBed.inject(ActivatedRoute)
-
-      const newBasicData = {
-        name: 'newName',
-        description: 'newDesc',
-        logoUrl: 'new_logo_url',
-        faviconUrl: 'new_favicon_url'
-      }
-      component.basicForm.patchValue(newBasicData)
-      component.fontForm.patchValue({
-        'font-family': 'newFont'
-      })
-      component.generalForm.patchValue({
-        'primary-color': 'rgb(255,255,255)'
-      })
-      themeApiSpy.createTheme.and.returnValue(
-        of({
-          resource: {
-            name: 'myTheme'
-          }
-        }) as any
-      )
+    it('should update theme failed', () => {
       component.changeMode = 'EDIT'
-      component.imageFaviconUrlExists = true
-      component.imageLogoUrlExists = true
+      component.themeName = validTheme.name
+      themeApiSpy.getThemeByName.and.returnValue(of({ resource: validTheme }) as any)
+      const errorResponse = { error: 'Cannot create', statusText: 'Bad Request', status: 400 }
+      themeApiSpy.updateTheme.and.returnValue(throwError(() => errorResponse))
+      spyOn(console, 'error')
 
-      component.saveAsForm.patchValue({ themeName: 'myTheme', displayName: 'myDisplayName' })
-      component.onSaveAsTheme()
+      component.ngOnInit()
 
-      const createArgs = themeApiSpy.createTheme.calls.mostRecent().args[0]
-      expect(createArgs.createThemeRequest?.resource).toEqual(
-        jasmine.objectContaining({
-          name: 'myTheme',
-          displayName: 'myDisplayName',
-          description: newBasicData.description,
-          logoUrl: undefined,
-          faviconUrl: undefined,
-          properties: jasmine.objectContaining({
-            font: jasmine.objectContaining({
-              'font-family': 'newFont'
-            }),
-            general: jasmine.objectContaining({
-              'primary-color': 'rgb(255,255,255)'
-            })
-          })
-        })
-      )
-      expect(router.navigate).toHaveBeenCalledOnceWith(
-        [`../../myTheme`],
-        jasmine.objectContaining({ relativeTo: route })
-      )
+      component.fontForm.patchValue({ 'font-family': 'updatedFont' })
+
+      expect(component.basicForm.valid).toBeTrue()
+
+      component.onSaveTheme()
+
+      expect(themeApiSpy.updateTheme).toHaveBeenCalledTimes(1)
+      expect(console.error).toHaveBeenCalledWith('updateTheme', errorResponse)
+      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.NOK' })
     })
+  })
 
-    it('should display success message and route correctly in create changeMode', () => {
-      const router = TestBed.inject(Router)
-      spyOn(router, 'navigate')
-
-      const route = TestBed.inject(ActivatedRoute)
-
-      const newBasicData = {
-        name: 'newName',
-        description: 'newDesc',
-        logoUrl: 'new_logo_url',
-        faviconUrl: 'new_favicon_url'
-      }
-      component.basicForm.patchValue(newBasicData)
-      component.fontForm.patchValue({ 'font-family': 'newFont' })
-      component.generalForm.patchValue({ 'primary-color': 'rgb(255,255,255)' })
-      themeApiSpy.createTheme.and.returnValue(of({ resource: { name: 'myTheme' } }) as any)
-      component.changeMode = 'CREATE'
-
-      component.saveAsForm.patchValue({ themeName: 'myTheme', displayName: 'myDisplayName' })
-      component.onSaveAsTheme()
-
-      expect(router.navigate).toHaveBeenCalledOnceWith([`../myTheme`], jasmine.objectContaining({ relativeTo: route }))
+  describe('save as new theme', () => {
+    beforeEach(() => {
+      initTestComponent()
     })
 
     it('should display save as new popup on save as click', (done: DoneFn) => {
@@ -668,316 +496,156 @@ describe('ThemeDesignerComponent', () => {
       expect(component.saveAsForm.controls['themeName'].value).toBe(component.copyOfPrefix + 'themeName')
       expect(component.saveAsForm.controls['displayName'].value).toBe(component.copyOfPrefix + 'themeDisplayName')
     })
+  })
 
-    describe('file upload', () => {
-      describe('checks before upload', () => {
-        it('should not upload a file if currThemeName is empty', () => {
-          const event = { target: { files: ['file'] } }
-          component.basicForm.controls['name'].setValue('')
+  describe('CREATE theme', () => {
+    beforeEach(() => {
+      initTestComponent()
+      component.autoApply = false
+      component.ngOnInit()
+    })
 
-          component.onFileUpload(event as any, RefType.Logo)
+    it('should create theme and route to it via saveAs - CREATE mode', () => {
+      component.changeMode = 'CREATE'
+      const router = TestBed.inject(Router)
+      spyOn(router, 'navigate')
+      const route = TestBed.inject(ActivatedRoute)
+      const basicData = { name: 'name', displayName: 'display name' }
 
-          expect(msgServiceSpy.error).toHaveBeenCalledWith({
-            summaryKey: 'IMAGE.CONSTRAINT_FAILED',
-            detailKey: 'IMAGE.CONSTRAINT_NAME'
-          })
-        })
+      themeApiSpy.createTheme.and.returnValue(of({ resource: { name: basicData.name } }) as any)
+      component.fontForm.patchValue({ 'font-family': 'newFont' })
+      component.generalForm.patchValue({ 'primary-color': 'rgb(255,255,255)' })
+      component.saveAsForm.patchValue({ themeName: basicData.name, displayName: basicData.displayName })
 
-        it('should not upload a file that is too large', () => {
-          const largeBlob = new Blob(['a'.repeat(120000)], { type: MimeType.Png })
-          const largeFile = new File([largeBlob], 'test.png', { type: MimeType.Png })
-          const event = { target: { files: [largeFile] } }
-          component.basicForm.controls['name'].setValue('name')
+      component.onSaveAsTheme()
 
-          component.onFileUpload(event as any, RefType.Logo)
+      expect(msgServiceSpy.success).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.CREATE.MESSAGE.OK' })
+      expect(router.navigate).toHaveBeenCalledOnceWith(
+        [`../` + basicData.name],
+        jasmine.objectContaining({ relativeTo: route })
+      )
+    })
 
-          expect(msgServiceSpy.error).toHaveBeenCalledWith({
-            summaryKey: 'IMAGE.CONSTRAINT_FAILED',
-            detailKey: 'IMAGE.CONSTRAINT_SIZE'
-          })
-        })
+    it('should create theme and route to it via save - CREATE mode', () => {
+      component.changeMode = 'CREATE'
+      const router = TestBed.inject(Router)
+      spyOn(router, 'navigate')
+      const route = TestBed.inject(ActivatedRoute)
+      const basicData = {
+        name: 'name',
+        displayName: 'display name',
+        description: 'desc'
+      }
+      themeApiSpy.createTheme.and.returnValue(of({ resource: { name: basicData.name } }) as any)
+      component.basicForm.patchValue(basicData)
+      component.fontForm.patchValue({ 'font-family': 'newFont' })
+      component.generalForm.patchValue({ 'primary-color': 'rgb(255,255,255)' })
 
-        it('should not upload a file without correct extension', () => {
-          imgServiceSpy.getImage.and.returnValue(throwError(() => new Error()))
-          const blob = new Blob(['a'.repeat(10)], { type: MimeType.Png })
-          const file = new File([blob], 'test.wrong', { type: MimeType.Png })
-          const event = { target: { files: [file] } }
-          component.basicForm.controls['name'].setValue('name')
+      component.onSaveTheme()
 
-          component.onFileUpload(event as any, RefType.Logo)
+      expect(msgServiceSpy.success).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.CREATE.MESSAGE.OK' })
+      expect(router.navigate).toHaveBeenCalledOnceWith(
+        [`../` + basicData.name],
+        jasmine.objectContaining({ relativeTo: route })
+      )
+    })
 
-          expect(component.displayFileTypeErrorLogo).toBeTrue()
-        })
+    it('should create theme and route to it via saveAs - EDIT mode', () => {
+      component.changeMode = 'EDIT'
+      const router = TestBed.inject(Router)
+      spyOn(router, 'navigate')
+      const route = TestBed.inject(ActivatedRoute)
+      const basicData = { name: 'name', displayName: 'display name' }
 
-        it('should display error if there are no files on upload image', () => {
-          const event = { target: { files: undefined } }
-          component.basicForm.controls['name'].setValue('name')
+      themeApiSpy.createTheme.and.returnValue(of({ resource: { name: basicData.name } }) as any)
+      component.basicForm.patchValue(basicData)
+      component.fontForm.patchValue({ 'font-family': 'newFont' })
+      component.generalForm.patchValue({ 'primary-color': 'rgb(255,255,255)' })
+      component.saveAsForm.patchValue({ themeName: basicData.name, displayName: basicData.displayName })
 
-          component.onFileUpload(event as any, RefType.Logo)
+      component.onSaveAsTheme()
 
-          expect(msgServiceSpy.error).toHaveBeenCalledWith({
-            summaryKey: 'IMAGE.CONSTRAINT_FAILED',
-            detailKey: 'IMAGE.CONSTRAINT_FILE_MISSING'
-          })
-        })
-      })
+      expect(msgServiceSpy.success).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.CREATE.MESSAGE.OK' })
+      expect(router.navigate).toHaveBeenCalledOnceWith(
+        [`../../` + basicData.name],
+        jasmine.objectContaining({ relativeTo: route })
+      )
+    })
 
-      describe('upload if file not exist', () => {
-        it('should upload logo', () => {
-          const mockHttpResponse: HttpResponse<Blob> = new HttpResponse({
-            body: new Blob([''], { type: MimeType.Png }),
-            status: 200
-          })
-          imgServiceSpy.getImage.and.returnValue(of(mockHttpResponse))
-          const blob = new Blob(['a'.repeat(10)], { type: MimeType.Png })
-          const file = new File([blob], 'test.png', { type: MimeType.Png })
-          const event = { target: { files: [file] } }
-          component.basicForm.controls['name'].setValue('name')
+    it('should create theme failed with error message', () => {
+      const errorResponse = { error: 'Cannot create', statusText: 'Bad Request', status: 400 }
+      themeApiSpy.createTheme.and.returnValue(throwError(() => errorResponse))
+      spyOn(console, 'error')
 
-          component.onFileUpload(event as any, RefType.Logo)
+      component.onSaveAsTheme()
 
-          expect(msgServiceSpy.info).toHaveBeenCalledWith({ summaryKey: 'IMAGE.UPLOADED' })
-        })
-
-        it('should upload favicon', () => {
-          const mockHttpResponse: HttpResponse<Blob> = new HttpResponse({
-            body: new Blob([''], { type: MimeType.XIcon }),
-            status: 200
-          })
-          imgServiceSpy.getImage.and.returnValue(of(mockHttpResponse))
-          const blob = new Blob(['a'.repeat(10)], { type: MimeType.XIcon })
-          const file = new File([blob], 'test.ico', { type: MimeType.XIcon })
-          const event = { target: { files: [file] } }
-          component.basicForm.controls['name'].setValue('name')
-
-          component.onFileUpload(event as any, RefType.Favicon)
-
-          expect(msgServiceSpy.info).toHaveBeenCalledWith({ summaryKey: 'IMAGE.UPLOADED' })
-        })
-      })
-
-      it('should manage upload error', () => {
-        const errorResponse = { status: 400, statusText: 'error on uploading' }
-        imgServiceSpy.uploadImage.and.returnValue(throwError(() => errorResponse))
-        spyOn(console, 'error')
-        const blob = new Blob(['a'.repeat(10)], { type: MimeType.XIcon })
-        const file = new File([blob], 'test.ico', { type: MimeType.XIcon })
-        const event = { target: { files: [file] } }
-        component.basicForm.controls['name'].setValue('name')
-
-        component.onFileUpload(event as any, RefType.Favicon)
-
-        expect(console.error).toHaveBeenCalledWith('uploadImage', errorResponse)
+      expect(console.error).toHaveBeenCalledWith('createTheme', errorResponse)
+      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({
+        summaryKey: 'ACTIONS.CREATE.MESSAGE.NOK',
+        detailKey: errorResponse.error
       })
     })
 
-    describe('image loading result', () => {
-      it('should load logo - failed', () => {
-        component.theme = {
-          id: 'id',
-          name: 'themeName',
-          logoUrl: 'path to logo',
-          faviconUrl: 'path to favicon'
-        }
-        component.onImageLoadResult(RefType.Logo, false)
+    it('should create theme failed with error message - CONSTRAINT', () => {
+      const errorResponse = { error: { errorCode: 'PERSIST_ENTITY_FAILED' }, statusText: 'Bad Request', status: 400 }
+      themeApiSpy.createTheme.and.returnValue(throwError(() => errorResponse))
+      spyOn(console, 'error')
 
-        expect(component.imageLogoExists).toBeFalse()
-        expect(component.fetchingLogoUrl).toBeUndefined()
-      })
+      component.onSaveAsTheme()
 
-      it('should load logo - success', () => {
-        component.theme = {
-          id: 'id',
-          name: 'themeName',
-          logoUrl: 'path to logo',
-          faviconUrl: 'path to favicon'
-        }
-        component.onImageLoadResult(RefType.Logo, true)
-
-        expect(component.imageLogoExists).toBeTrue()
-        expect(component.fetchingLogoUrl).toEqual(component.theme.logoUrl)
-      })
-
-      it('should load favicon - failed', () => {
-        component.theme = {
-          id: 'id',
-          name: 'themeName',
-          logoUrl: 'path to logo',
-          faviconUrl: 'path to favicon'
-        }
-        component.onImageLoadResult(RefType.Favicon, false)
-
-        expect(component.imageFaviconExists).toBeFalse()
-        expect(component.fetchingFaviconUrl).toBeUndefined()
-      })
-
-      it('should load favicon - success', () => {
-        component.theme = {
-          id: 'id',
-          name: 'themeName',
-          logoUrl: 'path to logo',
-          faviconUrl: 'path to favicon'
-        }
-        component.onImageLoadResult(RefType.Favicon, true)
-
-        expect(component.imageFaviconExists).toBeTrue()
-        expect(component.fetchingFaviconUrl).toEqual(component.theme.faviconUrl)
+      expect(console.error).toHaveBeenCalledWith('createTheme', errorResponse)
+      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({
+        summaryKey: 'ACTIONS.CREATE.MESSAGE.NOK',
+        detailKey: 'ACTIONS.CREATE.MESSAGE.THEME_ALREADY_EXISTS'
       })
     })
+  })
 
-    describe('remove image', () => {
-      it('should abort deletion if theme name is missing', () => {
-        component.basicForm.controls['name'].setValue('')
+  describe('templating', () => {
+    const themes: Theme[] = [validTheme, { ...validTheme, id: 'id2', name: 'name2', displayName: 'display name 2' }]
 
-        component.onRemoveImage(RefType.Logo)
+    beforeEach(() => {
+      themeApiSpy.searchThemes.and.returnValue(of({ totalElements: 1, stream: themes }) as any)
+    })
 
-        expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({
-          summaryKey: 'IMAGE.CONSTRAINT_FAILED',
-          detailKey: 'IMAGE.CONSTRAINT_NAME'
+    describe('themes', () => {
+      it('should get themes - success', (done: DoneFn) => {
+        themeApiSpy.searchThemes.and.returnValue(of({ totalElements: 1, stream: themes }) as any)
+
+        initTestComponent()
+        component.changeMode === 'CREATE'
+        component.ngOnInit()
+
+        component.themes$?.subscribe((data) => {
+          expect(data).toEqual(themes)
+          done()
         })
       })
 
-      it('should delete logo - successful', () => {
-        component.basicForm.controls['name'].setValue('theme')
-        component.imageLogoExists = true
-        imgServiceSpy.deleteImage.and.returnValue(of({}))
-
-        component.onRemoveImage(RefType.Logo)
-
-        expect(component.fetchingLogoUrl).toBeUndefined()
-        expect(component.imageLogoExists).toBeFalse()
-      })
-
-      it('should delete favicon - successful', () => {
-        component.basicForm.controls['name'].setValue('theme')
-        component.imageFaviconExists = true
-        imgServiceSpy.deleteImage.and.returnValue(of({}))
-
-        component.onRemoveImage(RefType.Favicon)
-
-        expect(component.fetchingFaviconUrl).toBeUndefined()
-        expect(component.imageFaviconExists).toBeFalse()
-      })
-
-      it('should delete favicon - failed', () => {
-        component.basicForm.controls['name'].setValue('theme')
-        component.imageFaviconExists = true
-        const errorResponse = { status: 400, statusText: 'error on uploading' }
-        imgServiceSpy.deleteImage.and.returnValue(throwError(() => errorResponse))
+      it('should get themes - failed', (done: DoneFn) => {
+        const errorResponse = { statusText: 'Bad Request', status: 400 }
+        themeApiSpy.searchThemes.and.returnValue(throwError(() => errorResponse))
         spyOn(console, 'error')
 
-        component.onRemoveImage(RefType.Favicon)
+        initTestComponent()
+        component.changeMode === 'CREATE'
+        component.ngOnInit()
 
-        expect(component.imageFaviconExists).toBeTrue()
-        expect(console.error).toHaveBeenCalledWith('deleteImage', errorResponse)
+        component.themes$?.subscribe((data) => {
+          expect(data).toEqual([])
+          done()
+        })
+
+        expect(console.error).toHaveBeenCalledWith('searchThemes', errorResponse)
       })
     })
-
-    describe('image url', () => {
-      it('should get logo img url: base url on empty logo url', () => {
-        const theme = {
-          id: 'id',
-          description: 'desc',
-          logoUrl: '',
-          faviconUrl: 'fav_url',
-          name: 'themeName'
-        }
-
-        const result = component.getImageUrl(theme, RefType.Logo)
-
-        expect(result).toBe('basePath/images/themeName/logo')
-      })
-
-      it('should get favicon img url: base url on empty favicon url', () => {
-        const theme = {
-          id: 'id',
-          description: 'desc',
-          logoUrl: 'logo_url',
-          faviconUrl: '',
-          name: 'name'
-        }
-
-        const result = component.getImageUrl(theme, RefType.Favicon)
-
-        expect(result).toBe('basePath/images/name/favicon')
-      })
-    })
-
-    it('should behave correctly onInputChange: logo url exists', fakeAsync(() => {
-      component.theme = {
-        id: 'id',
-        description: 'desc',
-        logoUrl: 'logo_url',
-        faviconUrl: 'fav_url',
-        name: 'name'
-      }
-      component.basicForm.controls['logoUrl'].setValue('http://icon/path')
-
-      component.onInputChange(RefType.Logo)
-
-      tick(1000)
-      expect(component.fetchingLogoUrl).toBe('http://icon/path')
-    }))
-
-    it('should behave correctly onInputChange: favicon url exists', fakeAsync(() => {
-      component.theme = {
-        id: 'id',
-        description: 'desc',
-        logoUrl: 'logo_url',
-        faviconUrl: 'fav_url',
-        name: 'name'
-      }
-      component.basicForm.controls['faviconUrl'].setValue('http://icon/path')
-
-      component.onInputChange(RefType.Favicon)
-
-      tick(1000)
-      expect(component.fetchingFaviconUrl).toBe('http://icon/path')
-    }))
-
-    it('should behave correctly on onInputChange: logo url empty', fakeAsync(() => {
-      component.theme = {
-        id: 'id',
-        description: 'desc',
-        logoUrl: 'logo_url',
-        faviconUrl: 'fav_url',
-        name: 'themeName'
-      }
-      component.basicForm.controls['logoUrl'].setValue('')
-      component.imageLogoUrlExists = true
-
-      component.onInputChange(RefType.Logo)
-
-      tick(1000)
-      expect(component.fetchingLogoUrl).toBe('basePath/images/themeName/logo')
-    }))
-
-    it('should behave correctly on onInputChange: favicon url empty', fakeAsync(() => {
-      component.theme = {
-        id: 'id',
-        description: 'desc',
-        logoUrl: 'logo_url',
-        faviconUrl: 'fav_url',
-        name: 'themeName',
-        properties: {
-          font: { 'font-family': 'myFont' },
-          general: { 'primary-color': 'rgb(0,0,0)' }
-        }
-      }
-      component.basicForm.controls['faviconUrl'].setValue('')
-      component.imageFaviconUrlExists = true
-
-      component.onInputChange(RefType.Favicon)
-
-      tick(1000)
-      expect(component.fetchingFaviconUrl).toBe('basePath/images/themeName/favicon')
-    }))
 
     it('should use translation data on theme template change', () => {
-      component.themeTemplates = [
-        { label: 'theme1', value: 'id1' },
-        { label: 'myTheme', value: 'id2' }
-      ]
+      themeApiSpy.getThemeById.and.returnValue(of({ resource: validTheme }) as any)
+      initTestComponent()
+      component.changeMode === 'CREATE'
+      component.ngOnInit()
+
       const translationData = {
         'ACTIONS.COPY_OF': 'Copy of ',
         'THEME.TEMPLATE.CONFIRMATION.HEADER': 'themeTemplateConfirmationHeader',
@@ -989,13 +657,13 @@ describe('ThemeDesignerComponent', () => {
       spyOn(translateService, 'get').and.returnValue(of(translationData))
       const confirmdialog: ConfirmDialog = fixture.debugElement.query(By.css('p-confirmdialog')).componentInstance
 
-      component.onThemeTemplateDropdownChange({ value: 'id2' })
+      component.onSelectThemeTemplate({ value: themes[1].name }, themes)
       fixture.detectChanges()
 
       expect(confirmdialog.confirmation).toEqual(
         jasmine.objectContaining({
           header: 'themeTemplateConfirmationHeader',
-          message: 'myTheme themeTemplateConfirmationMessage',
+          message: themes[1].displayName + ' themeTemplateConfirmationMessage',
           acceptLabel: 'actionsConfirmationYes',
           rejectLabel: 'actionsConfirmationNo'
         })
@@ -1003,13 +671,14 @@ describe('ThemeDesignerComponent', () => {
     })
 
     it('should reset selected template on confirmation reject', () => {
-      component.themeTemplates = [
-        { label: 'theme1', value: 'id1' },
-        { label: 'myTheme', value: 'id2' }
-      ]
+      themeApiSpy.getThemeById.and.returnValue(of({ resource: validTheme }) as any)
+      initTestComponent()
+      component.changeMode === 'CREATE'
+      component.ngOnInit()
+
       const confirmdialog: ConfirmDialog = fixture.debugElement.query(By.css('p-confirmdialog')).componentInstance
       const reject = spyOn(confirmdialog, 'reject').and.callThrough()
-      component.onThemeTemplateDropdownChange({ value: 'id2' })
+      component.onSelectThemeTemplate({ value: themes[1].name }, themes)
       fixture.detectChanges()
       component = fixture.componentInstance
 
@@ -1020,12 +689,12 @@ describe('ThemeDesignerComponent', () => {
     })
 
     it('should populate only properties with template data on confirmation accept and EDIT changeMode', () => {
-      component.themeTemplates = [
-        { label: 'theme1', value: 'id1' },
-        { label: 'myTheme', value: 'id2' }
-      ]
+      themeApiSpy.getThemeById.and.returnValue(of({ resource: validTheme }) as any)
+      initTestComponent()
+      component.changeMode === 'EDIT'
+      component.ngOnInit()
 
-      component.onThemeTemplateDropdownChange({ value: 'id2' })
+      component.onSelectThemeTemplate({ value: themes[1].name }, themes)
 
       const translationData = {
         'ACTIONS.COPY_OF': 'Copy of ',
@@ -1044,31 +713,30 @@ describe('ThemeDesignerComponent', () => {
         mandatory: false,
         description: 'd',
         faviconUrl: 'f',
-        logoUrl: 'l'
+        logoUrl: 'l',
+        smallLogoUrl: 's'
       }
       component.basicForm.patchValue(basicFormBeforeFetch)
 
-      const fetchedTheme = {
-        name: 'fetchedName',
-        displayName: 'fetchedNamedisplay',
-        description: 'fetchedDesc',
-        faviconUrl: 'fetchedFavUrl',
-        logoUrl: 'fetchedLogoUrl',
+      const theme = {
+        name: 'Name',
+        displayName: 'Namedisplay',
+        description: 'Desc',
+        faviconUrl: 'FavUrl',
+        logoUrl: 'LogoUrl',
+        smallLogoUrl: 'SmallLogoUrl',
         properties: {
-          font: { 'font-family': 'fetchedFont' },
+          font: { 'font-family': 'Font' },
           general: { 'primary-color': 'rgb(255,255,255)' }
         }
       }
-      const fetchedThemeResponse = { resource: fetchedTheme }
-      themeApiSpy.getThemeById.and.returnValue(of(fetchedThemeResponse) as any)
-
-      component.fetchingFaviconUrl = 'ffu'
-      component.fetchingLogoUrl = 'flu'
+      const themeResponse = { resource: theme }
+      themeApiSpy.getThemeById.and.returnValue(of(themeResponse) as any)
 
       const confirmdialog: ConfirmDialog = fixture.debugElement.query(By.css('p-confirmdialog')).componentInstance
       const accept = spyOn(confirmdialog, 'accept').and.callThrough()
 
-      component.onThemeTemplateDropdownChange({ value: 'id2' })
+      component.onSelectThemeTemplate({ value: themes[1].name }, themes)
       fixture.detectChanges()
 
       const acceptBtn = fixture.debugElement.nativeElement.querySelector('.p-confirm-dialog-accept')
@@ -1078,19 +746,17 @@ describe('ThemeDesignerComponent', () => {
       expect(component.basicForm.value).toEqual(basicFormBeforeFetch)
       expect(component.propertiesForm.value).toEqual(
         jasmine.objectContaining({
-          font: jasmine.objectContaining({ 'font-family': 'fetchedFont' }),
+          font: jasmine.objectContaining({ 'font-family': 'Font' }),
           general: jasmine.objectContaining({ 'primary-color': 'rgb(255,255,255)' })
         })
       )
-      expect(component.fetchingFaviconUrl).toBe('ffu')
-      expect(component.fetchingLogoUrl).toBe('flu')
     })
 
     it('should populate properties and basic info with template data on confirmation accept and NEW changeMode', () => {
-      component.themeTemplates = [
-        { label: 'theme1', value: 'id1' },
-        { label: 'myTheme', value: 'id2' }
-      ]
+      themeApiSpy.getThemeById.and.returnValue(of({ resource: validTheme }) as any)
+      initTestComponent()
+      component.changeMode === 'EDIT'
+      component.ngOnInit()
 
       const translationData = {
         'ACTIONS.COPY_OF': 'Copy of ',
@@ -1108,31 +774,31 @@ describe('ThemeDesignerComponent', () => {
         displayName: 'n',
         mandatory: null,
         description: 'd',
-        faviconUrl: 'f',
-        logoUrl: 'l'
+        logoUrl: 'l',
+        smallLogoUrl: 's',
+        faviconUrl: 'f'
       }
       component.basicForm.patchValue(basicFormBeforeFetch)
 
-      const fetchedTheme = {
-        name: 'fetchedName',
-        displayName: 'fetchedNamedisplay',
-        description: 'fetchedDesc',
-        faviconUrl: 'fetchedFavUrl',
-        logoUrl: 'fetchedLogoUrl',
+      const theme = {
+        name: 'Name',
+        displayName: 'Namedisplay',
+        description: 'Desc',
+        logoUrl: 'LogoUrl',
+        smallLogoUrl: 'SmallLogoUrl',
+        faviconUrl: 'FavUrl',
         properties: {
-          font: { 'font-family': 'fetchedFont' },
+          font: { 'font-family': 'Font' },
           general: { 'primary-color': 'rgb(255,255,255)' }
         }
       }
-      const fetchedThemeResponse = {
-        resource: fetchedTheme
-      }
-      themeApiSpy.getThemeById.and.returnValue(of(fetchedThemeResponse) as any)
+      const themeResponse = { resource: theme }
+      themeApiSpy.getThemeById.and.returnValue(of(themeResponse) as any)
 
       const confirmdialog: ConfirmDialog = fixture.debugElement.query(By.css('p-confirmdialog')).componentInstance
       const accept = spyOn(confirmdialog, 'accept').and.callThrough()
 
-      component.onThemeTemplateDropdownChange({ value: 'id2' })
+      component.onSelectThemeTemplate({ value: themes[1].name }, themes)
       fixture.detectChanges()
 
       const acceptBtn = fixture.debugElement.nativeElement.querySelector('.p-confirm-dialog-accept')
@@ -1140,35 +806,389 @@ describe('ThemeDesignerComponent', () => {
 
       expect(accept).toHaveBeenCalled()
       expect(component.basicForm.value).toEqual({
-        name: 'Copy of fetchedName',
+        name: 'Copy of Name',
         mandatory: null,
-        displayName: 'fetchedNamedisplay',
-        description: 'fetchedDesc',
-        faviconUrl: 'fetchedFavUrl',
-        logoUrl: 'fetchedLogoUrl'
+        displayName: 'Namedisplay',
+        description: 'Desc',
+        logoUrl: 'LogoUrl',
+        smallLogoUrl: 'SmallLogoUrl',
+        faviconUrl: 'FavUrl'
       })
       expect(component.propertiesForm.value).toEqual(
         jasmine.objectContaining({
-          font: jasmine.objectContaining({ 'font-family': 'fetchedFont' }),
+          font: jasmine.objectContaining({ 'font-family': 'Font' }),
           general: jasmine.objectContaining({ 'primary-color': 'rgb(255,255,255)' })
         })
       )
-      expect(component.fetchingFaviconUrl).toBe('fetchedFavUrl')
-      expect(component.fetchingLogoUrl).toBe('fetchedLogoUrl')
+      expect(component.imageUrl[RefType.Logo]).toBe('LogoUrl')
+      expect(component.imageUrl[RefType.LogoSmall]).toBe('SmallLogoUrl')
+      expect(component.imageUrl[RefType.Favicon]).toBe('FavUrl')
     })
   })
 
-  it('should test utility functions', () => {
-    expect(component.getImageUrl(undefined, RefType.Logo)).toBeUndefined()
-    expect(component.getImageUrl(undefined, RefType.Favicon)).toBeUndefined()
+  describe('image', () => {
+    beforeEach(() => {
+      initTestComponent()
+      component.autoApply = false
+      component.changeMode = 'EDIT'
+      component.themeName = validTheme.name
+      themeApiSpy.getThemeByName.and.returnValue(of({ resource: validTheme }) as any)
+      component.ngOnInit()
+    })
 
-    const theme = {
-      id: 'id',
-      logoUrl: 'logo_url',
-      faviconUrl: 'fav_url',
-      name: 'name'
-    }
-    expect(component.getImageUrl(theme, RefType.Logo)).toBe(theme.logoUrl)
-    expect(component.getImageUrl(theme, RefType.Favicon)).toBe(theme.faviconUrl)
+    describe('setImageUrl', () => {
+      it('call with undefined theme', () => {
+        expect(component.setImageUrl(undefined, RefType.Logo)).toBeUndefined()
+      })
+
+      xit('call without external URLs', () => {
+        component.changeMode = 'EDIT'
+        component.themeName = validTheme.name
+        const theme: Theme = { ...validTheme, logoUrl: undefined, smallLogoUrl: undefined, faviconUrl: undefined }
+        themeApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
+        themeApiSpy.updateTheme.and.returnValue(of({}) as any)
+
+        component.ngOnInit()
+
+        expect(component.imageUrl[RefType.Logo]).toBe('basePath/images/themeName/logo')
+        expect(component.imageUrlExists[RefType.Logo]).toBeFalse()
+      })
+    })
+
+    describe('Loading image', () => {
+      it('should set URL to undefined if the loading of external URL failed', () => {
+        component.changeMode = 'EDIT'
+        component.themeName = validTheme.name
+        themeApiSpy.getThemeByName.and.returnValue(of({ resource: validTheme }) as any)
+        themeApiSpy.updateTheme.and.returnValue(of({}) as any)
+
+        component.ngOnInit()
+
+        expect(component.imageUrl[RefType.Logo]).toBe(validTheme.logoUrl)
+        expect(component.imageUrlExists[RefType.Logo]).toBeTrue()
+
+        component.onImageLoadResult(false, RefType.Logo) // failed loading
+
+        expect(component.imageUrl[RefType.Logo]).toBeUndefined()
+        expect(component.headerImageUrl).toBeUndefined()
+      })
+
+      it('should let image URL untouched if the load was successful', () => {
+        component.changeMode = 'EDIT'
+        component.themeName = validTheme.name
+        themeApiSpy.getThemeByName.and.returnValue(of({ resource: validTheme }) as any)
+        themeApiSpy.updateTheme.and.returnValue(of({}) as any)
+
+        component.ngOnInit()
+
+        expect(component.imageUrl[RefType.Logo]).toBe(validTheme.logoUrl)
+        expect(component.imageUrlExists[RefType.Logo]).toBeTrue()
+
+        component.onImageLoadResult(true, RefType.Logo) // failed loading
+
+        expect(component.imageUrl[RefType.Logo]).toBe(validTheme.logoUrl)
+        expect(component.headerImageUrl).toBe(validTheme.logoUrl)
+      })
+    })
+
+    describe('onInputChange', () => {
+      it('should edit a logo URL on inputChange: valid value', fakeAsync(() => {
+        const url = 'https://host.com/logo-url'
+        const event = { target: { value: url } } as unknown as Event
+
+        component.onInputChange(event, RefType.Logo)
+        tick(1000)
+
+        expect(component.imageUrl[RefType.Logo]).toBe(url)
+        expect(component.imageUrlExists[RefType.Logo]).toBeTrue()
+      }))
+
+      it('should edit a logo URL on inputChange: invalid value', fakeAsync(() => {
+        const url = 'https://host'
+        const event = { target: { value: url } } as unknown as Event
+
+        component.onInputChange(event, RefType.Logo)
+        tick(1000)
+
+        expect(component.imageUrl[RefType.Logo]).toBeUndefined()
+      }))
+
+      it('should switch to upload URL if no URL was entered', fakeAsync(() => {
+        const url = ''
+        const event = { target: { value: url } } as unknown as Event
+        const currentUrl = component.imageUrl[RefType.Logo]
+
+        component.onInputChange(event, RefType.Logo)
+        tick(1000)
+
+        expect(component.imageUrl[RefType.Logo]).toBe(currentUrl) // url remains
+        expect(component.imageUrlExists[RefType.Logo]).toBeFalse()
+      }))
+    })
+
+    describe('image loading result', () => {
+      it('should load images - failed', () => {
+        component.onImageLoadResult(false, RefType.Logo)
+        component.onImageLoadResult(false, RefType.LogoSmall)
+        component.onImageLoadResult(false, RefType.Favicon)
+
+        expect(component.imageUrl[RefType.Logo]).toBeUndefined()
+        expect(component.imageUrl[RefType.LogoSmall]).toBeUndefined()
+        expect(component.imageUrl[RefType.Favicon]).toBeUndefined()
+      })
+
+      it('should load logo - success', () => {
+        component.onImageLoadResult(true, RefType.Logo)
+        component.onImageLoadResult(true, RefType.LogoSmall)
+        component.onImageLoadResult(true, RefType.Favicon)
+
+        expect(component.imageUrl[RefType.Logo]).toEqual(component.theme?.logoUrl)
+        expect(component.imageUrl[RefType.LogoSmall]).toEqual(component.theme?.smallLogoUrl)
+        expect(component.imageUrl[RefType.Favicon]).toEqual(component.theme?.faviconUrl)
+      })
+    })
+
+    describe('remove image or URL', () => {
+      describe('URL', () => {
+        it('should remove the real logo URL - successful', () => {
+          expect(component.imageUrl[RefType.Logo]).toBe(validTheme.logoUrl)
+          expect(component.imageUrlExists[RefType.Logo]).toBeTrue()
+
+          component.onRemoveImageUrl(RefType.Logo)
+          expect(component.imageUrl[RefType.Logo]).toBe('basePath/images/themeName/logo')
+
+          component.onRemoveImageUrl(RefType.LogoSmall)
+          expect(component.imageUrl[RefType.LogoSmall]).toBe('basePath/images/themeName/logo-small')
+
+          component.onRemoveImageUrl(RefType.Favicon)
+          expect(component.imageUrl[RefType.Favicon]).toBe('basePath/images/themeName/favicon')
+        })
+      })
+
+      describe('image', () => {
+        beforeEach(() => {
+          component.imageUrlExists[RefType.Logo] = false
+        })
+
+        it('should delete logo - successful', () => {
+          imgServiceSpy.deleteImage.and.returnValue(of({}))
+
+          component.onRemoveImage(RefType.Logo)
+
+          expect(component.imageUrl[RefType.Logo]).toBeUndefined()
+        })
+
+        it('should delete favicon - failed', () => {
+          const errorResponse = { status: 400, statusText: 'error on uploading' }
+          imgServiceSpy.deleteImage.and.returnValue(throwError(() => errorResponse))
+          spyOn(console, 'error')
+
+          component.onRemoveImage(RefType.Logo)
+
+          expect(console.error).toHaveBeenCalledWith('deleteImage', errorResponse)
+        })
+      })
+    })
+
+    describe('set image URL', () => {
+      it('should get uploaded img URL if no external URLs are defined', () => {
+        const theme = { id: 'id', name: 'name', logoUrl: undefined, smallLogoUrl: undefined, faviconUrl: undefined }
+
+        component.setImageUrl(theme, RefType.Logo)
+        component.setImageUrl(theme, RefType.LogoSmall)
+        component.setImageUrl(theme, RefType.Favicon)
+
+        expect(component.imageUrl[RefType.Logo]).toBe('basePath/images/name/logo')
+        expect(component.imageUrl[RefType.LogoSmall]).toBe('basePath/images/name/logo-small')
+        expect(component.imageUrl[RefType.Favicon]).toBe('basePath/images/name/favicon')
+      })
+
+      it('should get external URLs if exist', () => {
+        const theme = { id: 'id', name: 'name', logoUrl: 'lurl', smallLogoUrl: 'surl', faviconUrl: 'furl' }
+
+        component.setImageUrl(theme, RefType.Logo)
+        component.setImageUrl(theme, RefType.LogoSmall)
+        component.setImageUrl(theme, RefType.Favicon)
+
+        expect(component.imageUrl[RefType.Logo]).toBe('lurl')
+        expect(component.imageUrl[RefType.LogoSmall]).toBe('surl')
+        expect(component.imageUrl[RefType.Favicon]).toBe('furl')
+      })
+    })
+
+    describe('file upload', () => {
+      describe('checks before', () => {
+        it('should not upload a file if currThemeName is empty', () => {
+          const event = { target: { files: ['file'] } }
+          component.basicForm.controls['name'].setValue('')
+
+          component.onFileUpload(event as any, RefType.Logo)
+
+          expect(msgServiceSpy.error).toHaveBeenCalledWith({
+            summaryKey: 'IMAGE.CONSTRAINT_FAILED',
+            detailKey: 'IMAGE.CONSTRAINT_NAME'
+          })
+        })
+
+        it('should not upload a file that is too large', () => {
+          const largeBlob = new Blob(['a'.repeat(120000)], { type: MimeType.Png })
+          const largeFile = new File([largeBlob], 'test.png', { type: MimeType.Png })
+          const event = { target: { files: [largeFile] } }
+
+          component.onFileUpload(event as any, RefType.Logo)
+
+          expect(msgServiceSpy.error).toHaveBeenCalledWith({
+            summaryKey: 'IMAGE.CONSTRAINT.FAILED',
+            detailKey: 'IMAGE.CONSTRAINT.SIZE'
+          })
+        })
+
+        it('should not upload a file without correct extension', () => {
+          imgServiceSpy.getImage.and.returnValue(throwError(() => new Error()))
+          const blob = new Blob(['a'.repeat(10)], { type: MimeType.Png })
+          const file = new File([blob], 'test.wrong', { type: MimeType.Png })
+          const event = { target: { files: [file] } }
+          component.basicForm.controls['name'].setValue('name')
+
+          component.onFileUpload(event as any, RefType.Logo)
+
+          expect(msgServiceSpy.error).toHaveBeenCalledWith({
+            summaryKey: 'IMAGE.CONSTRAINT.FAILED',
+            detailKey: 'IMAGE.CONSTRAINT.FILE_TYPE'
+          })
+
+          component.onFileUpload(event as any, RefType.Favicon)
+
+          expect(msgServiceSpy.error).toHaveBeenCalledWith({
+            summaryKey: 'IMAGE.CONSTRAINT.FAILED',
+            detailKey: 'IMAGE.CONSTRAINT.FILE_TYPE.FAVICON'
+          })
+        })
+
+        it('should display error if there are no files on upload image', () => {
+          const event = { target: { files: undefined } }
+          component.basicForm.controls['name'].setValue('name')
+
+          component.onFileUpload(event as any, RefType.Logo)
+
+          expect(msgServiceSpy.error).toHaveBeenCalledWith({
+            summaryKey: 'IMAGE.CONSTRAINT.FAILED',
+            detailKey: 'IMAGE.CONSTRAINT.FILE_MISSING'
+          })
+        })
+      })
+
+      describe('upload', () => {
+        it('should upload logo - png success', () => {
+          const fileType = MimeType.Png
+          const mockHttpResponse: HttpResponse<Blob> = new HttpResponse({
+            body: new Blob([''], { type: fileType }),
+            status: 200
+          })
+          imgServiceSpy.getImage.and.returnValue(of(mockHttpResponse))
+          const blob = new Blob(['a'.repeat(10)], { type: fileType })
+          const file = new File([blob], 'test.png', { type: fileType })
+          const event = { target: { files: [file] } }
+          component.basicForm.controls['name'].setValue('name')
+
+          component.onFileUpload(event as any, RefType.Logo)
+          expect(msgServiceSpy.success).toHaveBeenCalledWith({ summaryKey: 'IMAGE.UPLOAD.OK' })
+        })
+
+        it('should upload logo - Jpg success', () => {
+          const fileType = MimeType.Jpg
+          const mockHttpResponse: HttpResponse<Blob> = new HttpResponse({
+            body: new Blob([''], { type: fileType }),
+            status: 200
+          })
+          imgServiceSpy.getImage.and.returnValue(of(mockHttpResponse))
+          const blob = new Blob(['a'.repeat(10)], { type: fileType })
+          const file = new File([blob], 'test.jpg', { type: fileType })
+          const event = { target: { files: [file] } }
+          component.basicForm.controls['name'].setValue('name')
+
+          component.onFileUpload(event as any, RefType.Logo)
+          expect(msgServiceSpy.success).toHaveBeenCalledWith({ summaryKey: 'IMAGE.UPLOAD.OK' })
+        })
+
+        it('should upload logo - Jpeg success', () => {
+          const fileType = MimeType.Jpeg
+          const mockHttpResponse: HttpResponse<Blob> = new HttpResponse({
+            body: new Blob([''], { type: fileType }),
+            status: 200
+          })
+          imgServiceSpy.getImage.and.returnValue(of(mockHttpResponse))
+          const blob = new Blob(['a'.repeat(10)], { type: fileType })
+          const file = new File([blob], 'test.jpeg', { type: fileType })
+          const event = { target: { files: [file] } }
+          component.basicForm.controls['name'].setValue('name')
+
+          component.onFileUpload(event as any, RefType.Logo)
+          expect(msgServiceSpy.success).toHaveBeenCalledWith({ summaryKey: 'IMAGE.UPLOAD.OK' })
+        })
+
+        it('should upload logo - Svgxml success', () => {
+          const fileType = MimeType.Svgxml
+          const mockHttpResponse: HttpResponse<Blob> = new HttpResponse({
+            body: new Blob([''], { type: fileType }),
+            status: 200
+          })
+          imgServiceSpy.getImage.and.returnValue(of(mockHttpResponse))
+          const blob = new Blob(['a'.repeat(10)], { type: fileType })
+          const file = new File([blob], 'test.svg', { type: fileType })
+          const event = { target: { files: [file] } }
+          component.basicForm.controls['name'].setValue('name')
+
+          component.onFileUpload(event as any, RefType.Logo)
+          expect(msgServiceSpy.success).toHaveBeenCalledWith({ summaryKey: 'IMAGE.UPLOAD.OK' })
+        })
+
+        it('should upload logo - default success', () => {
+          const fileType = undefined
+          const mockHttpResponse: HttpResponse<Blob> = new HttpResponse({
+            body: new Blob([''], { type: fileType }),
+            status: 200
+          })
+          imgServiceSpy.getImage.and.returnValue(of(mockHttpResponse))
+          const blob = new Blob(['a'.repeat(10)], { type: fileType })
+          const file = new File([blob], 'test.svg', { type: fileType })
+          const event = { target: { files: [file] } }
+          component.basicForm.controls['name'].setValue('name')
+
+          component.onFileUpload(event as any, RefType.Logo)
+          expect(msgServiceSpy.success).toHaveBeenCalledWith({ summaryKey: 'IMAGE.UPLOAD.OK' })
+        })
+
+        it('should upload favicon - ico success', () => {
+          const mockHttpResponse: HttpResponse<Blob> = new HttpResponse({
+            body: new Blob([''], { type: MimeType.XIcon }),
+            status: 200
+          })
+          imgServiceSpy.getImage.and.returnValue(of(mockHttpResponse))
+          const blob = new Blob(['a'.repeat(10)], { type: MimeType.XIcon })
+          const file = new File([blob], 'test.ico', { type: MimeType.XIcon })
+          const event = { target: { files: [file] } }
+          component.basicForm.controls['name'].setValue('name')
+
+          component.onFileUpload(event as any, RefType.Favicon)
+
+          expect(msgServiceSpy.success).toHaveBeenCalledWith({ summaryKey: 'IMAGE.UPLOAD.OK' })
+        })
+
+        it('should upload favicon - ico failed', () => {
+          const errorResponse = { status: 400, statusText: 'error on uploading' }
+          imgServiceSpy.uploadImage.and.returnValue(throwError(() => errorResponse))
+          spyOn(console, 'error')
+          const blob = new Blob(['a'.repeat(10)], { type: MimeType.XIcon })
+          const file = new File([blob], 'test.ico', { type: MimeType.XIcon })
+          const event = { target: { files: [file] } }
+          component.basicForm.controls['name'].setValue('name')
+
+          component.onFileUpload(event as any, RefType.Favicon)
+
+          expect(console.error).toHaveBeenCalledWith('uploadImage', errorResponse)
+        })
+      })
+    })
   })
 })
