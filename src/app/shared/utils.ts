@@ -1,4 +1,3 @@
-import { SelectItem } from 'primeng/api'
 import { Location } from '@angular/common'
 import { RefType } from 'src/app/shared/generated'
 

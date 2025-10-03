@@ -1,9 +1,9 @@
-import { Component, OnChanges, OnInit } from '@angular/core'
+import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { Observable, catchError, combineLatest, debounceTime, first, map, of, switchMap } from 'rxjs'
 import { TranslateService } from '@ngx-translate/core'
-import { ConfirmationService, SelectItem } from 'primeng/api'
+import { ConfirmationService } from 'primeng/api'
 
 import { PortalMessageService, ThemeService } from '@onecx/angular-integration-interface'
 import { Action } from '@onecx/angular-accelerator'

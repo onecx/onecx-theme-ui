@@ -1,4 +1,3 @@
-import { SelectItem } from 'primeng/api'
 import {
   mapping_error_status,
   filterObject,
