@@ -1,4 +1,4 @@
-<ocx-portal-page permission="THEME#VIEW" helpArticleId="PAGE_THEME_DETAIL">
+<ocx-portal-page permission="THEME#VIEW" helpArticleId="PAGE_THEME_DETAIL" *ngIf="theme$ | async as theme">
   <ocx-page-header
     [loading]="loading"
     [header]="theme?.displayName"
@@ -9,7 +9,7 @@
   >
   </ocx-page-header>
 
-  <ocx-page-content *ngIf="theme$ | async as theme">
+  <ocx-page-content>
     <p-message
       *ngIf="loading"
       id="ws_detail_loading_message"
@@ -100,7 +100,9 @@
               <app-image-container
                 id="th_detail_props_item_logo"
                 styleClass="max-h-2rem sm:max-h-3rem md:max-h-4rem max-w-6rem sm:max-w-8rem border-round-sm"
-                [imageUrl]="getImageUrl(theme, RefType.Logo)"
+                [bffUrl]="bffImageUrl(imageBasePath, theme.name, RefType.Logo)"
+                [imageUrl]="theme.logoUrl"
+                aria-hidden="true"
                 aria-hidden="true"
               ></app-image-container>
             </div>
@@ -117,7 +119,8 @@
               <app-image-container
                 id="th_detail_props_item_logo_small"
                 styleClass="max-h-2rem sm:max-h-3rem md:max-h-4rem max-w-6rem sm:max-w-8rem border-round-sm"
-                [imageUrl]="getImageUrl(theme, RefType.LogoSmall)"
+                [bffUrl]="bffImageUrl(imageBasePath, theme.name, RefType.LogoSmall)"
+                [imageUrl]="theme.smallLogoUrl"
                 aria-hidden="true"
               ></app-image-container>
             </div>
@@ -134,7 +137,9 @@
               <app-image-container
                 id="th_detail_props_item_favicon"
                 styleClass="max-h-2rem sm:max-h-3rem md:max-h-4rem max-w-6rem sm:max-w-8rem border-round-sm"
-                [imageUrl]="getImageUrl(theme, RefType.Favicon)"
+                [bffUrl]="bffImageUrl(imageBasePath, theme.name, RefType.Favicon)"
+                [imageUrl]="theme.faviconUrl"
+                aria-hidden="true"
               ></app-image-container>
             </div>
           </div>
@@ -159,7 +164,7 @@
         tooltipPosition="top"
         tooltipEvent="hover"
       >
-        <app-theme-use [themeName]="themeForUse?.name" (used)="preparePageAction($event)"></app-theme-use>
+        <app-theme-use [themeName]="themeForUse?.name" (used)="preparePageAction($event, theme)"></app-theme-use>
       </p-tabPanel>
 
       <p-tabPanel
@@ -245,7 +250,7 @@
           *ngIf="!theme?.mandatory"
           icon="pi pi-check"
           id="th_delete_action_yes"
-          (onClick)="onConfirmThemeDeletion()"
+          (onClick)="onConfirmThemeDeletion(theme)"
           [label]="'ACTIONS.CONFIRMATION.YES' | translate"
           [pTooltip]="'ACTIONS.CONFIRMATION.YES.TOOLTIP' | translate"
           tooltipPosition="top"

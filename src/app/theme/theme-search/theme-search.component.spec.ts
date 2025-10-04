@@ -160,24 +160,6 @@ describe('ThemeSearchComponent', () => {
     })
   })
 
-  it('should get the logo url: theme undefined', () => {
-    const result = component.getLogoUrl(undefined)
-
-    expect(result).toBeUndefined()
-  })
-
-  it('should get the logo url: logoUrl present', () => {
-    const result = component.getLogoUrl({ logoUrl: 'theme' })
-
-    expect(result).toBe('theme')
-  })
-
-  it('should get the logo url: logoUrl empty', () => {
-    const result = component.getLogoUrl({ logoUrl: '' })
-
-    expect(result).toBe('')
-  })
-
   it('should navigate to theme detail on new theme callback', () => {
     const router = TestBed.inject(Router)
     spyOn(router, 'navigate')

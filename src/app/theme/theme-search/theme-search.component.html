@@ -67,11 +67,12 @@
             [id]="'th_search_data_list_row_' + i"
             [routerLink]="['./', theme.name]"
           >
-            <div class="p-0 col-3 md:col-2 flex justify-content-around align-items-center">
+            <div class="p-0 col-3 md:col-2 flex justify-content-around align-items-center" aria-hidden="true">
               <app-image-container
                 [id]="'th_search_data_list_row_' + i + '_logo'"
                 styleClass="h-2rem sm:h-3rem md:h-3rem max-h-2rem sm:max-h-3rem max-w-4rem sm:max-w-8rem"
-                [imageUrl]="getLogoUrl(theme)"
+                [bffUrl]="bffImageUrl(imageBasePath, theme.name, RefType.Logo)"
+                [imageUrl]="theme.logoUrl"
                 aria-hidden="true"
               ></app-image-container>
             </div>
@@ -152,8 +153,8 @@
                 <app-image-container
                   [id]="'th_search_data_grid_row_' + i + '_logo'"
                   styleClass="max-h-2rem sm:max-h-3rem lg:max-h-4rem border-round-sm"
-                  [imageUrl]="getLogoUrl(theme)"
-                  [title]=""
+                  [bffUrl]="bffImageUrl(imageBasePath, theme.name, RefType.Logo)"
+                  [imageUrl]="theme.logoUrl"
                   aria-hidden="true"
                 ></app-image-container>
               </div>

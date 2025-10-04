@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core'
+import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core'
 import { Observable, map } from 'rxjs'
 
 import { AppStateService } from '@onecx/angular-integration-interface'
@@ -19,14 +19,15 @@ import { prepareUrlPath } from 'src/app/shared/utils'
 export class ImageContainerComponent implements OnChanges {
   @Input() public id = 'th_image_container'
   @Input() public title: string | undefined
-  @Input() public small = false
-  @Input() public imageUrl: string | undefined
+  @Input() public bffUrl: string | undefined // uploaded image
+  @Input() public imageUrl: string | undefined // external URL
   @Input() public styleClass: string | undefined
   @Output() public imageLoadResult = new EventEmitter<boolean>() // inform caller
 
   public url: string | undefined
-  public defaultImageUrl: string | undefined
   public defaultImageUrl$: Observable<string>
+  private defaultImageUrl: string | undefined
+  private urlType: 'ext-url' | 'bff-url' | 'def-url' = 'ext-url'
 
   constructor(appState: AppStateService) {
     this.defaultImageUrl$ = appState.currentMfe$.pipe(
@@ -35,10 +36,13 @@ export class ImageContainerComponent implements OnChanges {
     this.defaultImageUrl$.subscribe((data) => (this.defaultImageUrl = data))
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['imageUrl']) {
-      if (changes['imageUrl'].currentValue) this.url = this.imageUrl
-      if (!changes['imageUrl'].currentValue && changes['imageUrl'].previousValue) this.url = this.defaultImageUrl
+  public ngOnChanges(): void {
+    if (this.imageUrl) {
+      this.url = this.imageUrl
+      this.urlType = 'ext-url'
+    } else if (this.bffUrl) {
+      this.url = this.bffUrl
+      this.urlType = 'bff-url'
     }
   }
 
@@ -46,10 +50,21 @@ export class ImageContainerComponent implements OnChanges {
    * Emit image loading results
    */
   public onImageLoadSuccess(): void {
-    if (this.imageUrl !== undefined) this.imageLoadResult.emit(true)
+    if (this.url !== undefined) this.imageLoadResult.emit(true)
   }
 
+  // on loading error switch URL
   public onImageLoadError(): void {
-    if (this.imageUrl !== undefined) this.imageLoadResult.emit(false)
+    if (this.url !== undefined) this.imageLoadResult.emit(false)
+
+    // using ext-url not possible, use bff URL
+    if (this.urlType === 'ext-url' && this.bffUrl) {
+      this.url = this.bffUrl
+      this.urlType = 'bff-url'
+      // using bff-url not possible, use default URL
+    } else if (this.urlType === 'bff-url' && this.defaultImageUrl) {
+      this.url = this.defaultImageUrl
+      this.urlType = 'def-url'
+    }
   }
 }
