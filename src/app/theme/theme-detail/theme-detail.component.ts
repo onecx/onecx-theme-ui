@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core'
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateService } from '@ngx-translate/core'
@@ -52,8 +52,7 @@ export class ThemeDetailComponent implements OnInit {
     private readonly themeApi: ThemesAPIService,
     private readonly msgService: PortalMessageService,
     private readonly translate: TranslateService,
-    private readonly imageApi: ImagesInternalAPIService,
-    private readonly cd: ChangeDetectorRef
+    private readonly imageApi: ImagesInternalAPIService
   ) {
     this.dateFormat = this.user.lang$.getValue() === 'de' ? 'dd.MM.yyyy HH:mm:ss' : 'medium'
   }
