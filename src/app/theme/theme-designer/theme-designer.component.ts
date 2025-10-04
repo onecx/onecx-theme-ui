@@ -6,7 +6,7 @@ import { TranslateService } from '@ngx-translate/core'
 import { ConfirmationService } from 'primeng/api'
 
 import { PortalMessageService, ThemeService } from '@onecx/angular-integration-interface'
-import { Action, FilterType } from '@onecx/angular-accelerator'
+import { Action } from '@onecx/angular-accelerator'
 
 import {
   GetThemeResponse,
