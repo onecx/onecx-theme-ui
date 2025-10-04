@@ -108,7 +108,7 @@ describe('ThemeDetailComponent', () => {
     it('should set showOperatorMessage to false', () => {
       const event = { index: 2 }
 
-      component.ngOnChanges()
+      component.ngOnInit()
       component.onTabChange(event, theme)
 
       expect(component.showOperatorMessage).toBeFalsy()
@@ -136,7 +136,7 @@ describe('ThemeDetailComponent', () => {
     it('should get theme - success', (done: DoneFn) => {
       themesApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
 
-      component.ngOnChanges()
+      component.ngOnInit()
 
       component.theme$?.subscribe((data) => {
         expect(data).toBe(theme)
@@ -159,7 +159,7 @@ describe('ThemeDetailComponent', () => {
       spyOn(console, 'error')
       component.exceptionKey = undefined
 
-      component.ngOnChanges()
+      component.ngOnInit()
 
       component.theme$?.subscribe(() => {
         expect(console.error).toHaveBeenCalledWith('getThemeByName', errorResponse)
@@ -215,45 +215,11 @@ describe('ThemeDetailComponent', () => {
     })
 
     it('onClose', () => {
-      component.ngOnChanges()
+      component.ngOnInit()
       component.onClose()
 
       expect(locationSpy.back).toHaveBeenCalled()
     })
-  })
-
-  xit('should load prepare translations on successfull call', (done: DoneFn) => {
-    const themeResponse = {
-      resource: {
-        name: 'themeName',
-        displayName: 'Theme',
-        creationDate: 'myCreDate',
-        modificationDate: 'myModDate'
-      }
-    }
-    themesApiSpy.getThemeByName.and.returnValue(of(themeResponse) as any)
-
-    const translateService = TestBed.inject(TranslateService)
-    const actionsTranslations = {
-      'ACTIONS.NAVIGATION.BACK': 'actionNavigationClose',
-      'ACTIONS.NAVIGATION.BACK.TOOLTIP': 'actionNavigationCloseTooltip',
-      'ACTIONS.EDIT.LABEL': 'actionEditLabel',
-      'ACTIONS.EDIT.TOOLTIP': 'actionEditTooltip',
-      'ACTIONS.EXPORT.LABEL': 'actionExportLabel',
-      'ACTIONS.EXPORT.TOOLTIP': 'actionExportTooltip',
-      'ACTIONS.DELETE.LABEL': 'actionDeleteLabel',
-      'ACTIONS.DELETE.TOOLTIP': 'actionDeleteTooltip',
-      'ACTIONS.DELETE.THEME_MESSAGE': '{{ITEM}} actionDeleteThemeMessage'
-    }
-    const generalTranslations = {
-      'INTERNAL.CREATION_DATE': 'detailCreationDate',
-      'INTERNAL.TOOLTIPS.CREATION_DATE': 'detailTooltipsCreationDate',
-      'INTERNAL.MODIFICATION_DATE': 'detailModificationDate',
-      'INTERNAL.TOOLTIPS.MODIFICATION_DATE': 'detailTooltipsModificationDate'
-    }
-    spyOn(translateService, 'get').and.returnValues(of(actionsTranslations), of(generalTranslations))
-
-    component.ngOnChanges()
   })
 
   describe('Theme deletion', () => {

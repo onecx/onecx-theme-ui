@@ -120,7 +120,7 @@ export class ThemeSearchComponent implements OnInit {
   }
   public onFilterChange(filter: string): void {
     this.filter = filter
-    this.dv?.filter(filter, 'contains')
+    this.dv?.filter(filter)
   }
   public onSortChange(field: string): void {
     this.sortField = field

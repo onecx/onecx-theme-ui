@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnChanges } from '@angular/core'
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateService } from '@ngx-translate/core'
@@ -22,7 +22,7 @@ import {
   templateUrl: './theme-detail.component.html',
   styleUrls: ['./theme-detail.component.scss']
 })
-export class ThemeDetailComponent implements OnChanges, AfterViewInit {
+export class ThemeDetailComponent implements OnInit {
   // dialog
   public loading = true
   public exceptionKey: string | undefined = undefined
@@ -58,13 +58,9 @@ export class ThemeDetailComponent implements OnChanges, AfterViewInit {
     this.dateFormat = this.user.lang$.getValue() === 'de' ? 'dd.MM.yyyy HH:mm:ss' : 'medium'
   }
 
-  ngOnChanges(): void {
+  ngOnInit(): void {
     this.prepareDialogTranslations()
     this.getTheme()
-  }
-
-  ngAfterViewInit() {
-    this.cd.detectChanges()
   }
 
   private getTheme() {
