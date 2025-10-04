@@ -841,7 +841,7 @@ describe('ThemeDesignerComponent', () => {
         expect(component.setImageUrl(undefined, RefType.Logo)).toBeUndefined()
       })
 
-      xit('call without external URLs', () => {
+      it('call without external URLs', () => {
         component.changeMode = 'EDIT'
         component.themeName = validTheme.name
         const theme: Theme = { ...validTheme, logoUrl: undefined, smallLogoUrl: undefined, faviconUrl: undefined }

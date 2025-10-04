@@ -43,8 +43,12 @@ export function prepareUrlPath(url?: string, path?: string): string {
   else if (url) return url
   else return ''
 }
-export function bffImageUrl(basePath: string | undefined, name: string | undefined, refType?: RefType): string {
-  return !name ? '' : (basePath ?? '') + '/images/' + name + '/' + (refType ?? RefType.Logo)
+export function bffImageUrl(
+  basePath: string | undefined,
+  name: string | undefined,
+  refType: RefType
+): string | undefined {
+  return name ? (basePath ?? '') + '/images/' + name + '/' + refType : undefined
 }
 
 /**

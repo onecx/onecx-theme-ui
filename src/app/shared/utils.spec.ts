@@ -177,7 +177,7 @@ describe('util functions', () => {
       const basePath = undefined
       const name = 'name'
 
-      const preparedUrl = bffImageUrl(basePath, name)
+      const preparedUrl = bffImageUrl(basePath, name, RefType.Logo)
 
       expect(preparedUrl).toBe('/images/name/logo')
     })
@@ -188,7 +188,7 @@ describe('util functions', () => {
 
       const preparedUrl = bffImageUrl(basePath, name, RefType.Favicon)
 
-      expect(preparedUrl).toBe('')
+      expect(preparedUrl).toBeUndefined()
     })
   })
 })

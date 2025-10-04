@@ -6,7 +6,7 @@ import { TranslateService } from '@ngx-translate/core'
 import { ConfirmationService } from 'primeng/api'
 
 import { PortalMessageService, ThemeService } from '@onecx/angular-integration-interface'
-import { Action } from '@onecx/angular-accelerator'
+import { Action, FilterType } from '@onecx/angular-accelerator'
 
 import {
   GetThemeResponse,
@@ -109,12 +109,11 @@ export class ThemeDesignerComponent implements OnInit {
       ]).subscribe(([theme, data]) => this.fillForm(theme, data))
     } else {
       const currentVars: { [key: string]: { [key: string]: string } } = {}
-      Object.entries(themeVariables).forEach(([key, val]: [string, string[]]) => {
-        currentVars[key] = {}
-        val.forEach((v) => {
-          currentVars[key][v] = getComputedStyle(document.documentElement).getPropertyValue(`--${v}`)
-        })
-      })
+      for (const tv of Object.entries(themeVariables)) {
+        currentVars[tv[0]] = {}
+        for (const v of tv[1])
+          currentVars[tv[0]][v] = getComputedStyle(document.documentElement).getPropertyValue(`--${v}`)
+      }
       this.propertiesForm.reset()
       this.propertiesForm.patchValue(currentVars)
     }
@@ -194,24 +193,20 @@ export class ThemeDesignerComponent implements OnInit {
       this.msgService.error({ summaryKey: 'IMAGE.CONSTRAINT_FAILED', detailKey: 'IMAGE.CONSTRAINT_NAME' })
       return
     }
-    if (ev.target && (ev.target as HTMLInputElement).files) {
-      const files = (ev.target as HTMLInputElement).files
+    const files = (ev.target as HTMLInputElement).files
+    if (files) {
       const regex = RefType.Favicon === refType ? /^.*.(jpg|jpeg|ico|png|svg)$/ : /^.*.(jpg|jpeg|png|svg)$/
-      if (files) {
-        if (files[0].size > this.imageMaxSize) {
-          this.msgService.error({ summaryKey: 'IMAGE.CONSTRAINT.FAILED', detailKey: 'IMAGE.CONSTRAINT.SIZE' })
-        } else if (!regex.exec(files[0].name)) {
-          this.msgService.error({
-            summaryKey: 'IMAGE.CONSTRAINT.FAILED',
-            detailKey: 'IMAGE.CONSTRAINT.FILE_TYPE' + (RefType.Favicon === refType ? '.FAVICON' : '')
-          })
-        } else if (this.theme) {
-          this.saveImage(this.theme.name!, files, refType) // store image
-        }
+      if (files[0].size > this.imageMaxSize) {
+        this.msgService.error({ summaryKey: 'IMAGE.CONSTRAINT.FAILED', detailKey: 'IMAGE.CONSTRAINT.SIZE' })
+      } else if (!regex.exec(files[0].name)) {
+        this.msgService.error({
+          summaryKey: 'IMAGE.CONSTRAINT.FAILED',
+          detailKey: 'IMAGE.CONSTRAINT.FILE_TYPE' + (RefType.Favicon === refType ? '.FAVICON' : '')
+        })
+      } else if (this.theme) {
+        this.saveImage(this.theme.name!, files, refType) // store image
       }
-    } else {
-      this.msgService.error({ summaryKey: 'IMAGE.CONSTRAINT.FAILED', detailKey: 'IMAGE.CONSTRAINT.FILE_MISSING' })
-    }
+    } else this.msgService.error({ summaryKey: 'IMAGE.CONSTRAINT.FAILED', detailKey: 'IMAGE.CONSTRAINT.FILE_MISSING' })
   }
 
   private mapMimeType(type: string): MimeType {
@@ -471,9 +466,9 @@ export class ThemeDesignerComponent implements OnInit {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
     return result
       ? {
-          r: parseInt(result[1], 16),
-          g: parseInt(result[2], 16),
-          b: parseInt(result[3], 16)
+          r: Number.parseInt(result[1], 16),
+          g: Number.parseInt(result[2], 16),
+          b: Number.parseInt(result[3], 16)
         }
       : null
   }
@@ -501,37 +496,31 @@ export class ThemeDesignerComponent implements OnInit {
       ])
     })
 
-    themeVariables.font.forEach((v: string) => {
+    for (const v of themeVariables.font) {
       const fc = new FormControl<string | null>(null)
       this.fontForm.addControl(v, fc)
-    })
-    themeVariables.general.forEach((v: string) => {
+    }
+    for (const v of themeVariables.general) {
       const fc = new FormControl<string | null>(null)
       fc.valueChanges.pipe(debounceTime(300)).subscribe((formVal) => {
-        if (this.autoApply) {
-          this.updateCssVar(v, formVal || '')
-        }
+        if (this.autoApply) this.updateCssVar(v, formVal || '')
       })
       this.generalForm.addControl(v, fc)
-    })
-    themeVariables.topbar.forEach((v: string) => {
+    }
+    for (const v of themeVariables.topbar) {
       const fc = new FormControl<string | null>(null)
       fc.valueChanges.pipe(debounceTime(300)).subscribe((formVal) => {
-        if (this.autoApply) {
-          this.updateCssVar(v, formVal || '')
-        }
+        if (this.autoApply) this.updateCssVar(v, formVal || '')
       })
       this.topbarForm.addControl(v, fc)
-    })
-    themeVariables.sidebar.forEach((v: string) => {
+    }
+    for (const v of themeVariables.sidebar) {
       const fc = new FormControl<string | null>(null)
       fc.valueChanges.pipe(debounceTime(300)).subscribe((formVal) => {
-        if (this.autoApply) {
-          this.updateCssVar(v, formVal || '')
-        }
+        if (this.autoApply) this.updateCssVar(v, formVal || '')
       })
       this.sidebarForm.addControl(v, fc)
-    })
+    }
   }
 
   private preparePageActions(): void {
