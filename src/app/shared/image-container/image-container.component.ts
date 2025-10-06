@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core'
-import { Observable, map } from 'rxjs'
+import { map } from 'rxjs'
 
 import { AppStateService } from '@onecx/angular-integration-interface'
 
