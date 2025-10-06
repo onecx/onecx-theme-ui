@@ -712,18 +712,6 @@ describe('ThemeDesignerComponent', () => {
       }
       component.basicForm.patchValue(basicFormBeforeFetch)
 
-      const theme = {
-        name: 'Name',
-        displayName: 'Namedisplay',
-        description: 'Desc',
-        logoUrl: 'LogoUrl',
-        smallLogoUrl: 'SmallLogoUrl',
-        faviconUrl: 'FavUrl',
-        properties: {
-          font: { 'font-family': 'Font' },
-          general: { 'primary-color': 'rgb(255,255,255)' }
-        }
-      }
       const themeResponse = { resource: validTheme }
       themeApiSpy.getThemeById.and.returnValue(of(themeResponse) as any)
 
