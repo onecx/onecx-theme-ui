@@ -1,4 +1,3 @@
-import { SelectItem } from 'primeng/api'
 import { Location } from '@angular/common'
 import { RefType } from 'src/app/shared/generated'
 
@@ -14,15 +13,6 @@ export function limitText(text: string | null, limit: number): string {
   }
 }
 
-export function dropDownSortItemsByLabel(a: SelectItem, b: SelectItem): number {
-  return (a.label ? a.label.toUpperCase() : '').localeCompare(b.label ? b.label.toUpperCase() : '')
-}
-export function dropDownGetLabelByValue(ddArray: SelectItem[], val: string): string {
-  const a: any = ddArray.find((item: SelectItem) => {
-    return item?.value == val
-  })
-  return a.label
-}
 export function sortByLocale(a: any, b: any): number {
   return a.toUpperCase().localeCompare(b.toUpperCase())
 }
@@ -53,8 +43,12 @@ export function prepareUrlPath(url?: string, path?: string): string {
   else if (url) return url
   else return ''
 }
-export function bffImageUrl(basePath: string | undefined, name: string | undefined, refType?: RefType): string {
-  return !name ? '' : (basePath ?? '') + '/images/' + name + '/' + (refType ?? RefType.Logo)
+export function bffImageUrl(
+  basePath: string | undefined,
+  name: string | undefined,
+  refType: RefType
+): string | undefined {
+  return name ? (basePath ?? '') + '/images/' + name + '/' + refType : undefined
 }
 
 /**

@@ -24,6 +24,10 @@ export class ThemeSearchComponent implements OnInit {
   public actions$: Observable<Action[]> | undefined
   public importDialogVisible = false
   public limitText = limitText
+  // image
+  public imageBasePath = this.imageApi.configuration.basePath
+  public RefType = RefType
+  public bffImageUrl = bffImageUrl
   // data
   public themes$!: Observable<Theme[]>
   @ViewChild(DataView) dv: DataView | undefined
@@ -108,12 +112,6 @@ export class ThemeSearchComponent implements OnInit {
       )
   }
 
-  getLogoUrl(theme: Theme | undefined): string | undefined {
-    if (!theme) return undefined
-    if (theme.logoUrl !== null && theme.logoUrl !== '') return theme.logoUrl
-    return bffImageUrl(this.imageApi.configuration.basePath, theme.name, RefType.Logo)
-  }
-
   public onNewTheme(): void {
     this.router.navigate(['./new'], { relativeTo: this.route })
   }
@@ -122,7 +120,7 @@ export class ThemeSearchComponent implements OnInit {
   }
   public onFilterChange(filter: string): void {
     this.filter = filter
-    this.dv?.filter(filter, 'contains')
+    this.dv?.filter(filter)
   }
   public onSortChange(field: string): void {
     this.sortField = field

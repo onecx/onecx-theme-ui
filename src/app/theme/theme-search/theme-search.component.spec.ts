@@ -160,34 +160,20 @@ describe('ThemeSearchComponent', () => {
     })
   })
 
-  it('should get the logo url: theme undefined', () => {
-    const result = component.getLogoUrl(undefined)
-
-    expect(result).toBeUndefined()
-  })
-
-  it('should get the logo url: logoUrl present', () => {
-    const result = component.getLogoUrl({ logoUrl: 'theme' })
-
-    expect(result).toBe('theme')
-  })
-
-  it('should get the logo url: logoUrl empty', () => {
-    const result = component.getLogoUrl({ logoUrl: '' })
-
-    expect(result).toBe('')
-  })
-
   it('should navigate to theme detail on new theme callback', () => {
     const router = TestBed.inject(Router)
     spyOn(router, 'navigate')
+
     component.onNewTheme()
+
     expect(router.navigate).toHaveBeenCalledOnceWith(['./new'], jasmine.any(Object))
   })
 
   it('should change viewMode on layout change', () => {
     expect(component.viewMode).toBe('grid')
+
     component.onLayoutChange('list')
+
     expect(component.viewMode).toBe('list')
   })
 
@@ -195,14 +181,18 @@ describe('ThemeSearchComponent', () => {
     component.dv = jasmine.createSpyObj('DataView', ['filter'])
     component.filter = ''
     const myFilter = 'myTheme'
+
     component.onFilterChange(myFilter)
+
     expect(component.filter).toBe(myFilter)
-    expect(component.dv!.filter).toHaveBeenCalledOnceWith(myFilter, 'contains')
+    expect(component.dv!.filter).toHaveBeenCalledOnceWith(myFilter)
   })
 
   it('should change field to sort by on sort change', () => {
     component.sortField = 'name'
+
     component.onSortChange('description')
+
     expect(component.sortField).toBe('description')
   })
 

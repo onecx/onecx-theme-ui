@@ -1,15 +1,15 @@
-<ocx-portal-page permission="THEME#VIEW" helpArticleId="PAGE_THEME_DETAIL">
+<ocx-portal-page permission="THEME#VIEW" helpArticleId="PAGE_THEME_DETAIL" *ngIf="theme$ | async as theme">
   <ocx-page-header
     [loading]="loading"
     [header]="theme?.displayName"
     [subheader]="'THEME.DETAIL.SUBHEADER' | translate"
     [actions]="(actions$ | async) ?? []"
     [figureImage]="headerImageUrl"
-    [figureBackground]="!theme?.logoUrl"
+    [figureBackground]="!headerImageUrl"
   >
   </ocx-page-header>
 
-  <ocx-page-content *ngIf="theme$ | async as theme">
+  <ocx-page-content>
     <p-message
       *ngIf="loading"
       id="ws_detail_loading_message"
@@ -85,26 +85,60 @@
             <label for="th_detail_item_description" aria-hidden="true">{{ 'THEME.DESCRIPTION' | translate }}</label>
           </span>
 
-          <div class="flex flex-wrap sm:flex-nowrap justify-content-around align-items-center gap-2">
+          <!-- IMAGES -->
+          <div class="flex flex-wrap sm:flex-nowrap justify-content-around align-items-center gap-2" aria-hidden="true">
             <div class="flex flex-nowrap align-items-center column-gap-2">
-              <label for="th_detail_item_logo" class="flex font-medium text-600" aria-hidden="true">
-                {{ 'LOGO.LABEL' | translate }}
-              </label>
+              <section
+                class="w-4rem text-center"
+                style="color: var(--emphasis-medium)"
+                [pTooltip]="'IMAGE.TOOLTIPS.LOGO' | translate"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+              >
+                {{ 'IMAGE.LOGO' | translate }}
+              </section>
               <app-image-container
                 id="th_detail_props_item_logo"
-                styleClass="max-h-2rem sm:max-h-3rem md:max-h-4rem max-w-6rem sm:max-w-8rem  border-round-sm"
-                [imageUrl]="getImageUrl(theme, RefType.Logo)"
+                styleClass="max-h-2rem sm:max-h-3rem md:max-h-4rem max-w-6rem sm:max-w-8rem border-round-sm"
+                [bffUrl]="bffImageUrl(imageBasePath, theme.name, RefType.Logo)"
+                [imageUrl]="theme.logoUrl"
+                aria-hidden="true"
               ></app-image-container>
             </div>
             <div class="flex flex-nowrap align-items-center column-gap-2">
-              <label for="th_detail_item_favicon" class="flex font-medium text-600" aria-hidden="true">
-                {{ 'FAVICON.LABEL' | translate }}
-              </label>
+              <section
+                class="w-4rem text-center"
+                style="color: var(--emphasis-medium)"
+                [pTooltip]="'IMAGE.TOOLTIPS.LOGO_SMALL' | translate"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+              >
+                {{ 'IMAGE.LOGO_SMALL' | translate }}
+              </section>
+              <app-image-container
+                id="th_detail_props_item_logo_small"
+                styleClass="max-h-2rem sm:max-h-3rem md:max-h-4rem max-w-6rem sm:max-w-8rem border-round-sm"
+                [bffUrl]="bffImageUrl(imageBasePath, theme.name, RefType.LogoSmall)"
+                [imageUrl]="theme.smallLogoUrl"
+                aria-hidden="true"
+              ></app-image-container>
+            </div>
+            <div class="flex flex-nowrap align-items-center column-gap-2">
+              <section
+                class="w-4rem text-center"
+                style="color: var(--emphasis-medium)"
+                [pTooltip]="'IMAGE.TOOLTIPS.FAVICON' | translate"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+              >
+                {{ 'IMAGE.FAVICON' | translate }}
+              </section>
               <app-image-container
                 id="th_detail_props_item_favicon"
-                styleClass="max-h-2rem sm:max-h-3rem md:max-h-4rem max-w-6rem sm:max-w-8rem  border-round-sm"
-                [imageUrl]="getImageUrl(theme, RefType.Favicon)"
-                [title]="'FAVICON.IMAGE' | translate"
+                styleClass="max-h-2rem sm:max-h-3rem md:max-h-4rem max-w-6rem sm:max-w-8rem border-round-sm"
+                [bffUrl]="bffImageUrl(imageBasePath, theme.name, RefType.Favicon)"
+                [imageUrl]="theme.faviconUrl"
+                aria-hidden="true"
               ></app-image-container>
             </div>
           </div>
@@ -129,7 +163,7 @@
         tooltipPosition="top"
         tooltipEvent="hover"
       >
-        <app-theme-use [themeName]="themeForUse?.name" (used)="preparePageAction($event)"></app-theme-use>
+        <app-theme-use [themeName]="themeForUse?.name" (used)="preparePageAction($event, theme)"></app-theme-use>
       </p-tabPanel>
 
       <p-tabPanel
@@ -215,7 +249,7 @@
           *ngIf="!theme?.mandatory"
           icon="pi pi-check"
           id="th_delete_action_yes"
-          (onClick)="onConfirmThemeDeletion()"
+          (onClick)="onConfirmThemeDeletion(theme)"
           [label]="'ACTIONS.CONFIRMATION.YES' | translate"
           [pTooltip]="'ACTIONS.CONFIRMATION.YES.TOOLTIP' | translate"
           tooltipPosition="top"

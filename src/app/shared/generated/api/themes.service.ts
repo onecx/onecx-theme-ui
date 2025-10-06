@@ -1,6 +1,6 @@
 /**
  * onecx-theme-bff
- * OneCx theme Bff
+ * Backend-For-Frontend (BFF) service for onecx-theme. This API provides endpoints to manage Themes and related Images
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -26,8 +26,6 @@ import { CreateThemeResponse } from '../model/createThemeResponse';
 import { ExportThemeRequest } from '../model/exportThemeRequest';
 // @ts-ignore
 import { GetThemeResponse } from '../model/getThemeResponse';
-// @ts-ignore
-import { GetThemesResponse } from '../model/getThemesResponse';
 // @ts-ignore
 import { ImportThemeResponse } from '../model/importThemeResponse';
 // @ts-ignore
@@ -66,11 +64,6 @@ export interface GetThemeByIdRequestParams {
 
 export interface GetThemeByNameRequestParams {
     name: string;
-}
-
-export interface GetThemesRequestParams {
-    pageNumber?: number;
-    pageSize?: number;
 }
 
 export interface ImportThemesRequestParams {
@@ -152,7 +145,7 @@ export class ThemesAPIService {
     }
 
     /**
-     * Create theme
+     * Create a new theme
      * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
@@ -218,7 +211,7 @@ export class ThemesAPIService {
     }
 
     /**
-     * Delete theme
+     * Delete a theme by its id
      * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
@@ -277,7 +270,7 @@ export class ThemesAPIService {
     }
 
     /**
-     * Export list of themes
+     * Export a list of themes
      * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
@@ -346,7 +339,7 @@ export class ThemesAPIService {
     }
 
     /**
-     * Find theme by id
+     * Get a theme by its id
      * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
@@ -405,7 +398,7 @@ export class ThemesAPIService {
     }
 
     /**
-     * Find theme by name including workspace
+     * Get a theme by its name
      * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
@@ -464,75 +457,7 @@ export class ThemesAPIService {
     }
 
     /**
-     * Find all themes
-     * @param requestParameters
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public getThemes(requestParameters: GetThemesRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<GetThemesResponse>;
-    public getThemes(requestParameters: GetThemesRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpResponse<GetThemesResponse>>;
-    public getThemes(requestParameters: GetThemesRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpEvent<GetThemesResponse>>;
-    public getThemes(requestParameters: GetThemesRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any> {
-        const pageNumber = requestParameters.pageNumber;
-        const pageSize = requestParameters.pageSize;
-
-        let localVarQueryParameters = new HttpParams({encoder: this.encoder});
-        if (pageNumber !== undefined && pageNumber !== null) {
-          localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
-            <any>pageNumber, 'pageNumber');
-        }
-        if (pageSize !== undefined && pageSize !== null) {
-          localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
-            <any>pageSize, 'pageSize');
-        }
-
-        let localVarHeaders = this.defaultHeaders;
-
-        let localVarHttpHeaderAcceptSelected: string | undefined = options && options.httpHeaderAccept;
-        if (localVarHttpHeaderAcceptSelected === undefined) {
-            // to determine the Accept header
-            const httpHeaderAccepts: string[] = [
-                'application/json'
-            ];
-            localVarHttpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        }
-        if (localVarHttpHeaderAcceptSelected !== undefined) {
-            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
-        }
-
-        let localVarHttpContext: HttpContext | undefined = options && options.context;
-        if (localVarHttpContext === undefined) {
-            localVarHttpContext = new HttpContext();
-        }
-
-
-        let responseType_: 'text' | 'json' | 'blob' = 'json';
-        if (localVarHttpHeaderAcceptSelected) {
-            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
-                responseType_ = 'text';
-            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
-                responseType_ = 'json';
-            } else {
-                responseType_ = 'blob';
-            }
-        }
-
-        let localVarPath = `/themes`;
-        return this.httpClient.request<GetThemesResponse>('get', `${this.configuration.basePath}${localVarPath}`,
-            {
-                context: localVarHttpContext,
-                params: localVarQueryParameters,
-                responseType: <any>responseType_,
-                withCredentials: this.configuration.withCredentials,
-                headers: localVarHeaders,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * Import themes
+     * Import a list of themes
      * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
@@ -601,7 +526,7 @@ export class ThemesAPIService {
     }
 
     /**
-     * Search themes by criteria
+     * Search themes by search criteria
      * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
@@ -670,7 +595,7 @@ export class ThemesAPIService {
     }
 
     /**
-     * Update theme
+     * Update a theme by its id
      * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.

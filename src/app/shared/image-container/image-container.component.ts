@@ -1,5 +1,5 @@
-import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core'
-import { map } from 'rxjs'
+import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core'
+import { Observable, map } from 'rxjs'
 
 import { AppStateService } from '@onecx/angular-integration-interface'
 
@@ -14,50 +14,70 @@ import { prepareUrlPath } from 'src/app/shared/utils'
  */
 @Component({
   selector: 'app-image-container',
-  styleUrls: ['./image-container.component.scss'],
   templateUrl: './image-container.component.html'
 })
 export class ImageContainerComponent implements OnChanges {
-  @Input() public id: string | undefined = undefined
-  @Input() public title: string | undefined = undefined
-  @Input() public imageUrl: string | undefined
+  @Input() public id = 'th_image_container'
+  @Input() public title: string | undefined
+  @Input() public bffUrl: string | undefined // uploaded image
+  @Input() public imageUrl: string | undefined // external URL
   @Input() public styleClass: string | undefined
   @Output() public imageLoadResult = new EventEmitter<boolean>() // inform caller
 
-  public displayImageUrl: string | undefined
-  public defaultImageUrl = ''
-  public displayDefault = false
+  public url: string | undefined = undefined
+  public defaultImageUrl$: Observable<string>
+  private defaultImageUrl: string | undefined
+  private urlType: 'ext-url' | 'bff-url' | 'def-url' = 'ext-url'
 
-  constructor(private readonly appState: AppStateService) {
-    appState.currentMfe$
-      .pipe(
-        map((mfe) => {
-          this.defaultImageUrl = prepareUrlPath(mfe.remoteBaseUrl, environment.DEFAULT_LOGO_PATH)
-        })
-      )
-      .subscribe()
+  constructor(appState: AppStateService) {
+    this.defaultImageUrl$ = appState.currentMfe$.pipe(
+      map((mfe) => prepareUrlPath(mfe.remoteBaseUrl, environment.DEFAULT_LOGO_PATH))
+    )
+    this.defaultImageUrl$.subscribe((data) => (this.defaultImageUrl = data))
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    // Hint: there are more changes (e.g. on title) => ignore them
-    if (changes['imageUrl']) {
-      if (this.imageUrl) {
-        this.displayDefault = false
-        this.displayImageUrl = this.imageUrl
-      } else this.displayDefault = true
+  public ngOnChanges(): void {
+    if (this.imageUrl) {
+      if (/^(http|https):\/\/.{6,245}$/.exec(this.imageUrl)) {
+        this.url = this.imageUrl
+        this.urlType = 'ext-url'
+      } else {
+        this.url = this.defaultImageUrl
+        this.urlType = 'def-url'
+      }
+    } else if (this.bffUrl) {
+      this.url = this.bffUrl
+      this.urlType = 'bff-url'
+    } else {
+      this.url = this.defaultImageUrl
+      this.urlType = 'def-url'
     }
   }
 
   /**
-   * Image loading Results
+   * Emit image loading results
    */
   public onImageLoadSuccess(): void {
-    if (this.displayImageUrl !== undefined) this.imageLoadResult.emit(true)
+    if (this.url !== undefined && this.url !== this.defaultImageUrl) this.imageLoadResult.emit(true)
   }
 
+  // on loading error switch URL
   public onImageLoadError(): void {
-    if (this.displayImageUrl !== undefined) this.imageLoadResult.emit(false)
-    this.displayDefault = true
-    this.displayImageUrl = undefined
+    if (this.url !== undefined) this.imageLoadResult.emit(false)
+
+    // using ext-url not possible, use bff URL
+    if (this.urlType === 'ext-url') {
+      if (this.bffUrl) {
+        this.url = this.bffUrl
+        this.urlType = 'bff-url'
+      } else {
+        this.url = this.defaultImageUrl
+        this.urlType = 'def-url'
+      }
+      // using bff-url not possible, use default URL
+    } else if (this.urlType === 'bff-url' && this.defaultImageUrl) {
+      this.url = this.defaultImageUrl
+      this.urlType = 'def-url'
+    }
   }
 }
