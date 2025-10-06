@@ -1,4 +1,4 @@
-<ocx-portal-page permission="THEME#EDIT" helpArticleId="PAGE_THEME_DESIGNER">
+<ocx-portal-page permission="THEME#EDIT" helpArticleId="PAGE_THEME_DESIGNER" *ngIf="theme$ | async as theme">
   <ocx-page-header
     [header]="theme ? theme.displayName : 'Theme Designer'"
     [subheader]="'THEME.DESIGNER.' + changeMode + '.SUBHEADER' | translate"
@@ -163,15 +163,16 @@
               <app-image-container
                 id="th_designer_logo_url_image"
                 styleClass="max-h-3rem max-w-5rem border-round-sm"
-                [imageUrl]="imageUrl[RefType.Logo]"
-                (imageLoadResult)="onImageLoadResult($event, RefType.Logo)"
+                [bffUrl]="LogoUrlInput.value !== '' ? undefined : bffUrl[RefType.Logo]"
+                [imageUrl]="LogoUrlInput.value"
+                (imageLoadResult)="onImageLoadResult($event, RefType.Logo, LogoUrlInput.value)"
               ></app-image-container>
               <button
                 pButton
                 id="th_designer_action_remove_logo"
                 icon="pi pi-trash"
                 class="action-button p-button-icon-only"
-                [disabled]="!(imageUrl[RefType.Logo] && !imageUrlExists[RefType.Logo])"
+                [disabled]="!(bffUrl[RefType.Logo] && !LogoUrlInput.value)"
                 (click)="onRemoveImage(RefType.Logo)"
                 [ariaLabel]="'IMAGE.TOOLTIPS.REMOVE' | translate"
                 [pTooltip]="'IMAGE.TOOLTIPS.REMOVE' | translate"
@@ -180,11 +181,10 @@
               ></button>
               <button
                 pButton
-                id="th_designer_action_logo_upload"
+                id="th_designer_action_upload_logo"
                 icon="pi pi-upload"
-                [disabled]=""
                 class="action-button p-button-icon-only"
-                [disabled]="imageUrlExists[RefType.Logo]"
+                [disabled]="LogoUrlInput.value"
                 (click)="fileUploadLogo.click()"
                 [ariaLabel]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
                 [pTooltip]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
@@ -195,25 +195,25 @@
                 <div class="p-inputgroup">
                   <span class="p-float-label w-full">
                     <input
+                      #LogoUrlInput
                       pInputText
                       type="text"
                       id="th_designer_field_logo_url"
                       class="w-full pt-3 pb-2 text-responsive"
                       formControlName="logoUrl"
-                      (input)="onInputChange($event, RefType.Logo)"
                       [ariaLabel]="('IMAGE.LOGO' | translate) + ':  ' + ('IMAGE.TOOLTIPS.URL' | translate)"
                       [pTooltip]="'IMAGE.TOOLTIPS.URL' | translate"
                       tooltipPosition="top"
                       tooltipEvent="hover"
                     />
-                    <label for="th_designer_field_logo_url" aria-hidden="true">{{
-                      'IMAGE.LOGO_URL' | translate
-                    }}</label>
+                    <label for="th_designer_field_logo_url" aria-hidden="true">
+                      {{ 'IMAGE.LOGO_URL' | translate }}
+                    </label>
                   </span>
                   <button
                     id="ws_detail_props_item_logo_url_remove"
                     class="p-inputgroup-addon bg-primary pseudo-button"
-                    [ngClass]="changeMode === 'EDIT' && imageUrlExists[RefType.Logo] ? 'cursor-pointer' : 'p-disabled'"
+                    [ngClass]="changeMode === 'EDIT' && LogoUrlInput.value ? 'cursor-pointer' : 'p-disabled'"
                     (click)="onRemoveImageUrl(RefType.Logo)"
                     [attr.aria-label]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
                     [pTooltip]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
@@ -260,15 +260,16 @@
               <app-image-container
                 id="th_designer_logo_small_url_image"
                 styleClass="max-h-3rem max-w-5rem border-round-sm"
-                [imageUrl]="imageUrl[RefType.LogoSmall]"
-                (imageLoadResult)="onImageLoadResult($event, RefType.LogoSmall)"
+                [bffUrl]="SmallLogoUrlInput.value !== '' ? undefined : bffUrl[RefType.LogoSmall]"
+                [imageUrl]="SmallLogoUrlInput.value"
+                (imageLoadResult)="onImageLoadResult($event, RefType.LogoSmall, SmallLogoUrlInput.value)"
               ></app-image-container>
               <button
                 pButton
-                id="th_designer_action_remove_logo"
+                id="th_designer_action_remove_logo_small"
                 icon="pi pi-trash"
                 class="action-button p-button-icon-only"
-                [disabled]="!(imageUrl[RefType.LogoSmall] && !imageUrlExists[RefType.LogoSmall])"
+                [disabled]="!(bffUrl[RefType.LogoSmall] && !SmallLogoUrlInput.value)"
                 (click)="onRemoveImage(RefType.LogoSmall)"
                 [ariaLabel]="'IMAGE.TOOLTIPS.REMOVE' | translate"
                 [pTooltip]="'IMAGE.TOOLTIPS.REMOVE' | translate"
@@ -277,11 +278,10 @@
               ></button>
               <button
                 pButton
-                id="th_designer_action_logo_small_upload"
+                id="th_designer_action_upload_logo_small"
                 icon="pi pi-upload"
-                [disabled]=""
                 class="action-button p-button-icon-only"
-                [disabled]="imageUrlExists[RefType.LogoSmall]"
+                [disabled]="SmallLogoUrlInput.value"
                 (click)="fileUploadLogoSmall.click()"
                 [ariaLabel]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
                 [pTooltip]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
@@ -292,25 +292,25 @@
                 <div class="p-inputgroup">
                   <span class="p-float-label w-full">
                     <input
+                      #SmallLogoUrlInput
                       pInputText
                       type="text"
                       id="th_designer_field_logo_small_url"
                       class="w-full pt-3 pb-2 text-responsive"
                       formControlName="smallLogoUrl"
-                      (input)="onInputChange($event, RefType.LogoSmall)"
                       [ariaLabel]="('IMAGE.LOGO_SMALL' | translate) + ':  ' + ('IMAGE.TOOLTIPS.URL' | translate)"
                       [pTooltip]="'IMAGE.TOOLTIPS.URL' | translate"
                       tooltipPosition="top"
                       tooltipEvent="hover"
                     />
-                    <label for="th_designer_field_logo_small_url" aria-hidden="true">{{
-                      'IMAGE.LOGO_URL' | translate
-                    }}</label>
+                    <label for="th_designer_field_logo_small_url" aria-hidden="true">
+                      {{ 'IMAGE.LOGO_URL' | translate }}
+                    </label>
                   </span>
                   <button
                     id="ws_detail_props_item_logo_small_url_remove"
                     class="p-inputgroup-addon bg-primary pseudo-button"
-                    [ngClass]="changeMode === 'EDIT' && imageUrlExists[RefType.Logo] ? 'cursor-pointer' : 'p-disabled'"
+                    [ngClass]="changeMode === 'EDIT' && SmallLogoUrlInput.value ? 'cursor-pointer' : 'p-disabled'"
                     (click)="onRemoveImageUrl(RefType.LogoSmall)"
                     [attr.aria-label]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
                     [pTooltip]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
@@ -356,15 +356,16 @@
               <app-image-container
                 id="th_designer_favicon_url_image"
                 styleClass="max-h-3rem max-w-5rem border-round-sm"
-                [imageUrl]="imageUrl[RefType.Favicon]"
-                (imageLoadResult)="onImageLoadResult($event, RefType.Favicon)"
+                [bffUrl]="FaviconUrlInput.value !== '' ? undefined : bffUrl[RefType.Favicon]"
+                [imageUrl]="FaviconUrlInput.value"
+                (imageLoadResult)="onImageLoadResult($event, RefType.Favicon, FaviconUrlInput.value)"
               ></app-image-container>
               <button
                 pButton
                 id="th_designer_action_remove_favicon"
                 icon="pi pi-trash"
                 class="action-button p-button-icon-only"
-                [disabled]="!(imageUrl[RefType.Favicon] && !imageUrlExists[RefType.Favicon])"
+                [disabled]="!(bffUrl[RefType.Favicon] && !FaviconUrlInput.value)"
                 (click)="onRemoveImage(RefType.Favicon)"
                 [ariaLabel]="'IMAGE.TOOLTIPS.REMOVE' | translate"
                 [pTooltip]="'IMAGE.TOOLTIPS.REMOVE' | translate"
@@ -373,10 +374,10 @@
               ></button>
               <button
                 pButton
-                id="th_designer_action_favicon_upload"
+                id="th_designer_action_upload_favicon"
                 icon="pi pi-upload"
                 class="action-button p-button-icon-only"
-                [disabled]="imageUrlExists[RefType.Favicon]"
+                [disabled]="FaviconUrlInput.value"
                 (click)="fileUploadFavicon.click()"
                 [ariaLabel]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
                 [pTooltip]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
@@ -387,25 +388,25 @@
                 <div class="p-inputgroup">
                   <span class="p-float-label w-full">
                     <input
+                      #FaviconUrlInput
                       pInputText
                       type="text"
                       id="th_designer_field_favicon_url"
                       class="w-full pt-3 pb-2 text-responsive"
                       formControlName="faviconUrl"
-                      (input)="onInputChange($event, RefType.Favicon)"
                       [ariaLabel]="('IMAGE.FAVICON' | translate) + ':  ' + ('IMAGE.TOOLTIPS.URL' | translate)"
                       [pTooltip]="'IMAGE.TOOLTIPS.URL' | translate"
                       tooltipPosition="top"
                       tooltipEvent="hover"
                     />
                     <label for="th_designer_field_favicon_url" aria-hidden="true">
-                      {{ 'IMAGE.FAVICON_URL' | translate }}</label
-                    >
+                      {{ 'IMAGE.FAVICON_URL' | translate }}
+                    </label>
                   </span>
                   <button
                     id="ws_detail_props_item_favicon_url_remove"
                     class="p-inputgroup-addon bg-primary pseudo-button"
-                    [ngClass]="imageUrlExists[RefType.Favicon] ? 'cursor-pointer' : 'p-disabled'"
+                    [ngClass]="changeMode === 'EDIT' && FaviconUrlInput.value ? 'cursor-pointer' : 'p-disabled'"
                     (click)="onRemoveImageUrl(RefType.Favicon)"
                     [attr.aria-label]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
                     [pTooltip]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"

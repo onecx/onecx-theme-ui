@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { AfterContentChecked, ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { Observable, catchError, combineLatest, debounceTime, first, map, of, switchMap } from 'rxjs'
@@ -28,7 +28,7 @@ import { themeVariables } from './theme-variables'
   styleUrls: ['./theme-designer.component.scss'],
   providers: [ConfirmationService]
 })
-export class ThemeDesignerComponent implements OnInit {
+export class ThemeDesignerComponent implements OnInit, AfterContentChecked {
   // dialog
   public actions$: Observable<Action[]> | undefined
   public changeMode: 'EDIT' | 'CREATE' = 'CREATE'
@@ -37,17 +37,18 @@ export class ThemeDesignerComponent implements OnInit {
   public headerImageUrl?: string
   public displaySaveAsDialog = false
   // data
-  public theme: Theme | undefined
+  public theme$!: Observable<Theme>
   public themes$!: Observable<Theme[]>
   public themeId: string | undefined
   public themeName: string | null
   public copyOfPrefix: string | undefined
-  public themeVars = themeVariables
+  public themeVars = themeVariables // make it available in HTML
   // Images: Logo, Favicon
   public RefType = RefType
-  public imageUrl: Partial<Record<RefType, string | undefined>> = {}
+  public bffImageUrl = bffImageUrl // make it available in HTML
+  public imageBasePath = this.imageApi.configuration.basePath
+  public bffUrl: Partial<Record<RefType, string | undefined>> = {}
   public imageMaxSize = 100000
-  public imageUrlExists: Partial<Record<RefType, boolean>> = {}
   public urlPatternAbsolute = 'http(s)://path-to-image'
 
   // Forms
@@ -73,11 +74,21 @@ export class ThemeDesignerComponent implements OnInit {
     private readonly imageApi: ImagesInternalAPIService,
     private readonly translate: TranslateService,
     private readonly confirmation: ConfirmationService,
-    private readonly msgService: PortalMessageService
+    private readonly msgService: PortalMessageService,
+    private readonly cd: ChangeDetectorRef
   ) {
     this.themeName = route.snapshot.paramMap.get('name')
-    this.changeMode = route.snapshot.paramMap.has('name') ? 'EDIT' : 'CREATE'
+    this.changeMode = this.themeName ? 'EDIT' : 'CREATE'
     this.preparePageActions()
+    // for using themes as templates
+    this.themes$ = this.themeApi.searchThemes({ searchThemeRequest: {} }).pipe(
+      map((data) => data.stream ?? []),
+      catchError((err) => {
+        console.error('searchThemes', err)
+        return of([])
+      })
+    )
+    // FORMs
     this.saveAsForm = new FormGroup({
       themeName: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(100)]),
       displayName: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(100)])
@@ -103,11 +114,21 @@ export class ThemeDesignerComponent implements OnInit {
 
   public ngOnInit(): void {
     if (this.changeMode === 'EDIT' && this.themeName) {
-      combineLatest([
+      this.theme$ = combineLatest([
         this.themeService.currentTheme$.pipe(first()),
         this.themeApi.getThemeByName({ name: this.themeName })
-      ]).subscribe(([theme, data]) => this.fillForm(theme, data))
+      ]).pipe(
+        map(([ct, response]) => {
+          this.themeId = response.resource.id
+          this.isCurrentTheme = ct.name === response.resource.name
+          this.autoApply = this.isCurrentTheme
+          this.fillForm(response.resource)
+          return response.resource
+        })
+      )
     } else {
+      // CREATION ... initialize a fresh theme
+      this.theme$ = of({})
       const currentVars: { [key: string]: { [key: string]: string } } = {}
       for (const tv of Object.entries(themeVariables)) {
         currentVars[tv[0]] = {}
@@ -117,29 +138,21 @@ export class ThemeDesignerComponent implements OnInit {
       this.propertiesForm.reset()
       this.propertiesForm.patchValue(currentVars)
     }
-    // for using themes as templates
-    this.themes$ = this.themeApi.searchThemes({ searchThemeRequest: {} }).pipe(
-      map((data) => data.stream ?? []),
-      catchError((err) => {
-        console.error('searchThemes', err)
-        return of([])
-      })
-    )
   }
 
-  private fillForm(theme: Theme, data: GetThemeResponse): void {
-    this.theme = data.resource
-    this.themeId = this.theme.id
-    this.basicForm.patchValue(this.theme)
+  public ngAfterContentChecked(): void {
+    this.cd.detectChanges()
+  }
+
+  private fillForm(theme: Theme): void {
+    this.basicForm.patchValue(theme)
     this.basicForm.get('name')?.disable()
     this.propertiesForm.reset()
-    if (this.theme.properties) this.propertiesForm.patchValue(this.theme.properties)
-    this.isCurrentTheme = this.theme.name === theme.name
-    this.autoApply = this.isCurrentTheme
+    if (theme.properties) this.propertiesForm.patchValue(theme.properties as { [key: string]: any })
     // images
-    this.setImageUrl(this.theme, RefType.Logo)
-    this.setImageUrl(this.theme, RefType.LogoSmall)
-    this.setImageUrl(this.theme, RefType.Favicon)
+    this.setBffImageUrl(theme, RefType.Logo)
+    this.setBffImageUrl(theme, RefType.LogoSmall)
+    this.setBffImageUrl(theme, RefType.Favicon)
   }
 
   /***************************************************************************
@@ -148,49 +161,28 @@ export class ThemeDesignerComponent implements OnInit {
 
   // LOAD AND DISPLAYING
   // Image component informs about loading result for image
-  public onImageLoadResult(loaded: any, refType: RefType) {
-    // Loading failed
-    if (!loaded) this.imageUrl[refType] = undefined
-    if (refType === RefType.Logo) this.headerImageUrl = this.imageUrl[refType]
+  public onImageLoadResult(loaded: any, refType: RefType, extUrl?: string): void {
+    if (loaded && refType === RefType.Logo) {
+      this.headerImageUrl = extUrl !== '' ? extUrl : this.bffUrl[refType]
+    }
+    if (!loaded) {
+      if (refType === RefType.Logo) this.headerImageUrl = undefined
+      // if no ext. URL then bff URL was used => reset
+      if (!(extUrl && extUrl !== '') && this.bffUrl[refType]) this.bffUrl[refType] = undefined
+    }
   }
 
   // initially prepare image URL based on workspace
-  public setImageUrl(theme: Theme | undefined, refType: RefType): void {
+  public setBffImageUrl(theme: Theme | undefined, refType: RefType): void {
     if (!theme) return undefined
-
-    this.imageUrlExists[refType] = false
-    if (refType === RefType.Logo && theme.logoUrl && theme.logoUrl !== '') {
-      this.imageUrl[refType] = theme.logoUrl
-      this.imageUrlExists[refType] = true
-    } else if (refType === RefType.LogoSmall && theme.smallLogoUrl && theme.smallLogoUrl !== '') {
-      this.imageUrl[refType] = theme.smallLogoUrl
-      this.imageUrlExists[refType] = true
-    } else if (refType === RefType.Favicon && theme.faviconUrl && theme.faviconUrl !== '') {
-      this.imageUrl[refType] = theme.faviconUrl
-      this.imageUrlExists[refType] = true
-    } else this.imageUrl[refType] = bffImageUrl(this.imageApi.configuration.basePath, theme.name, refType)
-  }
-
-  // ENTER URL
-  // changes on external image URL field: user enters text (change) or paste/removed something
-  public onInputChange(event: Event, refType: RefType): void {
-    const val = (event.target as HTMLInputElement).value
-    if (val && val !== '') {
-      // check minimum of URL pattern
-      if (/^(http|https):\/\/.{6,245}$/.exec(val)) {
-        this.imageUrl[refType] = val
-        this.imageUrlExists[refType] = true
-      } else this.imageUrl[refType] = undefined
-    } else {
-      this.imageUrlExists[refType] = false
-    }
+    this.bffUrl[refType] = bffImageUrl(this.imageBasePath, theme.name, refType)
   }
 
   // UPLOAD
   public onFileUpload(ev: Event, refType: RefType): void {
     const currThemeName = this.basicForm.controls['name'].value
     if (!currThemeName || currThemeName === '') {
-      this.msgService.error({ summaryKey: 'IMAGE.CONSTRAINT_FAILED', detailKey: 'IMAGE.CONSTRAINT_NAME' })
+      this.msgService.error({ summaryKey: 'IMAGE.CONSTRAINT.FAILED', detailKey: 'IMAGE.CONSTRAINT.NAME' })
       return
     }
     const files = (ev.target as HTMLInputElement).files
@@ -203,8 +195,8 @@ export class ThemeDesignerComponent implements OnInit {
           summaryKey: 'IMAGE.CONSTRAINT.FAILED',
           detailKey: 'IMAGE.CONSTRAINT.FILE_TYPE' + (RefType.Favicon === refType ? '.FAVICON' : '')
         })
-      } else if (this.theme) {
-        this.saveImage(this.theme.name!, files, refType) // store image
+      } else if (this.themeName) {
+        this.saveImage(this.themeName, files, refType) // store image
       }
     } else this.msgService.error({ summaryKey: 'IMAGE.CONSTRAINT.FAILED', detailKey: 'IMAGE.CONSTRAINT.FILE_MISSING' })
   }
@@ -228,7 +220,7 @@ export class ThemeDesignerComponent implements OnInit {
 
   // SAVE image
   private saveImage(name: string, files: FileList, refType: RefType) {
-    this.imageUrl[refType] = undefined // reset - important to trigger the change in UI (props)
+    this.bffUrl[refType] = undefined // reset - important to trigger the change in UI (props)
     this.headerImageUrl = undefined // trigger the change in UI (header)
 
     // prepare request
@@ -252,13 +244,14 @@ export class ThemeDesignerComponent implements OnInit {
       this.msgService.error({ summaryKey: 'IMAGE.UPLOAD.NOK' })
     } else {
       this.msgService.success({ summaryKey: 'IMAGE.UPLOAD.OK' })
-      this.imageUrl[refType] = bffImageUrl(this.imageApi.configuration.basePath, name, refType)
-      if (refType === RefType.Logo) this.headerImageUrl = this.imageUrl[refType]
+      this.bffUrl[refType] = bffImageUrl(this.imageBasePath, name, refType)
+      if (refType === RefType.Logo) this.headerImageUrl = this.bffUrl[refType]
     }
   }
 
   // REMOVING
   public onRemoveImageUrl(refType: RefType) {
+    this.bffUrl[refType] = undefined
     if (refType === RefType.Logo && this.basicForm.get('logoUrl')?.value) {
       this.basicForm.get('logoUrl')?.setValue(null)
     }
@@ -268,18 +261,17 @@ export class ThemeDesignerComponent implements OnInit {
     if (refType === RefType.Favicon && this.basicForm.get('faviconUrl')?.value) {
       this.basicForm.get('faviconUrl')?.setValue(null)
     }
-    this.imageUrlExists[refType] = false
-    this.imageUrl[refType] = bffImageUrl(this.imageApi.configuration.basePath, this.theme?.name, refType)
+    this.bffUrl[refType] = bffImageUrl(this.imageBasePath, this.themeName!, refType)
   }
 
   public onRemoveImage(refType: RefType) {
-    if (this.theme?.name && this.imageUrl[refType] && !this.imageUrlExists[refType]) {
+    if (this.themeName && this.bffUrl[refType]) {
       // On VIEW mode: manage image is enabled
-      this.imageApi.deleteImage({ refId: this.theme.name, refType: refType }).subscribe({
+      this.imageApi.deleteImage({ refId: this.themeName, refType: refType }).subscribe({
         next: () => {
           // reset - important to trigger the change in UI
-          if (!this.imageUrlExists[refType]) this.imageUrl[refType] = undefined
-          if (refType === RefType.Logo) this.headerImageUrl = this.imageUrl[refType]
+          this.bffUrl[refType] = undefined
+          if (refType === RefType.Logo) this.headerImageUrl = undefined
         },
         error: (err) => console.error('deleteImage', err)
       })
@@ -351,13 +343,13 @@ export class ThemeDesignerComponent implements OnInit {
         switchMap((data) => {
           data.resource.properties = this.propertiesForm.value
 
-          if (this.imageUrlExists[RefType.Logo]) data.resource.logoUrl = undefined
+          if (this.basicForm.controls['logoUrl'].value) data.resource.logoUrl = undefined
           else data.resource.logoUrl = this.basicForm.controls['logoUrl'].value
           //
-          if (this.imageUrlExists[RefType.LogoSmall]) data.resource.smallLogoUrl = undefined
+          if (this.basicForm.controls['smallLogoUrl'].value) data.resource.smallLogoUrl = undefined
           else data.resource.smallLogoUrl = this.basicForm.controls['smallLogoUrl'].value
           //
-          if (this.imageUrlExists[RefType.Favicon]) data.resource.faviconUrl = undefined
+          if (this.basicForm.controls['faviconUrl'].value) data.resource.faviconUrl = undefined
           else data.resource.faviconUrl = this.basicForm.controls['faviconUrl'].value
 
           //
@@ -421,9 +413,9 @@ export class ThemeDesignerComponent implements OnInit {
         this.basicForm.controls['smallLogoUrl'].setValue(result.resource.smallLogoUrl)
         this.basicForm.controls['faviconUrl'].setValue(result.resource.faviconUrl)
         // images
-        this.setImageUrl(result.resource, RefType.Logo)
-        this.setImageUrl(result.resource, RefType.LogoSmall)
-        this.setImageUrl(result.resource, RefType.Favicon)
+        this.setBffImageUrl(result.resource, RefType.Logo)
+        this.setBffImageUrl(result.resource, RefType.LogoSmall)
+        this.setBffImageUrl(result.resource, RefType.Favicon)
       }
       if (result.resource.properties) {
         this.propertiesForm.reset()
@@ -539,6 +531,7 @@ export class ThemeDesignerComponent implements OnInit {
           this.copyOfPrefix = data['ACTIONS.COPY_OF']
           return [
             {
+              id: 'th_designer_page_action_close',
               label: data['ACTIONS.CANCEL'],
               title: data['ACTIONS.TOOLTIPS.CANCEL_AND_CLOSE'],
               actionCallback: () => this.onClose(),
@@ -547,6 +540,7 @@ export class ThemeDesignerComponent implements OnInit {
               permission: 'THEME#VIEW'
             },
             {
+              id: 'th_designer_page_action_save',
               label: data['ACTIONS.SAVE'],
               title: data['ACTIONS.TOOLTIPS.SAVE'],
               actionCallback: () => this.onSaveTheme(),
@@ -557,6 +551,7 @@ export class ThemeDesignerComponent implements OnInit {
               permission: this.changeMode === 'EDIT' ? 'THEME#EDIT' : 'THEME#CREATE'
             },
             {
+              id: 'th_designer_page_action_save_as',
               label: data['ACTIONS.SAVE_AS'],
               title: data['ACTIONS.TOOLTIPS.SAVE_AS'],
               actionCallback: () => this.onDisplaySaveAsDialog(),

@@ -7,7 +7,7 @@
       "YES.TOOLTIP": "Bestätigen und Ausführen"
     },
     "CREATE": {
-      "THEME": "Theme erstellen",
+      "THEME": "Erstellen",
       "THEME.TOOLTIP": "Ein neues Theme erstellen",
       "MESSAGE": {
         "THEME_ALREADY_EXISTS": "Ein Theme mit diesem Namen existert schon",
@@ -105,6 +105,14 @@
       "CRITERIA": "Suchfelder",
       "RESULTS": "Suchergebnisse"
     },
+    "HEADER": {
+      "SEARCH": "Theme Verwaltung",
+      "SEARCH.SUBHEADER": "Erstellung und Bearbeitung von Themes",
+      "DETAIL": "Anzeige und Bearbeitung der Theme-Eigenschaften",
+      "CREATE": "Theme erstellen",
+      "DELETE": "Theme löschen",
+      "EXPORT": "Theme exportieren"
+    },
     "DATAVIEW": {
       "FILTER": "Filter",
       "PRODUCT_FILTER_TOOLTIP": "Filtern nach Applikation und Klassifikation",
@@ -197,7 +205,7 @@
     "NO_PROPERTIES": "Keine Farbwerte enthalten",
     "TABS": {
       "INTERN": "Intern",
-      "INTERN_TOOLTIP": "Interne Informationen zum Theme",
+      "INTERN_TOOLTIP": "Interne Informationen",
       "PROPERTIES": "Eigenschaften",
       "PROPERTIES_TOOLTIP": "Eigenschaften des Themes",
       "USE": "Verwendung",

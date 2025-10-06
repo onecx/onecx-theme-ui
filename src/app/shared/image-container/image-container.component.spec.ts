@@ -58,12 +58,29 @@ describe('ImageContainerComponent', () => {
       expect(component.url).toBe(component.imageUrl)
     })
 
+    it('should use default URL if image URL is invalid', () => {
+      component.imageUrl = 'https://host'
+
+      component.ngOnChanges()
+
+      expect(component.url).toBe(component['defaultImageUrl'])
+    })
+
     it('should use imageUrl as URL if was set', () => {
       component.bffUrl = '/basePath/path-to-logo'
 
       component.ngOnChanges()
 
       expect(component.url).toBe(component.bffUrl)
+    })
+
+    it('should use default URL if no URL is provided', () => {
+      component.imageUrl = undefined
+      component.bffUrl = undefined
+
+      component.ngOnChanges()
+
+      expect(component.url).toBe(component['defaultImageUrl'])
     })
   })
 
@@ -88,6 +105,21 @@ describe('ImageContainerComponent', () => {
 
       expect(component.url).toBe(component.bffUrl)
       expect(component['urlType']).toBe('bff-url')
+      expect(component.imageLoadResult.emit).toHaveBeenCalledWith(false)
+    })
+
+    it('should use default URL and emit an error if external image could not be loaded and no bff URL', () => {
+      spyOn(component.imageLoadResult, 'emit')
+
+      component['defaultImageUrl'] = 'default-url'
+      component.url = '/external/url'
+      component['urlType'] === 'ext-url'
+      component.bffUrl = undefined
+
+      component.onImageLoadError()
+
+      expect(component.url).toBe(component['defaultImageUrl'])
+      expect(component['urlType']).toBe('def-url')
       expect(component.imageLoadResult.emit).toHaveBeenCalledWith(false)
     })
 

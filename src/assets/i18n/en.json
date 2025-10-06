@@ -7,7 +7,7 @@
       "YES.TOOLTIP": "Confirm and execute"
     },
     "CREATE": {
-      "THEME": "Create Theme",
+      "THEME": "Create",
       "THEME.TOOLTIP": "Create a new Theme",
       "MESSAGE": {
         "THEME_ALREADY_EXISTS": "A Theme with that name already exists",
@@ -105,6 +105,14 @@
       "CRITERIA": "Search Criteria",
       "RESULTS": "Search Results"
     },
+    "HEADER": {
+      "SEARCH": "Theme Management",
+      "SEARCH.SUBHEADER": "Creation and editing of Theme",
+      "DETAIL": "Display and editing of the Theme properties",
+      "CREATE": "Create Theme",
+      "DELETE": "Delete Theme",
+      "EXPORT": "Export Theme"
+    },
     "DATAVIEW": {
       "FILTER": "Filter",
       "PRODUCT_FILTER_TOOLTIP": "Filter by Application and Classification",
@@ -196,7 +204,7 @@
     "NO_PROPERTIES": "No properties specified",
     "TABS": {
       "INTERN": "Internal",
-      "INTERN_TOOLTIP": "Internal information for the Theme",
+      "INTERN_TOOLTIP": "Internal information",
       "PROPERTIES": "Properties",
       "PROPERTIES_TOOLTIP": "Properties of the Theme",
       "USE": "Use",

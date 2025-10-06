@@ -24,7 +24,7 @@ export class ImageContainerComponent implements OnChanges {
   @Input() public styleClass: string | undefined
   @Output() public imageLoadResult = new EventEmitter<boolean>() // inform caller
 
-  public url: string | undefined
+  public url: string | undefined = undefined
   public defaultImageUrl$: Observable<string>
   private defaultImageUrl: string | undefined
   private urlType: 'ext-url' | 'bff-url' | 'def-url' = 'ext-url'
@@ -38,11 +38,19 @@ export class ImageContainerComponent implements OnChanges {
 
   public ngOnChanges(): void {
     if (this.imageUrl) {
-      this.url = this.imageUrl
-      this.urlType = 'ext-url'
+      if (/^(http|https):\/\/.{6,245}$/.exec(this.imageUrl)) {
+        this.url = this.imageUrl
+        this.urlType = 'ext-url'
+      } else {
+        this.url = this.defaultImageUrl
+        this.urlType = 'def-url'
+      }
     } else if (this.bffUrl) {
       this.url = this.bffUrl
       this.urlType = 'bff-url'
+    } else {
+      this.url = this.defaultImageUrl
+      this.urlType = 'def-url'
     }
   }
 
@@ -50,7 +58,7 @@ export class ImageContainerComponent implements OnChanges {
    * Emit image loading results
    */
   public onImageLoadSuccess(): void {
-    if (this.url !== undefined) this.imageLoadResult.emit(true)
+    if (this.url !== undefined && this.url !== this.defaultImageUrl) this.imageLoadResult.emit(true)
   }
 
   // on loading error switch URL
@@ -58,9 +66,14 @@ export class ImageContainerComponent implements OnChanges {
     if (this.url !== undefined) this.imageLoadResult.emit(false)
 
     // using ext-url not possible, use bff URL
-    if (this.urlType === 'ext-url' && this.bffUrl) {
-      this.url = this.bffUrl
-      this.urlType = 'bff-url'
+    if (this.urlType === 'ext-url') {
+      if (this.bffUrl) {
+        this.url = this.bffUrl
+        this.urlType = 'bff-url'
+      } else {
+        this.url = this.defaultImageUrl
+        this.urlType = 'def-url'
+      }
       // using bff-url not possible, use default URL
     } else if (this.urlType === 'bff-url' && this.defaultImageUrl) {
       this.url = this.defaultImageUrl
