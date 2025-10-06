@@ -163,7 +163,7 @@ export class ThemeDesignerComponent implements OnInit, AfterContentChecked {
   // Image component informs about loading result for image
   public onImageLoadResult(loaded: any, refType: RefType, extUrl?: string): void {
     if (loaded && refType === RefType.Logo) {
-      this.headerImageUrl = extUrl !== '' ? extUrl : this.bffUrl[refType]
+      this.headerImageUrl = !extUrl || extUrl === '' ? this.bffUrl[refType] : extUrl
     }
     if (!loaded) {
       if (refType === RefType.Logo) this.headerImageUrl = undefined
