@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core'
-import { Observable, map } from 'rxjs'
+import { map } from 'rxjs'
 
 import { AppStateService } from '@onecx/angular-integration-interface'
 
@@ -25,15 +25,13 @@ export class ImageContainerComponent implements OnChanges {
   @Output() public imageLoadResult = new EventEmitter<boolean>() // inform caller
 
   public url: string | undefined = undefined
-  public defaultImageUrl$: Observable<string>
-  private defaultImageUrl: string | undefined
   private urlType: 'ext-url' | 'bff-url' | 'def-url' = 'ext-url'
+  private defaultImageUrl: string | undefined = undefined
 
   constructor(appState: AppStateService) {
-    this.defaultImageUrl$ = appState.currentMfe$.pipe(
-      map((mfe) => prepareUrlPath(mfe.remoteBaseUrl, environment.DEFAULT_LOGO_PATH))
-    )
-    this.defaultImageUrl$.subscribe((data) => (this.defaultImageUrl = data))
+    appState.currentMfe$
+      .pipe(map((mfe) => prepareUrlPath(mfe.remoteBaseUrl, environment.DEFAULT_LOGO_PATH)))
+      .subscribe((data) => (this.defaultImageUrl = data))
   }
 
   public ngOnChanges(): void {

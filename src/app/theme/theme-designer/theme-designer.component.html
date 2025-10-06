@@ -163,16 +163,16 @@
               <app-image-container
                 id="th_designer_logo_url_image"
                 styleClass="max-h-3rem max-w-5rem border-round-sm"
-                [bffUrl]="LogoUrlInput.value !== '' ? undefined : bffUrl[RefType.Logo]"
-                [imageUrl]="LogoUrlInput.value"
-                (imageLoadResult)="onImageLoadResult($event, RefType.Logo, LogoUrlInput.value)"
+                [bffUrl]="bffUrl[RefType.Logo]"
+                [imageUrl]="basicForm.controls['logoUrl'].value"
+                (imageLoadResult)="onImageLoadResult($event, RefType.Logo, basicForm.controls['logoUrl'].value)"
               ></app-image-container>
               <button
                 pButton
                 id="th_designer_action_remove_logo"
                 icon="pi pi-trash"
                 class="action-button p-button-icon-only"
-                [disabled]="!(bffUrl[RefType.Logo] && !LogoUrlInput.value)"
+                [disabled]="!(bffUrl[RefType.Logo] && !basicForm.controls['logoUrl'].value)"
                 (click)="onRemoveImage(RefType.Logo)"
                 [ariaLabel]="'IMAGE.TOOLTIPS.REMOVE' | translate"
                 [pTooltip]="'IMAGE.TOOLTIPS.REMOVE' | translate"
@@ -260,16 +260,18 @@
               <app-image-container
                 id="th_designer_logo_small_url_image"
                 styleClass="max-h-3rem max-w-5rem border-round-sm"
-                [bffUrl]="SmallLogoUrlInput.value !== '' ? undefined : bffUrl[RefType.LogoSmall]"
-                [imageUrl]="SmallLogoUrlInput.value"
-                (imageLoadResult)="onImageLoadResult($event, RefType.LogoSmall, SmallLogoUrlInput.value)"
+                [bffUrl]="bffUrl[RefType.LogoSmall]"
+                [imageUrl]="basicForm.controls['smallLogoUrl'].value"
+                (imageLoadResult)="
+                  onImageLoadResult($event, RefType.LogoSmall, basicForm.controls['smallLogoUrl'].value)
+                "
               ></app-image-container>
               <button
                 pButton
                 id="th_designer_action_remove_logo_small"
                 icon="pi pi-trash"
                 class="action-button p-button-icon-only"
-                [disabled]="!(bffUrl[RefType.LogoSmall] && !SmallLogoUrlInput.value)"
+                [disabled]="!(bffUrl[RefType.LogoSmall] && !basicForm.controls['smallLogoUrl'].value)"
                 (click)="onRemoveImage(RefType.LogoSmall)"
                 [ariaLabel]="'IMAGE.TOOLTIPS.REMOVE' | translate"
                 [pTooltip]="'IMAGE.TOOLTIPS.REMOVE' | translate"
@@ -356,16 +358,16 @@
               <app-image-container
                 id="th_designer_favicon_url_image"
                 styleClass="max-h-3rem max-w-5rem border-round-sm"
-                [bffUrl]="FaviconUrlInput.value !== '' ? undefined : bffUrl[RefType.Favicon]"
-                [imageUrl]="FaviconUrlInput.value"
-                (imageLoadResult)="onImageLoadResult($event, RefType.Favicon, FaviconUrlInput.value)"
+                [bffUrl]="bffUrl[RefType.Favicon]"
+                [imageUrl]="basicForm.controls['faviconUrl'].value"
+                (imageLoadResult)="onImageLoadResult($event, RefType.Favicon, basicForm.controls['faviconUrl'].value)"
               ></app-image-container>
               <button
                 pButton
                 id="th_designer_action_remove_favicon"
                 icon="pi pi-trash"
                 class="action-button p-button-icon-only"
-                [disabled]="!(bffUrl[RefType.Favicon] && !FaviconUrlInput.value)"
+                [disabled]="!(bffUrl[RefType.Favicon] && !basicForm.controls['faviconUrl'].value)"
                 (click)="onRemoveImage(RefType.Favicon)"
                 [ariaLabel]="'IMAGE.TOOLTIPS.REMOVE' | translate"
                 [pTooltip]="'IMAGE.TOOLTIPS.REMOVE' | translate"
