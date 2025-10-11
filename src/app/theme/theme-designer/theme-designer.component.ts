@@ -4,6 +4,7 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { Observable, catchError, combineLatest, debounceTime, first, firstValueFrom, map, of, switchMap } from 'rxjs'
 import { TranslateService } from '@ngx-translate/core'
 import { ConfirmationService } from 'primeng/api'
+import { Dropdown } from 'primeng/dropdown'
 
 import { PortalMessageService, ThemeService } from '@onecx/angular-integration-interface'
 import { Action } from '@onecx/angular-accelerator'
@@ -21,7 +22,6 @@ import {
 } from 'src/app/shared/generated'
 import { Utils } from 'src/app/shared/utils'
 import { themeVariables } from './theme-variables'
-import { Dropdown } from 'primeng/dropdown'
 
 @Component({
   selector: 'app-theme-designer',
@@ -187,50 +187,51 @@ export class ThemeDesignerComponent implements OnInit, AfterContentChecked {
       this.msgService.error({ summaryKey: 'IMAGE.CONSTRAINT.FAILED', detailKey: 'IMAGE.CONSTRAINT.NAME' })
       return
     }
-    if (ev.target && (ev.target as HTMLInputElement).files) {
+    if (ev.target) {
       const files = (ev.target as HTMLInputElement).files
-      const regex = RefType.Favicon === refType ? /^.*.(ico|jpg|jpeg|png|svg)$/ : /^.*.(jpg|jpeg|png|svg)$/
-      if (files) {
-        if (files[0].size > this.imageMaxSize) {
-          this.msgService.error({ summaryKey: 'IMAGE.CONSTRAINT.FAILED', detailKey: 'IMAGE.CONSTRAINT.SIZE' })
-        } else if (!regex.exec(files[0].name)) {
-          this.msgService.error({
-            summaryKey: 'IMAGE.CONSTRAINT.FAILED',
-            detailKey: 'IMAGE.CONSTRAINT.FILE_TYPE' + (RefType.Favicon === refType ? '.FAVICON' : '')
-          })
-        } else if (this.themeName) {
-          this.saveImage(this.themeName, files, refType) // store image
-        }
+      if (files && files.length === 1) this.proccessFile(files[0], refType)
+      else {
+        this.msgService.error({ summaryKey: 'IMAGE.CONSTRAINT.FAILED', detailKey: 'IMAGE.CONSTRAINT.FILE_MISSING' })
       }
-    } else {
-      this.msgService.error({ summaryKey: 'IMAGE.CONSTRAINT.FAILED', detailKey: 'IMAGE.CONSTRAINT.FILE_MISSING' })
     }
   }
-  private mapMimeType(type: string): MimeType {
-    switch (type) {
-      case 'image/x-icon':
-        return MimeType.XIcon
-      case 'image/svg+xml':
-        return MimeType.Svgxml
-      case 'image/jpg':
-        return MimeType.Jpg
-      case 'image/jpeg':
-        return MimeType.Jpeg
-      case 'image/png':
-        return MimeType.Png
-      default:
-        return MimeType.Png
+  private proccessFile(file: File, refType: RefType): void {
+    const regex = RefType.Favicon === refType ? /^.*.(ico|jpg|jpeg|png|svg)$/ : /^.*.(jpg|jpeg|png|svg)$/
+    if (file.size > this.imageMaxSize) {
+      this.msgService.error({ summaryKey: 'IMAGE.CONSTRAINT.FAILED', detailKey: 'IMAGE.CONSTRAINT.SIZE' })
+    } else if (!regex.exec(file.name)) {
+      this.msgService.error({
+        summaryKey: 'IMAGE.CONSTRAINT.FAILED',
+        detailKey: 'IMAGE.CONSTRAINT.FILE_TYPE' + (RefType.Favicon === refType ? '.FAVICON' : '')
+      })
+    } else if (this.themeName) {
+      this.saveImage(this.themeName, file, refType) // store image
     }
   }
 
   // SAVE image
-  private saveImage(name: string, files: FileList, refType: RefType) {
+  private saveImage(name: string, file: File, refType: RefType) {
     this.bffUrl[refType] = undefined // reset - important to trigger the change in UI (props)
     this.headerImageUrl = undefined // trigger the change in UI (header)
-
+    function mapMimeType(type: string): MimeType {
+      switch (type) {
+        case 'image/x-icon':
+          return MimeType.XIcon
+        case 'image/svg+xml':
+          return MimeType.Svgxml
+        case 'image/jpg':
+          return MimeType.Jpg
+        case 'image/jpeg':
+          return MimeType.Jpeg
+        case 'image/png':
+          return MimeType.Png
+        default:
+          return MimeType.Png
+      }
+    }
     // prepare request
-    const mType = this.mapMimeType(files[0].type)
-    const data = mType === MimeType.Svgxml ? files[0] : new Blob([files[0]], { type: files[0].type })
+    const mType = mapMimeType(file.type)
+    const data = mType === MimeType.Svgxml ? file : new Blob([file], { type: file.type })
     const requestParameter: UploadImageRequestParams = {
       refId: name,
       refType: refType,

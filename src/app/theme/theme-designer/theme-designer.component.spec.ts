@@ -9,6 +9,7 @@ import { ActivatedRoute, provideRouter, Router } from '@angular/router'
 import { TranslateService } from '@ngx-translate/core'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 import { of, throwError } from 'rxjs'
+import { Dropdown } from 'primeng/dropdown'
 
 import { ConfirmationService } from 'primeng/api'
 import { InputSwitchModule } from 'primeng/inputswitch'
@@ -21,7 +22,6 @@ import { MimeType, RefType, ThemesAPIService, ImagesInternalAPIService, Theme } 
 import { Utils } from 'src/app/shared/utils'
 import { ThemeDesignerComponent } from './theme-designer.component'
 import { themeVariables } from './theme-variables'
-import { Dropdown } from 'primeng/dropdown'
 
 const validTheme = {
   id: 'id',

@@ -11,14 +11,14 @@
       *ngIf="loading"
       id="th_search_message_loading"
       severity="info"
-      styleClass="m-3 p-2"
+      styleClass="m-3"
       [text]="'ACTIONS.LOADING' | translate"
     ></p-message>
     <p-message
       *ngIf="exceptionKey"
       id="th_search_message_error"
       severity="error"
-      styleClass="m-3 p-2"
+      styleClass="m-3"
       [text]="exceptionKey | translate"
     ></p-message>
     <p-dataView
@@ -64,13 +64,17 @@
           <article
             *ngFor="let theme of themes; index as i"
             class="flex flex-row flex-nowrap justify-content-start align-items-center column-gap-3 py-1 px-3 hover:bg-gray-200 cursor-pointer"
+            [ngStyle]="i % 2 === 0 ? { 'background-color': 'var(--table-body-row-even-bg)' } : {}"
             [id]="'th_search_data_list_row_' + i"
             [routerLink]="['./', theme.name]"
           >
-            <div class="p-0 col-3 md:col-2 flex justify-content-around align-items-center" aria-hidden="true">
+            <div
+              class="p-0 h-3rem sm:h-4rem col-3 md:col-2 flex justify-content-around align-items-center"
+              aria-hidden="true"
+            >
               <app-image-container
                 [id]="'th_search_data_list_row_' + i + '_logo'"
-                styleClass="h-2rem sm:h-3rem md:h-3rem max-h-2rem sm:max-h-3rem max-w-4rem sm:max-w-8rem  border-round-sm"
+                styleClass="max-h-4rem sm:max-h-5rem max-w-4rem sm:max-w-6rem border-round-sm"
                 [bffUrl]="Utils.bffImageUrl(imageBasePath, theme.name, RefType.Logo)"
                 [imageUrl]="theme.logoUrl"
                 aria-hidden="true"
@@ -140,16 +144,6 @@
               <div
                 class="relative w-full h-3rem sm:h-4rem lg:h-5rem px-4 flex justify-content-center align-items-center"
               >
-                <div
-                  *ngIf="theme.mandatory"
-                  [id]="'th_search_data_grid_row_' + i + '_mandatory'"
-                  class="card-badge-left badge-1 font-bold text-lg pi pi-shield"
-                  [attr.aria-label]="'INTERNAL.MANDATORY_TRUE' | translate"
-                  [pTooltip]="'THEME.TOOLTIPS.MANDATORY' | translate"
-                  tooltipPosition="top"
-                  tooltipEvent="hover"
-                  role="note"
-                ></div>
                 <app-image-container
                   [id]="'th_search_data_grid_row_' + i + '_logo'"
                   styleClass="max-h-2rem sm:max-h-3rem lg:max-h-4rem border-round-sm"
@@ -157,6 +151,17 @@
                   [imageUrl]="theme.logoUrl"
                   aria-hidden="true"
                 ></app-image-container>
+                <!-- BADGES -->
+                <div
+                  *ngIf="theme.mandatory"
+                  [id]="'th_search_data_grid_row_' + i + '_mandatory'"
+                  class="card-badge-left badge-1 font-bold text-lg md:text-xl pi pi-shield"
+                  [attr.aria-label]="'INTERNAL.MANDATORY_TRUE' | translate"
+                  [pTooltip]="'THEME.TOOLTIPS.MANDATORY' | translate"
+                  tooltipPosition="top"
+                  tooltipEvent="hover"
+                  role="note"
+                ></div>
               </div>
               <app-theme-color-box
                 [properties]="theme.properties"
