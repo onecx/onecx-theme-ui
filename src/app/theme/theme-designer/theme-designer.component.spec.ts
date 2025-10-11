@@ -18,8 +18,10 @@ import { CurrentThemeTopic } from '@onecx/integration-interface'
 import { PortalMessageService, ThemeService } from '@onecx/angular-integration-interface'
 
 import { MimeType, RefType, ThemesAPIService, ImagesInternalAPIService, Theme } from 'src/app/shared/generated'
+import { Utils } from 'src/app/shared/utils'
 import { ThemeDesignerComponent } from './theme-designer.component'
 import { themeVariables } from './theme-variables'
+import { Dropdown } from 'primeng/dropdown'
 
 const validTheme = {
   id: 'id',
@@ -219,13 +221,13 @@ describe('ThemeDesignerComponent', () => {
       // expect(component.themeId).toBe('id')
 
       expect(component.bffUrl[RefType.Logo]).toBe(
-        component.bffImageUrl(component.imageBasePath, validTheme.name, RefType.Logo)
+        Utils.bffImageUrl(component.imageBasePath, validTheme.name, RefType.Logo)
       )
       expect(component.bffUrl[RefType.LogoSmall]).toBe(
-        component.bffImageUrl(component.imageBasePath, validTheme.name, RefType.LogoSmall)
+        Utils.bffImageUrl(component.imageBasePath, validTheme.name, RefType.LogoSmall)
       )
       expect(component.bffUrl[RefType.Favicon]).toBe(
-        component.bffImageUrl(component.imageBasePath, validTheme.name, RefType.Favicon)
+        Utils.bffImageUrl(component.imageBasePath, validTheme.name, RefType.Favicon)
       )
     })
 
@@ -591,8 +593,9 @@ describe('ThemeDesignerComponent', () => {
       const translateService = TestBed.inject(TranslateService)
       spyOn(translateService, 'get').and.returnValue(of(translationData))
       const confirmdialog: ConfirmDialog = fixture.debugElement.query(By.css('p-confirmdialog')).componentInstance
+      const box = jasmine.createSpyObj('nativeElement', ['clear']) as Dropdown
 
-      component.onSelectThemeTemplate({ value: validTheme2.name }, themes)
+      component.onSelectThemeTemplate({ value: validTheme2.name }, themes, box)
       fixture.detectChanges()
 
       expect(confirmdialog.confirmation).toEqual(
@@ -614,8 +617,9 @@ describe('ThemeDesignerComponent', () => {
       // prepare dialog
       const confirmdialog: ConfirmDialog = fixture.debugElement.query(By.css('p-confirmdialog')).componentInstance
       const reject = spyOn(confirmdialog, 'reject').and.callThrough()
+      const box = jasmine.createSpyObj('nativeElement', ['clear']) as Dropdown
       // open dialog
-      component.onSelectThemeTemplate({ value: validTheme2.name }, themes)
+      component.onSelectThemeTemplate({ value: validTheme2.name }, themes, box)
       fixture.detectChanges()
       spyOn<any>(component, 'useThemeAsTemplate')
 
@@ -670,11 +674,12 @@ describe('ThemeDesignerComponent', () => {
       const translateService = TestBed.inject(TranslateService)
       spyOn(translateService, 'get').and.returnValue(of(translationData))
       spyOn<any>(component, 'useThemeAsTemplate')
+      const box = jasmine.createSpyObj('nativeElement', ['clear']) as Dropdown
 
       const confirmdialog: ConfirmDialog = fixture.debugElement.query(By.css('p-confirmdialog')).componentInstance
       const accept = spyOn(confirmdialog, 'accept').and.callThrough()
       // open dialog
-      component.onSelectThemeTemplate({ value: validTheme2.name }, themes) // select theme 2
+      component.onSelectThemeTemplate({ value: validTheme2.name }, themes, box) // select theme 2
       fixture.detectChanges()
 
       const acceptBtn = fixture.debugElement.nativeElement.querySelector('.p-confirm-dialog-accept')
@@ -717,8 +722,9 @@ describe('ThemeDesignerComponent', () => {
 
       const confirmdialog: ConfirmDialog = fixture.debugElement.query(By.css('p-confirmdialog')).componentInstance
       const accept = spyOn(confirmdialog, 'accept').and.callThrough()
+      const box = jasmine.createSpyObj('nativeElement', ['clear']) as Dropdown
 
-      component.onSelectThemeTemplate({ value: validTheme.name }, themes)
+      component.onSelectThemeTemplate({ value: validTheme.name }, themes, box)
       fixture.detectChanges()
 
       const acceptBtn = fixture.debugElement.nativeElement.querySelector('.p-confirm-dialog-accept')
@@ -749,7 +755,7 @@ describe('ThemeDesignerComponent', () => {
 
       beforeEach(() => {
         initTestComponent()
-        bffUrl = component.bffImageUrl(component.imageBasePath, validTheme.name, RefType.Logo)
+        bffUrl = Utils.bffImageUrl(component.imageBasePath, validTheme.name, RefType.Logo)
       })
 
       it('call with undefined theme', () => {

@@ -12,7 +12,7 @@ import FileSaver from 'file-saver'
 import { ConfigurationService, PortalMessageService, UserService } from '@onecx/angular-integration-interface'
 
 import { ImagesInternalAPIService, RefType, Theme, ThemesAPIService } from 'src/app/shared/generated'
-import { bffImageUrl, getCurrentDateTime } from 'src/app/shared/utils'
+import { Utils } from 'src/app/shared/utils'
 
 import { ThemeDetailComponent } from './theme-detail.component'
 
@@ -185,7 +185,7 @@ describe('ThemeDetailComponent', () => {
 
       component.prepareHeaderUrl({ ...theme, logoUrl: undefined, smallLogoUrl: undefined })
 
-      expect(component.headerImageUrl).toBe(bffImageUrl(component.imageBasePath, theme.name, RefType.Logo))
+      expect(component.headerImageUrl).toBe(Utils.bffImageUrl(component.imageBasePath, theme.name, RefType.Logo))
     })
   })
 
@@ -286,7 +286,7 @@ describe('ThemeDetailComponent', () => {
       expect(JSON.stringify).toHaveBeenCalledOnceWith(jasmine.objectContaining(exportResponse), null, 2)
       expect(FileSaver.saveAs).toHaveBeenCalledOnceWith(
         jasmine.any(Blob),
-        `onecx-theme_${theme.name}_${getCurrentDateTime()}.json`
+        `onecx-theme_${theme.name}_${Utils.getCurrentDateTime()}.json`
       )
     })
 

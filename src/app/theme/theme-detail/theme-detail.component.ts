@@ -2,14 +2,13 @@ import { Component, OnInit } from '@angular/core'
 import { Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateService } from '@ngx-translate/core'
-import { Observable, catchError, finalize, map, of } from 'rxjs'
+import { Observable, catchError, finalize, first, map, of } from 'rxjs'
 import { Message } from 'primeng/api'
 import FileSaver from 'file-saver'
 
 import { PortalMessageService, UserService } from '@onecx/angular-integration-interface'
 import { Action } from '@onecx/angular-accelerator'
 
-import { bffImageUrl, getCurrentDateTime, mapping_error_status } from 'src/app/shared/utils'
 import {
   ExportThemeRequest,
   ImagesInternalAPIService,
@@ -17,6 +16,7 @@ import {
   Theme,
   ThemesAPIService
 } from 'src/app/shared/generated'
+import { Utils } from 'src/app/shared/utils'
 
 @Component({
   templateUrl: './theme-detail.component.html',
@@ -32,6 +32,7 @@ export class ThemeDetailComponent implements OnInit {
   public dateFormat = 'medium'
   public messages: Message[] = []
   public isThemeUsedByWorkspace = false
+  public Utils = Utils
   private translations$: Observable<Message[]> | undefined
   // page header
   public actions$: Observable<Action[]> = of([])
@@ -42,7 +43,6 @@ export class ThemeDetailComponent implements OnInit {
   // image
   public imageBasePath = this.imageApi.configuration.basePath
   public RefType = RefType
-  public bffImageUrl = bffImageUrl
 
   constructor(
     private readonly user: UserService,
@@ -73,7 +73,7 @@ export class ThemeDetailComponent implements OnInit {
         return data.resource
       }),
       catchError((err) => {
-        this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + mapping_error_status(err.status) + '.THEME'
+        this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + Utils.mapping_error_status(err.status) + '.THEME'
         console.error('getThemeByName', err)
         this.prepareHeaderUrl()
         this.preparePageAction(true)
@@ -133,7 +133,7 @@ export class ThemeDetailComponent implements OnInit {
           const themeJSON = JSON.stringify(data, null, 2)
           FileSaver.saveAs(
             new Blob([themeJSON], { type: 'text/json' }),
-            `onecx-theme_${theme?.name}_${getCurrentDateTime()}.json`
+            `onecx-theme_${theme?.name}_${Utils.getCurrentDateTime()}.json`
           )
         },
         error: (err) => {
@@ -151,11 +151,12 @@ export class ThemeDetailComponent implements OnInit {
     if (!theme) return undefined
     if (theme.logoUrl) this.headerImageUrl = theme.logoUrl
     else if (theme.smallLogoUrl) this.headerImageUrl = theme.smallLogoUrl
-    else this.headerImageUrl = bffImageUrl(this.imageBasePath, theme.name, RefType.Logo)
+    else this.headerImageUrl = Utils.bffImageUrl(this.imageBasePath, theme.name, RefType.Logo)
   }
 
   private prepareDialogTranslations(): void {
     this.translations$ = this.translate.get(['INTERNAL.OPERATOR_MESSAGE', 'INTERNAL.OPERATOR_HINT']).pipe(
+      first(),
       map((data) => {
         return [
           {

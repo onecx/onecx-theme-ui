@@ -1,7 +1,7 @@
 import { AfterContentChecked, ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
-import { Observable, catchError, combineLatest, debounceTime, first, map, of, switchMap } from 'rxjs'
+import { Observable, catchError, combineLatest, debounceTime, first, firstValueFrom, map, of, switchMap } from 'rxjs'
 import { TranslateService } from '@ngx-translate/core'
 import { ConfirmationService } from 'primeng/api'
 
@@ -19,8 +19,9 @@ import {
   UpdateThemeResponse,
   MimeType
 } from 'src/app/shared/generated'
-import { bffImageUrl } from 'src/app/shared/utils'
+import { Utils } from 'src/app/shared/utils'
 import { themeVariables } from './theme-variables'
+import { Dropdown } from 'primeng/dropdown'
 
 @Component({
   selector: 'app-theme-designer',
@@ -30,6 +31,7 @@ import { themeVariables } from './theme-variables'
 })
 export class ThemeDesignerComponent implements OnInit, AfterContentChecked {
   // dialog
+  public exceptionKey: string | undefined = undefined
   public actions$: Observable<Action[]> | undefined
   public changeMode: 'EDIT' | 'CREATE' = 'CREATE'
   public isCurrentTheme = false
@@ -45,9 +47,8 @@ export class ThemeDesignerComponent implements OnInit, AfterContentChecked {
   public themeVars = themeVariables // make it available in HTML
   // Images: Logo, Favicon
   public RefType = RefType
-  public bffImageUrl = bffImageUrl // make it available in HTML
-  public imageBasePath = this.imageApi.configuration.basePath
   public bffUrl: Partial<Record<RefType, string | undefined>> = {}
+  public imageBasePath = this.imageApi.configuration.basePath
   public imageMaxSize = 100000
   public urlPatternAbsolute = 'http(s)://path-to-image'
 
@@ -82,8 +83,9 @@ export class ThemeDesignerComponent implements OnInit, AfterContentChecked {
     this.preparePageActions()
     // for using themes as templates
     this.themes$ = this.themeApi.searchThemes({ searchThemeRequest: {} }).pipe(
-      map((data) => data.stream ?? []),
+      map((data) => data.stream?.sort(Utils.sortByDisplayName) ?? []),
       catchError((err) => {
+        this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + Utils.mapping_error_status(err.status) + '.THEME'
         console.error('searchThemes', err)
         return of([])
       })
@@ -175,7 +177,7 @@ export class ThemeDesignerComponent implements OnInit, AfterContentChecked {
   // initially prepare image URL based on workspace
   public setBffImageUrl(theme: Theme | undefined, refType: RefType): void {
     if (!theme) return undefined
-    this.bffUrl[refType] = bffImageUrl(this.imageBasePath, theme.name, refType)
+    this.bffUrl[refType] = Utils.bffImageUrl(this.imageBasePath, theme.name, refType)
   }
 
   // UPLOAD
@@ -185,22 +187,25 @@ export class ThemeDesignerComponent implements OnInit, AfterContentChecked {
       this.msgService.error({ summaryKey: 'IMAGE.CONSTRAINT.FAILED', detailKey: 'IMAGE.CONSTRAINT.NAME' })
       return
     }
-    const files = (ev.target as HTMLInputElement).files
-    if (files) {
-      const regex = RefType.Favicon === refType ? /^.*.(jpg|jpeg|ico|png|svg)$/ : /^.*.(jpg|jpeg|png|svg)$/
-      if (files[0].size > this.imageMaxSize) {
-        this.msgService.error({ summaryKey: 'IMAGE.CONSTRAINT.FAILED', detailKey: 'IMAGE.CONSTRAINT.SIZE' })
-      } else if (!regex.exec(files[0].name)) {
-        this.msgService.error({
-          summaryKey: 'IMAGE.CONSTRAINT.FAILED',
-          detailKey: 'IMAGE.CONSTRAINT.FILE_TYPE' + (RefType.Favicon === refType ? '.FAVICON' : '')
-        })
-      } else if (this.themeName) {
-        this.saveImage(this.themeName, files, refType) // store image
+    if (ev.target && (ev.target as HTMLInputElement).files) {
+      const files = (ev.target as HTMLInputElement).files
+      const regex = RefType.Favicon === refType ? /^.*.(ico|jpg|jpeg|png|svg)$/ : /^.*.(jpg|jpeg|png|svg)$/
+      if (files) {
+        if (files[0].size > this.imageMaxSize) {
+          this.msgService.error({ summaryKey: 'IMAGE.CONSTRAINT.FAILED', detailKey: 'IMAGE.CONSTRAINT.SIZE' })
+        } else if (!regex.exec(files[0].name)) {
+          this.msgService.error({
+            summaryKey: 'IMAGE.CONSTRAINT.FAILED',
+            detailKey: 'IMAGE.CONSTRAINT.FILE_TYPE' + (RefType.Favicon === refType ? '.FAVICON' : '')
+          })
+        } else if (this.themeName) {
+          this.saveImage(this.themeName, files, refType) // store image
+        }
       }
-    } else this.msgService.error({ summaryKey: 'IMAGE.CONSTRAINT.FAILED', detailKey: 'IMAGE.CONSTRAINT.FILE_MISSING' })
+    } else {
+      this.msgService.error({ summaryKey: 'IMAGE.CONSTRAINT.FAILED', detailKey: 'IMAGE.CONSTRAINT.FILE_MISSING' })
+    }
   }
-
   private mapMimeType(type: string): MimeType {
     switch (type) {
       case 'image/x-icon':
@@ -237,14 +242,13 @@ export class ThemeDesignerComponent implements OnInit, AfterContentChecked {
       error: (err) => this.saveImageResponse(name, refType, err)
     })
   }
-
   private saveImageResponse(name: string, refType: RefType, err?: any): void {
     if (err) {
       console.error('uploadImage', err)
       this.msgService.error({ summaryKey: 'IMAGE.UPLOAD.NOK' })
     } else {
       this.msgService.success({ summaryKey: 'IMAGE.UPLOAD.OK' })
-      this.bffUrl[refType] = bffImageUrl(this.imageBasePath, name, refType)
+      this.bffUrl[refType] = Utils.bffImageUrl(this.imageBasePath, name, refType)
       if (refType === RefType.Logo) this.headerImageUrl = this.bffUrl[refType]
     }
   }
@@ -261,9 +265,8 @@ export class ThemeDesignerComponent implements OnInit, AfterContentChecked {
     if (refType === RefType.Favicon && this.basicForm.get('faviconUrl')?.value) {
       this.basicForm.get('faviconUrl')?.setValue(null)
     }
-    this.bffUrl[refType] = bffImageUrl(this.imageBasePath, this.themeName!, refType)
+    this.bffUrl[refType] = Utils.bffImageUrl(this.imageBasePath, this.themeName!, refType)
   }
-
   public onRemoveImage(refType: RefType) {
     if (this.themeName && this.bffUrl[refType]) {
       // On VIEW mode: manage image is enabled
@@ -340,6 +343,7 @@ export class ThemeDesignerComponent implements OnInit, AfterContentChecked {
     this.themeApi
       .getThemeByName({ name: this.themeName! })
       .pipe(
+        first(),
         switchMap((data) => {
           data.resource.properties = this.propertiesForm.value
 
@@ -355,10 +359,7 @@ export class ThemeDesignerComponent implements OnInit, AfterContentChecked {
           //
           Object.assign(data.resource, this.basicForm.value)
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          return this.themeApi.updateTheme({
-            id: this.themeId!,
-            updateThemeRequest: data
-          })
+          return this.themeApi.updateTheme({ id: this.themeId!, updateThemeRequest: data })
         })
       )
       .subscribe({
@@ -380,30 +381,27 @@ export class ThemeDesignerComponent implements OnInit, AfterContentChecked {
   }
 
   // TEMPLATES
-  public onSelectThemeTemplate(ev: any, themes: Theme[]): void {
+  public onSelectThemeTemplate(ev: any, themes: Theme[], box: Dropdown): void {
     const theme = themes.find((t) => t.name === ev.value)
-    if (theme?.displayName) this.confirmUseThemeTemplate(theme.displayName, ev.value)
+    if (theme?.id && theme?.displayName) this.confirmUseThemeTemplate(theme.id, theme.displayName, box)
   }
 
-  private confirmUseThemeTemplate(name: string, id: string) {
-    this.translate
-      .get([
-        'ACTIONS.COPY_OF',
-        'THEME.TEMPLATE.CONFIRMATION.HEADER',
-        'THEME.TEMPLATE.CONFIRMATION.MESSAGE',
-        'ACTIONS.CONFIRMATION.YES',
-        'ACTIONS.CONFIRMATION.NO'
-      ])
-      .pipe(
-        map((data) => {
-          this.displayConfirmationForUsingTemplate(name, data, this.useThemeAsTemplate(id, data))
-        })
-      )
-      .subscribe()
+  private confirmUseThemeTemplate(id: string, dn: string, box: Dropdown) {
+    firstValueFrom(
+      this.translate
+        .get([
+          'ACTIONS.COPY_OF',
+          'THEME.TEMPLATE.CONFIRMATION.HEADER',
+          'THEME.TEMPLATE.CONFIRMATION.MESSAGE',
+          'ACTIONS.CONFIRMATION.YES',
+          'ACTIONS.CONFIRMATION.NO'
+        ])
+        .pipe(map((data) => this.displayConfirmationForUsingTemplate(id, dn, data, box)))
+    )
   }
 
   private useThemeAsTemplate(themeId: string, data: any): any {
-    return this.getThemeById(themeId).subscribe((result) => {
+    this.getThemeById(themeId).subscribe((result) => {
       if (this.changeMode === 'CREATE') {
         this.basicForm.controls['name'].setValue(data['ACTIONS.COPY_OF'] + result.resource.name)
         this.basicForm.controls['mandatory'].setValue(null)
@@ -412,28 +410,30 @@ export class ThemeDesignerComponent implements OnInit, AfterContentChecked {
         this.basicForm.controls['logoUrl'].setValue(result.resource.logoUrl)
         this.basicForm.controls['smallLogoUrl'].setValue(result.resource.smallLogoUrl)
         this.basicForm.controls['faviconUrl'].setValue(result.resource.faviconUrl)
-        // images
-        this.setBffImageUrl(result.resource, RefType.Logo)
-        this.setBffImageUrl(result.resource, RefType.LogoSmall)
-        this.setBffImageUrl(result.resource, RefType.Favicon)
       }
       if (result.resource.properties) {
         this.propertiesForm.reset()
         this.propertiesForm.patchValue(result.resource.properties)
       }
+      this.msgService.info({ summaryKey: 'THEME.TEMPLATE.CONFIRMATION.OK' })
     })
   }
 
-  private displayConfirmationForUsingTemplate(themeName: string, data: any, onConfirm: () => void): void {
+  private displayConfirmationForUsingTemplate(themeId: string, themeName: string, data: any, box: Dropdown): void {
     this.confirmation.confirm({
+      key: 'template',
       icon: 'pi pi-question-circle',
       defaultFocus: 'reject',
       dismissableMask: true,
       header: data['THEME.TEMPLATE.CONFIRMATION.HEADER'],
-      message: data['THEME.TEMPLATE.CONFIRMATION.MESSAGE'].replace('{{ITEM}}', themeName),
+      message: data['THEME.TEMPLATE.CONFIRMATION.MESSAGE'].replace('{{ITEM}}', Utils.limitText(themeName, 50)),
       acceptLabel: data['ACTIONS.CONFIRMATION.YES'],
       rejectLabel: data['ACTIONS.CONFIRMATION.NO'],
-      accept: () => onConfirm()
+      accept: () => {
+        box.clear()
+        this.useThemeAsTemplate(themeId, data)
+      },
+      reject: () => box.clear()
     })
   }
 
