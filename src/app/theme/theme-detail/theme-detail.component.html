@@ -14,14 +14,14 @@
       *ngIf="loading"
       id="ws_detail_loading_message"
       severity="info"
-      styleClass="m-3 p-2"
+      styleClass="m-3"
       [text]="'ACTIONS.LOADING' | translate"
     ></p-message>
     <p-message
       *ngIf="exceptionKey"
       id="th_detail_error_message"
       severity="error"
-      styleClass="m-3 p-2"
+      styleClass="m-3"
       [text]="exceptionKey | translate"
     ></p-message>
 

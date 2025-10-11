@@ -1,4 +1,6 @@
 import { Location } from '@angular/common'
+import { PortalMessageService, WorkspaceService } from '@onecx/angular-integration-interface'
+import { catchError, first, of, tap } from 'rxjs'
 import { RefType } from 'src/app/shared/generated'
 
 // This object encupsulated function because ...
@@ -63,6 +65,40 @@ const Utils = {
     const seconds = String(now.getSeconds()).padStart(2, '0')
 
     return `${year}-${month}-${day}_${hours}${minutes}${seconds}`
+  },
+
+  /**
+   * Endpoints
+   */
+  doesEndpointExist(
+    workspaceService: WorkspaceService,
+    msgService: PortalMessageService,
+    productName: string,
+    appId: string,
+    endpointName: string
+  ): boolean {
+    let exist = false
+    workspaceService
+      .doesUrlExistFor(productName, appId, endpointName)
+      .pipe(
+        first(),
+        tap((exists) => {
+          if (!exists) {
+            console.error(`Routing not possible to workspace for endpoint: ${productName} ${appId} ${endpointName}`)
+            msgService.error({
+              summaryKey: 'EXCEPTIONS.ENDPOINT.NOT_EXIST',
+              summaryParameters: { product: productName, endpoint: endpointName },
+              detailKey: 'EXCEPTIONS.CONTACT_ADMIN'
+            })
+          }
+        }),
+        catchError((err) => {
+          console.error('doesUrlExistFor', err)
+          return of(false)
+        })
+      )
+      .subscribe((ex) => (exist = ex))
+    return exist
   }
 }
 

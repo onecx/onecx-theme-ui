@@ -1,5 +1,5 @@
+import { of, throwError } from 'rxjs'
 import { RefType } from './generated'
-
 import { Utils } from './utils'
 
 describe('util functions', () => {
@@ -182,6 +182,66 @@ describe('util functions', () => {
       const preparedUrl = Utils.bffImageUrl(basePath, name, RefType.Favicon)
 
       expect(preparedUrl).toBeUndefined()
+    })
+  })
+
+  describe('getCurrentDateTime', () => {
+    beforeAll(() => {
+      jasmine.clock().install()
+      jasmine.clock().mockDate(new Date('2025-06-30T14:05:09'))
+    })
+
+    afterAll(() => {
+      jasmine.clock().uninstall()
+    })
+
+    it('should return formatted current date and time', () => {
+      const result = Utils.getCurrentDateTime()
+      expect(result).toBe('2025-06-30_140509')
+    })
+  })
+
+  describe('getEndpointUrl', () => {
+    let workspaceServiceMock: any
+    let msgServiceMock: any
+    const productName = 'testProduct'
+    const appId = 'testApp'
+    const endpointName = 'testEndpoint'
+
+    beforeEach(() => {
+      workspaceServiceMock = {
+        doesUrlExistFor: jasmine.createSpy('doesUrlExistFor')
+      }
+      msgServiceMock = { error: jasmine.createSpy('error') }
+      spyOn(console, 'error')
+    })
+
+    it('should endpoint exist', () => {
+      workspaceServiceMock.doesUrlExistFor.and.returnValue(of(true))
+
+      const exist = Utils.doesEndpointExist(workspaceServiceMock, msgServiceMock, productName, appId, endpointName)
+
+      expect(exist).toBeTrue()
+    })
+
+    it('should endpoint NOT exist', () => {
+      workspaceServiceMock.doesUrlExistFor.and.returnValue(of(false))
+
+      const exist = Utils.doesEndpointExist(workspaceServiceMock, msgServiceMock, productName, appId, endpointName)
+
+      expect(exist).toBeFalse()
+      expect(console.error).toHaveBeenCalled()
+      expect(msgServiceMock.error).toHaveBeenCalled()
+    })
+
+    it('should get endpoint failed', () => {
+      const errorResponse = { status: 403, statusText: 'No permissions' }
+      workspaceServiceMock.doesUrlExistFor.and.returnValue(throwError(() => errorResponse))
+
+      const exist = Utils.doesEndpointExist(workspaceServiceMock, msgServiceMock, productName, appId, endpointName)
+
+      expect(exist).toBeFalse()
+      expect(console.error).toHaveBeenCalledWith('doesUrlExistFor', errorResponse)
     })
   })
 })
