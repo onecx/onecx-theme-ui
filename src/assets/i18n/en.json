@@ -232,8 +232,11 @@
     "TEMPLATE": {
       "SELECTOR": "Select Theme template",
       "SELECTOR.TOOLTIP": "Choose an existing Theme and use it as a template",
-      "CONFIRMATION.HEADER": "Replace Theme values",
-      "CONFIRMATION.MESSAGE": "Should all values be replaced by the values of \"{{ITEM}}\"?"
+      "CONFIRMATION": {
+        "HEADER": "Replace Theme values",
+        "MESSAGE": "Should all values be replaced by the values of \"{{ITEM}}\"?",
+        "OK": "Values was replaced - They are not yet saved"
+      }
     },
     "GROUPS": {
       "BASE": "Basis",

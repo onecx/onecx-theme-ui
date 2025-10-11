@@ -233,8 +233,11 @@
     "TEMPLATE": {
       "SELECTOR": "Theme-Vorlage wählen",
       "SELECTOR.TOOLTIP": "Ein vorhandenes Theme als Vorlage verwenden",
-      "CONFIRMATION.HEADER": "Themewerte ersetzen",
-      "CONFIRMATION.MESSAGE": "Sollen alle Werte durch die Werte von \"{{ITEM}}\" ersetzt werden?"
+      "CONFIRMATION": {
+        "HEADER": "Themewerte ersetzen",
+        "MESSAGE": "Sollen alle Werte durch die Werte von \"{{ITEM}}\" ersetzt werden?",
+        "OK": "Themewerte wurden ersetzt - Sie sind noch nicht gespeichert"
+      }
     },
     "GROUPS": {
       "BASE": "Basis",
@@ -282,7 +285,7 @@
       "THEME": "Unbekanntes Problem beim Abrufen von Theme Daten - Bitte versuchen sie es noch einmal."
     },
     "HTTP_STATUS_400": {
-      "Theme": "Ihre Anfrage konnte nicht bearbeitet werden."
+      "THEME": "Ihre Anfrage konnte nicht bearbeitet werden."
     },
     "HTTP_STATUS_401": {
       "THEME": "Sie sind nicht authorisiert um Themes zu sehen."

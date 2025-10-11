@@ -3,7 +3,7 @@ import { CommonModule, Location } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
 import { UntilDestroy } from '@ngneat/until-destroy'
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
-import { BehaviorSubject, catchError, map, Observable, of, ReplaySubject } from 'rxjs'
+import { BehaviorSubject, catchError, first, map, Observable, of, ReplaySubject } from 'rxjs'
 
 import {
   AngularRemoteComponentsModule,
@@ -25,7 +25,7 @@ import {
   SearchThemeResponse
 } from 'src/app/shared/generated'
 import { SharedModule } from 'src/app/shared/shared.module'
-import { bffImageUrl, prepareUrlPath, sortByDisplayName } from 'src/app/shared/utils'
+import { Utils } from 'src/app/shared/utils'
 import { environment } from 'src/environments/environment'
 
 type DataType = 'logo' | 'favicon' | 'themes' | 'theme'
@@ -86,7 +86,7 @@ export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWeb
       basePath: Location.joinWithSlash(remoteComponentConfig.baseUrl, environment.apiPrefix)
     })
     if (environment.DEFAULT_LOGO_PATH)
-      this.defaultImageUrl = prepareUrlPath(remoteComponentConfig.baseUrl, environment.DEFAULT_LOGO_PATH)
+      this.defaultImageUrl = Utils.prepareUrlPath(remoteComponentConfig.baseUrl, environment.DEFAULT_LOGO_PATH)
   }
 
   /**
@@ -110,8 +110,9 @@ export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWeb
       pageSize: 1000
     }
     this.themes$ = this.themeApi.searchThemes({ searchThemeRequest: criteria }).pipe(
+      first(),
       map((response: SearchThemeResponse) => {
-        return response.stream?.sort(sortByDisplayName) ?? []
+        return response.stream?.sort(Utils.sortByDisplayName) ?? []
       }),
       catchError((err) => {
         console.error('onecx-theme-data.searchThemes', err)
@@ -127,6 +128,7 @@ export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWeb
   private getTheme() {
     if (!this.themeName) return
     this.theme$ = this.themeApi.getThemeByName({ name: this.themeName }).pipe(
+      first(),
       map((data) => data.resource),
       catchError((err) => {
         console.error('onecx-theme-data.getThemeByName', err)
@@ -163,8 +165,8 @@ export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWeb
       this.log('getImageUrl => ' + this.imageUrl)
       return this.imageUrl
     } else if (['url', 'image'].includes(prioType)) {
-      this.log('getImageUrl => ' + bffImageUrl(this.themeApi.configuration.basePath, themeName, RefType.Logo))
-      return bffImageUrl(this.themeApi.configuration.basePath, themeName, RefType.Logo)
+      this.log('getImageUrl => ' + Utils.bffImageUrl(this.themeApi.configuration.basePath, themeName, RefType.Logo))
+      return Utils.bffImageUrl(this.themeApi.configuration.basePath, themeName, RefType.Logo)
     } else if (['url', 'image', 'default'].includes(prioType) && this.useDefaultLogo && this.defaultImageUrl !== '') {
       // if user wants to have the default (as asset)
       return this.defaultImageUrl

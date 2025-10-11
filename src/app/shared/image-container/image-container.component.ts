@@ -4,7 +4,7 @@ import { map } from 'rxjs'
 import { AppStateService } from '@onecx/angular-integration-interface'
 
 import { environment } from 'src/environments/environment'
-import { prepareUrlPath } from 'src/app/shared/utils'
+import { Utils } from 'src/app/shared/utils'
 
 /**
  * This component displays the image with given imageURL.
@@ -17,11 +17,14 @@ import { prepareUrlPath } from 'src/app/shared/utils'
   templateUrl: './image-container.component.html'
 })
 export class ImageContainerComponent implements OnChanges {
+  // HTML properties
   @Input() public id = 'th_image_container'
   @Input() public title: string | undefined
+  @Input() public styleClass: string | undefined
+  // image data + behavior
   @Input() public bffUrl: string | undefined // uploaded image
   @Input() public imageUrl: string | undefined // external URL
-  @Input() public styleClass: string | undefined
+  @Input() public cascadeUse: boolean = true // if false then only the default logo is used if loading failed
   @Output() public imageLoadResult = new EventEmitter<boolean>() // inform caller
 
   public url: string | undefined = undefined
@@ -30,7 +33,7 @@ export class ImageContainerComponent implements OnChanges {
 
   constructor(appState: AppStateService) {
     appState.currentMfe$
-      .pipe(map((mfe) => prepareUrlPath(mfe.remoteBaseUrl, environment.DEFAULT_LOGO_PATH)))
+      .pipe(map((mfe) => Utils.prepareUrlPath(mfe.remoteBaseUrl, environment.DEFAULT_LOGO_PATH)))
       .subscribe((data) => (this.defaultImageUrl = data))
   }
 
@@ -64,7 +67,7 @@ export class ImageContainerComponent implements OnChanges {
     if (this.url !== undefined) this.imageLoadResult.emit(false)
 
     // using ext-url not possible, use bff URL
-    if (this.urlType === 'ext-url') {
+    if (this.urlType === 'ext-url' && this.cascadeUse) {
       if (this.bffUrl) {
         this.url = this.bffUrl
         this.urlType = 'bff-url'
@@ -73,7 +76,7 @@ export class ImageContainerComponent implements OnChanges {
         this.urlType = 'def-url'
       }
       // using bff-url not possible, use default URL
-    } else if (this.urlType === 'bff-url' && this.defaultImageUrl) {
+    } else if (this.defaultImageUrl) {
       this.url = this.defaultImageUrl
       this.urlType = 'def-url'
     }
