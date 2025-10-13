@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Inject, Input, NO_ERRORS_SCHEMA } from '@angular/core'
 import { CommonModule, Location } from '@angular/common'
 import { UntilDestroy } from '@ngneat/until-destroy'
-import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs'
+import { BehaviorSubject, first, Observable, ReplaySubject } from 'rxjs'
 
 import {
   AngularRemoteComponentsModule,
@@ -14,7 +14,7 @@ import { Theme, ThemeService } from '@onecx/angular-integration-interface'
 import { PortalCoreModule } from '@onecx/portal-integration-angular'
 
 import { Configuration, RefType, ThemesAPIService } from 'src/app/shared/generated'
-import { bffImageUrl, prepareUrlPath } from 'src/app/shared/utils'
+import { Utils } from 'src/app/shared/utils'
 import { environment } from 'src/environments/environment'
 
 @Component({
@@ -57,7 +57,7 @@ export class OneCXCurrentThemeLogoComponent implements ocxRemoteComponent, ocxRe
     private readonly themeService: ThemeService
   ) {
     this.currentTheme$ = this.themeService.currentTheme$.asObservable()
-    this.currentTheme$.subscribe((theme) => {
+    this.currentTheme$.pipe(first()).subscribe((theme) => {
       this.themeName = theme?.name
       this.imageUrl$.next(this.getImageUrl(this.themeName, 'url'))
     })
@@ -69,7 +69,7 @@ export class OneCXCurrentThemeLogoComponent implements ocxRemoteComponent, ocxRe
       basePath: Location.joinWithSlash(remoteComponentConfig.baseUrl, environment.apiPrefix)
     })
     if (environment.DEFAULT_LOGO_PATH)
-      this.defaultImageUrl = prepareUrlPath(remoteComponentConfig.baseUrl, environment.DEFAULT_LOGO_PATH)
+      this.defaultImageUrl = Utils.prepareUrlPath(remoteComponentConfig.baseUrl, environment.DEFAULT_LOGO_PATH)
   }
 
   /**
@@ -100,8 +100,8 @@ export class OneCXCurrentThemeLogoComponent implements ocxRemoteComponent, ocxRe
       this.log('getImageUrl => ' + this.imageUrl)
       return this.imageUrl
     } else if (['url', 'image'].includes(prioType)) {
-      this.log('getImageUrl => ' + bffImageUrl(this.themeApi.configuration.basePath, themeName, RefType.Logo))
-      return bffImageUrl(this.themeApi.configuration.basePath, themeName, RefType.Logo)
+      this.log('getImageUrl => ' + Utils.bffImageUrl(this.themeApi.configuration.basePath, themeName, RefType.Logo))
+      return Utils.bffImageUrl(this.themeApi.configuration.basePath, themeName, RefType.Logo)
     } else if (['url', 'image', 'default'].includes(prioType) && this.useDefaultLogo && this.defaultImageUrl !== '') {
       // if user wants to have the default (as asset)
       return this.defaultImageUrl

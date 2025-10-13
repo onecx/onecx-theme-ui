@@ -54,7 +54,8 @@
       "NEXT.TOOLTIP": "Next page",
       "BACK.TOOLTIP": "Previous page",
       "DETAILS.TOOLTIP": "Display details",
-      "CREATE.TOOLTIP": "Create new entry"
+      "CREATE.TOOLTIP": "Create new entry",
+      "GOTO_WORKSPACE": "Go to Workspace"
     },
     "SEARCH": {
       "ERROR": "Data not available",
@@ -157,39 +158,6 @@
       "URL": "As an alternative to uploading, a URL to an image can be specified here."
     }
   },
-  "IMAGE_ALT": {
-    "LOGO": "Logo",
-    "LOGO_SMALL": "Logo (small)",
-    "LOGO_URL": "External Logo URL",
-    "UPLOAD": {
-      "OK": "The file was uploaded successfully",
-      "NOK": "The file was not uploaded successfully."
-    },
-    "CONSTRAINT_FILE_MISSING": "No file selected.",
-    "CONSTRAINT_FILE_TYPE": "The following image formats are accepted: jpg, jpeg, png, svg",
-    "CONSTRAINT_FAILED": "File upload condition check failed:",
-    "CONSTRAINT_NAME": "Please add a Workspace name before uploading a file.",
-    "CONSTRAINT_SIZE": "The image file size exceeds the maximum length of 100,000 bytes.",
-    "TOOLTIPS": {
-      "FAVICON": "Bookmark icon",
-      "LOGO": "Logo - standard size",
-      "LOGO_SMALL": "Logo - reduced size, e.g. for use in slim menu",
-      "PLACEHOLDER": "Logo Placeholder",
-      "REMOVE": "Remove Image",
-      "UPLOAD": "Select and upload image",
-      "URL": "As an alternative to uploading, a URL to an image can be specified here."
-    }
-  },
-  "LOGO": {
-    "LABEL": "Logo",
-    "URL": "External Logo URL",
-    "IMAGE": "Logo"
-  },
-  "FAVICON": {
-    "LABEL": "Favicon",
-    "URL": "External Favicon URL",
-    "IMAGE": "Favorite/Bookmark Icon"
-  },
   "THEME": {
     "SEARCH.HEADER": "Theme Management",
     "SEARCH.SUBHEADER": "Creation and editing of Themes",
@@ -232,8 +200,11 @@
     "TEMPLATE": {
       "SELECTOR": "Select Theme template",
       "SELECTOR.TOOLTIP": "Choose an existing Theme and use it as a template",
-      "CONFIRMATION.HEADER": "Replace Theme values",
-      "CONFIRMATION.MESSAGE": "Should all values be replaced by the values of \"{{ITEM}}\"?"
+      "CONFIRMATION": {
+        "HEADER": "Replace Theme values",
+        "MESSAGE": "Should all values be replaced by the values of \"{{ITEM}}\"?",
+        "OK": "Values was replaced - They are not yet saved"
+      }
     },
     "GROUPS": {
       "BASE": "Basis",
@@ -277,6 +248,10 @@
     }
   },
   "EXCEPTIONS": {
+    "CONTACT_ADMIN": "Please contact your administrator.",
+    "ENDPOINT": {
+      "NOT_EXIST": "Routing not possible because target is not configured correctly. Application: {{product}}, Endpoint: {{endpoint}}"
+    },
     "HTTP_STATUS_0": {
       "THEME": "Unknown problem retrieving Theme data - please try again."
     },

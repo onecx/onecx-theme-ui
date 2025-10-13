@@ -8,6 +8,10 @@
     grid-row-gap: 0.5rem;
   }
 
+  .p-dialog.p-confirm-dialog .p-confirm-dialog-icon {
+    color: var(--danger-button-bg);
+  }
+
   .p-fieldset {
     background-color: var(--body-bg-color) !important;
     .p-fieldset-legend {

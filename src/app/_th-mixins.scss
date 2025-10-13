@@ -401,6 +401,11 @@
     .p-dropdown-panel .p-dropdown-items *:nth-child(odd) .p-dropdown-item {
       background-color: #f8f9fa;
     }
+    .p-dropdown-panel .p-dropdown-items .p-dropdown-item {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
 }
 @mixin listbox-zebra-rows {

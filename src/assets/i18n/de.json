@@ -54,7 +54,8 @@
       "NEXT.TOOLTIP": "Nächste Seite",
       "BACK.TOOLTIP": "Vorherige Seite",
       "DETAILS.TOOLTIP": "Anzeige Details",
-      "CREATE.TOOLTIP": "Erstelle neuen Eintrag"
+      "CREATE.TOOLTIP": "Erstelle neuen Eintrag",
+      "GOTO_WORKSPACE": "Zum Workspace wechseln"
     },
     "SEARCH": {
       "ERROR": "Daten nicht abrufbar",
@@ -157,40 +158,6 @@
       "URL": "Als Alternative zum Hochladen kann hier eine URL zu einem Bild angegeben werden."
     }
   },
-  "IMAGE_ALT": {
-    "FAVICON": "Favicon",
-    "LOGO": "Logo",
-    "LOGO_SMALL": "Logo (klein)",
-    "LOGO_URL": "Externe Logo URL",
-    "UPLOAD": {
-      "OK": "Die Datei wurde erfolgreich hochgeladen",
-      "NOK": "Die Datei wurde nicht erfolgreich hochgeladen"
-    },
-    "CONSTRAINT_FILE_MISSING": "Keine Datei ausgewählt.",
-    "CONSTRAINT_FILE_TYPE": "Die folgenden Bildformate werden akzeptiert: jpg, jpeg, png, svg",
-    "CONSTRAINT_FAILED": "Bedingung zum Hochladen nicht erfüllt:",
-    "CONSTRAINT_NAME": "Bitte füge einen Namen hinzu bevor das Bild geladen wird.",
-    "CONSTRAINT_SIZE": "Die Größe der Bilddatei übersteigt die maximale Lönge von 100.000 Bytes.",
-    "TOOLTIPS": {
-      "FAVICON": "Lesezeichen/Favoriten-Icon",
-      "LOGO": "Logo in Standardgröße",
-      "LOGO_SMALL": "Logo in reduzierter Größe, z.b. für Verwendung im Slim Menü",
-      "PLACEHOLDER": "Logo Platzhalter",
-      "REMOVE": "Bild löschen",
-      "UPLOAD": "Bild auswählen und hochladen",
-      "URL": "Als Alternative zum Hochladen kann hier eine URL zu einem Bild angegeben werden."
-    }
-  },
-  "LOGO": {
-    "LABEL": "Logo",
-    "URL": "Externe Logo URL",
-    "IMAGE": "Logo"
-  },
-  "FAVICON": {
-    "LABEL": "Favicon",
-    "URL": "Externe Favicon URL",
-    "IMAGE": "Favoriten/Lesezeichen Icon"
-  },
   "THEME": {
     "SEARCH.HEADER": "Theme Verwaltung",
     "SEARCH.SUBHEADER": "Erstellung und Bearbeitung von Themes",
@@ -233,8 +200,11 @@
     "TEMPLATE": {
       "SELECTOR": "Theme-Vorlage wählen",
       "SELECTOR.TOOLTIP": "Ein vorhandenes Theme als Vorlage verwenden",
-      "CONFIRMATION.HEADER": "Themewerte ersetzen",
-      "CONFIRMATION.MESSAGE": "Sollen alle Werte durch die Werte von \"{{ITEM}}\" ersetzt werden?"
+      "CONFIRMATION": {
+        "HEADER": "Themewerte ersetzen",
+        "MESSAGE": "Sollen alle Werte durch die Werte von \"{{ITEM}}\" ersetzt werden?",
+        "OK": "Themewerte wurden ersetzt - Sie sind noch nicht gespeichert"
+      }
     },
     "GROUPS": {
       "BASE": "Basis",
@@ -278,11 +248,15 @@
     }
   },
   "EXCEPTIONS": {
+    "CONTACT_ADMIN": "Wenden Sie sich bitte an Ihren Administrator.",
+    "ENDPOINT": {
+      "NOT_EXIST": "Routing nicht möglich da Ziel nicht korrekt konfiguriert. Applikation: {{product}}, Endpunkt: {{endpoint}}"
+    },
     "HTTP_STATUS_0": {
       "THEME": "Unbekanntes Problem beim Abrufen von Theme Daten - Bitte versuchen sie es noch einmal."
     },
     "HTTP_STATUS_400": {
-      "Theme": "Ihre Anfrage konnte nicht bearbeitet werden."
+      "THEME": "Ihre Anfrage konnte nicht bearbeitet werden."
     },
     "HTTP_STATUS_401": {
       "THEME": "Sie sind nicht authorisiert um Themes zu sehen."
