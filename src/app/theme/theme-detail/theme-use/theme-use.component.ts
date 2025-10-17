@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core
 import { BehaviorSubject, Observable, of } from 'rxjs'
 
 import { SlotService } from '@onecx/angular-remote-components'
-import { PortalMessageService, WorkspaceService } from '@onecx/angular-integration-interface'
+import { WorkspaceService } from '@onecx/angular-integration-interface'
 
 import { Utils } from 'src/app/shared/utils'
 
@@ -40,7 +40,6 @@ export class ThemeUseComponent implements OnChanges {
 
   constructor(
     private readonly slotService: SlotService,
-    private readonly msgService: PortalMessageService,
     private readonly workspaceService: WorkspaceService
   ) {
     this.isComponentDefined$ = this.slotService.isSomeComponentDefinedForSlot(this.slotName)
@@ -54,10 +53,9 @@ export class ThemeUseComponent implements OnChanges {
         if (res.length > 0) this.used.emit(true)
         else this.used.emit(false)
       })
-      // check workspace detail endpoint exists
+      // check endpoint exists
       this.workspaceEndpointExist = Utils.doesEndpointExist(
         this.workspaceService,
-        this.msgService,
         'onecx-workspace',
         'onecx-workspace-ui',
         'workspace-detail'
@@ -65,8 +63,8 @@ export class ThemeUseComponent implements OnChanges {
     }
   }
 
-  public getEndpointUrl$(name: string): Observable<string | undefined> {
-    if (this.workspaceEndpointExist)
+  public getWorkspaceEndpointUrl$(name?: string): Observable<string | undefined> {
+    if (this.workspaceEndpointExist && name)
       return this.workspaceService.getUrl('onecx-workspace', 'onecx-workspace-ui', 'workspace-detail', {
         'workspace-name': name
       })

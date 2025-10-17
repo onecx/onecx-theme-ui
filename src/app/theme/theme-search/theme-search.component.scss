@@ -16,8 +16,32 @@
   .word-break-all {
     word-break: break-all;
   }
-  .card-badge-left.badge-1 {
-    top: 0px;
-    left: -12px;
+
+  .card-badge-left,
+  .card-badge-right {
+    &.badge-1 {
+      top: 5px;
+    }
+    &.badge-2 {
+      top: 40px;
+    }
+  }
+
+  .card-badge-right {
+    right: -4px;
+  }
+  .card-badge-left {
+    left: -4px;
+  }
+
+  @media screen and (min-width: 576px) {
+    .card-badge-right {
+      right: -10px;
+      padding: 6px !important;
+    }
+    .card-badge-left {
+      left: -10px;
+      padding: 6px !important;
+    }
   }
 }

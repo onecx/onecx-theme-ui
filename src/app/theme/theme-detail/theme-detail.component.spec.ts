@@ -181,10 +181,6 @@ describe('ThemeDetailComponent', () => {
 
       component.prepareHeaderUrl({ ...theme, logoUrl: undefined })
 
-      expect(component.headerImageUrl).toBe(theme.smallLogoUrl)
-
-      component.prepareHeaderUrl({ ...theme, logoUrl: undefined, smallLogoUrl: undefined })
-
       expect(component.headerImageUrl).toBe(Utils.bffImageUrl(component.imageBasePath, theme.name, RefType.Logo))
     })
   })

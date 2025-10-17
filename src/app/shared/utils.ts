@@ -1,5 +1,5 @@
 import { Location } from '@angular/common'
-import { PortalMessageService, WorkspaceService } from '@onecx/angular-integration-interface'
+import { WorkspaceService } from '@onecx/angular-integration-interface'
 import { catchError, first, of, tap } from 'rxjs'
 import { RefType } from 'src/app/shared/generated'
 
@@ -72,7 +72,6 @@ const Utils = {
    */
   doesEndpointExist(
     workspaceService: WorkspaceService,
-    msgService: PortalMessageService,
     productName: string,
     appId: string,
     endpointName: string
@@ -85,11 +84,6 @@ const Utils = {
         tap((exists) => {
           if (!exists) {
             console.error(`Routing not possible to workspace for endpoint: ${productName} ${appId} ${endpointName}`)
-            msgService.error({
-              summaryKey: 'EXCEPTIONS.ENDPOINT.NOT_EXIST',
-              summaryParameters: { product: productName, endpoint: endpointName },
-              detailKey: 'EXCEPTIONS.CONTACT_ADMIN'
-            })
           }
         }),
         catchError((err) => {

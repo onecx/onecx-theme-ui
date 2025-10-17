@@ -58,7 +58,6 @@ app:
             CREATE: Create theme
             DELETE: Delete theme
             EDIT: Edit theme
-            SAVE: Update and save theme
             SEARCH: Search theme
             VIEW: View mode for theme
             IMPORT: Import theme
