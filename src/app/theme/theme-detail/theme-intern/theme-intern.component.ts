@@ -1,7 +1,4 @@
 import { Component, Input, OnChanges } from '@angular/core'
-import { Observable } from 'rxjs'
-
-import { SlotService } from '@onecx/angular-remote-components'
 
 import { Theme } from 'src/app/shared/generated'
 
