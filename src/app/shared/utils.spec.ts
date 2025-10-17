@@ -203,7 +203,6 @@ describe('util functions', () => {
 
   describe('doesEndpointExist', () => {
     let workspaceServiceMock: any
-    let msgServiceMock: any
     const productName = 'testProduct'
     const appId = 'testApp'
     const endpointName = 'testEndpoint'
@@ -212,14 +211,13 @@ describe('util functions', () => {
       workspaceServiceMock = {
         doesUrlExistFor: jasmine.createSpy('doesUrlExistFor')
       }
-      msgServiceMock = { error: jasmine.createSpy('error') }
       spyOn(console, 'error')
     })
 
     it('should endpoint exist', () => {
       workspaceServiceMock.doesUrlExistFor.and.returnValue(of(true))
 
-      const exist = Utils.doesEndpointExist(workspaceServiceMock, msgServiceMock, productName, appId, endpointName)
+      const exist = Utils.doesEndpointExist(workspaceServiceMock, productName, appId, endpointName)
 
       expect(exist).toBeTrue()
     })
@@ -227,18 +225,17 @@ describe('util functions', () => {
     it('should endpoint NOT exist', () => {
       workspaceServiceMock.doesUrlExistFor.and.returnValue(of(false))
 
-      const exist = Utils.doesEndpointExist(workspaceServiceMock, msgServiceMock, productName, appId, endpointName)
+      const exist = Utils.doesEndpointExist(workspaceServiceMock, productName, appId, endpointName)
 
       expect(exist).toBeFalse()
       expect(console.error).toHaveBeenCalled()
-      expect(msgServiceMock.error).toHaveBeenCalled()
     })
 
     it('should get endpoint failed', () => {
       const errorResponse = { status: 403, statusText: 'No permissions' }
       workspaceServiceMock.doesUrlExistFor.and.returnValue(throwError(() => errorResponse))
 
-      const exist = Utils.doesEndpointExist(workspaceServiceMock, msgServiceMock, productName, appId, endpointName)
+      const exist = Utils.doesEndpointExist(workspaceServiceMock, productName, appId, endpointName)
 
       expect(exist).toBeFalse()
       expect(console.error).toHaveBeenCalledWith('doesUrlExistFor', errorResponse)
