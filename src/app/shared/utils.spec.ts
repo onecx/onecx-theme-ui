@@ -201,7 +201,7 @@ describe('util functions', () => {
     })
   })
 
-  describe('getEndpointUrl', () => {
+  describe('doesEndpointExist', () => {
     let workspaceServiceMock: any
     let msgServiceMock: any
     const productName = 'testProduct'

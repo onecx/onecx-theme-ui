@@ -150,7 +150,6 @@ export class ThemeDetailComponent implements OnInit {
   public prepareHeaderUrl(theme?: Theme): void {
     if (!theme) return undefined
     if (theme.logoUrl) this.headerImageUrl = theme.logoUrl
-    else if (theme.smallLogoUrl) this.headerImageUrl = theme.smallLogoUrl
     else this.headerImageUrl = Utils.bffImageUrl(this.imageBasePath, theme.name, RefType.Logo)
   }
 

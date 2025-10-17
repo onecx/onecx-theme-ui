@@ -17,7 +17,7 @@
               tabindex="0"
               id="ws_detail_props_item_theme_link"
               class="max-w-15rem md:max-w-20rem lg:max-w-30rem xl:max-w-full cursor-pointer font-italic text-primary text-responsive"
-              [routerLink]="[getEndpointUrl$(w.name) | async]"
+              [routerLink]="[getWorkspaceEndpointUrl$(w.name) | async]"
               [attr.aria-label]="'ACTIONS.NAVIGATION.GOTO_WORKSPACE' | translate"
               [pTooltip]="'ACTIONS.NAVIGATION.GOTO_WORKSPACE' | translate"
               tooltipPosition="right"

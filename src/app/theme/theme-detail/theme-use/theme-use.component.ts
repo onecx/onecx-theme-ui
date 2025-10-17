@@ -65,8 +65,8 @@ export class ThemeUseComponent implements OnChanges {
     }
   }
 
-  public getEndpointUrl$(name: string): Observable<string | undefined> {
-    if (this.workspaceEndpointExist)
+  public getWorkspaceEndpointUrl$(name?: string): Observable<string | undefined> {
+    if (this.workspaceEndpointExist && name)
       return this.workspaceService.getUrl('onecx-workspace', 'onecx-workspace-ui', 'workspace-detail', {
         'workspace-name': name
       })

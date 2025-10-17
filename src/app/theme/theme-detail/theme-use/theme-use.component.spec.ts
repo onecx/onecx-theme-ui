@@ -12,7 +12,6 @@ describe('ThemeUseComponent', () => {
   let component: ThemeUseComponent
   let fixture: ComponentFixture<ThemeUseComponent>
 
-  const workspaceService = jasmine.createSpyObj<WorkspaceService>('WorkspaceService', ['doesUrlExistFor', 'getUrl'])
   const workspaceServiceSpy = jasmine.createSpyObj<WorkspaceService>('WorkspaceService', ['doesUrlExistFor', 'getUrl'])
 
   beforeEach(waitForAsync(() => {
@@ -56,9 +55,8 @@ describe('ThemeUseComponent', () => {
     })
   })
 
-  describe('getEndpointUrl', () => {
+  describe('getWorkspaceEndpointUrl', () => {
     beforeEach(() => {
-      workspaceService.getUrl.calls.reset()
       component.themeName = 'theme'
     })
 
@@ -66,7 +64,7 @@ describe('ThemeUseComponent', () => {
       component.workspaceEndpointExist = true
       workspaceServiceSpy.getUrl.and.returnValue(of('/url'))
 
-      const eu$ = component.getEndpointUrl$('name')
+      const eu$ = component.getWorkspaceEndpointUrl$('name')
 
       eu$.subscribe({
         next: (data) => {
@@ -84,7 +82,7 @@ describe('ThemeUseComponent', () => {
       const errorResponse = { status: 400, statusText: 'Error on check endpoint' }
       workspaceServiceSpy.getUrl.and.returnValue(throwError(() => errorResponse))
 
-      const eu$ = component.getEndpointUrl$('name')
+      const eu$ = component.getWorkspaceEndpointUrl$('name')
 
       eu$.subscribe({
         next: (data) => {
