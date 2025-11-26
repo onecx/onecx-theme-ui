@@ -189,7 +189,7 @@ export class ThemeDesignerComponent implements OnInit, AfterContentChecked {
     }
     if (ev.target) {
       const files = (ev.target as HTMLInputElement).files
-      if (files && files.length === 1) this.proccessFile(files[0], refType)
+      if (files?.length === 1) this.proccessFile(files[0], refType)
       else {
         this.msgService.error({ summaryKey: 'IMAGE.CONSTRAINT.FAILED', detailKey: 'IMAGE.CONSTRAINT.FILE_MISSING' })
       }
