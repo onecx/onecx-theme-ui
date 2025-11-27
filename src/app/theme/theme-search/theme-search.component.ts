@@ -49,7 +49,11 @@ export class ThemeSearchComponent implements OnInit {
   public loadThemes(): void {
     this.loading = true
     this.themes$ = this.themeApi.searchThemes({ searchThemeRequest: {} }).pipe(
-      map((data) => (data?.stream ? data.stream.sort(this.sortThemesByName) : [])),
+      map((data) => {
+        const themes = data?.stream ?? []
+        themes.sort(this.sortThemesByName)
+        return themes
+      }),
       catchError((err) => {
         this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + Utils.mapping_error_status(err.status) + '.THEME'
         console.error('searchThemes', err)

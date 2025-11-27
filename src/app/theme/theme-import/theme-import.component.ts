@@ -91,10 +91,10 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
 
   public onThemeNameChange() {
     if (this.themes.length === 0 || !this.formGroup.valid) return
-    this.themeNameExists =
-      this.themes.filter((theme) => theme.name === this.formGroup.controls['themeName'].value).length > 0
-    this.displayNameExists =
-      this.themes.filter((theme) => theme.displayName === this.formGroup.controls['displayName'].value).length > 0
+    this.themeNameExists = this.themes.some((theme) => theme.name === this.formGroup.controls['themeName'].value)
+    this.displayNameExists = this.themes.some(
+      (theme) => theme.displayName === this.formGroup.controls['displayName'].value
+    )
   }
 
   public onImportThemeHide(): void {

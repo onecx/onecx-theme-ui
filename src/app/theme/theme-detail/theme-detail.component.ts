@@ -210,7 +210,9 @@ export class ThemeDetailComponent implements OnInit {
             {
               label: data['ACTIONS.EDIT.LABEL'],
               title: data['ACTIONS.EDIT.TOOLTIP'],
-              actionCallback: () => this.router.navigate(['./edit'], { relativeTo: this.route }),
+              actionCallback: () => {
+                this.router.navigate(['./edit'], { relativeTo: this.route })
+              },
               icon: 'pi pi-pencil',
               show: 'always',
               permission: 'THEME#EDIT',
