@@ -77,7 +77,7 @@ export class ThemeDetailComponent implements OnInit {
         console.error('getThemeByName', err)
         this.prepareHeaderUrl()
         this.preparePageAction(true)
-        return of(undefined)
+        return of({})
       }),
       finalize(() => (this.loading = false))
     )
