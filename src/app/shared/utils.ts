@@ -1,9 +1,10 @@
 import { Location } from '@angular/common'
-import { WorkspaceService } from '@onecx/angular-integration-interface'
 import { catchError, first, of, tap } from 'rxjs'
+
+import { WorkspaceService } from '@onecx/angular-integration-interface'
 import { RefType } from 'src/app/shared/generated'
 
-// This object encupsulated function because ...
+// This object encapsulated function because ...
 //  ...Jasmine has problems to spying direct imported functions
 const Utils = {
   mapping_error_status(status: number): number {

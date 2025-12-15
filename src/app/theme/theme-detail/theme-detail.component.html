@@ -39,6 +39,7 @@
       >
       </p-messages>
     </ng-container>
+
     <p-tabView
       *ngIf="!loading && !exceptionKey"
       (onChange)="onTabChange($event, theme)"
@@ -225,36 +226,36 @@
 
     <ng-template pTemplate="footer">
       <div class="flex flex-wrap column-gap-2 row-gap-1 justify-content-end">
-        <p-button
-          *ngIf="theme?.mandatory"
-          icon="pi pi-times"
-          id="th_delete_action_close"
-          (onClick)="themeDeleteVisible = false"
-          [label]="'ACTIONS.NAVIGATION.CLOSE' | translate"
-          [pTooltip]="'ACTIONS.NAVIGATION.CLOSE.TOOLTIP' | translate"
-          tooltipPosition="top"
-          tooltipEvent="hover"
-        ></p-button>
-        <p-button
-          *ngIf="!theme?.mandatory"
-          icon="pi pi-times"
-          id="th_delete_action_no"
-          (onClick)="themeDeleteVisible = false"
-          [label]="'ACTIONS.CONFIRMATION.NO' | translate"
-          [pTooltip]="'ACTIONS.CONFIRMATION.NO.TOOLTIP' | translate"
-          tooltipPosition="top"
-          tooltipEvent="hover"
-        ></p-button>
-        <p-button
-          *ngIf="!theme?.mandatory"
-          icon="pi pi-check"
-          id="th_delete_action_yes"
-          (onClick)="onConfirmThemeDeletion(theme)"
-          [label]="'ACTIONS.CONFIRMATION.YES' | translate"
-          [pTooltip]="'ACTIONS.CONFIRMATION.YES.TOOLTIP' | translate"
-          tooltipPosition="top"
-          tooltipEvent="hover"
-        ></p-button>
+        @if (theme?.mandatory || isThemeUsedByWorkspace) {
+          <p-button
+            icon="pi pi-times"
+            id="th_delete_action_close"
+            (onClick)="themeDeleteVisible = false"
+            [label]="'ACTIONS.NAVIGATION.CLOSE' | translate"
+            [pTooltip]="'ACTIONS.NAVIGATION.CLOSE.TOOLTIP' | translate"
+            tooltipPosition="top"
+            tooltipEvent="hover"
+          ></p-button>
+        } @else {
+          <p-button
+            icon="pi pi-times"
+            id="th_delete_action_no"
+            (onClick)="themeDeleteVisible = false"
+            [label]="'ACTIONS.CONFIRMATION.NO' | translate"
+            [pTooltip]="'ACTIONS.CONFIRMATION.NO.TOOLTIP' | translate"
+            tooltipPosition="top"
+            tooltipEvent="hover"
+          ></p-button>
+          <p-button
+            icon="pi pi-check"
+            id="th_delete_action_yes"
+            (onClick)="onConfirmThemeDeletion(theme)"
+            [label]="'ACTIONS.CONFIRMATION.YES' | translate"
+            [pTooltip]="'ACTIONS.CONFIRMATION.YES.TOOLTIP' | translate"
+            tooltipPosition="top"
+            tooltipEvent="hover"
+          ></p-button>
+        }
       </div>
     </ng-template>
   </p-dialog>
