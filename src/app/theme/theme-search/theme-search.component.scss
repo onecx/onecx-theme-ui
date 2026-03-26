@@ -2,11 +2,11 @@
 
 @include card-badges;
 @include danger-action;
+@include displaying-text-responsive;
+@include dataview-list-flex-zebra-rows;
 @include correct-select-button;
 @include correct-dataview-header;
 @include correct-data-view-control;
-@include displaying-text-responsive;
-@include dataview-list-flex-zebra-rows;
 @include media-queries;
 
 :host ::ng-deep {
@@ -15,10 +15,6 @@
   }
   .word-break-all {
     word-break: break-all;
-  }
-
-  .p-dataview-content article:nth-child(even) {
-    background-color: rgba(0, 0, 0, 0.03) !important;
   }
 
   .card-badge-left,
