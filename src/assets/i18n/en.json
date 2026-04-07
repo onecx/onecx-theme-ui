@@ -167,7 +167,7 @@
     "DETAIL.SUBHEADER": "Theme Details",
     "DETAIL.AUTO_APPLY": "Auto apply changes",
     "DETAIL.AUTO_APPLY.TOOLTIP": "If this option is switched on, then all changes (font, colors) are automatically applied to the current page.",
-    "DETAIL.AUTO_APPLY_CURRENT_THEME": "Changes are applied immediately when saving because it is the Theme currently in use",
+    "DETAIL.AUTO_APPLY_CURRENT_THEME": "Changes are applied immediately upon saving, as this is the currently used theme.",
     "DETAIL.THEME_SELECTOR": "Select Theme as Template",
     "NO_PROPERTIES": "No properties specified",
     "TABS": {

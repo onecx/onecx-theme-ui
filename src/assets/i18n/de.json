@@ -167,7 +167,7 @@
     "DETAIL.SUBHEADER": "Theme Details",
     "DETAIL.AUTO_APPLY": "Änderungen automatisch anwenden",
     "DETAIL.AUTO_APPLY.TOOLTIP": "Wenn diese Option eingeschaltet ist, dann werden alle Änderungen (Schriftart, Farben) automatisch auf die aktuelle Seite angewendet.",
-    "DETAIL.AUTO_APPLY_CURRENT_THEME": "Änderungen werden beim Speichern sofort angewendet, weil es das aktuell benutzte Theme ist",
+    "DETAIL.AUTO_APPLY_CURRENT_THEME": "Änderungen werden beim Speichern sofort angewendet, da es das aktuell benutzte Theme ist",
     "DETAIL.THEME_SELECTOR": "Ein Theme als Vorlage wählen",
     "NO_PROPERTIES": "Keine Farbwerte enthalten",
     "TABS": {
