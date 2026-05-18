@@ -11,7 +11,6 @@ import { ThemeSearchComponent } from './theme-search/theme-search.component'
 import { ThemeImportComponent } from './theme-import/theme-import.component'
 import { ThemeDeleteComponent } from './theme-delete/theme-delete.component'
 import { ThemeDetailComponent } from './theme-detail/theme-detail.component'
-import { ThemeDetail2Component } from './theme-detail2/theme-detail2.component'
 import { ThemeInternComponent } from './theme-detail/theme-intern/theme-intern.component'
 import { ThemeUseComponent } from './theme-detail/theme-use/theme-use.component'
 import { ThemeDesignerComponent } from './theme-designer/theme-designer.component'
@@ -64,7 +63,6 @@ const routes: Routes = [
     ThemeSearchComponent,
     ThemeDeleteComponent,
     ThemeDetailComponent,
-    ThemeDetail2Component,
     ThemeDesignerComponent,
     ThemeImportComponent,
     ThemeInternComponent,
