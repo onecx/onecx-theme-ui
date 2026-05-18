@@ -1,7 +1,7 @@
 <ocx-portal-page permission="THEME#SEARCH" helpArticleId="PAGE_THEME_SEARCH">
   <ocx-page-header
-    [header]="'THEME.SEARCH.HEADER' | translate"
-    [subheader]="'THEME.SEARCH.SUBHEADER' | translate"
+    [header]="'DIALOG.HEADER.SEARCH' | translate"
+    [subheader]="'DIALOG.HEADER.SEARCH.SUBHEADER' | translate"
     [actions]="(actions$ | async) ?? []"
   >
   </ocx-page-header>
@@ -126,7 +126,7 @@
             <article
               [id]="'th_search_data_grid_row_' + i"
               class="card p-2 sm:px-3 flex flex-column gap-2 justify-content-between text-center hover:bg-gray-200 cursor-pointer"
-              [routerLink]="['./', theme.name]"
+              [routerLink]="['./detail2', theme.name]"
               [attr.aria-label]="'Theme: ' + theme.displayName"
             >
               <div

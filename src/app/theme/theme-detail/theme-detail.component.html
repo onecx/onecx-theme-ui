@@ -2,7 +2,7 @@
   <ocx-page-header
     [loading]="loading"
     [header]="theme?.displayName"
-    [subheader]="'THEME.DETAIL.SUBHEADER' | translate"
+    [subheader]="'DIALOG.HEADER.DETAIL.SUBHEADER' | translate"
     [actions]="(actions$ | async) ?? []"
     [figureImage]="headerImageUrl"
     [figureBackground]="!headerImageUrl"
@@ -47,9 +47,9 @@
     >
       <p-tabPanel
         id="th_detail_panel_props"
-        [header]="'THEME.TABS.PROPERTIES' | translate"
-        [attr.aria-label]="'THEME.TABS.PROPERTIES' | translate"
-        [tooltip]="'THEME.TABS.PROPERTIES_TOOLTIP' | translate"
+        [header]="'DIALOG.TABS.PROPERTIES' | translate"
+        [attr.aria-label]="'DIALOG.TABS.PROPERTIES' | translate"
+        [tooltip]="'DIALOG.TABS.PROPERTIES_TOOLTIP' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
       >
@@ -148,9 +148,9 @@
 
       <p-tabPanel
         id="th_detail_panel_variables"
-        [header]="'THEME.TABS.VARIABLES' | translate"
-        [attr.aria-label]="'THEME.TABS.VARIABLES' | translate"
-        [tooltip]="'THEME.TABS.VARIABLES_TOOLTIP' | translate"
+        [header]="'DIALOG.TABS.VARIABLES' | translate"
+        [attr.aria-label]="'DIALOG.TABS.VARIABLES' | translate"
+        [tooltip]="'DIALOG.TABS.VARIABLES_TOOLTIP' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
       >
@@ -158,9 +158,9 @@
       </p-tabPanel>
 
       <p-tabPanel
-        [header]="'THEME.TABS.USE' | translate"
-        [attr.aria-label]="'THEME.TABS.USE' | translate"
-        [tooltip]="'THEME.TABS.USE_TOOLTIP' | translate"
+        [header]="'DIALOG.TABS.USE' | translate"
+        [attr.aria-label]="'DIALOG.TABS.USE' | translate"
+        [tooltip]="'DIALOG.TABS.USE_TOOLTIP' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
       >
@@ -168,9 +168,9 @@
       </p-tabPanel>
 
       <p-tabPanel
-        [header]="'THEME.TABS.INTERN' | translate"
-        [attr.aria-label]="'THEME.TABS.INTERN' | translate"
-        [tooltip]="'THEME.TABS.INTERN_TOOLTIP' | translate"
+        [header]="'DIALOG.TABS.INTERN' | translate"
+        [attr.aria-label]="'DIALOG.TABS.INTERN' | translate"
+        [tooltip]="'DIALOG.TABS.INTERN_TOOLTIP' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
       >
@@ -180,83 +180,10 @@
   </ocx-page-content>
 
   <!-- DELETE -->
-  <p-dialog
-    [header]="'ACTIONS.DELETE.TOOLTIP' | translate"
+  <app-theme-delete
+    [theme]="themeForUse"
+    [isUsedByWorkspace]="isThemeUsedByWorkspace"
     [(visible)]="themeDeleteVisible"
-    [modal]="true"
-    [closable]="true"
-    [draggable]="true"
-    [resizable]="true"
-    [dismissableMask]="true"
-    [style]="{ 'max-width': '425px' }"
-  >
-    <div class="flex column-gap-3 row-gap-1 justify-content-start align-items-center">
-      <div class="pi pi-question-circle text-3xl danger-action-text"></div>
-      <div class="flex flex-column row-gap-3">
-        <p-message
-          *ngIf="theme?.mandatory"
-          id="th_delete_reject_mandatory_message"
-          severity="info"
-          styleClass="p-2"
-          [text]="'ACTIONS.DELETE.MESSAGE_REJECT_MANDATORY' | translate"
-        ></p-message>
-        <p-message
-          *ngIf="!theme?.mandatory && isThemeUsedByWorkspace"
-          id="th_delete_reject_use_message"
-          severity="info"
-          styleClass="p-2"
-          [text]="'ACTIONS.DELETE.MESSAGE_REJECT_USE' | translate"
-        ></p-message>
-        <div *ngIf="!(theme?.mandatory || isThemeUsedByWorkspace)">
-          <div id="th_delete_message_text" class="font-bold">{{ 'ACTIONS.DELETE.THEME_MESSAGE' | translate }}</div>
-          <div id="th_delete_theme_display_name" class="my-2 font-bold danger-action-text text-center">
-            {{ theme?.displayName }}
-          </div>
-          <div *ngIf="!theme?.operator" class="mt-2">{{ 'ACTIONS.DELETE.MESSAGE_INFO' | translate }}</div>
-          <p-message
-            *ngIf="theme?.operator"
-            id="th_delete_operator_hint"
-            severity="info"
-            styleClass="mt-1 p-2"
-            [text]="'ACTIONS.DELETE.MESSAGE_INFO_OPERATOR' | translate"
-          ></p-message>
-        </div>
-      </div>
-    </div>
-
-    <ng-template pTemplate="footer">
-      <div class="flex flex-wrap column-gap-2 row-gap-1 justify-content-end">
-        @if (theme?.mandatory || isThemeUsedByWorkspace) {
-          <p-button
-            icon="pi pi-times"
-            id="th_delete_action_close"
-            (onClick)="themeDeleteVisible = false"
-            [label]="'ACTIONS.NAVIGATION.CLOSE' | translate"
-            [pTooltip]="'ACTIONS.NAVIGATION.CLOSE.TOOLTIP' | translate"
-            tooltipPosition="top"
-            tooltipEvent="hover"
-          ></p-button>
-        } @else {
-          <p-button
-            icon="pi pi-times"
-            id="th_delete_action_no"
-            (onClick)="themeDeleteVisible = false"
-            [label]="'ACTIONS.CONFIRMATION.NO' | translate"
-            [pTooltip]="'ACTIONS.CONFIRMATION.NO.TOOLTIP' | translate"
-            tooltipPosition="top"
-            tooltipEvent="hover"
-          ></p-button>
-          <p-button
-            icon="pi pi-check"
-            id="th_delete_action_yes"
-            (onClick)="onConfirmThemeDeletion(theme)"
-            [label]="'ACTIONS.CONFIRMATION.YES' | translate"
-            [pTooltip]="'ACTIONS.CONFIRMATION.YES.TOOLTIP' | translate"
-            tooltipPosition="top"
-            tooltipEvent="hover"
-          ></p-button>
-        }
-      </div>
-    </ng-template>
-  </p-dialog>
+    (themeDeleted)="onThemeDeletion()"
+  ></app-theme-delete>
 </ocx-portal-page>

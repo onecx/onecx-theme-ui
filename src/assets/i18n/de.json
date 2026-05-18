@@ -110,9 +110,20 @@
       "SEARCH": "Theme Verwaltung",
       "SEARCH.SUBHEADER": "Erstellung und Bearbeitung von Themes",
       "DETAIL": "Anzeige und Bearbeitung der Theme-Eigenschaften",
+      "DETAIL.SUBHEADER": "Theme Details",
       "CREATE": "Theme erstellen",
       "DELETE": "Theme löschen",
       "EXPORT": "Theme exportieren"
+    },
+    "TABS": {
+      "INTERN": "Intern",
+      "INTERN_TOOLTIP": "Interne Informationen",
+      "PROPERTIES": "Eigenschaften",
+      "PROPERTIES_TOOLTIP": "Eigenschaften des Themes",
+      "USE": "Verwendung",
+      "USE_TOOLTIP": "Liste der Workspaces, die das Theme verwenden",
+      "VARIABLES": "Theme-Variablen",
+      "VARIABLES_TOOLTIP": "JSON-Darstellung der Theme-Variablen"
     },
     "DATAVIEW": {
       "FILTER": "Filter",
@@ -159,27 +170,14 @@
     }
   },
   "THEME": {
-    "SEARCH.HEADER": "Theme Verwaltung",
-    "SEARCH.SUBHEADER": "Erstellung und Bearbeitung von Themes",
     "DESIGNER.EDIT.SUBHEADER": "Theme Details ändern",
     "DESIGNER.CREATE.SUBHEADER": "Ein neues Theme erstellen",
     "DESIGNER.TOP.SECTION": "Theme anwenden und Vorlage wählen",
-    "DETAIL.SUBHEADER": "Theme Details",
     "DETAIL.AUTO_APPLY": "Änderungen automatisch anwenden",
     "DETAIL.AUTO_APPLY.TOOLTIP": "Wenn diese Option eingeschaltet ist, dann werden alle Änderungen (Schriftart, Farben) automatisch auf die aktuelle Seite angewendet.",
     "DETAIL.AUTO_APPLY_CURRENT_THEME": "Änderungen werden beim Speichern sofort angewendet, da es das aktuell benutzte Theme ist",
     "DETAIL.THEME_SELECTOR": "Ein Theme als Vorlage wählen",
     "NO_PROPERTIES": "Keine Farbwerte enthalten",
-    "TABS": {
-      "INTERN": "Intern",
-      "INTERN_TOOLTIP": "Interne Informationen",
-      "PROPERTIES": "Eigenschaften",
-      "PROPERTIES_TOOLTIP": "Eigenschaften des Themes",
-      "USE": "Verwendung",
-      "USE_TOOLTIP": "Liste der Workspaces, die das Theme verwenden",
-      "VARIABLES": "Theme-Variablen",
-      "VARIABLES_TOOLTIP": "JSON-Darstellung der Theme-Variablen"
-    },
     "WORKSPACES_USING_THEME": {
       "MISSING_COMPONENT": "Informationen zur Verwendung des Themes in einem Workspace konnten nicht abgerufen werden.",
       "USED": "Das Theme wird von folgenden Workspaces verwendet: ",
@@ -190,7 +188,7 @@
       "IMPORT_THEME_SUCCESS": "Theme wurde erfolgreich importiert.",
       "IMPORT_THEME_FAIL": "Ein Fehler ist aufgetreten. Das Theme wurde nicht importiert.",
       "NAME_EXISTS_MESSAGE": "Ein Theme mit diesem Namen existiert bereits. Dessen Definition wird überschrieben.",
-      "DISPLAY_NAME_EXISTS_MESSAGE": "Ein Theme mit diesem Anzeigenamen existiert bereits. Importing is possible but results in themes with the same display name.",
+      "DISPLAY_NAME_EXISTS_MESSAGE": "Ein Theme mit diesem Anzeigenamen existiert bereits. Importieren ist möglich, führt jedoch zu Themes mit demselben Anzeigenamen.",
       "THEME_COLOR_PRIMARY": "Primärfarbe",
       "THEME_COLOR_SECONDARY": "Sekundärfarbe",
       "THEME_COLOR_TEXT": "Textfarbe",
