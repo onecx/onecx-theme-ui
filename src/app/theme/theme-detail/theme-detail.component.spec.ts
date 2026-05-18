@@ -219,33 +219,20 @@ describe('ThemeDetailComponent', () => {
   })
 
   describe('Theme deletion', () => {
-    it('should hide dialog, inform and navigate on successfull deletion', () => {
-      const router = TestBed.inject(Router)
-      spyOn(router, 'navigate')
-      themesApiSpy.deleteTheme.and.returnValue(of({}) as any)
-      component.themeDeleteVisible = true
+    it('should show delete dialog', () => {
+      component.themeDeleteVisible = false
 
-      component.onConfirmThemeDeletion(theme)
+      component.onDeleteTheme(theme)
 
-      expect(component.themeDeleteVisible).toBe(false)
-      expect(router.navigate).toHaveBeenCalledOnceWith(['..'], jasmine.any(Object))
-      expect(msgServiceSpy.success).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.DELETE.THEME_OK' })
+      expect(component.themeDeleteVisible).toBe(true)
     })
 
-    it('should hide dialog and display error on failed deletion', () => {
-      const errorResponse = { error: { message: 'Error on deleting theme' }, status: 400 }
-      themesApiSpy.deleteTheme.and.returnValue(throwError(() => errorResponse))
+    it('should hide delete dialog', () => {
       component.themeDeleteVisible = true
-      spyOn(console, 'error')
 
-      component.onConfirmThemeDeletion(theme)
+      component.onThemeDeletion()
 
       expect(component.themeDeleteVisible).toBe(false)
-      expect(console.error).toHaveBeenCalledWith('deleteTheme', errorResponse)
-      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({
-        summaryKey: 'ACTIONS.DELETE.THEME_NOK',
-        detailKey: errorResponse.error.message
-      })
     })
   })
 

@@ -9,7 +9,9 @@ import { SharedModule } from 'src/app/shared/shared.module'
 
 import { ThemeSearchComponent } from './theme-search/theme-search.component'
 import { ThemeImportComponent } from './theme-import/theme-import.component'
+import { ThemeDeleteComponent } from './theme-delete/theme-delete.component'
 import { ThemeDetailComponent } from './theme-detail/theme-detail.component'
+import { ThemeDetail2Component } from './theme-detail2/theme-detail2.component'
 import { ThemeInternComponent } from './theme-detail/theme-intern/theme-intern.component'
 import { ThemeUseComponent } from './theme-detail/theme-use/theme-use.component'
 import { ThemeDesignerComponent } from './theme-designer/theme-designer.component'
@@ -46,12 +48,23 @@ const routes: Routes = [
       breadcrumbFn: (data: any) => `${data.labeli18n}`
     },
     resolve: { labeli18n: LabelResolver }
+  },
+  {
+    path: 'detail2/:name',
+    component: ThemeDetail2Component,
+    data: {
+      breadcrumb: 'BREADCRUMBS.DETAIL',
+      breadcrumbFn: (data: any) => `${data.labeli18n}`
+    },
+    resolve: { labeli18n: LabelResolver }
   }
 ]
 @NgModule({
   declarations: [
     ThemeSearchComponent,
+    ThemeDeleteComponent,
     ThemeDetailComponent,
+    ThemeDetail2Component,
     ThemeDesignerComponent,
     ThemeImportComponent,
     ThemeInternComponent,

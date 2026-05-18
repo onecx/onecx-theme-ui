@@ -91,23 +91,8 @@ export class ThemeDetailComponent implements OnInit {
     this.themeDeleteVisible = true
   }
 
-  public onConfirmThemeDeletion(theme: Theme): void {
-    this.deleteTheme(theme)
+  public onThemeDeletion(): void {
     this.themeDeleteVisible = false
-  }
-
-  private deleteTheme(theme: Theme): void {
-    if (theme?.id)
-      this.themeApi.deleteTheme({ id: theme.id }).subscribe({
-        next: () => {
-          this.router.navigate(['..'], { relativeTo: this.route })
-          this.msgService.success({ summaryKey: 'ACTIONS.DELETE.THEME_OK' })
-        },
-        error: (err) => {
-          console.error('deleteTheme', err)
-          this.msgService.error({ summaryKey: 'ACTIONS.DELETE.THEME_NOK', detailKey: err.error.message })
-        }
-      })
   }
 
   /**

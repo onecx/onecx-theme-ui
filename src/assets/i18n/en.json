@@ -110,9 +110,20 @@
       "SEARCH": "Theme Management",
       "SEARCH.SUBHEADER": "Creation and editing of Theme",
       "DETAIL": "Display and editing of the Theme properties",
+      "DETAIL.SUBHEADER": "Theme Details",
       "CREATE": "Create Theme",
       "DELETE": "Delete Theme",
       "EXPORT": "Export Theme"
+    },
+    "TABS": {
+      "INTERN": "Internal",
+      "INTERN_TOOLTIP": "Internal information",
+      "PROPERTIES": "Properties",
+      "PROPERTIES_TOOLTIP": "Properties of the Theme",
+      "USE": "Use",
+      "USE_TOOLTIP": "List of Workspaces using the Theme",
+      "VARIABLES": "Theme Variables",
+      "VARIABLES_TOOLTIP": "JSON representation of Theme Variables"
     },
     "DATAVIEW": {
       "FILTER": "Filter",
@@ -159,27 +170,14 @@
     }
   },
   "THEME": {
-    "SEARCH.HEADER": "Theme Management",
-    "SEARCH.SUBHEADER": "Creation and editing of Themes",
     "DESIGNER.EDIT.SUBHEADER": "Change Theme Details",
     "DESIGNER.CREATE.SUBHEADER": "Create a new Theme",
     "DESIGNER.TOP.SECTION": "Theme applying and template selection",
-    "DETAIL.SUBHEADER": "Theme Details",
     "DETAIL.AUTO_APPLY": "Auto apply changes",
     "DETAIL.AUTO_APPLY.TOOLTIP": "If this option is switched on, then all changes (font, colors) are automatically applied to the current page.",
     "DETAIL.AUTO_APPLY_CURRENT_THEME": "Changes are applied immediately upon saving, as this is the currently used theme.",
     "DETAIL.THEME_SELECTOR": "Select Theme as Template",
     "NO_PROPERTIES": "No properties specified",
-    "TABS": {
-      "INTERN": "Internal",
-      "INTERN_TOOLTIP": "Internal information",
-      "PROPERTIES": "Properties",
-      "PROPERTIES_TOOLTIP": "Properties of the Theme",
-      "USE": "Use",
-      "USE_TOOLTIP": "List of Workspaces using the Theme",
-      "VARIABLES": "Theme Variables",
-      "VARIABLES_TOOLTIP": "JSON representation of Theme Variables"
-    },
     "WORKSPACES_USING_THEME": {
       "MISSING_COMPONENT": "Information on using the Theme in a Workspace could not be obtained.",
       "USED": "The Theme is used by the following Workspaces: ",
