@@ -47,15 +47,6 @@ const routes: Routes = [
       breadcrumbFn: (data: any) => `${data.labeli18n}`
     },
     resolve: { labeli18n: LabelResolver }
-  },
-  {
-    path: 'detail2/:name',
-    component: ThemeDetail2Component,
-    data: {
-      breadcrumb: 'BREADCRUMBS.DETAIL',
-      breadcrumbFn: (data: any) => `${data.labeli18n}`
-    },
-    resolve: { labeli18n: LabelResolver }
   }
 ]
 @NgModule({
