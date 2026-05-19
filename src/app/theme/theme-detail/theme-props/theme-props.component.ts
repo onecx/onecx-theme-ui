@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
-import { Observable, ReplaySubject } from 'rxjs'
+import { ReplaySubject } from 'rxjs'
 import { TranslateService } from '@ngx-translate/core'
 
 import { getLocation } from '@onecx/accelerator'

@@ -4,7 +4,7 @@ import { Location } from '@angular/common'
 import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ActivatedRoute, provideRouter } from '@angular/router'
-import { TranslateModule, TranslateService } from '@ngx-translate/core'
+import { TranslateModule } from '@ngx-translate/core'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 import { BehaviorSubject, of, throwError } from 'rxjs'
 import FileSaver from 'file-saver'
@@ -29,7 +29,6 @@ const theme: Theme = {
 describe('ThemeDetailComponent', () => {
   let component: ThemeDetailComponent
   let fixture: ComponentFixture<ThemeDetailComponent>
-  let translateService: TranslateService
 
   const mockUserService = { lang$: { getValue: jasmine.createSpy('getValue').and.returnValue('en') } }
   const msgServiceSpy = jasmine.createSpyObj<PortalMessageService>('PortalMessageService', ['success', 'error', 'info'])
@@ -98,7 +97,6 @@ describe('ThemeDetailComponent', () => {
     mockUserService.lang$.getValue.and.returnValue('en')
     currentTheme$.next({ name: 'currentTheme' })
 
-    translateService = TestBed.inject(TranslateService)
     initTestComponent()
   })
 
