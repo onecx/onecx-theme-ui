@@ -1,0 +1,48 @@
+<div class="my-2 flex flex-column row-gap-5">
+  <div *ngFor="let group of groups">
+    <div class="mb-4 text-center border-bottom-1" style="border-color: var(--p-stone-300)" [title]="group.title">
+      <div class="h-1rem mb-2 text-xl text-600 font-bold">{{ group.title }}</div>
+    </div>
+
+    <form [formGroup]="group.formGroup" class="grid grid-row-gap">
+      <article
+        class="col-12 sm:col-6 md:col-4 lg:col-4 xl:col-3"
+        *ngFor="let item of themeVars[group.key]"
+        [attr.aria-label]="('THEME.TOOLTIPS.ITEM_COLOR' | translate) + ': ' + item"
+      >
+        <div class="px-2 p-inputgroup">
+          <span class="p-float-label">
+            <input
+              pInputText
+              [id]="'th_designer_item_color_' + item"
+              class="text-responsive"
+              [formControlName]="item"
+              [value]="group.formGroup.value[item]"
+              [ariaLabel]="item"
+            />
+            <label [for]="'th_designer_item_color_' + item" aria-hidden="true"> {{ item }} </label>
+          </span>
+          <p-overlayPanel #op>
+            <ng-template pTemplate>
+              <div style="width: 240px; display: inline-block">
+                <color-sketch [width]="220" [formControlName]="item"> </color-sketch>
+              </div>
+            </ng-template>
+          </p-overlayPanel>
+          <button
+            tabindex="0"
+            [id]="'th_designer_item_color_' + item + '_toggle'"
+            class="p-inputgroup-addon cursor-pointer pseudo-button"
+            (click)="op.toggle($event)"
+            (keyup)="op.toggle($event)"
+            [ngStyle]="{ 'background-color': group.formGroup.value[item] }"
+            [ariaLabel]="'THEME.TOOLTIPS.ITEM_COLOR_PICKER' | translate"
+            [pTooltip]="'THEME.TOOLTIPS.ITEM_COLOR_PICKER' | translate"
+            tooltipPosition="top"
+            tooltipEvent="hover"
+          ></button>
+        </div>
+      </article>
+    </form>
+  </div>
+</div>

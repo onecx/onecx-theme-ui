@@ -1,0 +1,53 @@
+<section
+  *ngIf="changeMode === 'EDIT'"
+  class="p-3 flex flex-wrap justify-content-between align-items-center row-gap-2 column-gap-3 surface-200 border-round"
+  [attr.aria-label]="'DIALOG.DETAIL.SPECIAL.SECTION' | translate"
+>
+  <div
+    class="field mb-0 flex flex-wrap sm:flex-nowrap align-items-center row-gap-3 column-gap-3"
+    [attr.aria-label]="'DIALOG.DETAIL.AUTO_APPLY.LABEL' | translate"
+    [pTooltip]="'DIALOG.DETAIL.AUTO_APPLY.TOOLTIP' | translate"
+    tooltipPosition="top"
+    tooltipEvent="hover"
+  >
+    <p-inputSwitch
+      inputId="th_detail_apply_auto_apply"
+      name="autoApplyToggle"
+      [(ngModel)]="autoApply"
+      (ngModelChange)="autoApplyChange.emit($event)"
+    ></p-inputSwitch>
+    <label for="th_detail_apply_auto_apply" aria-hidden="true">
+      {{ 'DIALOG.DETAIL.AUTO_APPLY.LABEL' | translate }}
+    </label>
+  </div>
+  <div
+    *ngIf="isCurrentTheme"
+    class="pi pi-bolt text-primary font-medium"
+    [attr.aria-label]="'DIALOG.DETAIL.AUTO_APPLY.CURRENT_THEME' | translate"
+    role="note"
+  ></div>
+  <div class="field mb-0">
+    <span class="p-float-label min-w-16rem">
+      <p-dropdown
+        *ngIf="themes$ | async as themes"
+        #themeTemplateBox
+        inputId="th_detail_apply_theme_template"
+        [options]="themes ?? []"
+        optionLabel="displayName"
+        optionValue="name"
+        styleClass="w-full"
+        panelStyleClass="sm:max-w-20rem"
+        (onChange)="onSelectThemeTemplate($event, themes, themeTemplateBox)"
+        [showClear]="false"
+        [autoDisplayFirst]="false"
+        [ariaLabel]="'THEME.TEMPLATE.SELECTOR' | translate"
+        [pTooltip]="'THEME.TEMPLATE.SELECTOR.TOOLTIP' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      ></p-dropdown>
+      <label for="th_detail_apply_theme_template" class="white-space-nowrap" aria-hidden="true">
+        {{ 'THEME.TEMPLATE.SELECTOR' | translate }}
+      </label>
+    </span>
+  </div>
+</section>

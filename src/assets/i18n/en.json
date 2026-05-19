@@ -72,6 +72,7 @@
     "SAVE_AS": "Save as ...",
     "UPLOAD": "Upload",
     "TOOLTIPS": {
+      "CANCEL": "Cancel and discard changes",
       "CANCEL_AND_CLOSE": "Cancel and close dialog",
       "SAVE": "Save changes",
       "SAVE_AS": "Save as new Theme"
@@ -102,10 +103,6 @@
     }
   },
   "DIALOG": {
-    "SEARCH": {
-      "CRITERIA": "Search Criteria",
-      "RESULTS": "Search Results"
-    },
     "HEADER": {
       "SEARCH": "Theme Management",
       "SEARCH.SUBHEADER": "Creation and editing of Theme",
@@ -115,15 +112,32 @@
       "DELETE": "Delete Theme",
       "EXPORT": "Export Theme"
     },
+    "DETAIL": {
+      "SPECIAL.SECTION": "Theme applying and template selection",
+      "AUTO_APPLY": {
+        "LABEL": "Auto apply changes",
+        "TOOLTIP": "If this option is switched on, then all changes (font, colors) are automatically applied to the current page.",
+        "CURRENT_THEME": "Changes are applied immediately upon saving, as this is the currently used theme."
+      },
+      "THEME_SELECTOR": "Select Theme as Template"
+    },
+    "SEARCH": {
+      "CRITERIA": "Search Criteria",
+      "RESULTS": "Search Results"
+    },
     "TABS": {
+      "COLORS": "Colors",
+      "COLORS.TOOLTIP": "Color values of the Theme",
+      "EXTRAS": "Extras",
+      "EXTRAS.TOOLTIP": "Additional properties of the Theme (Fonts, Iconsets etc.)",
       "INTERN": "Internal",
-      "INTERN_TOOLTIP": "Internal information",
-      "PROPERTIES": "Properties",
-      "PROPERTIES_TOOLTIP": "Properties of the Theme",
+      "INTERN.TOOLTIP": "Internal information",
+      "PROPS": "Basic Properties",
+      "PROPS.TOOLTIP": "Basic properties of the Theme",
       "USE": "Use",
-      "USE_TOOLTIP": "List of Workspaces using the Theme",
+      "USE.TOOLTIP": "List of Workspaces using the Theme",
       "VARIABLES": "Theme Variables",
-      "VARIABLES_TOOLTIP": "JSON representation of Theme Variables"
+      "VARIABLES.TOOLTIP": "JSON representation of Theme Variables"
     },
     "DATAVIEW": {
       "FILTER": "Filter",
@@ -144,7 +158,7 @@
     "FAVICON": "Favicon",
     "FAVICON_URL": "External Favicon URL",
     "LOGO": "Logo",
-    "LOGO_SMALL": "Logo (small)",
+    "LOGO_SMALL": "Logo small",
     "LOGO_URL": "External Logo URL",
     "UPLOAD": {
       "OK": "The file was uploaded successfully",
@@ -173,10 +187,6 @@
     "DESIGNER.EDIT.SUBHEADER": "Change Theme Details",
     "DESIGNER.CREATE.SUBHEADER": "Create a new Theme",
     "DESIGNER.TOP.SECTION": "Theme applying and template selection",
-    "DETAIL.AUTO_APPLY": "Auto apply changes",
-    "DETAIL.AUTO_APPLY.TOOLTIP": "If this option is switched on, then all changes (font, colors) are automatically applied to the current page.",
-    "DETAIL.AUTO_APPLY_CURRENT_THEME": "Changes are applied immediately upon saving, as this is the currently used theme.",
-    "DETAIL.THEME_SELECTOR": "Select Theme as Template",
     "NO_PROPERTIES": "No properties specified",
     "WORKSPACES_USING_THEME": {
       "MISSING_COMPONENT": "Information on using the Theme in a Workspace could not be obtained.",
@@ -242,7 +252,8 @@
       "FILETYPE_PATTERN_ERROR_2": "Your file does not match the allowed filetypes: .png, .jpg, .jpeg"
     },
     "HINTS": {
-      "FORMAT_URL": "Format: "
+      "FORMAT_URL": "Format: ",
+      "FORMAT_IMAGE_URL": "<br/>Format: http(s)://path-to-image"
     }
   },
   "EXCEPTIONS": {

@@ -45,132 +45,93 @@
       (onChange)="onTabChange($event, theme)"
       [(activeIndex)]="selectedTabIndex"
     >
+      <!-- PROPS -->
       <p-tabPanel
-        id="th_detail_panel_props"
-        [header]="'DIALOG.TABS.PROPERTIES' | translate"
-        [attr.aria-label]="'DIALOG.TABS.PROPERTIES' | translate"
-        [tooltip]="'DIALOG.TABS.PROPERTIES_TOOLTIP' | translate"
+        [header]="'DIALOG.TABS.PROPS' | translate"
+        [attr.aria-label]="'DIALOG.TABS.PROPS' | translate"
+        [tooltip]="'DIALOG.TABS.PROPS.TOOLTIP' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
       >
-        <div class="mt-2 mx-2 sm:mx-3 flex flex-wrap flex-column row-gap-4 md:w-10 lg:w-9 xl:w-7">
-          <span class="p-float-label">
-            <input
-              pInputText
-              type="text"
-              readonly
-              class="w-full pt-3 pb-2 text-responsive"
-              id="th_detail_props_item_display_name"
-              [value]="theme?.displayName"
-              [attr.aria-label]="'THEME.TOOLTIPS.DISPLAY_NAME' | translate"
-              [pTooltip]="'THEME.TOOLTIPS.DISPLAY_NAME' | translate"
-              tooltipPosition="top"
-              tooltipEvent="hover"
-            />
-            <label for="th_detail_item_display_name" aria-hidden="true">{{ 'THEME.DISPLAY_NAME' | translate }}</label>
-          </span>
-          <span class="p-float-label">
-            <textarea
-              pInputTextarea
-              readonly
-              class="w-full"
-              autoresize="true"
-              rows="3"
-              id="th_detail_props_item_description"
-              [ngModel]="theme?.description"
-              [attr.aria-label]="'THEME.DESCRIPTION' | translate"
-              [pTooltip]="'THEME.DESCRIPTION' | translate"
-              tooltipPosition="top"
-              tooltipEvent="hover"
-            ></textarea>
-            <label for="th_detail_item_description" aria-hidden="true">{{ 'THEME.DESCRIPTION' | translate }}</label>
-          </span>
-
-          <!-- IMAGES -->
-          <div class="flex flex-wrap sm:flex-nowrap justify-content-around align-items-center gap-2" aria-hidden="true">
-            <div class="flex flex-nowrap align-items-center column-gap-2">
-              <section
-                class="w-4rem text-center"
-                style="color: var(--emphasis-medium)"
-                [pTooltip]="'IMAGE.TOOLTIPS.LOGO' | translate"
-                tooltipPosition="top"
-                tooltipEvent="hover"
-              >
-                {{ 'IMAGE.LOGO' | translate }}
-              </section>
-              <app-image-container
-                id="th_detail_props_item_logo"
-                styleClass="max-h-2rem sm:max-h-3rem max-w-6rem sm:max-w-8rem border-round-sm"
-                [bffUrl]="Utils.bffImageUrl(imageBasePath, theme.name, RefType.Logo)"
-                [imageUrl]="theme.logoUrl"
-                aria-hidden="true"
-              ></app-image-container>
-            </div>
-            <div class="flex flex-nowrap align-items-center column-gap-2">
-              <section
-                class="w-4rem text-center"
-                style="color: var(--emphasis-medium)"
-                [pTooltip]="'IMAGE.TOOLTIPS.LOGO_SMALL' | translate"
-                tooltipPosition="top"
-                tooltipEvent="hover"
-              >
-                {{ 'IMAGE.LOGO_SMALL' | translate }}
-              </section>
-              <app-image-container
-                id="th_detail_props_item_logo_small"
-                styleClass="max-h-2rem sm:max-h-3rem max-w-6rem sm:max-w-8rem border-round-sm"
-                [bffUrl]="Utils.bffImageUrl(imageBasePath, theme.name, RefType.LogoSmall)"
-                [imageUrl]="theme.smallLogoUrl"
-                aria-hidden="true"
-              ></app-image-container>
-            </div>
-            <div class="flex flex-nowrap align-items-center column-gap-2">
-              <section
-                class="w-4rem text-center"
-                style="color: var(--emphasis-medium)"
-                [pTooltip]="'IMAGE.TOOLTIPS.FAVICON' | translate"
-                tooltipPosition="top"
-                tooltipEvent="hover"
-              >
-                {{ 'IMAGE.FAVICON' | translate }}
-              </section>
-              <app-image-container
-                id="th_detail_props_item_favicon"
-                styleClass="max-h-2rem sm:max-h-3rem max-w-6rem sm:max-w-8rem border-round-sm"
-                [bffUrl]="Utils.bffImageUrl(imageBasePath, theme.name, RefType.Favicon)"
-                [imageUrl]="theme.faviconUrl"
-                aria-hidden="true"
-              ></app-image-container>
-            </div>
-          </div>
+        <p-message
+          *ngIf="exceptionKey"
+          id="th_detail_basic_message_error"
+          severity="error"
+          styleClass="m-3"
+          [text]="exceptionKey | translate"
+        ></p-message>
+        <div *ngIf="!exceptionKey" class="mx-3 mt-1 mb-2">
+          <app-theme-apply
+            [theme]="theme"
+            [themes$]="themes$"
+            [changeMode]="changeMode"
+            [isCurrentTheme]="isCurrentTheme"
+            [autoApply]="autoApply"
+            (autoApplyChange)="changeAutoApply($event)"
+          ></app-theme-apply>
+          <app-theme-props [theme]="theme" [themes$]="themes$" [changeMode]="changeMode"></app-theme-props>
         </div>
       </p-tabPanel>
 
+      <!-- COLORS -->
+      <p-tabPanel
+        [header]="'DIALOG.TABS.COLORS' | translate"
+        [attr.aria-label]="'DIALOG.TABS.COLORS' | translate"
+        [tooltip]="'DIALOG.TABS.COLORS.TOOLTIP' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      >
+        <p-message
+          *ngIf="exceptionKey"
+          id="th_detail_color_message_error"
+          severity="error"
+          styleClass="m-3"
+          [text]="exceptionKey | translate"
+        ></p-message>
+        <div *ngIf="!exceptionKey" class="mx-3 mt-1 mb-2">
+          <app-theme-apply
+            [theme]="theme"
+            [themes$]="themes$"
+            [changeMode]="changeMode"
+            [isCurrentTheme]="isCurrentTheme"
+            [autoApply]="autoApply"
+            (autoApplyChange)="changeAutoApply($event)"
+          ></app-theme-apply>
+          <app-theme-colors [theme]="theme"></app-theme-colors>
+        </div>
+      </p-tabPanel>
+
+      <!-- VARIABLES -->
       <p-tabPanel
         id="th_detail_panel_variables"
         [header]="'DIALOG.TABS.VARIABLES' | translate"
+        [disabled]="changeMode !== 'VIEW'"
         [attr.aria-label]="'DIALOG.TABS.VARIABLES' | translate"
-        [tooltip]="'DIALOG.TABS.VARIABLES_TOOLTIP' | translate"
+        [tooltip]="'DIALOG.TABS.VARIABLES.TOOLTIP' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
       >
         <pre class="my-0 pt-1 pb-0 card surface-50">{{ theme?.properties | json }}</pre>
       </p-tabPanel>
 
+      <!-- USE -->
       <p-tabPanel
         [header]="'DIALOG.TABS.USE' | translate"
+        [disabled]="changeMode !== 'VIEW'"
         [attr.aria-label]="'DIALOG.TABS.USE' | translate"
-        [tooltip]="'DIALOG.TABS.USE_TOOLTIP' | translate"
+        [tooltip]="'DIALOG.TABS.USE.TOOLTIP' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
       >
-        <app-theme-use [themeName]="themeForUse?.name" (used)="preparePageAction($event, theme)"></app-theme-use>
+        <app-theme-use [themeName]="themeForUse?.name" (used)="preparePageActions($event, theme)"></app-theme-use>
       </p-tabPanel>
 
+      <!-- INTERN -->
       <p-tabPanel
         [header]="'DIALOG.TABS.INTERN' | translate"
+        [disabled]="changeMode !== 'VIEW'"
         [attr.aria-label]="'DIALOG.TABS.INTERN' | translate"
-        [tooltip]="'DIALOG.TABS.INTERN_TOOLTIP' | translate"
+        [tooltip]="'DIALOG.TABS.INTERN.TOOLTIP' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
       >

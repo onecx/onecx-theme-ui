@@ -1,0 +1,12 @@
+@import '/src/app/_th-mixins.scss';
+
+@include dropdown-zebra-rows;
+
+:host ::ng-deep {
+  .min-w-20rem {
+    min-width: 20rem;
+  }
+  .min-w-16rem {
+    min-width: 16rem;
+  }
+}

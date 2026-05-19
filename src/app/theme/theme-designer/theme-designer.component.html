@@ -22,8 +22,8 @@
       >
         <div
           class="field mb-0 flex flex-wrap sm:flex-nowrap align-items-center row-gap-3 column-gap-3"
-          [attr.aria-label]="'THEME.DETAIL.AUTO_APPLY' | translate"
-          [pTooltip]="'THEME.DETAIL.AUTO_APPLY.TOOLTIP' | translate"
+          [attr.aria-label]="'DIALOG.DETAIL.AUTO_APPLY' | translate"
+          [pTooltip]="'DIALOG.DETAIL.AUTO_APPLY.TOOLTIP' | translate"
           tooltipPosition="top"
           tooltipEvent="hover"
         >
@@ -31,20 +31,20 @@
             inputId="th_designer_header_is_current_theme"
             name="autoApplyToggle"
             [(ngModel)]="autoApply"
-            [ariaLabel]="'THEME.DETAIL.AUTO_APPLY' | translate"
-            [pTooltip]="'THEME.DETAIL.AUTO_APPLY' | translate"
+            [ariaLabel]="'DIALOG.DETAIL.AUTO_APPLY' | translate"
+            [pTooltip]="'DIALOG.DETAIL.AUTO_APPLY' | translate"
             tooltipPosition="top"
             tooltipEvent="hover"
           ></p-inputSwitch>
           <label for="th_designer_header_is_current_theme" aria-hidden="true">
-            {{ 'THEME.DETAIL.AUTO_APPLY' | translate }}
+            {{ 'DIALOG.DETAIL.AUTO_APPLY' | translate }}
           </label>
         </div>
         <span
           *ngIf="isCurrentTheme"
           class="pi pi-bolt text-primary font-medium"
-          [attr.aria-label]="'THEME.DETAIL.AUTO_APPLY_CURRENT_THEME' | translate"
-          [pTooltip]="'THEME.DETAIL.AUTO_APPLY_CURRENT_THEME' | translate"
+          [attr.aria-label]="'DIALOG.DETAIL.AUTO_APPLY.CURRENT_THEME' | translate"
+          [pTooltip]="'DIALOG.DETAIL.AUTO_APPLY.CURRENT_THEME' | translate"
           tooltipPosition="top"
           tooltipEvent="hover"
           role="note"

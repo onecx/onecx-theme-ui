@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core'
 import { RouterModule, Routes } from '@angular/router'
+import { DividerModule } from 'primeng/divider'
 
 import { PortalCoreModule } from '@onecx/portal-integration-angular'
 import { addInitializeModuleGuard, InitializeModuleGuard } from '@onecx/angular-integration-interface'
@@ -11,7 +12,10 @@ import { ThemeSearchComponent } from './theme-search/theme-search.component'
 import { ThemeImportComponent } from './theme-import/theme-import.component'
 import { ThemeDeleteComponent } from './theme-delete/theme-delete.component'
 import { ThemeDetailComponent } from './theme-detail/theme-detail.component'
+import { ThemeApplyComponent } from './theme-detail/theme-apply/theme-apply.component'
+import { ThemePropsComponent } from './theme-detail/theme-props/theme-props.component'
 import { ThemeInternComponent } from './theme-detail/theme-intern/theme-intern.component'
+import { ThemeColorsComponent } from './theme-detail/theme-colors/theme-colors.component'
 import { ThemeUseComponent } from './theme-detail/theme-use/theme-use.component'
 import { ThemeDesignerComponent } from './theme-designer/theme-designer.component'
 
@@ -56,13 +60,17 @@ const routes: Routes = [
     ThemeDetailComponent,
     ThemeDesignerComponent,
     ThemeImportComponent,
+    ThemeApplyComponent,
+    ThemePropsComponent,
+    ThemeColorsComponent,
     ThemeInternComponent,
     ThemeUseComponent
   ],
   imports: [
     PortalCoreModule.forMicroFrontend(),
     [RouterModule.forChild(addInitializeModuleGuard(routes))],
-    SharedModule
+    SharedModule,
+    DividerModule
   ],
   providers: [InitializeModuleGuard]
 })

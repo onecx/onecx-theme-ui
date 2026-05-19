@@ -1,16 +1,18 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, ViewChild } from '@angular/core'
 import { Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateService } from '@ngx-translate/core'
-import { Observable, catchError, finalize, first, map, of } from 'rxjs'
+import { Observable, catchError, combineLatest, finalize, first, firstValueFrom, map, of } from 'rxjs'
+import { Dropdown } from 'primeng/dropdown'
 import { Message } from 'primeng/api'
 import FileSaver from 'file-saver'
 
-import { PortalMessageService, UserService } from '@onecx/angular-integration-interface'
+import { PortalMessageService, ThemeService, UserService } from '@onecx/angular-integration-interface'
 import { Action } from '@onecx/angular-accelerator'
 
 import {
   ExportThemeRequest,
+  GetThemeResponse,
   ImagesInternalAPIService,
   RefType,
   Theme,
@@ -18,27 +20,38 @@ import {
 } from 'src/app/shared/generated'
 import { Utils } from 'src/app/shared/utils'
 
+import { ThemeColorsComponent } from './theme-colors/theme-colors.component'
+import { ThemePropsComponent } from './theme-props/theme-props.component'
+
 @Component({
   templateUrl: './theme-detail.component.html',
   styleUrls: ['./theme-detail.component.scss']
 })
 export class ThemeDetailComponent implements OnInit {
+  @ViewChild(ThemePropsComponent, { static: false }) ThemePropsComponent!: ThemePropsComponent
+  @ViewChild(ThemeColorsComponent, { static: false }) ThemeColorsComponent!: ThemeColorsComponent
+
   // dialog
   public loading = true
   public exceptionKey: string | undefined = undefined
+  public changeMode: 'VIEW' | 'EDIT' | 'CREATE' = 'VIEW'
+  public autoApply = false
   public themeDeleteVisible = false
   public showOperatorMessage = true // display initially only
   public selectedTabIndex = 0
   public dateFormat = 'medium'
   public messages: Message[] = []
   public isThemeUsedByWorkspace = false
+  public isCurrentTheme = false
   public Utils = Utils
   private translations$: Observable<Message[]> | undefined
   // page header
   public actions$: Observable<Action[]> = of([])
   public headerImageUrl?: string
   // data
+  public themeName: string | null = null
   public theme$!: Observable<Theme | undefined>
+  public themes$!: Observable<Theme[]>
   public themeForUse: Theme | undefined
   // image
   public imageBasePath = this.imageApi.configuration.basePath
@@ -50,36 +63,69 @@ export class ThemeDetailComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly location: Location,
     private readonly themeApi: ThemesAPIService,
+    private readonly themeService: ThemeService,
     private readonly msgService: PortalMessageService,
     private readonly translate: TranslateService,
     private readonly imageApi: ImagesInternalAPIService
   ) {
     this.dateFormat = this.user.lang$.getValue() === 'de' ? 'dd.MM.yyyy HH:mm:ss' : 'medium'
+    this.themeName = route.snapshot.paramMap.get('name')
+    this.changeMode = this.themeName ? 'VIEW' : 'CREATE'
   }
 
   ngOnInit(): void {
     this.prepareDialogTranslations()
     this.getTheme()
+    this.getThemes()
   }
 
-  private getTheme() {
-    const themeName = this.route.snapshot.paramMap.get('name')
-    if (!themeName) return
+  public changeAutoApply(value: boolean): void {
+    this.autoApply = value
+    if (this.autoApply) {
+      this.msgService.info({ summaryKey: 'INTERNAL.AUTO_APPLY_MESSAGE' })
+    }
+  }
+  private getTheme(switchToEdit?: boolean) {
+    if (!this.themeName) return
     this.loading = true
-    this.theme$ = this.themeApi.getThemeByName({ name: themeName }).pipe(
-      map((data) => {
-        this.prepareHeaderUrl(data.resource)
-        this.preparePageAction(true, data.resource)
-        return data.resource
+    this.theme$ = combineLatest([
+      this.themeService.currentTheme$.pipe(first()),
+      this.themeApi.getThemeByName({ name: this.themeName })
+    ]).pipe(
+      map(([ct, response]) => {
+        this.isCurrentTheme = ct.name === response.resource.name
+        this.autoApply = this.isCurrentTheme
+        this.prepareHeaderUrl(response.resource)
+        this.preparePageActions(true, response.resource)
+        return response.resource
       }),
       catchError((err) => {
         this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + Utils.mapping_error_status(err.status) + '.THEME'
         console.error('getThemeByName', err)
         this.prepareHeaderUrl()
-        this.preparePageAction(true)
+        this.preparePageActions(true)
         return of({})
       }),
-      finalize(() => (this.loading = false))
+      finalize(() => {
+        this.loading = false
+        if (switchToEdit === true) this.changeMode = 'EDIT'
+      })
+    )
+  }
+  private getThemes(): void {
+    // for using themes as templates
+    this.themes$ = this.themeApi.searchThemes({ searchThemeRequest: {} }).pipe(
+      map(
+        (data) =>
+          data.stream
+            ?.map((theme) => ({ ...theme, displayName: Utils.limitText(theme.displayName!, 30) }))
+            ?.sort(Utils.sortByDisplayName) ?? []
+      ),
+      catchError((err) => {
+        this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + Utils.mapping_error_status(err.status) + '.THEME'
+        console.error('searchThemes', err)
+        return of([])
+      })
     )
   }
 
@@ -98,7 +144,7 @@ export class ThemeDetailComponent implements OnInit {
   /**
    * UI EVENTS
    */
-  public onClose(): void {
+  public onBack(): void {
     this.location.back()
   }
 
@@ -106,8 +152,61 @@ export class ThemeDetailComponent implements OnInit {
     if (theme) {
       this.showOperatorMessage = false
       this.selectedTabIndex = $event.index
-      if (this.selectedTabIndex === 2) this.themeForUse = theme
+      if (this.selectedTabIndex === 3) this.themeForUse = theme
     }
+  }
+
+  private toggleEditMode(forcedMode?: 'edit' | 'view', theme?: Theme): void {
+    if (forcedMode === 'view') {
+      this.changeMode = 'VIEW'
+    } else {
+      this.changeMode = this.changeMode === 'EDIT' ? 'VIEW' : 'EDIT'
+      this.getTheme(this.changeMode === 'EDIT')
+    }
+    this.preparePageActions(this.isThemeUsedByWorkspace, theme)
+  }
+
+  private onSave() {
+    // Get data from forms
+    this.ThemePropsComponent.onSave()
+    if (!this.ThemePropsComponent.basicForm.valid) return
+    let themeData = this.ThemePropsComponent.theme
+    if (!themeData) return
+    themeData = {
+      ...themeData,
+      // prevent empty strings for urls, as it causes issues for the image service
+      logoUrl: themeData.logoUrl === '' ? undefined : themeData.logoUrl,
+      smallLogoUrl: themeData.smallLogoUrl === '' ? undefined : themeData.smallLogoUrl,
+      faviconUrl: themeData.faviconUrl === '' ? undefined : themeData.faviconUrl
+    }
+    // properties: fonts & colors
+    this.ThemeColorsComponent.onSave()
+    if (!this.ThemeColorsComponent.colorsForm.valid) return
+    if (!themeData.properties) themeData.properties = {}
+    themeData.properties = {
+      ...this.ThemeColorsComponent.theme?.properties,
+      fontFamily: this.ThemePropsComponent.fontForm.get('fontFamily')?.value,
+      fontSize: this.ThemePropsComponent.fontForm.get('fontSize')?.value
+    }
+
+    if (themeData.id)
+      this.themeApi
+        .updateTheme({
+          id: themeData.id,
+          updateThemeRequest: { resource: themeData }
+        })
+        .subscribe({
+          next: (data) => {
+            this.msgService.success({ summaryKey: 'ACTIONS.EDIT.MESSAGE.THEME.OK' })
+            this.toggleEditMode('view', data.resource)
+            // update observable with response data
+            this.theme$ = new Observable((sub) => sub.next(data.resource))
+          },
+          error: (err) => {
+            console.error('updateTheme', err)
+            this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.THEME.NOK' })
+          }
+        })
   }
 
   public onExportTheme(theme: Theme): void {
@@ -158,7 +257,7 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   // default: we guess the Theme is in use so that deletion is not offered
-  public preparePageAction(inUse: boolean, theme?: Theme): void {
+  public preparePageActions(inUse: boolean, theme?: Theme): void {
     this.isThemeUsedByWorkspace = inUse
     this.actions$ = this.translate
       .get([
@@ -170,52 +269,146 @@ export class ThemeDetailComponent implements OnInit {
         'ACTIONS.EXPORT.TOOLTIP',
         'ACTIONS.DELETE.LABEL',
         'ACTIONS.DELETE.TOOLTIP',
-        'ACTIONS.DELETE.THEME_MESSAGE'
+        'ACTIONS.DELETE.THEME_MESSAGE',
+        'ACTIONS.CANCEL',
+        'ACTIONS.TOOLTIPS.CANCEL',
+        'ACTIONS.SAVE',
+        'ACTIONS.TOOLTIPS.SAVE'
       ])
       .pipe(
         map((data) => {
           return [
             {
+              id: 'th_detail_page_action_back',
               label: data['ACTIONS.NAVIGATION.BACK'],
               title: data['ACTIONS.NAVIGATION.BACK.TOOLTIP'],
-              actionCallback: () => this.onClose(),
+              actionCallback: () => this.onBack(),
               icon: 'pi pi-arrow-left',
-              show: 'always'
+              show: 'always',
+              conditional: true,
+              showCondition: this.changeMode === 'VIEW'
             },
             {
+              id: 'th_detail_page_action_export',
               label: data['ACTIONS.EXPORT.LABEL'],
               title: data['ACTIONS.EXPORT.TOOLTIP'],
               actionCallback: () => this.onExportTheme(theme!),
+              permission: 'THEME#EXPORT',
               icon: 'pi pi-download',
               show: 'always',
-              permission: 'THEME#EXPORT',
               conditional: true,
-              showCondition: theme !== undefined
+              showCondition: theme !== undefined && this.changeMode === 'VIEW'
             },
             {
+              id: 'th_detail_page_action_edit',
               label: data['ACTIONS.EDIT.LABEL'],
               title: data['ACTIONS.EDIT.TOOLTIP'],
-              actionCallback: () => {
-                this.router.navigate(['./edit'], { relativeTo: this.route })
-              },
+              actionCallback: () => this.toggleEditMode('edit', theme!),
+              permission: 'THEME#EDIT',
               icon: 'pi pi-pencil',
               show: 'always',
-              permission: 'THEME#EDIT',
               conditional: true,
-              showCondition: theme !== undefined
+              showCondition: theme !== undefined && this.changeMode === 'VIEW'
             },
             {
+              id: 'th_detail_page_action_cancel',
+              label: data['ACTIONS.CANCEL'],
+              title: data['ACTIONS.TOOLTIPS.CANCEL'],
+              actionCallback: () => this.toggleEditMode('view', theme!),
+              permission: 'THEME#VIEW',
+              icon: 'pi pi-times',
+              show: 'always',
+              conditional: true,
+              showCondition: this.changeMode === 'EDIT' || this.changeMode === 'CREATE'
+            },
+            {
+              id: 'th_detail_page_action_save',
+              label: data['ACTIONS.SAVE'],
+              title: data['ACTIONS.TOOLTIPS.SAVE'],
+              actionCallback: () => this.onSave(),
+              permission: this.changeMode === 'EDIT' ? 'THEME#EDIT' : 'THEME#CREATE',
+              icon: 'pi pi-save',
+              show: 'always',
+              conditional: true,
+              showCondition: this.changeMode === 'EDIT' || this.changeMode === 'CREATE'
+            },
+            {
+              id: 'th_detail_page_action_delete',
               label: data['ACTIONS.DELETE.LABEL'],
               title: data['ACTIONS.DELETE.TOOLTIP'],
               actionCallback: () => this.onDeleteTheme(theme!),
+              permission: 'THEME#DELETE',
               icon: 'pi pi-trash',
               show: 'asOverflow',
-              permission: 'THEME#DELETE',
               conditional: true,
-              showCondition: theme !== undefined
+              showCondition: this.changeMode === 'VIEW' && theme !== undefined
             }
           ]
         })
       )
+  }
+
+  // TEMPLATES
+  public onSelectThemeTemplate(ev: any, themes: Theme[], box: Dropdown): void {
+    const theme = themes.find((t) => t.name === ev.value)
+    if (theme?.id && theme?.displayName) this.confirmUseThemeTemplate(theme.id, theme.displayName, box)
+  }
+
+  private confirmUseThemeTemplate(id: string, dn: string, box: Dropdown) {
+    firstValueFrom(
+      this.translate
+        .get([
+          'ACTIONS.COPY_OF',
+          'THEME.TEMPLATE.CONFIRMATION.HEADER',
+          'THEME.TEMPLATE.CONFIRMATION.MESSAGE',
+          'ACTIONS.CONFIRMATION.YES',
+          'ACTIONS.CONFIRMATION.NO'
+        ])
+        .pipe(map((data) => this.displayConfirmationForUsingTemplate(id, dn, data, box)))
+    )
+  }
+
+  private getThemeById(id: string): Observable<GetThemeResponse> {
+    return this.themeApi.getThemeById({ id: id })
+  }
+  private useThemeAsTemplate(themeId: string, data: any): any {
+    this.getThemeById(themeId).subscribe((data) => {
+      /*
+    if (this.changeMode === 'CREATE') {
+      this.basicForm.controls['name'].setValue(data['ACTIONS.COPY_OF'] + result.resource.name)
+      this.basicForm.controls['mandatory'].setValue(null)
+      this.basicForm.controls['displayName'].setValue(result.resource.displayName)
+      this.basicForm.controls['description'].setValue(result.resource.description)
+      this.basicForm.controls['logoUrl'].setValue(result.resource.logoUrl)
+      this.basicForm.controls['smallLogoUrl'].setValue(result.resource.smallLogoUrl)
+      this.basicForm.controls['faviconUrl'].setValue(result.resource.faviconUrl)
+    }
+    if (result.resource.properties) {
+      this.propertiesForm.reset()
+      this.propertiesForm.patchValue(result.resource.properties)
+    }
+      */
+      this.msgService.info({ summaryKey: 'THEME.TEMPLATE.CONFIRMATION.OK' })
+    })
+  }
+
+  private displayConfirmationForUsingTemplate(themeId: string, themeName: string, data: any, box: Dropdown): void {
+    /*
+    this.confirmation.confirm({
+      key: 'template',
+      icon: 'pi pi-question-circle',
+      defaultFocus: 'reject',
+      dismissableMask: true,
+      header: data['THEME.TEMPLATE.CONFIRMATION.HEADER'],
+      message: data['THEME.TEMPLATE.CONFIRMATION.MESSAGE'].replace('{{ITEM}}', Utils.limitText(themeName, 50)),
+      acceptLabel: data['ACTIONS.CONFIRMATION.YES'],
+      rejectLabel: data['ACTIONS.CONFIRMATION.NO'],
+      accept: () => {
+        box.clear()
+        this.useThemeAsTemplate(themeId, data)
+      },
+      reject: () => box.clear()
+    })
+      */
   }
 }

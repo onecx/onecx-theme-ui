@@ -72,6 +72,7 @@
     "SAVE_AS": "Speichern als ...",
     "UPLOAD": "Hochladen",
     "TOOLTIPS": {
+      "CANCEL": "Abbrechen und Änderungen verwerfen",
       "CANCEL_AND_CLOSE": "Abbrechen und Dialog schließen",
       "SAVE": "Änderungen speichern",
       "SAVE_AS": "Speichern als neues Theme"
@@ -102,10 +103,6 @@
     }
   },
   "DIALOG": {
-    "SEARCH": {
-      "CRITERIA": "Suchfelder",
-      "RESULTS": "Suchergebnisse"
-    },
     "HEADER": {
       "SEARCH": "Theme Verwaltung",
       "SEARCH.SUBHEADER": "Erstellung und Bearbeitung von Themes",
@@ -115,15 +112,32 @@
       "DELETE": "Theme löschen",
       "EXPORT": "Theme exportieren"
     },
+    "DETAIL": {
+      "SPECIAL.SECTION": "Theme anwenden und Vorlage wählen",
+      "AUTO_APPLY": {
+        "LABEL": "Änderungen automatisch anwenden",
+        "TOOLTIP": "Wenn diese Option eingeschaltet ist, dann werden alle Änderungen (Schriftart, Farben) automatisch auf die aktuelle Seite angewendet.",
+        "CURRENT_THEME": "Änderungen werden beim Speichern sofort angewendet, da es das aktuell benutzte Theme ist"
+      },
+      "THEME_SELECTOR": "Ein Theme als Vorlage wählen"
+    },
+    "SEARCH": {
+      "CRITERIA": "Suchfelder",
+      "RESULTS": "Suchergebnisse"
+    },
     "TABS": {
+      "COLORS": "Farben",
+      "COLORS.TOOLTIP": "Farbwerte des Themes",
+      "EXTRAS": "Extras",
+      "EXTRAS.TOOLTIP": "Zusätzliche Eigenschaften des Themes (Fonts, Iconsets etc.)",
       "INTERN": "Intern",
-      "INTERN_TOOLTIP": "Interne Informationen",
-      "PROPERTIES": "Eigenschaften",
-      "PROPERTIES_TOOLTIP": "Eigenschaften des Themes",
+      "INTERN.TOOLTIP": "Interne Informationen",
+      "PROPS": "Basis Eigenschaften",
+      "PROPS.TOOLTIP": "Basis Eigenschaften des Themes",
       "USE": "Verwendung",
-      "USE_TOOLTIP": "Liste der Workspaces, die das Theme verwenden",
+      "USE.TOOLTIP": "Liste der Workspaces, die das Theme verwenden",
       "VARIABLES": "Theme-Variablen",
-      "VARIABLES_TOOLTIP": "JSON-Darstellung der Theme-Variablen"
+      "VARIABLES.TOOLTIP": "JSON-Darstellung der Theme-Variablen"
     },
     "DATAVIEW": {
       "FILTER": "Filter",
@@ -144,7 +158,7 @@
     "FAVICON": "Favicon",
     "FAVICON_URL": "Externe Favicon URL",
     "LOGO": "Logo",
-    "LOGO_SMALL": "Logo (klein)",
+    "LOGO_SMALL": "Logo klein",
     "LOGO_URL": "Externe Logo URL",
     "UPLOAD": {
       "OK": "Die Datei wurde erfolgreich hochgeladen",
@@ -161,7 +175,7 @@
     "TOOLTIPS": {
       "FAVICON": "Lesezeichen/Favoriten-Icon",
       "LOGO": "Logo in Standardgröße",
-      "LOGO_SMALL": "Logo in reduzierter Größe, z.b. für Verwendung im Slim Menü",
+      "LOGO_SMALL": "Logo in reduzierter Größe, z.B. für Verwendung im Slim Menü",
       "PLACEHOLDER": "Logo Platzhalter",
       "REMOVE": "Bild löschen",
       "REMOVE.URL": "Eintrag entfernen",
@@ -173,10 +187,6 @@
     "DESIGNER.EDIT.SUBHEADER": "Theme Details ändern",
     "DESIGNER.CREATE.SUBHEADER": "Ein neues Theme erstellen",
     "DESIGNER.TOP.SECTION": "Theme anwenden und Vorlage wählen",
-    "DETAIL.AUTO_APPLY": "Änderungen automatisch anwenden",
-    "DETAIL.AUTO_APPLY.TOOLTIP": "Wenn diese Option eingeschaltet ist, dann werden alle Änderungen (Schriftart, Farben) automatisch auf die aktuelle Seite angewendet.",
-    "DETAIL.AUTO_APPLY_CURRENT_THEME": "Änderungen werden beim Speichern sofort angewendet, da es das aktuell benutzte Theme ist",
-    "DETAIL.THEME_SELECTOR": "Ein Theme als Vorlage wählen",
     "NO_PROPERTIES": "Keine Farbwerte enthalten",
     "WORKSPACES_USING_THEME": {
       "MISSING_COMPONENT": "Informationen zur Verwendung des Themes in einem Workspace konnten nicht abgerufen werden.",
@@ -242,7 +252,8 @@
       "FILETYPE_PATTERN_ERROR_2": "Ihre Datei entspricht nicht den erlaubten Formaten: ico, jpg, jpeg, png, svg"
     },
     "HINTS": {
-      "FORMAT_URL": "Format: "
+      "FORMAT_URL": "Format: ",
+      "FORMAT_IMAGE_URL": "<br/>Format: http(s)://path-to-image"
     }
   },
   "EXCEPTIONS": {
