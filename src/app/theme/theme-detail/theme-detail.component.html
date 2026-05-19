@@ -1,4 +1,4 @@
-<ocx-portal-page permission="THEME#VIEW" helpArticleId="PAGE_THEME_DETAIL" *ngIf="theme$ | async as theme">
+<ocx-portal-page permission="THEME#VIEW" helpArticleId="PAGE_THEME_DETAIL">
   <ocx-page-header
     [loading]="loading"
     [header]="theme?.displayName"
@@ -61,15 +61,7 @@
           [text]="exceptionKey | translate"
         ></p-message>
         <div *ngIf="!exceptionKey" class="mx-3 mt-1 mb-2">
-          <app-theme-apply
-            [theme]="theme"
-            [themes$]="themes$"
-            [changeMode]="changeMode"
-            [isCurrentTheme]="isCurrentTheme"
-            [autoApply]="autoApply"
-            (autoApplyChange)="changeAutoApply($event)"
-          ></app-theme-apply>
-          <app-theme-props [theme]="theme" [themes$]="themes$" [changeMode]="changeMode"></app-theme-props>
+          <app-theme-props [theme]="themeForProps" [changeMode]="changeMode"></app-theme-props>
         </div>
       </p-tabPanel>
 
@@ -97,7 +89,7 @@
             [autoApply]="autoApply"
             (autoApplyChange)="changeAutoApply($event)"
           ></app-theme-apply>
-          <app-theme-colors [theme]="theme"></app-theme-colors>
+          <app-theme-colors [theme]="themeForColors"></app-theme-colors>
         </div>
       </p-tabPanel>
 

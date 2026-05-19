@@ -52,7 +52,10 @@ export class ThemeDetailComponent implements OnInit {
   public themeName: string | null = null
   public theme$!: Observable<Theme | undefined>
   public themes$!: Observable<Theme[]>
+  public theme: Theme | undefined
   public themeForUse: Theme | undefined
+  public themeForProps: Theme | undefined
+  public themeForColors: Theme | undefined
   // image
   public imageBasePath = this.imageApi.configuration.basePath
   public RefType = RefType
@@ -88,29 +91,35 @@ export class ThemeDetailComponent implements OnInit {
   private getTheme(switchToEdit?: boolean) {
     if (!this.themeName) return
     this.loading = true
-    this.theme$ = combineLatest([
+    combineLatest([
       this.themeService.currentTheme$.pipe(first()),
       this.themeApi.getThemeByName({ name: this.themeName })
-    ]).pipe(
-      map(([ct, response]) => {
-        this.isCurrentTheme = ct.name === response.resource.name
-        this.autoApply = this.isCurrentTheme
-        this.prepareHeaderUrl(response.resource)
-        this.preparePageActions(true, response.resource)
-        return response.resource
-      }),
-      catchError((err) => {
-        this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + Utils.mapping_error_status(err.status) + '.THEME'
-        console.error('getThemeByName', err)
-        this.prepareHeaderUrl()
-        this.preparePageActions(true)
-        return of({})
-      }),
-      finalize(() => {
-        this.loading = false
-        if (switchToEdit === true) this.changeMode = 'EDIT'
+    ])
+      .pipe(
+        map(([ct, response]) => {
+          this.isCurrentTheme = ct.name === response.resource.name
+          this.autoApply = this.isCurrentTheme
+          this.prepareHeaderUrl(response.resource)
+          this.preparePageActions(true, response.resource)
+          return response.resource
+        }),
+        catchError((err) => {
+          this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + Utils.mapping_error_status(err.status) + '.THEME'
+          console.error('getThemeByName', err)
+          this.prepareHeaderUrl()
+          this.preparePageActions(true)
+          return of({})
+        }),
+        finalize(() => {
+          this.loading = false
+          if (switchToEdit === true) this.changeMode = 'EDIT'
+        })
+      )
+      .subscribe((theme) => {
+        this.theme = theme
+        this.themeForProps = { ...theme }
+        this.themeForColors = { ...theme }
       })
-    )
   }
   private getThemes(): void {
     // for using themes as templates
@@ -148,12 +157,19 @@ export class ThemeDetailComponent implements OnInit {
     this.location.back()
   }
 
-  public onTabChange($event: any, theme: Theme) {
+  public onTabChange($event: any, theme?: Theme): void {
     if (theme) {
       this.showOperatorMessage = false
       this.selectedTabIndex = $event.index
-      if (this.selectedTabIndex === 3) this.themeForUse = theme
+      if (this.selectedTabIndex === 2) this.themeForUse = theme
     }
+  }
+
+  // copy theme data to separate objects for each tab to avoid unsaved changes being displayed in other tabs when editing
+  public initializeTabThemes(theme: Theme | undefined): Theme | undefined {
+    this.themeForProps = { ...theme }
+    this.themeForColors = { ...theme }
+    return this.themeForProps
   }
 
   private toggleEditMode(forcedMode?: 'edit' | 'view', theme?: Theme): void {
@@ -163,10 +179,14 @@ export class ThemeDetailComponent implements OnInit {
       this.changeMode = this.changeMode === 'EDIT' ? 'VIEW' : 'EDIT'
       this.getTheme(this.changeMode === 'EDIT')
     }
+    if (this.changeMode === 'VIEW' && theme) {
+      this.theme$ = of(theme)
+      //this.theme$ = new Observable((sub) => sub.next(data.resource))
+    }
     this.preparePageActions(this.isThemeUsedByWorkspace, theme)
   }
 
-  private onSave() {
+  private onSave(): void {
     // Get data from forms
     this.ThemePropsComponent.onSave()
     if (!this.ThemePropsComponent.basicForm.valid) return
@@ -348,67 +368,24 @@ export class ThemeDetailComponent implements OnInit {
       )
   }
 
-  // TEMPLATES
-  public onSelectThemeTemplate(ev: any, themes: Theme[], box: Dropdown): void {
-    const theme = themes.find((t) => t.name === ev.value)
-    if (theme?.id && theme?.displayName) this.confirmUseThemeTemplate(theme.id, theme.displayName, box)
-  }
-
-  private confirmUseThemeTemplate(id: string, dn: string, box: Dropdown) {
-    firstValueFrom(
-      this.translate
-        .get([
-          'ACTIONS.COPY_OF',
-          'THEME.TEMPLATE.CONFIRMATION.HEADER',
-          'THEME.TEMPLATE.CONFIRMATION.MESSAGE',
-          'ACTIONS.CONFIRMATION.YES',
-          'ACTIONS.CONFIRMATION.NO'
-        ])
-        .pipe(map((data) => this.displayConfirmationForUsingTemplate(id, dn, data, box)))
-    )
-  }
-
+  // USE THEME AS TEMPLATE
   private getThemeById(id: string): Observable<GetThemeResponse> {
     return this.themeApi.getThemeById({ id: id })
   }
-  private useThemeAsTemplate(themeId: string, data: any): any {
-    this.getThemeById(themeId).subscribe((data) => {
-      /*
-    if (this.changeMode === 'CREATE') {
-      this.basicForm.controls['name'].setValue(data['ACTIONS.COPY_OF'] + result.resource.name)
-      this.basicForm.controls['mandatory'].setValue(null)
-      this.basicForm.controls['displayName'].setValue(result.resource.displayName)
-      this.basicForm.controls['description'].setValue(result.resource.description)
-      this.basicForm.controls['logoUrl'].setValue(result.resource.logoUrl)
-      this.basicForm.controls['smallLogoUrl'].setValue(result.resource.smallLogoUrl)
-      this.basicForm.controls['faviconUrl'].setValue(result.resource.faviconUrl)
-    }
-    if (result.resource.properties) {
-      this.propertiesForm.reset()
-      this.propertiesForm.patchValue(result.resource.properties)
-    }
-      */
+
+  public useThemeAsTemplate(data: any): any {
+    console.log('useThemeAsTemplate', data)
+    this.getThemeById(data.id).subscribe((response) => {
+      // on creation the "name" can be edited
+      if (this.changeMode === 'CREATE') {
+        this.themeForProps = {
+          ...response.resource,
+          name: data['ACTIONS.COPY_OF'] + response.resource.name,
+          displayName: data['ACTIONS.COPY_OF'] + response.resource.displayName
+        }
+      }
+      this.themeForColors = response.resource
       this.msgService.info({ summaryKey: 'THEME.TEMPLATE.CONFIRMATION.OK' })
     })
-  }
-
-  private displayConfirmationForUsingTemplate(themeId: string, themeName: string, data: any, box: Dropdown): void {
-    /*
-    this.confirmation.confirm({
-      key: 'template',
-      icon: 'pi pi-question-circle',
-      defaultFocus: 'reject',
-      dismissableMask: true,
-      header: data['THEME.TEMPLATE.CONFIRMATION.HEADER'],
-      message: data['THEME.TEMPLATE.CONFIRMATION.MESSAGE'].replace('{{ITEM}}', Utils.limitText(themeName, 50)),
-      acceptLabel: data['ACTIONS.CONFIRMATION.YES'],
-      rejectLabel: data['ACTIONS.CONFIRMATION.NO'],
-      accept: () => {
-        box.clear()
-        this.useThemeAsTemplate(themeId, data)
-      },
-      reject: () => box.clear()
-    })
-      */
   }
 }

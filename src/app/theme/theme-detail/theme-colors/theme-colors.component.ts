@@ -18,9 +18,6 @@ export class ThemeColorsComponent implements OnChanges {
   @Input() dateFormat = 'medium'
   @Input() autoApply = false
 
-  public mandatory = false
-  public operator = false
-
   // Form
   public formGroup = new FormGroup({})
   public generalForm: FormGroup
@@ -59,8 +56,6 @@ export class ThemeColorsComponent implements OnChanges {
   public ngOnChanges(): void {
     if (this.theme) {
       this.fillForm(this.theme)
-      this.mandatory = this.theme.mandatory ?? false
-      this.operator = this.theme.operator ?? false
     }
   }
 
@@ -68,21 +63,21 @@ export class ThemeColorsComponent implements OnChanges {
     for (const v of themeVariables.general) {
       const fc = new FormControl<string | null>(null)
       fc.valueChanges.pipe(debounceTime(300)).subscribe((formVal) => {
-        if (this.autoApply) this.updateCssVar(v, formVal || '')
+        if (this.autoApply) this.updateCssVar(v, formVal)
       })
       this.generalForm.addControl(v, fc)
     }
     for (const v of themeVariables.topbar) {
       const fc = new FormControl<string | null>(null)
       fc.valueChanges.pipe(debounceTime(300)).subscribe((formVal) => {
-        if (this.autoApply) this.updateCssVar(v, formVal || '')
+        if (this.autoApply) this.updateCssVar(v, formVal)
       })
       this.topbarForm.addControl(v, fc)
     }
     for (const v of themeVariables.sidebar) {
       const fc = new FormControl<string | null>(null)
       fc.valueChanges.pipe(debounceTime(300)).subscribe((formVal) => {
-        if (this.autoApply) this.updateCssVar(v, formVal || '')
+        if (this.autoApply) this.updateCssVar(v, formVal)
       })
       this.sidebarForm.addControl(v, fc)
     }
@@ -100,9 +95,9 @@ export class ThemeColorsComponent implements OnChanges {
   }
 
   // Applying Styles
-  private updateCssVar(varName: string, value: string): void {
-    document.documentElement.style.setProperty(`--${varName}`, value)
-    const rgb = this.hexToRgb(value)
+  private updateCssVar(varName: string, value: string | null): void {
+    document.documentElement.style.setProperty(`--${varName}`, value || '')
+    const rgb = this.hexToRgb(value || '')
     if (rgb) {
       document.documentElement.style.setProperty(`--${varName}-rgb`, `${rgb.r},${rgb.g},${rgb.b}`)
     }

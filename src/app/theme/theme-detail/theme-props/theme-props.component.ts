@@ -1,9 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
-import { firstValueFrom, map, Observable, ReplaySubject } from 'rxjs'
+import { Observable, ReplaySubject } from 'rxjs'
 import { TranslateService } from '@ngx-translate/core'
-import { ConfirmationService } from 'primeng/api'
-import { Dropdown } from 'primeng/dropdown'
 
 import { getLocation } from '@onecx/accelerator'
 import { PortalMessageService } from '@onecx/angular-integration-interface'
@@ -19,7 +17,6 @@ import { themeVariables } from '../theme-variables'
 })
 export class ThemePropsComponent implements OnChanges {
   @Input() theme: Theme | undefined
-  @Input() themes$: Observable<Theme[]> | undefined
   @Input() changeMode: 'VIEW' | 'EDIT' | 'CREATE' = 'VIEW'
   @Output() headerImageUrl = new EventEmitter<string>() // send logo url to detail header
 
@@ -38,7 +35,6 @@ export class ThemePropsComponent implements OnChanges {
   public getLocation = getLocation
 
   constructor(
-    private readonly confirmation: ConfirmationService,
     private readonly msgService: PortalMessageService,
     private readonly translate: TranslateService,
     private readonly imageApi: ImagesInternalAPIService
@@ -55,6 +51,7 @@ export class ThemePropsComponent implements OnChanges {
         Validators.maxLength(100)
       ]),
       description: new FormControl<string | null>(null, [Validators.maxLength(255)]),
+      mandatory: new FormControl<boolean | null>({ value: null, disabled: true }),
       logoUrl: new FormControl<string | null>(null, [
         Validators.minLength(7),
         Validators.maxLength(255),
@@ -82,11 +79,16 @@ export class ThemePropsComponent implements OnChanges {
 
   public ngOnChanges(changes: SimpleChanges): void {
     this.basicForm.disable()
+    this.fontForm.disable()
     if (this.theme) {
       if (changes['theme']) this.fillForm(this.theme)
-      if (this.changeMode !== 'VIEW') this.basicForm.enable()
+      if (this.changeMode !== 'VIEW') {
+        this.basicForm.enable()
+        this.fontForm.enable()
+      }
     } else {
       this.basicForm.reset()
+      this.fontForm.reset()
     }
   }
 
@@ -197,6 +199,7 @@ export class ThemePropsComponent implements OnChanges {
       error: (err) => this.saveImageResponse(name, refType, err)
     })
   }
+
   private saveImageResponse(name: string, refType: RefType, err?: any): void {
     if (err) {
       console.error('uploadImage', err)
@@ -218,6 +221,7 @@ export class ThemePropsComponent implements OnChanges {
     }
     this.bffUrl[refType] = Utils.bffImageUrl(this.imageBasePath, this.theme?.name, refType)
   }
+
   public onRemoveImage(refType: RefType) {
     if (this.theme?.name && this.bffUrl[refType]) {
       // On VIEW mode: manage image is enabled
@@ -230,51 +234,5 @@ export class ThemePropsComponent implements OnChanges {
         error: (err) => console.error('deleteImage', err)
       })
     }
-  }
-
-  /***************************************************************************
-   * VARIOUS
-   */
-  public getThemeImageUrl(themes: Theme[], themeName: string, refType: RefType): string | undefined {
-    const theme = themes.find((t) => t.name === themeName)
-    return theme?.logoUrl
-  }
-
-  /***************************************************************************
-   * TEMPLATING WITH EXISTING THEME
-   */
-  public onSelectThemeTemplate(ev: any, themes: Theme[], box: Dropdown): void {
-    const theme = themes.find((t) => t.name === ev.value)
-    if (theme?.id && theme?.displayName) this.confirmUseThemeTemplate(theme.id, theme.displayName, box)
-  }
-  private confirmUseThemeTemplate(id: string, dn: string, box: Dropdown) {
-    firstValueFrom(
-      this.translate
-        .get([
-          'ACTIONS.COPY_OF',
-          'THEME.TEMPLATE.CONFIRMATION.HEADER',
-          'THEME.TEMPLATE.CONFIRMATION.MESSAGE',
-          'ACTIONS.CONFIRMATION.YES',
-          'ACTIONS.CONFIRMATION.NO'
-        ])
-        .pipe(map((data) => this.displayConfirmationForUsingTemplate(id, dn, data, box)))
-    )
-  }
-  private displayConfirmationForUsingTemplate(themeId: string, themeName: string, data: any, box: Dropdown): void {
-    this.confirmation.confirm({
-      key: 'template',
-      icon: 'pi pi-question-circle',
-      defaultFocus: 'reject',
-      dismissableMask: true,
-      header: data['THEME.TEMPLATE.CONFIRMATION.HEADER'],
-      message: data['THEME.TEMPLATE.CONFIRMATION.MESSAGE'].replace('{{ITEM}}', Utils.limitText(themeName, 50)),
-      acceptLabel: data['ACTIONS.CONFIRMATION.YES'],
-      rejectLabel: data['ACTIONS.CONFIRMATION.NO'],
-      accept: () => {
-        box.clear()
-        //this.useThemeAsTemplate(themeId, data)
-      },
-      reject: () => box.clear()
-    })
   }
 }

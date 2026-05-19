@@ -3,13 +3,13 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { Location } from '@angular/common'
 import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { ActivatedRoute, provideRouter, Router } from '@angular/router'
+import { ActivatedRoute, provideRouter } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { TranslateTestingModule } from 'ngx-translate-testing'
-import { of, throwError } from 'rxjs'
+import { BehaviorSubject, of, throwError } from 'rxjs'
 import FileSaver from 'file-saver'
 
-import { ConfigurationService, PortalMessageService, UserService } from '@onecx/angular-integration-interface'
+import { PortalMessageService, ThemeService, UserService } from '@onecx/angular-integration-interface'
 
 import { ImagesInternalAPIService, RefType, Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { Utils } from 'src/app/shared/utils'
@@ -32,14 +32,19 @@ describe('ThemeDetailComponent', () => {
   let translateService: TranslateService
 
   const mockUserService = { lang$: { getValue: jasmine.createSpy('getValue').and.returnValue('en') } }
-  const msgServiceSpy = jasmine.createSpyObj<PortalMessageService>('PortalMessageService', ['success', 'error'])
+  const msgServiceSpy = jasmine.createSpyObj<PortalMessageService>('PortalMessageService', ['success', 'error', 'info'])
   const locationSpy = jasmine.createSpyObj<Location>('Location', ['back'])
-  const configServiceSpy = { getProperty: jasmine.createSpy('getProperty').and.returnValue('123'), lang: 'en' }
-  const themesApiSpy = jasmine.createSpyObj<ThemesAPIService>('ThemesAPIService', [
+  const themeApiSpy = jasmine.createSpyObj<ThemesAPIService>('ThemesAPIService', [
     'getThemeByName',
+    'getThemeById',
     'deleteTheme',
-    'exportThemes'
+    'exportThemes',
+    'createTheme',
+    'updateTheme',
+    'searchThemes'
   ])
+  const currentTheme$ = new BehaviorSubject<any>({ name: 'currentTheme' })
+  const mockThemeService = { currentTheme$: currentTheme$.asObservable() }
   const imgServiceSpy = { configuration: { basePath: '/basePath' } }
 
   function initTestComponent(): void {
@@ -56,7 +61,7 @@ describe('ThemeDetailComponent', () => {
         TranslateTestingModule.withTranslations({
           de: require('src/assets/i18n/de.json'),
           en: require('src/assets/i18n/en.json')
-        }).withDefaultLanguage('de')
+        }).withDefaultLanguage('en')
       ],
       providers: [
         provideHttpClientTesting(),
@@ -64,9 +69,9 @@ describe('ThemeDetailComponent', () => {
         provideRouter([{ path: '', component: ThemeDetailComponent }]),
         { provide: UserService, useValue: mockUserService },
         { provide: PortalMessageService, useValue: msgServiceSpy },
-        { provide: ConfigurationService, useValue: configServiceSpy },
         { provide: Location, useValue: locationSpy },
-        { provide: ThemesAPIService, useValue: themesApiSpy },
+        { provide: ThemesAPIService, useValue: themeApiSpy },
+        { provide: ThemeService, useValue: mockThemeService },
         { provide: ImagesInternalAPIService, useValue: imgServiceSpy }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -76,13 +81,22 @@ describe('ThemeDetailComponent', () => {
   beforeEach(() => {
     msgServiceSpy.success.calls.reset()
     msgServiceSpy.error.calls.reset()
-    // to spy data: reset
-    themesApiSpy.getThemeByName.calls.reset()
-    themesApiSpy.exportThemes.calls.reset()
+    msgServiceSpy.info.calls.reset()
+    themeApiSpy.getThemeByName.calls.reset()
+    themeApiSpy.getThemeById.calls.reset()
+    themeApiSpy.exportThemes.calls.reset()
+    themeApiSpy.searchThemes.calls.reset()
+    themeApiSpy.updateTheme.calls.reset()
+    themeApiSpy.createTheme.calls.reset()
     locationSpy.back.calls.reset()
-    // to spy data: refill with neutral data
-    themesApiSpy.getThemeByName.and.returnValue(of({}) as any)
-    themesApiSpy.exportThemes.and.returnValue(of({}) as any)
+    themeApiSpy.getThemeByName.and.returnValue(of({ resource: {} }) as any)
+    themeApiSpy.getThemeById.and.returnValue(of({ resource: {} }) as any)
+    themeApiSpy.exportThemes.and.returnValue(of({}) as any)
+    themeApiSpy.searchThemes.and.returnValue(of({ stream: [] }) as any)
+    themeApiSpy.createTheme.and.returnValue(of({}) as any)
+    themeApiSpy.updateTheme.and.returnValue(of({}) as any)
+    mockUserService.lang$.getValue.and.returnValue('en')
+    currentTheme$.next({ name: 'currentTheme' })
 
     translateService = TestBed.inject(TranslateService)
     initTestComponent()
@@ -105,116 +119,224 @@ describe('ThemeDetailComponent', () => {
       expect(component.dateFormat).toEqual('medium')
     })
 
-    it('should set showOperatorMessage to false', () => {
-      const event = { index: 2 }
-
-      component.ngOnInit()
-      component.onTabChange(event, theme)
-
-      expect(component.showOperatorMessage).toBeFalsy()
-      expect(component.themeForUse).toEqual(theme)
+    it('should set changeMode to CREATE when no name in route', () => {
+      expect(component.changeMode).toEqual('CREATE')
     })
 
-    it('should prevent theme loading if no name in route', () => {
+    it('should set changeMode to VIEW when name is in route', () => {
       const route = TestBed.inject(ActivatedRoute)
-      spyOn(route.snapshot.paramMap, 'get').and.returnValue(null)
-      spyOn<any>(component, 'getTheme')
+      spyOn(route.snapshot.paramMap, 'get').and.returnValue('someName')
+      initTestComponent()
+      expect(component.changeMode).toEqual('VIEW')
+    })
+  })
+
+  describe('ngOnInit', () => {
+    it('should call prepareDialogTranslations and getThemes on init', () => {
+      component.ngOnInit()
+      expect(component.messages.length).toBeGreaterThan(0)
+    })
+
+    it('should not load theme if no themeName', () => {
+      component['themeName'] = null
+      themeApiSpy.getThemeByName.calls.reset()
 
       component['getTheme']()
 
-      expect(component['getTheme']).toHaveBeenCalled()
+      expect(themeApiSpy.getThemeByName).not.toHaveBeenCalled()
     })
   })
 
-  describe('on changes', () => {
+  describe('getTheme', () => {
     beforeEach(() => {
-      const route = TestBed.inject(ActivatedRoute)
-      spyOn(route.snapshot.paramMap, 'get').and.returnValue(theme.name!)
-      translateService.use('en')
+      component['themeName'] = theme.name!
     })
 
-    it('should get theme - success', (done: DoneFn) => {
-      themesApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
+    it('should get theme - success', () => {
+      themeApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
 
-      component.ngOnInit()
+      component['getTheme']()
 
-      component.theme$?.subscribe((data) => {
-        expect(data).toBe(theme)
-        expect(component.headerImageUrl).toBe(theme.logoUrl)
-
-        component.actions$.subscribe((actions) => {
-          expect(actions.length).toBe(4)
-          if (actions.length > 0) {
-            expect(actions[3].label).toBe('Delete')
-            expect(actions[3].showCondition).toBeTrue() // hide action
-          }
-          done()
-        })
-      })
-    })
-
-    it('should get theme - failed', (done: DoneFn) => {
-      const errorResponse = { error: { message: 'No permissions' }, status: 403 }
-      themesApiSpy.getThemeByName.and.returnValue(throwError(() => errorResponse))
-      spyOn(console, 'error')
-      component.exceptionKey = undefined
-
-      component.ngOnInit()
-
-      component.theme$?.subscribe(() => {
-        expect(console.error).toHaveBeenCalledWith('getThemeByName', errorResponse)
-        expect(component.exceptionKey).toBe('EXCEPTIONS.HTTP_STATUS_' + errorResponse.status + '.THEME')
-        component.actions$!.subscribe((actions) => {
-          expect(actions.length).toBe(4)
-          if (actions.length > 0) {
-            expect(actions[3].showCondition).toBeFalse() // hide delete action
-          }
-          done()
-        })
-      })
-    })
-
-    it('should prepare header URL - logo URL', () => {
-      component.prepareHeaderUrl(theme)
-
+      expect(component.theme).toEqual(theme)
+      expect(component.themeForProps).toEqual({ ...theme })
+      expect(component.themeForColors).toEqual({ ...theme })
       expect(component.headerImageUrl).toBe(theme.logoUrl)
+      expect(component.loading).toBeFalse()
+    })
 
-      component.prepareHeaderUrl({ ...theme, logoUrl: undefined })
+    it('should set isCurrentTheme and autoApply when theme matches current theme', () => {
+      currentTheme$.next({ name: theme.name })
+      themeApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
 
-      expect(component.headerImageUrl).toBe(Utils.bffImageUrl(component.imageBasePath, theme.name, RefType.Logo))
+      component['getTheme']()
+
+      expect(component.isCurrentTheme).toBeTrue()
+      expect(component.autoApply).toBeTrue()
+    })
+
+    it('should set isCurrentTheme to false when theme does not match current theme', () => {
+      currentTheme$.next({ name: 'otherTheme' })
+      themeApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
+
+      component['getTheme']()
+
+      expect(component.isCurrentTheme).toBeFalse()
+      expect(component.autoApply).toBeFalse()
+    })
+
+    it('should switch to EDIT mode when switchToEdit is true', () => {
+      themeApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
+
+      component['getTheme'](true)
+
+      expect(component.changeMode).toBe('EDIT')
+    })
+
+    it('should handle error when getThemeByName fails', () => {
+      const errorResponse = { error: { message: 'No permissions' }, status: 403 }
+      themeApiSpy.getThemeByName.and.returnValue(throwError(() => errorResponse))
+      spyOn(console, 'error')
+
+      component['getTheme']()
+
+      expect(console.error).toHaveBeenCalledWith('getThemeByName', errorResponse)
+      expect(component.exceptionKey).toBe('EXCEPTIONS.HTTP_STATUS_403.THEME')
+      expect(component.loading).toBeFalse()
+    })
+
+    it('should map unknown error status to 0', () => {
+      const errorResponse = { status: 999 }
+      themeApiSpy.getThemeByName.and.returnValue(throwError(() => errorResponse))
+      spyOn(console, 'error')
+
+      component['getTheme']()
+
+      expect(component.exceptionKey).toBe('EXCEPTIONS.HTTP_STATUS_0.THEME')
     })
   })
 
-  describe('UI actions', () => {
-    it('should prepare page actions', async () => {
-      const router = TestBed.inject(Router)
-      spyOn(router, 'navigate')
-      spyOn(component, 'onClose')
-      spyOn(component, 'onExportTheme')
-      component.themeDeleteVisible = false
+  describe('getThemes', () => {
+    it('should load themes successfully', (done: DoneFn) => {
+      const themes = [
+        { name: 'b', displayName: 'Bravo' },
+        { name: 'a', displayName: 'Alpha' }
+      ]
+      themeApiSpy.searchThemes.and.returnValue(of({ stream: themes }) as any)
 
-      component.preparePageAction(true, theme)
+      component['getThemes']()
 
-      component.actions$!.subscribe((actions) => {
-        expect(actions.length).toBe(4)
-        if (actions.length > 0) {
-          actions[0].actionCallback()
-          actions[1].actionCallback()
-          actions[2].actionCallback() // => go to designer with ./edit
-          actions[3].actionCallback()
-          expect(component.onClose).toHaveBeenCalled()
-          expect(component.onExportTheme).toHaveBeenCalled()
-          expect(router.navigate).toHaveBeenCalledOnceWith(['./edit'], jasmine.any(Object))
-          expect(component.themeDeleteVisible).toBeTrue()
-        }
+      component.themes$.subscribe((result) => {
+        expect(result.length).toBe(2)
+        expect(result[0].displayName).toBe('Alpha')
+        done()
       })
     })
 
-    it('onClose', () => {
-      component.ngOnInit()
-      component.onClose()
+    it('should handle searchThemes error', (done: DoneFn) => {
+      const errorResponse = { status: 500 }
+      themeApiSpy.searchThemes.and.returnValue(throwError(() => errorResponse))
+      spyOn(console, 'error')
+
+      component['getThemes']()
+
+      component.themes$.subscribe((result) => {
+        expect(result).toEqual([])
+        expect(console.error).toHaveBeenCalledWith('searchThemes', errorResponse)
+        expect(component.exceptionKey).toBe('EXCEPTIONS.HTTP_STATUS_500.THEME')
+        done()
+      })
+    })
+
+    it('should return empty array when stream is undefined', (done: DoneFn) => {
+      themeApiSpy.searchThemes.and.returnValue(of({ stream: undefined }) as any)
+
+      component['getThemes']()
+
+      component.themes$.subscribe((result) => {
+        expect(result).toEqual([])
+        done()
+      })
+    })
+  })
+
+  describe('changeAutoApply', () => {
+    it('should set autoApply to true and show info message', () => {
+      component.changeAutoApply(true)
+
+      expect(component.autoApply).toBeTrue()
+      expect(msgServiceSpy.info).toHaveBeenCalledWith({ summaryKey: 'INTERNAL.AUTO_APPLY_MESSAGE' })
+    })
+
+    it('should set autoApply to false without showing info message', () => {
+      component.changeAutoApply(false)
+
+      expect(component.autoApply).toBeFalse()
+      expect(msgServiceSpy.info).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('onBack', () => {
+    it('should navigate back', () => {
+      component.onBack()
 
       expect(locationSpy.back).toHaveBeenCalled()
+    })
+  })
+
+  describe('onTabChange', () => {
+    it('should set showOperatorMessage to false and set selectedTabIndex', () => {
+      component.showOperatorMessage = true
+      const event = { index: 2 }
+
+      component.onTabChange(event, theme)
+
+      expect(component.showOperatorMessage).toBeFalse()
+      expect(component.selectedTabIndex).toBe(2)
+      expect(component.themeForUse).toEqual(theme)
+    })
+
+    it('should set themeForUse when tabIndex is 2', () => {
+      const event = { index: 2 }
+
+      component.onTabChange(event, theme)
+
+      expect(component.themeForUse).toEqual(theme)
+    })
+
+    it('should not set themeForUse when tabIndex is not 2', () => {
+      component.themeForUse = undefined
+      const event = { index: 1 }
+
+      component.onTabChange(event, theme)
+
+      expect(component.selectedTabIndex).toBe(1)
+      expect(component.themeForUse).toBeUndefined()
+    })
+
+    it('should do nothing if theme is undefined', () => {
+      component.showOperatorMessage = true
+      const event = { index: 1 }
+
+      component.onTabChange(event, undefined)
+
+      expect(component.showOperatorMessage).toBeTrue()
+    })
+  })
+
+  describe('initializeTabThemes', () => {
+    it('should copy theme to themeForProps and themeForColors', () => {
+      const result = component.initializeTabThemes(theme)
+
+      expect(component.themeForProps).toEqual({ ...theme })
+      expect(component.themeForColors).toEqual({ ...theme })
+      expect(result).toEqual({ ...theme })
+    })
+
+    it('should handle undefined theme', () => {
+      const result = component.initializeTabThemes(undefined)
+
+      expect(component.themeForProps).toEqual({ ...({} as any) })
+      expect(result).toEqual({ ...({} as any) })
     })
   })
 
@@ -224,7 +346,8 @@ describe('ThemeDetailComponent', () => {
 
       component.onDeleteTheme(theme)
 
-      expect(component.themeDeleteVisible).toBe(true)
+      expect(component.themeDeleteVisible).toBeTrue()
+      expect(component.themeForUse).toEqual(theme)
     })
 
     it('should hide delete dialog', () => {
@@ -232,7 +355,7 @@ describe('ThemeDetailComponent', () => {
 
       component.onThemeDeletion()
 
-      expect(component.themeDeleteVisible).toBe(false)
+      expect(component.themeDeleteVisible).toBeFalse()
     })
   })
 
@@ -240,48 +363,416 @@ describe('ThemeDetailComponent', () => {
     it('should save file on theme export', () => {
       spyOn(JSON, 'stringify').and.returnValue('themejson')
       spyOn(FileSaver, 'saveAs')
-      const theme = {
-        modificationCount: 1,
+      const exportTheme: Theme = {
+        id: 'id',
         name: 'themeName',
         displayName: 'Theme',
-        logoUrl: 'url',
-        creationDate: 'creationDate',
-        creationUser: 'createionUser',
-        modificationDate: 'modificationDate',
-        modificationUser: 'modificationUser',
-        id: 'id'
+        logoUrl: 'url'
       }
       const exportResponse = {
         themes: {
           themeName: {
             version: 1,
-            logoUrl: theme.logoUrl
+            logoUrl: exportTheme.logoUrl
           }
         }
       }
-      themesApiSpy.exportThemes.and.returnValue(of(exportResponse) as any)
+      themeApiSpy.exportThemes.and.returnValue(of(exportResponse) as any)
 
-      component.onExportTheme(theme)
+      component.onExportTheme(exportTheme)
 
-      expect(themesApiSpy.exportThemes).toHaveBeenCalledOnceWith(
-        jasmine.objectContaining({ exportThemeRequest: { names: [theme.name] } })
+      expect(themeApiSpy.exportThemes).toHaveBeenCalledOnceWith(
+        jasmine.objectContaining({ exportThemeRequest: { names: [exportTheme.name] } })
       )
       expect(JSON.stringify).toHaveBeenCalledOnceWith(jasmine.objectContaining(exportResponse), null, 2)
       expect(FileSaver.saveAs).toHaveBeenCalledOnceWith(
         jasmine.any(Blob),
-        `onecx-theme_${theme.name}_${Utils.getCurrentDateTime()}.json`
+        `onecx-theme_${exportTheme.name}_${Utils.getCurrentDateTime()}.json`
       )
     })
 
     it('should display error on theme export fail', () => {
       const errorResponse = { error: 'Error on exporting theme', status: 400 }
-      themesApiSpy.exportThemes.and.returnValue(throwError(() => errorResponse))
+      themeApiSpy.exportThemes.and.returnValue(throwError(() => errorResponse))
       spyOn(console, 'error')
 
       component.onExportTheme(theme)
 
       expect(console.error).toHaveBeenCalledWith('exportThemes', errorResponse)
       expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.EXPORT.EXPORT_THEME_FAIL' })
+    })
+
+    it('should not export if theme has no name', () => {
+      component.onExportTheme({})
+
+      expect(themeApiSpy.exportThemes).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('prepareHeaderUrl', () => {
+    it('should set headerImageUrl to logoUrl when present', () => {
+      component.prepareHeaderUrl(theme)
+
+      expect(component.headerImageUrl).toBe(theme.logoUrl)
+    })
+
+    it('should set headerImageUrl to bffImageUrl when no logoUrl', () => {
+      component.prepareHeaderUrl({ ...theme, logoUrl: undefined })
+
+      expect(component.headerImageUrl).toBe(Utils.bffImageUrl(component.imageBasePath, theme.name, RefType.Logo))
+    })
+
+    it('should do nothing if theme is undefined', () => {
+      component.headerImageUrl = 'previous'
+
+      component.prepareHeaderUrl(undefined)
+
+      expect(component.headerImageUrl).toBe('previous')
+    })
+  })
+
+  describe('preparePageActions', () => {
+    it('should create 6 actions', (done: DoneFn) => {
+      component.preparePageActions(true, theme)
+
+      component.actions$.subscribe((actions) => {
+        expect(actions.length).toBe(6)
+        done()
+      })
+    })
+
+    it('should set isThemeUsedByWorkspace', () => {
+      component.preparePageActions(true, theme)
+      expect(component.isThemeUsedByWorkspace).toBeTrue()
+
+      component.preparePageActions(false, theme)
+      expect(component.isThemeUsedByWorkspace).toBeFalse()
+    })
+
+    it('should show back, export, edit, delete in VIEW mode', (done: DoneFn) => {
+      component.changeMode = 'VIEW'
+      component.preparePageActions(false, theme)
+
+      component.actions$.subscribe((actions) => {
+        const back = actions.find((a) => a.id === 'th_detail_page_action_back')
+        const exportAction = actions.find((a) => a.id === 'th_detail_page_action_export')
+        const edit = actions.find((a) => a.id === 'th_detail_page_action_edit')
+        const deleteAction = actions.find((a) => a.id === 'th_detail_page_action_delete')
+        const cancel = actions.find((a) => a.id === 'th_detail_page_action_cancel')
+        const save = actions.find((a) => a.id === 'th_detail_page_action_save')
+        expect(back!.showCondition).toBeTrue()
+        expect(exportAction!.showCondition).toBeTrue()
+        expect(edit!.showCondition).toBeTrue()
+        expect(deleteAction!.showCondition).toBeTrue()
+        expect(cancel!.showCondition).toBeFalse()
+        expect(save!.showCondition).toBeFalse()
+        done()
+      })
+    })
+
+    it('should show cancel, save in EDIT mode', (done: DoneFn) => {
+      component.changeMode = 'EDIT'
+      component.preparePageActions(false, theme)
+
+      component.actions$.subscribe((actions) => {
+        const cancel = actions.find((a) => a.id === 'th_detail_page_action_cancel')
+        const save = actions.find((a) => a.id === 'th_detail_page_action_save')
+        const back = actions.find((a) => a.id === 'th_detail_page_action_back')
+        expect(cancel!.showCondition).toBeTrue()
+        expect(save!.showCondition).toBeTrue()
+        expect(back!.showCondition).toBeFalse()
+        done()
+      })
+    })
+
+    it('should hide delete when theme is undefined', (done: DoneFn) => {
+      component.changeMode = 'VIEW'
+      component.preparePageActions(false, undefined)
+
+      component.actions$.subscribe((actions) => {
+        const deleteAction = actions.find((a) => a.id === 'th_detail_page_action_delete')
+        expect(deleteAction!.showCondition).toBeFalse()
+        done()
+      })
+    })
+
+    it('should trigger onBack callback', (done: DoneFn) => {
+      component.preparePageActions(false, theme)
+
+      component.actions$.subscribe((actions) => {
+        const back = actions.find((a) => a.id === 'th_detail_page_action_back')
+        back!.actionCallback()
+        expect(locationSpy.back).toHaveBeenCalled()
+        done()
+      })
+    })
+
+    it('should trigger onExportTheme callback', (done: DoneFn) => {
+      spyOn(component, 'onExportTheme')
+      component.preparePageActions(false, theme)
+
+      component.actions$.subscribe((actions) => {
+        const exportAction = actions.find((a) => a.id === 'th_detail_page_action_export')
+        exportAction!.actionCallback()
+        expect(component.onExportTheme).toHaveBeenCalled()
+        done()
+      })
+    })
+
+    it('should trigger onDeleteTheme callback', (done: DoneFn) => {
+      component.preparePageActions(false, theme)
+
+      component.actions$.subscribe((actions) => {
+        const deleteAction = actions.find((a) => a.id === 'th_detail_page_action_delete')
+        deleteAction!.actionCallback()
+        expect(component.themeDeleteVisible).toBeTrue()
+        done()
+      })
+    })
+
+    it('should trigger edit action callback', (done: DoneFn) => {
+      component['themeName'] = theme.name!
+      themeApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
+      component.changeMode = 'VIEW'
+      component.preparePageActions(false, theme)
+
+      component.actions$.subscribe((actions) => {
+        const editAction = actions.find((a) => a.id === 'th_detail_page_action_edit')
+        editAction!.actionCallback()
+        expect(component.changeMode).toBe('EDIT')
+        done()
+      })
+    })
+
+    it('should trigger cancel action callback', (done: DoneFn) => {
+      component.changeMode = 'EDIT'
+      component.preparePageActions(false, theme)
+
+      component.actions$.subscribe((actions) => {
+        const cancelAction = actions.find((a) => a.id === 'th_detail_page_action_cancel')
+        cancelAction!.actionCallback()
+        expect(component.changeMode).toBe('VIEW')
+        done()
+      })
+    })
+
+    it('should trigger save action callback', (done: DoneFn) => {
+      component.changeMode = 'EDIT'
+      component.ThemePropsComponent = {
+        onSave: () => {},
+        basicForm: { valid: false },
+        theme: undefined
+      } as any
+      component.preparePageActions(false, theme)
+
+      component.actions$.subscribe((actions) => {
+        const saveAction = actions.find((a) => a.id === 'th_detail_page_action_save')
+        saveAction!.actionCallback()
+        done()
+      })
+    })
+  })
+
+  describe('toggleEditMode', () => {
+    beforeEach(() => {
+      component['themeName'] = theme.name!
+      themeApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
+    })
+
+    it('should switch to VIEW mode when forcedMode is view', () => {
+      component.changeMode = 'EDIT'
+
+      component['toggleEditMode']('view', theme)
+
+      expect(component.changeMode).toBe('VIEW')
+    })
+
+    it('should set theme$ when switching to VIEW with theme', (done: DoneFn) => {
+      component.changeMode = 'EDIT'
+
+      component['toggleEditMode']('view', theme)
+
+      component.theme$!.subscribe((data) => {
+        expect(data).toEqual(theme)
+        done()
+      })
+    })
+
+    it('should toggle from VIEW to EDIT and call getTheme', () => {
+      component.changeMode = 'VIEW'
+
+      component['toggleEditMode'](undefined, theme)
+
+      expect(component.changeMode).toBe('EDIT')
+    })
+
+    it('should toggle from EDIT to VIEW', () => {
+      component.changeMode = 'EDIT'
+
+      component['toggleEditMode'](undefined, theme)
+
+      expect(component.changeMode).toBe('VIEW')
+    })
+  })
+
+  describe('onSave', () => {
+    let mockThemePropsComponent: any
+    let mockThemeColorsComponent: any
+
+    beforeEach(() => {
+      mockThemePropsComponent = {
+        onSave: jasmine.createSpy('onSave'),
+        basicForm: { valid: true },
+        theme: { ...theme, id: 'themeId', properties: {} },
+        fontForm: {
+          get: jasmine.createSpy('get').and.callFake((key: string) => {
+            if (key === 'fontFamily') return { value: 'Arial' }
+            if (key === 'fontSize') return { value: '14px' }
+            return { value: '' }
+          })
+        }
+      }
+      mockThemeColorsComponent = {
+        onSave: jasmine.createSpy('onSave'),
+        colorsForm: { valid: true },
+        theme: { properties: { primary: '#fff' } }
+      }
+      component.ThemePropsComponent = mockThemePropsComponent
+      component.ThemeColorsComponent = mockThemeColorsComponent
+      component['themeName'] = theme.name!
+    })
+
+    it('should call updateTheme on save with valid forms', (done: DoneFn) => {
+      const updatedTheme = { ...theme, id: 'themeId' }
+      themeApiSpy.updateTheme.and.returnValue(of({ resource: updatedTheme }) as any)
+      themeApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
+
+      component['onSave']()
+
+      expect(mockThemePropsComponent.onSave).toHaveBeenCalled()
+      expect(mockThemeColorsComponent.onSave).toHaveBeenCalled()
+      expect(themeApiSpy.updateTheme).toHaveBeenCalled()
+      expect(msgServiceSpy.success).toHaveBeenCalledWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.THEME.OK' })
+      // subscribe to theme$ to cover the Observable subscriber
+      component.theme$!.subscribe((data) => {
+        expect(data).toEqual(updatedTheme)
+        done()
+      })
+    })
+
+    it('should not proceed if basicForm is invalid', () => {
+      mockThemePropsComponent.basicForm.valid = false
+
+      component['onSave']()
+
+      expect(themeApiSpy.updateTheme).not.toHaveBeenCalled()
+    })
+
+    it('should not proceed if themeData is undefined', () => {
+      mockThemePropsComponent.theme = undefined
+
+      component['onSave']()
+
+      expect(themeApiSpy.updateTheme).not.toHaveBeenCalled()
+    })
+
+    it('should not proceed if colorsForm is invalid', () => {
+      mockThemeColorsComponent.colorsForm.valid = false
+
+      component['onSave']()
+
+      expect(themeApiSpy.updateTheme).not.toHaveBeenCalled()
+    })
+
+    it('should handle updateTheme error', () => {
+      const errorResponse = { status: 400 }
+      themeApiSpy.updateTheme.and.returnValue(throwError(() => errorResponse))
+      spyOn(console, 'error')
+
+      component['onSave']()
+
+      expect(console.error).toHaveBeenCalledWith('updateTheme', errorResponse)
+      expect(msgServiceSpy.error).toHaveBeenCalledWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.THEME.NOK' })
+    })
+
+    it('should clear empty URL strings', () => {
+      mockThemePropsComponent.theme = { ...theme, id: 'themeId', logoUrl: '', smallLogoUrl: '', faviconUrl: '' }
+      themeApiSpy.updateTheme.and.returnValue(of({ resource: theme }) as any)
+      themeApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
+
+      component['onSave']()
+
+      const callArgs = themeApiSpy.updateTheme.calls.mostRecent().args[0]
+      expect(callArgs.updateThemeRequest!.resource.logoUrl).toBeUndefined()
+      expect(callArgs.updateThemeRequest!.resource.smallLogoUrl).toBeUndefined()
+      expect(callArgs.updateThemeRequest!.resource.faviconUrl).toBeUndefined()
+    })
+
+    it('should not call updateTheme when themeData has no id', () => {
+      mockThemePropsComponent.theme = { ...theme, id: undefined }
+
+      component['onSave']()
+
+      expect(themeApiSpy.updateTheme).not.toHaveBeenCalled()
+    })
+
+    it('should initialize properties if undefined', () => {
+      mockThemePropsComponent.theme = { ...theme, id: 'themeId', properties: undefined }
+      themeApiSpy.updateTheme.and.returnValue(of({ resource: theme }) as any)
+      themeApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
+
+      component['onSave']()
+
+      const callArgs = themeApiSpy.updateTheme.calls.mostRecent().args[0]
+      expect(callArgs.updateThemeRequest!.resource.properties).toBeDefined()
+    })
+  })
+
+  describe('useThemeAsTemplate', () => {
+    it('should load theme by id and set themeForColors', () => {
+      const templateTheme = { name: 'template', displayName: 'Template', properties: { color: 'red' } }
+      themeApiSpy.getThemeById.and.returnValue(of({ resource: templateTheme }) as any)
+      spyOn(console, 'log')
+
+      component.useThemeAsTemplate({ id: '123' })
+
+      expect(themeApiSpy.getThemeById).toHaveBeenCalledWith({ id: '123' })
+      expect(component.themeForColors).toEqual(templateTheme as any)
+      expect(msgServiceSpy.info).toHaveBeenCalledWith({ summaryKey: 'THEME.TEMPLATE.CONFIRMATION.OK' })
+    })
+
+    it('should set name and displayName with COPY_OF prefix in CREATE mode', () => {
+      const templateTheme = { name: 'template', displayName: 'Template', properties: {} }
+      themeApiSpy.getThemeById.and.returnValue(of({ resource: templateTheme }) as any)
+      component.changeMode = 'CREATE'
+      spyOn(console, 'log')
+
+      component.useThemeAsTemplate({ id: '123', 'ACTIONS.COPY_OF': 'Copy of ' })
+
+      expect(component.themeForProps!.name).toBe('Copy of template')
+      expect(component.themeForProps!.displayName).toBe('Copy of Template')
+    })
+
+    it('should not modify themeForProps name in EDIT mode', () => {
+      const templateTheme = { name: 'template', displayName: 'Template', properties: {} }
+      themeApiSpy.getThemeById.and.returnValue(of({ resource: templateTheme }) as any)
+      component.changeMode = 'EDIT'
+      component.themeForProps = { name: 'original' }
+      spyOn(console, 'log')
+
+      component.useThemeAsTemplate({ id: '123', 'ACTIONS.COPY_OF': 'Copy of ' })
+
+      expect(component.themeForProps!.name).toBe('original')
+    })
+  })
+
+  describe('prepareDialogTranslations', () => {
+    it('should populate messages with translation data', () => {
+      component['prepareDialogTranslations']()
+
+      expect(component.messages.length).toBe(1)
+      expect(component.messages[0].severity).toBe('warn')
+      expect(component.messages[0].id).toBe('ws_detail_operator_message')
     })
   })
 })

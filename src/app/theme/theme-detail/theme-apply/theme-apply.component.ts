@@ -10,7 +10,8 @@ import { Utils } from 'src/app/shared/utils'
 @Component({
   selector: 'app-theme-apply',
   templateUrl: './theme-apply.component.html',
-  styleUrls: ['./theme-apply.component.scss']
+  styleUrls: ['./theme-apply.component.scss'],
+  providers: [ConfirmationService]
 })
 export class ThemeApplyComponent {
   @Input() theme: Theme | undefined
@@ -19,6 +20,7 @@ export class ThemeApplyComponent {
   @Input() isCurrentTheme = true
   @Input() autoApply = true
   @Output() autoApplyChange = new EventEmitter<boolean>() // inform theme detail about change in auto apply to trigger message about it
+  @Output() templatingThemeData = new EventEmitter<Theme>() // the data of the theme to be used as template, emitted when user confirms to use a theme as template
 
   constructor(
     private readonly confirmation: ConfirmationService,
@@ -32,6 +34,7 @@ export class ThemeApplyComponent {
     const theme = themes.find((t) => t.name === ev.value)
     if (theme?.id && theme?.displayName) this.confirmUseThemeTemplate(theme.id, theme.displayName, box)
   }
+
   private confirmUseThemeTemplate(id: string, dn: string, box: Dropdown) {
     firstValueFrom(
       this.translate
@@ -51,13 +54,15 @@ export class ThemeApplyComponent {
       icon: 'pi pi-question-circle',
       defaultFocus: 'reject',
       dismissableMask: true,
+      closeOnEscape: true,
       header: data['THEME.TEMPLATE.CONFIRMATION.HEADER'],
       message: data['THEME.TEMPLATE.CONFIRMATION.MESSAGE'].replace('{{ITEM}}', Utils.limitText(themeName, 50)),
       acceptLabel: data['ACTIONS.CONFIRMATION.YES'],
       rejectLabel: data['ACTIONS.CONFIRMATION.NO'],
+
       accept: () => {
         box.clear()
-        //this.useThemeAsTemplate(themeId, data)
+        this.templatingThemeData.emit({ id: themeId, ...data })
       },
       reject: () => box.clear()
     })

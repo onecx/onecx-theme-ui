@@ -3,10 +3,18 @@
 @include dropdown-zebra-rows;
 
 :host ::ng-deep {
-  .min-w-20rem {
-    min-width: 20rem;
-  }
   .min-w-16rem {
     min-width: 16rem;
+  }
+
+  .p-dialog.p-confirm-dialog {
+    .p-confirm-dialog-icon {
+      color: var(--danger-button-bg);
+    }
+    .p-dialog-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+    }
   }
 }
