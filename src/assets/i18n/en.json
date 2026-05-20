@@ -193,12 +193,17 @@
       "USED": "The Theme is used by the following Workspaces: ",
       "UNUSED": "The Theme is not used by any Workspace."
     },
+    "COLORS": {
+      "GENERAL": "General Colors",
+      "TOPBAR": "Topbar Colors",
+      "SIDEBAR": "Menu Colors"
+    },
     "IMPORT": {
       "HEADER": "Import Theme",
-      "IMPORT_THEME_SUCCESS": "The Theme was sucessfully imported.",
+      "IMPORT_THEME_SUCCESS": "The Theme was successfully imported.",
       "IMPORT_THEME_FAIL": "An error occurred, the Theme was not imported.",
       "NAME_EXISTS_MESSAGE": "A Theme with this name already exists. Its definition is overwritten.",
-      "DISPLAY_NAME_EXISTS_MESSAGE": "A Theme with this display name already exists. ",
+      "DISPLAY_NAME_EXISTS_MESSAGE": "A Theme with this display name already exists. Importing is possible, but it will result in Themes with the same display name.",
       "THEME_COLOR_PRIMARY": "Primary color",
       "THEME_COLOR_SECONDARY": "Secondary color",
       "THEME_COLOR_TEXT": "Text color",
@@ -207,11 +212,11 @@
     },
     "TEMPLATE": {
       "SELECTOR": "Select Theme template",
-      "SELECTOR.TOOLTIP": "Choose an existing Theme and use it as a template",
+      "SELECTOR.TOOLTIP": "Choose an existing Theme and use their values (e.g. colors, fonts, etc.) in current Theme.",
       "CONFIRMATION": {
         "HEADER": "Replace Theme values",
-        "MESSAGE": "Should all values be replaced by the values of \"{{ITEM}}\"?",
-        "OK": "Values was replaced - They are not yet saved"
+        "MESSAGE": "Should all values (colors, fonts, etc.) be replaced by the values of \"{{ITEM}}\"?",
+        "OK": "Values were replaced. Please save the Theme to apply the changes."
       }
     },
     "GROUPS": {
@@ -225,12 +230,14 @@
     "VERSION": "Version",
     "DESCRIPTION": "Description",
     "CSS_FILE": "CSS File",
+    "FONT_FAMILY": "Font Family",
+    "FONT_SIZE": "Font Size",
     "TOOLTIPS": {
       "ID": "Unique technical ID of the Theme",
       "NAME": "Unique name of the Theme, cannot be changed. Used as reference to the Theme.",
       "DISPLAY_NAME": "Display Name",
-      "FONT_FAMILY": "Select Font family",
-      "FONT_SIZE": "Select Font size",
+      "FONT_FAMILY": "Used font family (CSS property: font-family), e.g. 'Arial', 'Times New Roman', etc.",
+      "FONT_SIZE": "Used basic font size (CSS property: font-size), e.g. '16px', '1em', etc.",
       "ITEM_COLOR": "Select a Color",
       "ITEM_COLOR_PICKER": "Select a color with the color picker",
       "VERSION": "Version of the Theme",

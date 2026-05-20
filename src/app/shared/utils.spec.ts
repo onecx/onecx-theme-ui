@@ -241,4 +241,22 @@ describe('util functions', () => {
       expect(console.error).toHaveBeenCalledWith('doesUrlExistFor', errorResponse)
     })
   })
+
+  describe('getPropertyValue', () => {
+    it('should return the value for an existing property', () => {
+      const obj = { 'font-family': 'Arial', 'font-size': '14px' }
+
+      expect(Utils.getPropertyValue(obj, 'font-family')).toEqual('Arial')
+    })
+
+    it('should return undefined for a non-existing property', () => {
+      const obj = { 'font-family': 'Arial' }
+
+      expect(Utils.getPropertyValue(obj, 'color')).toBeUndefined()
+    })
+
+    it('should return undefined if obj is undefined', () => {
+      expect(Utils.getPropertyValue(undefined, 'font-family')).toBeUndefined()
+    })
+  })
 })

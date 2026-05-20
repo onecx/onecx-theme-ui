@@ -3,7 +3,7 @@
 @include dropdown-zebra-rows;
 
 :host ::ng-deep {
-  .min-w-16rem {
+  .min-w-rem-dropdown-template {
     min-width: 16rem;
   }
 

@@ -99,14 +99,26 @@ describe('ThemePropsComponent', () => {
       expect().nothing()
     })
 
-    it('call with theme but invalid form', () => {
+    it('call with theme but invalid basic form', () => {
       component.changeMode = 'EDIT'
       component.theme = { ...validTheme, name: '' } // name is required, so form is invalid
       component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme, true) })
 
       component.onSave()
 
-      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'VALIDATION.FORM_INVALID' })
+      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
+    })
+
+    it('call with theme but invalid font form', () => {
+      component.changeMode = 'EDIT'
+      component.theme = { ...validTheme }
+      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme, true) })
+      // manually invalidate the font form
+      component.fontForm.controls['font-family'].setErrors({ invalid: true })
+
+      component.onSave()
+
+      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
     })
 
     it('call with valid theme', () => {

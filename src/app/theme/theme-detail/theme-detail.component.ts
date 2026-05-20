@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core'
 import { Location } from '@angular/common'
-import { ActivatedRoute, Router } from '@angular/router'
+import { ActivatedRoute } from '@angular/router'
 import { TranslateService } from '@ngx-translate/core'
 import { Observable, catchError, combineLatest, finalize, first, map, of } from 'rxjs'
 import { Message } from 'primeng/api'
@@ -59,9 +59,19 @@ export class ThemeDetailComponent implements OnInit {
   public imageBasePath = this.imageApi.configuration.basePath
   public RefType = RefType
 
+  // Partial theme with undefined values for internal use (copying, editing) to prevent issues with form patching and image url handling when required properties are missing
+  private unchangeableThemeData = {
+    id: undefined,
+    name: undefined,
+    operator: undefined,
+    modificationDate: undefined,
+    modificationUser: undefined,
+    creationDate: undefined,
+    creationUser: undefined
+  } as Theme
+
   constructor(
     private readonly user: UserService,
-    private readonly router: Router,
     private readonly route: ActivatedRoute,
     private readonly location: Location,
     private readonly themeApi: ThemesAPIService,
@@ -116,9 +126,13 @@ export class ThemeDetailComponent implements OnInit {
       )
       .subscribe((theme) => {
         this.theme = theme
-        this.themeForProps = { ...theme }
-        this.themeForColors = { ...theme }
+        this.initSubComponentData(theme)
       })
+  }
+  private initSubComponentData(theme: Theme | undefined): void {
+    if (!theme) return
+    this.themeForProps = { ...theme, id: undefined }
+    this.themeForColors = { properties: theme.properties } // only pass properties to colors component
   }
   private getThemes(): void {
     // for using themes as templates
@@ -164,13 +178,6 @@ export class ThemeDetailComponent implements OnInit {
     }
   }
 
-  // copy theme data to separate objects for each tab to avoid unsaved changes being displayed in other tabs when editing
-  public initializeTabThemes(theme: Theme | undefined): Theme | undefined {
-    this.themeForProps = { ...theme }
-    this.themeForColors = { ...theme }
-    return this.themeForProps
-  }
-
   private toggleEditMode(forcedMode?: 'edit' | 'view', theme?: Theme): void {
     if (forcedMode === 'view') {
       this.changeMode = 'VIEW'
@@ -179,51 +186,50 @@ export class ThemeDetailComponent implements OnInit {
       this.getTheme(this.changeMode === 'EDIT')
     }
     if (this.changeMode === 'VIEW' && theme) {
-      this.theme$ = of(theme)
-      //this.theme$ = new Observable((sub) => sub.next(data.resource))
+      this.initSubComponentData(theme) // use originally loaded theme data
     }
     this.preparePageActions(this.isThemeUsedByWorkspace, theme)
   }
 
   private onSave(): void {
-    // Get data from forms
-    this.ThemePropsComponent.onSave()
-    if (!this.ThemePropsComponent.basicForm.valid) return
+    // Trigger save on sub components (return false on validation error to prevent saving)
+    if (!this.ThemePropsComponent.onSave()) return
+    if (!this.ThemeColorsComponent.onSave()) return
+
     let themeData = this.ThemePropsComponent.theme
     if (!themeData) return
     themeData = {
       ...themeData,
+      id: undefined,
+      operator: undefined,
+      modificationCount: this.theme?.modificationCount,
       // prevent empty strings for urls, as it causes issues for the image service
       logoUrl: themeData.logoUrl === '' ? undefined : themeData.logoUrl,
       smallLogoUrl: themeData.smallLogoUrl === '' ? undefined : themeData.smallLogoUrl,
       faviconUrl: themeData.faviconUrl === '' ? undefined : themeData.faviconUrl
     }
     // properties: fonts & colors
-    this.ThemeColorsComponent.onSave()
-    if (!this.ThemeColorsComponent.colorsForm.valid) return
     if (!themeData.properties) themeData.properties = {}
     themeData.properties = {
-      ...this.ThemeColorsComponent.theme?.properties,
-      fontFamily: this.ThemePropsComponent.fontForm.get('fontFamily')?.value,
-      fontSize: this.ThemePropsComponent.fontForm.get('fontSize')?.value
+      ...this.ThemePropsComponent.theme?.properties, // font only
+      ...this.ThemeColorsComponent.theme?.properties // colors only
     }
-
-    if (themeData.id)
+    if (this.theme?.id)
       this.themeApi
         .updateTheme({
-          id: themeData.id,
+          id: this.theme.id,
           updateThemeRequest: { resource: themeData }
         })
         .subscribe({
           next: (data) => {
-            this.msgService.success({ summaryKey: 'ACTIONS.EDIT.MESSAGE.THEME.OK' })
+            this.msgService.success({ summaryKey: 'ACTIONS.EDIT.MESSAGE.OK' })
             this.toggleEditMode('view', data.resource)
             // update observable with response data
             this.theme$ = new Observable((sub) => sub.next(data.resource))
           },
           error: (err) => {
             console.error('updateTheme', err)
-            this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.THEME.NOK' })
+            this.msgService.error({ summaryKey: 'ACTIONS.EDIT.MESSAGE.NOK' })
           }
         })
   }
@@ -376,14 +382,18 @@ export class ThemeDetailComponent implements OnInit {
     console.log('useThemeAsTemplate', data)
     this.getThemeById(data.id).subscribe((response) => {
       // on creation the "name" can be edited
+      let name = this.theme?.name // default: original name
       if (this.changeMode === 'CREATE') {
-        this.themeForProps = {
-          ...response.resource,
-          name: data['ACTIONS.COPY_OF'] + response.resource.name,
-          displayName: data['ACTIONS.COPY_OF'] + response.resource.displayName
-        }
+        name = data['ACTIONS.COPY_OF'] + response.resource.name // only here changeable
+      }
+      this.themeForProps = {
+        ...response.resource,
+        ...this.unchangeableThemeData,
+        name: name,
+        displayName: data['ACTIONS.COPY_OF'] + response.resource.displayName
       }
       this.themeForColors = response.resource
+      console.log('themeForColors', this.themeForColors)
       this.msgService.info({ summaryKey: 'THEME.TEMPLATE.CONFIRMATION.OK' })
     })
   }

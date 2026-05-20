@@ -156,8 +156,8 @@ describe('ThemeDetailComponent', () => {
       component['getTheme']()
 
       expect(component.theme).toEqual(theme)
-      expect(component.themeForProps).toEqual({ ...theme })
-      expect(component.themeForColors).toEqual({ ...theme })
+      expect(component.themeForProps).toEqual({ ...theme, id: undefined })
+      expect(component.themeForColors).toEqual({ properties: theme.properties })
       expect(component.headerImageUrl).toBe(theme.logoUrl)
       expect(component.loading).toBeFalse()
     })
@@ -210,6 +210,25 @@ describe('ThemeDetailComponent', () => {
       component['getTheme']()
 
       expect(component.exceptionKey).toBe('EXCEPTIONS.HTTP_STATUS_0.THEME')
+    })
+  })
+
+  describe('initSubComponentData', () => {
+    it('should set themeForProps and themeForColors from theme', () => {
+      component['initSubComponentData'](theme)
+
+      expect(component.themeForProps).toEqual({ ...theme, id: undefined })
+      expect(component.themeForColors).toEqual({ properties: theme.properties })
+    })
+
+    it('should do nothing if theme is undefined', () => {
+      component.themeForProps = undefined
+      component.themeForColors = undefined
+
+      component['initSubComponentData'](undefined)
+
+      expect(component.themeForProps).toBeUndefined()
+      expect(component.themeForColors).toBeUndefined()
     })
   })
 
@@ -318,23 +337,6 @@ describe('ThemeDetailComponent', () => {
       component.onTabChange(event, undefined)
 
       expect(component.showOperatorMessage).toBeTrue()
-    })
-  })
-
-  describe('initializeTabThemes', () => {
-    it('should copy theme to themeForProps and themeForColors', () => {
-      const result = component.initializeTabThemes(theme)
-
-      expect(component.themeForProps).toEqual({ ...theme })
-      expect(component.themeForColors).toEqual({ ...theme })
-      expect(result).toEqual({ ...theme })
-    })
-
-    it('should handle undefined theme', () => {
-      const result = component.initializeTabThemes(undefined)
-
-      expect(component.themeForProps).toEqual({ ...({} as any) })
-      expect(result).toEqual({ ...({} as any) })
     })
   })
 
@@ -557,8 +559,7 @@ describe('ThemeDetailComponent', () => {
     it('should trigger save action callback', (done: DoneFn) => {
       component.changeMode = 'EDIT'
       component.ThemePropsComponent = {
-        onSave: () => {},
-        basicForm: { valid: false },
+        onSave: () => false,
         theme: undefined
       } as any
       component.preparePageActions(false, theme)
@@ -585,15 +586,13 @@ describe('ThemeDetailComponent', () => {
       expect(component.changeMode).toBe('VIEW')
     })
 
-    it('should set theme$ when switching to VIEW with theme', (done: DoneFn) => {
+    it('should reinitialize sub component data when switching to VIEW with theme', () => {
       component.changeMode = 'EDIT'
 
       component['toggleEditMode']('view', theme)
 
-      component.theme$!.subscribe((data) => {
-        expect(data).toEqual(theme)
-        done()
-      })
+      expect(component.themeForProps).toEqual({ ...theme, id: undefined })
+      expect(component.themeForColors).toEqual({ properties: theme.properties })
     })
 
     it('should toggle from VIEW to EDIT and call getTheme', () => {
@@ -619,25 +618,17 @@ describe('ThemeDetailComponent', () => {
 
     beforeEach(() => {
       mockThemePropsComponent = {
-        onSave: jasmine.createSpy('onSave'),
-        basicForm: { valid: true },
-        theme: { ...theme, id: 'themeId', properties: {} },
-        fontForm: {
-          get: jasmine.createSpy('get').and.callFake((key: string) => {
-            if (key === 'fontFamily') return { value: 'Arial' }
-            if (key === 'fontSize') return { value: '14px' }
-            return { value: '' }
-          })
-        }
+        onSave: jasmine.createSpy('onSave').and.returnValue(true),
+        theme: { ...theme, properties: {} }
       }
       mockThemeColorsComponent = {
-        onSave: jasmine.createSpy('onSave'),
-        colorsForm: { valid: true },
+        onSave: jasmine.createSpy('onSave').and.returnValue(true),
         theme: { properties: { primary: '#fff' } }
       }
       component.ThemePropsComponent = mockThemePropsComponent
       component.ThemeColorsComponent = mockThemeColorsComponent
       component['themeName'] = theme.name!
+      component.theme = { ...theme, id: 'themeId', modificationCount: 1 }
     })
 
     it('should call updateTheme on save with valid forms', (done: DoneFn) => {
@@ -649,8 +640,8 @@ describe('ThemeDetailComponent', () => {
 
       expect(mockThemePropsComponent.onSave).toHaveBeenCalled()
       expect(mockThemeColorsComponent.onSave).toHaveBeenCalled()
-      expect(themeApiSpy.updateTheme).toHaveBeenCalled()
-      expect(msgServiceSpy.success).toHaveBeenCalledWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.THEME.OK' })
+      expect(themeApiSpy.updateTheme).toHaveBeenCalledWith(jasmine.objectContaining({ id: 'themeId' }))
+      expect(msgServiceSpy.success).toHaveBeenCalledWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.OK' })
       // subscribe to theme$ to cover the Observable subscriber
       component.theme$!.subscribe((data) => {
         expect(data).toEqual(updatedTheme)
@@ -658,11 +649,12 @@ describe('ThemeDetailComponent', () => {
       })
     })
 
-    it('should not proceed if basicForm is invalid', () => {
-      mockThemePropsComponent.basicForm.valid = false
+    it('should not proceed if ThemePropsComponent.onSave returns false', () => {
+      mockThemePropsComponent.onSave.and.returnValue(false)
 
       component['onSave']()
 
+      expect(mockThemeColorsComponent.onSave).not.toHaveBeenCalled()
       expect(themeApiSpy.updateTheme).not.toHaveBeenCalled()
     })
 
@@ -674,8 +666,8 @@ describe('ThemeDetailComponent', () => {
       expect(themeApiSpy.updateTheme).not.toHaveBeenCalled()
     })
 
-    it('should not proceed if colorsForm is invalid', () => {
-      mockThemeColorsComponent.colorsForm.valid = false
+    it('should not proceed if ThemeColorsComponent.onSave returns false', () => {
+      mockThemeColorsComponent.onSave.and.returnValue(false)
 
       component['onSave']()
 
@@ -690,7 +682,7 @@ describe('ThemeDetailComponent', () => {
       component['onSave']()
 
       expect(console.error).toHaveBeenCalledWith('updateTheme', errorResponse)
-      expect(msgServiceSpy.error).toHaveBeenCalledWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.THEME.NOK' })
+      expect(msgServiceSpy.error).toHaveBeenCalledWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.NOK' })
     })
 
     it('should clear empty URL strings', () => {
@@ -706,8 +698,8 @@ describe('ThemeDetailComponent', () => {
       expect(callArgs.updateThemeRequest!.resource.faviconUrl).toBeUndefined()
     })
 
-    it('should not call updateTheme when themeData has no id', () => {
-      mockThemePropsComponent.theme = { ...theme, id: undefined }
+    it('should not call updateTheme when component theme has no id', () => {
+      component.theme = { ...theme, id: undefined }
 
       component['onSave']()
 
@@ -751,11 +743,11 @@ describe('ThemeDetailComponent', () => {
       expect(component.themeForProps!.displayName).toBe('Copy of Template')
     })
 
-    it('should not modify themeForProps name in EDIT mode', () => {
+    it('should use component theme name in EDIT mode', () => {
       const templateTheme = { name: 'template', displayName: 'Template', properties: {} }
       themeApiSpy.getThemeById.and.returnValue(of({ resource: templateTheme }) as any)
       component.changeMode = 'EDIT'
-      component.themeForProps = { name: 'original' }
+      component.theme = { name: 'original' }
       spyOn(console, 'log')
 
       component.useThemeAsTemplate({ id: '123', 'ACTIONS.COPY_OF': 'Copy of ' })

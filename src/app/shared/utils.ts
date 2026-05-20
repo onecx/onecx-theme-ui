@@ -94,6 +94,14 @@ const Utils = {
       )
       .subscribe((ex) => (exist = ex))
     return exist
+  },
+
+  /**
+   * Endpoints
+   */
+  getPropertyValue<T = any>(obj: Record<string, T> | undefined, prop: string): T | undefined {
+    if (!obj) return undefined
+    return obj[prop]
   }
 }
 

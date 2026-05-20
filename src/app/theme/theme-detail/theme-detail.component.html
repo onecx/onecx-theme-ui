@@ -60,7 +60,16 @@
           styleClass="m-3"
           [text]="exceptionKey | translate"
         ></p-message>
-        <div *ngIf="!exceptionKey" class="mx-3 mt-1 mb-2">
+        <div *ngIf="!exceptionKey" class="mx-2 mt-1 mb-2">
+          <app-theme-apply
+            [theme]="theme"
+            [themes$]="themes$"
+            [changeMode]="changeMode"
+            [isCurrentTheme]="isCurrentTheme"
+            [autoApply]="autoApply"
+            (autoApplyChange)="changeAutoApply($event)"
+            (templatingThemeData)="useThemeAsTemplate($event)"
+          ></app-theme-apply>
           <app-theme-props [theme]="themeForProps" [changeMode]="changeMode"></app-theme-props>
         </div>
       </p-tabPanel>
@@ -80,7 +89,7 @@
           styleClass="m-3"
           [text]="exceptionKey | translate"
         ></p-message>
-        <div *ngIf="!exceptionKey" class="mx-3 mt-1 mb-2">
+        <div *ngIf="!exceptionKey" class="mx-2 mt-1 mb-2">
           <app-theme-apply
             [theme]="theme"
             [themes$]="themes$"
@@ -88,8 +97,13 @@
             [isCurrentTheme]="isCurrentTheme"
             [autoApply]="autoApply"
             (autoApplyChange)="changeAutoApply($event)"
+            (templatingThemeData)="useThemeAsTemplate($event)"
           ></app-theme-apply>
-          <app-theme-colors [theme]="themeForColors"></app-theme-colors>
+          <app-theme-colors
+            [theme]="themeForColors"
+            [changeMode]="changeMode"
+            [autoApply]="autoApply"
+          ></app-theme-colors>
         </div>
       </p-tabPanel>
 

@@ -193,6 +193,11 @@
       "USED": "Das Theme wird von folgenden Workspaces verwendet: ",
       "UNUSED": "Das Theme wird von keinem Workspace verwendet."
     },
+    "COLORS": {
+      "GENERAL": "Allgemeine Farben",
+      "TOPBAR": "Topbar Farben",
+      "SIDEBAR": "Menü Farben"
+    },
     "IMPORT": {
       "HEADER": "Import Theme",
       "IMPORT_THEME_SUCCESS": "Theme wurde erfolgreich importiert.",
@@ -207,11 +212,11 @@
     },
     "TEMPLATE": {
       "SELECTOR": "Theme-Vorlage wählen",
-      "SELECTOR.TOOLTIP": "Ein vorhandenes Theme als Vorlage verwenden",
+      "SELECTOR.TOOLTIP": "Wählen Sie ein bestehendes Theme aus und verwenden Sie dessen Werte (z. B. Farben, Schriftarten usw.) im aktuellen Theme.",
       "CONFIRMATION": {
         "HEADER": "Themewerte ersetzen",
-        "MESSAGE": "Sollen alle Werte durch die Werte von \"{{ITEM}}\" ersetzt werden?",
-        "OK": "Themewerte wurden ersetzt - Sie sind noch nicht gespeichert"
+        "MESSAGE": "Sollen alle Werte (Farben, Schriftarten, etc.) durch die Werte von \"{{ITEM}}\" ersetzt werden?",
+        "OK": "Themewerte wurden ersetzt. Bitte speichern Sie das Theme um die Änderungen zu übernehmen."
       }
     },
     "GROUPS": {
@@ -225,12 +230,14 @@
     "VERSION": "Version",
     "DESCRIPTION": "Beschreibung",
     "CSS_FILE": "CSS Datei",
+    "FONT_FAMILY": "Schriftart",
+    "FONT_SIZE": "Schriftgröße",
     "TOOLTIPS": {
       "ID": "Eindeutige technische ID des Themes",
       "NAME": "Eindeutiger Name des Themes, der nicht geändert werden kann. Wird als Referenz auf das Theme benutzt.",
       "DISPLAY_NAME": "Anzeigename",
-      "FONT_FAMILY": "Wähle die Schriftart",
-      "FONT_SIZE": "Wähle die Schriftgröße",
+      "FONT_FAMILY": "Verwendete Schriftarten (CSS-Eigenschaft: font-family), z. B. 'Arial', 'Times New Roman', etc.",
+      "FONT_SIZE": "Verwendete Grundschriftgröße (CSS-Eigenschaft: font-size), z. B. '16px', '1em', etc.",
       "ITEM_COLOR": "Wähle eine Farbe",
       "ITEM_COLOR_PICKER": "Wähle eine Farbe mit dem Farbwähler",
       "VERSION": "Version des Themes",

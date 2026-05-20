@@ -29,7 +29,6 @@ export class ThemePropsComponent implements OnChanges {
   public bffUrl: Partial<Record<RefType, string | undefined>> = {}
   public imageBasePath = this.imageApi.configuration.basePath
   public imageMaxSize = 100000
-  public urlPatternAbsolute = 'http(s)://path-to-image'
   // make it available in HTML
   public Utils = Utils
   public getLocation = getLocation
@@ -72,7 +71,7 @@ export class ThemePropsComponent implements OnChanges {
     // font
     this.fontForm = new FormGroup({})
     for (const v of themeVariables.font) {
-      const fc = new FormControl<string | null>(null)
+      const fc = new FormControl<string | null>(null, [Validators.maxLength(255)])
       this.fontForm.addControl(v, fc)
     }
   }
@@ -96,31 +95,45 @@ export class ThemePropsComponent implements OnChanges {
     this.basicForm.patchValue(theme)
     this.basicForm.get('name')?.disable()
     this.fontForm.reset()
-    if (theme.properties) this.fontForm.patchValue(theme.properties as { [key: string]: any })
+    if (theme.properties) {
+      const font = Utils.getPropertyValue(theme.properties, 'font')
+      this.fontForm.patchValue(font)
+    }
     // initialize image variables: used URLs and if logo URLs exist
     this.setBffImageUrl(theme, RefType.Logo)
     this.setBffImageUrl(theme, RefType.LogoSmall)
     this.setBffImageUrl(theme, RefType.Favicon)
   }
 
-  /***************************************************************************
-   * THEME
-   */
-
   // called by theme detail dialog: returns form values to theme detail component for saving
-  public onSave(): void {
-    if (!this.theme) return
-    if (this.basicForm.valid) Object.assign(this.theme, this.getFormData())
-    else this.msgService.error({ summaryKey: 'VALIDATION.FORM_INVALID' })
+  public onSave(): boolean {
+    if (this.theme) {
+      if (this.basicForm.valid) {
+        Object.assign(this.theme, this.getFormData(this.basicForm))
+      } else {
+        this.msgService.error({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
+        return false
+      }
+      if (this.fontForm.valid)
+        // add only font properties
+        this.theme.properties = {
+          font: this.fontForm.value
+        }
+      else {
+        this.msgService.error({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
+        return false
+      }
+    }
+    return true
   }
 
   // return the values that are different
-  private getFormData(): any {
+  private getFormData(form: FormGroup): any {
     const changes: any = {}
-    Object.keys(this.basicForm.controls).forEach((key) => {
-      if (this.basicForm.value[key] !== undefined) {
-        if (this.basicForm.value[key] !== (this.theme as any)[key]) {
-          changes[key] = this.basicForm.value[key]
+    Object.keys(form.controls).forEach((key) => {
+      if (form.value[key] !== undefined) {
+        if (form.value[key] !== (this.theme as any)[key]) {
+          changes[key] = form.value[key]
         }
       }
     })

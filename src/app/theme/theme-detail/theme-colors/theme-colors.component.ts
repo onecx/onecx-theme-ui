@@ -15,7 +15,7 @@ import { debounceTime } from 'rxjs'
 })
 export class ThemeColorsComponent implements OnChanges {
   @Input() theme: Theme | undefined
-  @Input() dateFormat = 'medium'
+  @Input() changeMode: 'VIEW' | 'EDIT' | 'CREATE' = 'VIEW'
   @Input() autoApply = false
 
   // Form
@@ -25,7 +25,7 @@ export class ThemeColorsComponent implements OnChanges {
   public sidebarForm: FormGroup
   public colorsForm: FormGroup
   public groups: {
-    title: string
+    titleKey: string
     formGroup: FormGroup
     key: keyof typeof themeVariables
   }[]
@@ -41,9 +41,9 @@ export class ThemeColorsComponent implements OnChanges {
     this.generalForm = new FormGroup({})
     this.sidebarForm = new FormGroup({})
     this.groups = [
-      { key: 'general', title: 'General Colors', formGroup: this.generalForm },
-      { key: 'topbar', title: 'Topbar Colors', formGroup: this.topbarForm },
-      { key: 'sidebar', title: 'Menu Colors', formGroup: this.sidebarForm }
+      { key: 'general', titleKey: 'THEME.COLORS.GENERAL', formGroup: this.generalForm },
+      { key: 'topbar', titleKey: 'THEME.COLORS.TOPBAR', formGroup: this.topbarForm },
+      { key: 'sidebar', titleKey: 'THEME.COLORS.SIDEBAR', formGroup: this.sidebarForm }
     ]
     this.colorsForm = this.fb.group({
       topbar: this.topbarForm,
@@ -88,10 +88,15 @@ export class ThemeColorsComponent implements OnChanges {
     if (theme.properties) this.colorsForm.patchValue(theme.properties as { [key: string]: any })
   }
 
-  public onSave(): void {
-    if (this.theme && this.formGroup.valid) {
-      this.theme.properties = this.colorsForm.value
-    }
+  public onSave(): boolean {
+    if (this.theme)
+      if (this.colorsForm.valid) {
+        this.theme.properties = this.colorsForm.value
+      } else {
+        this.msgService.error({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
+        return false
+      }
+    return true
   }
 
   // Applying Styles

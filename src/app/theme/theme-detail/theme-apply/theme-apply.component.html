@@ -27,7 +27,7 @@
     role="note"
   ></div>
   <div class="field mb-0">
-    <span class="p-float-label min-w-16rem">
+    <span class="p-float-label min-w-rem-dropdown-template max-w-30rem">
       <p-dropdown
         *ngIf="themes$ | async as themes"
         #themeTemplateBox
@@ -36,7 +36,7 @@
         optionLabel="displayName"
         optionValue="name"
         styleClass="w-full"
-        panelStyleClass="sm:max-w-20rem"
+        panelStyleClass="max-w-30rem"
         (onChange)="onSelectThemeTemplate($event, themes, themeTemplateBox)"
         [showClear]="false"
         [autoDisplayFirst]="false"
@@ -44,6 +44,7 @@
         [pTooltip]="'THEME.TEMPLATE.SELECTOR.TOOLTIP' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
+        escape="false"
       ></p-dropdown>
       <label for="th_detail_apply_theme_template" class="white-space-nowrap" aria-hidden="true">
         {{ 'THEME.TEMPLATE.SELECTOR' | translate }}

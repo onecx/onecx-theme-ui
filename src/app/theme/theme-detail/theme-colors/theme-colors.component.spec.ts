@@ -77,10 +77,6 @@ describe('ThemeColorsComponent', () => {
     it('should default autoApply to false', () => {
       expect(component.autoApply).toBeFalse()
     })
-
-    it('should default dateFormat to medium', () => {
-      expect(component.dateFormat).toBe('medium')
-    })
   })
 
   describe('ngOnChanges', () => {
@@ -142,6 +138,20 @@ describe('ThemeColorsComponent', () => {
       component.onSave()
 
       expect(component.theme.properties).toEqual(component.colorsForm.value)
+    })
+
+    it('call with theme but invalid font form', () => {
+      const theme: Theme = { name: 'test-theme', properties: {} }
+      component.changeMode = 'EDIT'
+      component.theme = theme
+      component.ngOnChanges()
+      // manually invalidate the font form
+      component.colorsForm.markAsDirty()
+      component.colorsForm.setErrors({ invalid: true })
+
+      component.onSave()
+
+      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
     })
 
     it('should not save if theme is undefined', () => {

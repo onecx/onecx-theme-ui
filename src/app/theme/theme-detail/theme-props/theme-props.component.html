@@ -350,13 +350,14 @@
         pInputText
         type="text"
         id="th_detail_font_font_family"
-        formControlName="font-family"
         class="w-full pt-3 pb-2 text-responsive"
+        formControlName="font-family"
+        [ariaLabel]="'THEME.TOOLTIPS.FONT_FAMILY' | translate"
         [pTooltip]="'THEME.TOOLTIPS.FONT_FAMILY' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
       />
-      <label for="th_detail_font_font_family" aria-hidden="true">font-family</label>
+      <label for="th_detail_font_font_family" aria-hidden="true">{{ 'THEME.FONT_FAMILY' | translate }}</label>
     </span>
   </div>
   <div class="flex-grow-1">
@@ -365,13 +366,14 @@
         pInputText
         type="text"
         id="th_detail_font_font_size"
-        formControlName="font-size"
         class="w-full pt-3 pb-2 text-responsive"
+        formControlName="font-size"
+        [ariaLabel]="'THEME.TOOLTIPS.FONT_SIZE' | translate"
         [pTooltip]="'THEME.TOOLTIPS.FONT_SIZE' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
       />
-      <label for="th_detail_font_font_size" aria-hidden="true">font-size</label>
+      <label for="th_detail_font_font_size" aria-hidden="true">{{ 'THEME.FONT_SIZE' | translate }}</label>
     </span>
   </div>
 </form>
