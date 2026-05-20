@@ -32,7 +32,7 @@ export class ThemeColorsComponent implements OnChanges {
   public themeVars = themeVariables // make it available in HTML
 
   constructor(
-    private fb: FormBuilder,
+    private readonly fb: FormBuilder,
     private readonly translate: TranslateService,
     private readonly msgService: PortalMessageService,
     private readonly cd: ChangeDetectorRef
@@ -85,17 +85,17 @@ export class ThemeColorsComponent implements OnChanges {
 
   private fillForm(theme: Theme): void {
     this.colorsForm.reset()
-    if (theme.properties) this.colorsForm.patchValue(theme.properties as { [key: string]: any })
+    if (theme.properties) this.colorsForm.patchValue(theme.properties)
   }
 
   public onSave(): boolean {
-    if (this.theme)
-      if (this.colorsForm.valid) {
-        this.theme.properties = this.colorsForm.value
-      } else {
-        this.msgService.error({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
-        return false
-      }
+    if (!this.theme) return false
+    if (this.colorsForm.valid) {
+      this.theme.properties = this.colorsForm.value
+    } else {
+      this.msgService.error({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
+      return false
+    }
     return true
   }
 

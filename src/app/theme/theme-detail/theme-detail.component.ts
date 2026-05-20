@@ -60,7 +60,7 @@ export class ThemeDetailComponent implements OnInit {
   public RefType = RefType
 
   // Partial theme with undefined values for internal use (copying, editing) to prevent issues with form patching and image url handling when required properties are missing
-  private unchangeableThemeData = {
+  private readonly unchangeableThemeData = {
     id: undefined,
     name: undefined,
     operator: undefined,
@@ -140,7 +140,7 @@ export class ThemeDetailComponent implements OnInit {
       map(
         (data) =>
           data.stream
-            ?.map((theme) => ({ ...theme, displayName: Utils.limitText(theme.displayName!, 30) }))
+            ?.map((theme) => ({ ...theme, displayName: Utils.limitText(theme.displayName, 30) }))
             ?.sort(Utils.sortByDisplayName) ?? []
       ),
       catchError((err) => {
@@ -209,7 +209,6 @@ export class ThemeDetailComponent implements OnInit {
       faviconUrl: themeData.faviconUrl === '' ? undefined : themeData.faviconUrl
     }
     // properties: fonts & colors
-    if (!themeData.properties) themeData.properties = {}
     themeData.properties = {
       ...this.ThemePropsComponent.theme?.properties, // font only
       ...this.ThemeColorsComponent.theme?.properties // colors only

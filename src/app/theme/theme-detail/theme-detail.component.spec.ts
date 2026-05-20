@@ -554,6 +554,7 @@ describe('ThemeDetailComponent', () => {
         expect(component.changeMode).toBe('VIEW')
         done()
       })
+      expect().nothing() // to satisfy linter about no expectations in subscribe block
     })
 
     it('should trigger save action callback', (done: DoneFn) => {

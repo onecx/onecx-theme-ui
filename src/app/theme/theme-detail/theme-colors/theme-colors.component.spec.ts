@@ -100,12 +100,18 @@ describe('ThemeColorsComponent', () => {
     it('should not fill form when theme is undefined', () => {
       component.theme = undefined
       component.ngOnChanges()
+
+      expect(component.generalForm.get('primary-color')?.value).toBeNull()
+      expect(component.topbarForm.get('topbar-bg-color')?.value).toBeNull()
+      expect(component.sidebarForm.get('menu-text-color')?.value).toBeNull()
     })
 
-    it('should default operator to false if not set on theme', () => {
+    it('should default operator to undefined if not set on theme', () => {
       const theme: Theme = { name: 'test-theme' }
       component.theme = theme
       component.ngOnChanges()
+
+      expect(component.theme.operator).toBeUndefined()
     })
 
     it('should reset form before patching new values', () => {
@@ -156,12 +162,13 @@ describe('ThemeColorsComponent', () => {
 
     it('should not save if theme is undefined', () => {
       component.theme = undefined
-      component.onSave()
+
       // no error thrown
+      expect(component.onSave()).toBeFalse()
     })
   })
 
-  describe('autoApply CSS variable updates', () => {
+  describe('autoApply', () => {
     it('should apply CSS variable when autoApply is true and a color value changes', fakeAsync(() => {
       component.autoApply = true
       const spy = spyOn(document.documentElement.style, 'setProperty')
