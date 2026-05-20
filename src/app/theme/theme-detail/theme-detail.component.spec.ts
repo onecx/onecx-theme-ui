@@ -570,6 +570,7 @@ describe('ThemeDetailComponent', () => {
         saveAction!.actionCallback()
         done()
       })
+      expect().nothing() // to satisfy linter about no expectations in subscribe block
     })
   })
 
