@@ -1,12 +1,4 @@
-@import '/src/app/_th-mixins.scss';
-
-@include dropdown-zebra-rows;
-
 :host ::ng-deep {
-  .p-dialog.p-confirm-dialog .p-confirm-dialog-icon {
-    color: var(--danger-button-bg);
-  }
-
   .h-3-5rem {
     height: 3.5rem;
   }

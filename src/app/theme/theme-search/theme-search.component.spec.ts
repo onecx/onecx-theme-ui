@@ -93,9 +93,8 @@ describe('ThemeSearchComponent', () => {
     component.actions$!.subscribe((act) => (actions = act))
     expect(actions.length).toBe(2)
 
-    spyOn(component, 'onNewTheme')
     actions[0].actionCallback()
-    expect(component.onNewTheme).toHaveBeenCalledTimes(1)
+    expect(component.createDialogVisible).toBe(true)
 
     spyOn(component, 'onImportThemeClick')
     actions[1].actionCallback()
@@ -160,15 +159,6 @@ describe('ThemeSearchComponent', () => {
     })
   })
 
-  it('should navigate to theme detail on new theme callback', () => {
-    const router = TestBed.inject(Router)
-    spyOn(router, 'navigate')
-
-    component.onNewTheme()
-
-    expect(router.navigate).toHaveBeenCalledOnceWith(['./new'], jasmine.any(Object))
-  })
-
   it('should change viewMode on layout change', () => {
     expect(component.viewMode).toBe('grid')
 
@@ -220,5 +210,23 @@ describe('ThemeSearchComponent', () => {
     component.onThemeUpload(true)
     expect(component.importDialogVisible).toBe(false)
     expect(component.loadThemes).toHaveBeenCalledTimes(1)
+  })
+
+  it('should set createDialogVisible on onHideCreateDialog', () => {
+    component.createDialogVisible = true
+    component.onHideCreateDialog(false)
+    expect(component.createDialogVisible).toBe(false)
+
+    component.onHideCreateDialog(true)
+    expect(component.createDialogVisible).toBe(true)
+  })
+
+  it('should navigate to created theme on onThemeCreated', () => {
+    const router = TestBed.inject(Router)
+    spyOn(router, 'navigate')
+
+    component.onThemeCreated({ name: 'new-theme' })
+
+    expect(router.navigate).toHaveBeenCalledWith(['./new-theme'], { relativeTo: (component as any).route })
   })
 })

@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core'
 import { Location } from '@angular/common'
+import { FormControl, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router'
 import { TranslateService } from '@ngx-translate/core'
 import { Observable, catchError, combineLatest, finalize, first, map, of } from 'rxjs'
@@ -58,6 +59,7 @@ export class ThemeDetailComponent implements OnInit {
   // image
   public imageBasePath = this.imageApi.configuration.basePath
   public RefType = RefType
+  public saveAsForm: FormGroup
 
   // Partial theme with undefined values for internal use (copying, editing) to prevent issues with form patching and image url handling when required properties are missing
   private readonly unchangeableThemeData = {
@@ -83,6 +85,11 @@ export class ThemeDetailComponent implements OnInit {
     this.dateFormat = this.user.lang$.getValue() === 'de' ? 'dd.MM.yyyy HH:mm:ss' : 'medium'
     this.themeName = route.snapshot.paramMap.get('name')
     this.changeMode = this.themeName ? 'VIEW' : 'CREATE'
+    // FORMs
+    this.saveAsForm = new FormGroup({
+      themeName: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(100)]),
+      displayName: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(100)])
+    })
   }
 
   ngOnInit(): void {

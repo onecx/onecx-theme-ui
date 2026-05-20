@@ -139,6 +139,11 @@
       "VARIABLES": "Theme-Variablen",
       "VARIABLES.TOOLTIP": "JSON-Darstellung der Theme-Variablen"
     },
+    "WORKSPACES_USING_THEME": {
+      "MISSING_COMPONENT": "Informationen zur Verwendung des Themes in einem Workspace konnten nicht abgerufen werden.",
+      "USED": "Das Theme wird von folgenden Workspaces verwendet: ",
+      "UNUSED": "Das Theme wird von keinem Workspace verwendet."
+    },
     "DATAVIEW": {
       "FILTER": "Filter",
       "PRODUCT_FILTER_TOOLTIP": "Filtern nach Applikation und Klassifikation",
@@ -188,11 +193,6 @@
     "DESIGNER.CREATE.SUBHEADER": "Ein neues Theme erstellen",
     "DESIGNER.TOP.SECTION": "Theme anwenden und Vorlage wählen",
     "NO_PROPERTIES": "Keine Farbwerte enthalten",
-    "WORKSPACES_USING_THEME": {
-      "MISSING_COMPONENT": "Informationen zur Verwendung des Themes in einem Workspace konnten nicht abgerufen werden.",
-      "USED": "Das Theme wird von folgenden Workspaces verwendet: ",
-      "UNUSED": "Das Theme wird von keinem Workspace verwendet."
-    },
     "COLORS": {
       "GENERAL": "Allgemeine Farben",
       "TOPBAR": "Topbar Farben",

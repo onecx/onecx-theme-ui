@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core'
 import { RouterModule, Routes } from '@angular/router'
-import { DividerModule } from 'primeng/divider'
 
 import { PortalCoreModule } from '@onecx/portal-integration-angular'
 import { addInitializeModuleGuard, InitializeModuleGuard } from '@onecx/angular-integration-interface'
@@ -18,6 +17,7 @@ import { ThemeInternComponent } from './theme-detail/theme-intern/theme-intern.c
 import { ThemeColorsComponent } from './theme-detail/theme-colors/theme-colors.component'
 import { ThemeUseComponent } from './theme-detail/theme-use/theme-use.component'
 import { ThemeDesignerComponent } from './theme-designer/theme-designer.component'
+import { ThemeCreateComponent } from './theme-create/theme-create.component'
 
 const routes: Routes = [
   {
@@ -56,6 +56,7 @@ const routes: Routes = [
 @NgModule({
   declarations: [
     ThemeSearchComponent,
+    ThemeCreateComponent,
     ThemeDeleteComponent,
     ThemeDetailComponent,
     ThemeDesignerComponent,
@@ -69,8 +70,7 @@ const routes: Routes = [
   imports: [
     PortalCoreModule.forMicroFrontend(),
     [RouterModule.forChild(addInitializeModuleGuard(routes))],
-    SharedModule,
-    DividerModule
+    SharedModule
   ],
   providers: [InitializeModuleGuard]
 })

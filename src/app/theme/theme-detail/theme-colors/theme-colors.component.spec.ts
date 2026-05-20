@@ -1,4 +1,4 @@
-import { NO_ERRORS_SCHEMA } from '@angular/core'
+import { NO_ERRORS_SCHEMA, SimpleChange } from '@angular/core'
 import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from '@angular/core/testing'
 import { ReactiveFormsModule } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
@@ -90,7 +90,7 @@ describe('ThemeColorsComponent', () => {
         }
       }
       component.theme = theme
-      component.ngOnChanges()
+      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme, true) })
 
       expect(component.generalForm.get('primary-color')?.value).toBe('#ff0000')
       expect(component.topbarForm.get('topbar-bg-color')?.value).toBe('#00ff00')
@@ -99,7 +99,7 @@ describe('ThemeColorsComponent', () => {
 
     it('should not fill form when theme is undefined', () => {
       component.theme = undefined
-      component.ngOnChanges()
+      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme, true) })
 
       expect(component.generalForm.get('primary-color')?.value).toBeNull()
       expect(component.topbarForm.get('topbar-bg-color')?.value).toBeNull()
@@ -109,7 +109,7 @@ describe('ThemeColorsComponent', () => {
     it('should default operator to undefined if not set on theme', () => {
       const theme: Theme = { name: 'test-theme' }
       component.theme = theme
-      component.ngOnChanges()
+      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme, true) })
 
       expect(component.theme.operator).toBeUndefined()
     })
@@ -120,7 +120,8 @@ describe('ThemeColorsComponent', () => {
         properties: { general: { 'primary-color': '#111111' } }
       }
       component.theme = theme1
-      component.ngOnChanges()
+      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme, true) })
+
       expect(component.generalForm.get('primary-color')?.value).toBe('#111111')
 
       const theme2: Theme = {
@@ -128,20 +129,30 @@ describe('ThemeColorsComponent', () => {
         properties: { general: { 'secondary-color': '#222222' } }
       }
       component.theme = theme2
-      component.ngOnChanges()
+      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme, true) })
+
       expect(component.generalForm.get('primary-color')?.value).toBeNull()
       expect(component.generalForm.get('secondary-color')?.value).toBe('#222222')
     })
   })
 
   describe('onSave', () => {
-    it('should save form values to theme properties', () => {
-      const theme: Theme = { name: 'test-theme', properties: {} }
-      component.theme = theme
-      component.ngOnChanges()
+    const theme: Theme = {
+      name: 'test-theme',
+      displayName: 'Test Theme',
+      properties: {
+        general: { 'primary-color': '#ff0000' },
+        topbar: { 'topbar-bg-color': '#00ff00' },
+        sidebar: { 'menu-text-color': '#0000ff' }
+      }
+    }
 
-      component.generalForm.patchValue({ 'primary-color': '#abcdef' })
-      component.onSave()
+    it('should save form values to theme properties', () => {
+      component.changeMode = 'EDIT'
+      component.theme = theme
+
+      component.ngOnChanges({ theme: new SimpleChange(undefined, theme, true) })
+      expect(component.onSave()).toBeTrue()
 
       expect(component.theme.properties).toEqual(component.colorsForm.value)
     })
@@ -150,7 +161,8 @@ describe('ThemeColorsComponent', () => {
       const theme: Theme = { name: 'test-theme', properties: {} }
       component.changeMode = 'EDIT'
       component.theme = theme
-      component.ngOnChanges()
+
+      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme, true) })
       // manually invalidate the font form
       component.colorsForm.markAsDirty()
       component.colorsForm.setErrors({ invalid: true })

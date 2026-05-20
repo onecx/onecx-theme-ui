@@ -23,6 +23,7 @@ export class ThemeSearchComponent implements OnInit {
   public sortOrder = 1
   public actions$: Observable<Action[]> | undefined
   public importDialogVisible = false
+  public createDialogVisible = false
   public Utils = Utils
   // image
   public imageBasePath = this.imageApi.configuration.basePath
@@ -97,7 +98,7 @@ export class ThemeSearchComponent implements OnInit {
             {
               label: data['ACTIONS.CREATE.THEME'],
               title: data['ACTIONS.CREATE.THEME.TOOLTIP'],
-              actionCallback: () => this.onNewTheme(),
+              actionCallback: () => (this.createDialogVisible = true),
               permission: 'THEME#CREATE',
               icon: 'pi pi-plus',
               show: 'always'
@@ -115,8 +116,11 @@ export class ThemeSearchComponent implements OnInit {
       )
   }
 
-  public onNewTheme(): void {
-    this.router.navigate(['./new'], { relativeTo: this.route })
+  public onHideCreateDialog(visible: boolean): void {
+    this.createDialogVisible = visible
+  }
+  public onThemeCreated(theme: Theme): void {
+    this.router.navigate(['./' + theme.name], { relativeTo: this.route })
   }
   public onLayoutChange(viewMode: 'list' | 'grid'): void {
     this.viewMode = viewMode

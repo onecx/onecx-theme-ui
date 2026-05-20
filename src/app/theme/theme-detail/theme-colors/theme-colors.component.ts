@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Input, OnChanges } from '@angular/core'
+import { ChangeDetectorRef, Component, Input, OnChanges, SimpleChanges } from '@angular/core'
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
 
@@ -19,7 +19,6 @@ export class ThemeColorsComponent implements OnChanges {
   @Input() autoApply = false
 
   // Form
-  public formGroup = new FormGroup({})
   public generalForm: FormGroup
   public topbarForm: FormGroup
   public sidebarForm: FormGroup
@@ -37,25 +36,34 @@ export class ThemeColorsComponent implements OnChanges {
     private readonly msgService: PortalMessageService,
     private readonly cd: ChangeDetectorRef
   ) {
+    // color sections
     this.topbarForm = new FormGroup({})
     this.generalForm = new FormGroup({})
     this.sidebarForm = new FormGroup({})
+    // group all color sections
+    this.colorsForm = this.fb.group({
+      general: this.generalForm,
+      topbar: this.topbarForm,
+      sidebar: this.sidebarForm
+    })
+    // group sections for HTML
     this.groups = [
       { key: 'general', titleKey: 'THEME.COLORS.GENERAL', formGroup: this.generalForm },
       { key: 'topbar', titleKey: 'THEME.COLORS.TOPBAR', formGroup: this.topbarForm },
       { key: 'sidebar', titleKey: 'THEME.COLORS.SIDEBAR', formGroup: this.sidebarForm }
     ]
-    this.colorsForm = this.fb.group({
-      topbar: this.topbarForm,
-      general: this.generalForm,
-      sidebar: this.sidebarForm
-    })
     this.initForms()
   }
 
-  public ngOnChanges(): void {
+  public ngOnChanges(changes: SimpleChanges): void {
+    this.colorsForm.disable()
     if (this.theme) {
-      this.fillForm(this.theme)
+      if (changes['theme']) this.fillForm(this.theme)
+      if (this.changeMode !== 'VIEW') {
+        this.colorsForm.enable()
+      }
+    } else {
+      this.colorsForm.reset()
     }
   }
 
@@ -85,6 +93,7 @@ export class ThemeColorsComponent implements OnChanges {
 
   private fillForm(theme: Theme): void {
     this.colorsForm.reset()
+    this.colorsForm.disable()
     if (theme.properties) this.colorsForm.patchValue(theme.properties)
   }
 

@@ -184,6 +184,13 @@
       </ng-template>
     </p-dataView>
 
+    <!-- CREATE -->
+    <app-theme-create
+      [visible]="createDialogVisible"
+      (visibleChange)="onHideCreateDialog($event)"
+      (themeCreated)="onThemeCreated($event)"
+    ></app-theme-create>
+
     <!-- IMPORT -->
     <app-theme-import
       [themes]="themes"

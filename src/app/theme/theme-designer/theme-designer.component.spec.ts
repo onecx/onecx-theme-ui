@@ -21,7 +21,7 @@ import { PortalMessageService, ThemeService } from '@onecx/angular-integration-i
 import { MimeType, RefType, ThemesAPIService, ImagesInternalAPIService, Theme } from 'src/app/shared/generated'
 import { Utils } from 'src/app/shared/utils'
 import { ThemeDesignerComponent } from './theme-designer.component'
-import { themeVariables } from './theme-variables'
+import { themeVariables } from '../theme-detail/theme-variables'
 
 const validTheme = {
   id: 'id',

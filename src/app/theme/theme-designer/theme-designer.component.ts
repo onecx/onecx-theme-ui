@@ -21,7 +21,7 @@ import {
   MimeType
 } from 'src/app/shared/generated'
 import { Utils } from 'src/app/shared/utils'
-import { themeVariables } from './theme-variables'
+import { themeVariables } from '../theme-detail/theme-variables'
 
 @Component({
   selector: 'app-theme-designer',
