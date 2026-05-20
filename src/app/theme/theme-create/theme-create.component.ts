@@ -6,6 +6,7 @@ import { TranslateService } from '@ngx-translate/core'
 import { PortalMessageService } from '@onecx/angular-integration-interface'
 
 import { ThemesAPIService } from 'src/app/shared/generated'
+import { themeVariables } from '../theme-detail/theme-variables'
 
 export type Theme = {
   name: string
@@ -46,9 +47,17 @@ export class ThemeCreateComponent {
   }
 
   public saveTheme(): void {
+    // prepare theme properties with current values from document
+    const currentVars: { [key: string]: { [key: string]: string } } = {}
+    for (const tv of Object.entries(themeVariables)) {
+      currentVars[tv[0]] = {}
+      for (const v of tv[1])
+        currentVars[tv[0]][v] = getComputedStyle(document.documentElement).getPropertyValue(`--${v}`)
+    }
+    // create
     this.themesApi
       .createTheme({
-        createThemeRequest: { resource: this.formGroup.value }
+        createThemeRequest: { resource: { ...this.formGroup.value, properties: currentVars } }
       })
       .pipe()
       .subscribe({
