@@ -9,15 +9,14 @@ import { SharedModule } from 'src/app/shared/shared.module'
 
 import { ThemeSearchComponent } from './theme-search/theme-search.component'
 import { ThemeImportComponent } from './theme-import/theme-import.component'
+import { ThemeCreateComponent } from './theme-create/theme-create.component'
 import { ThemeDeleteComponent } from './theme-delete/theme-delete.component'
 import { ThemeDetailComponent } from './theme-detail/theme-detail.component'
+import { ThemeUseComponent } from './theme-detail/theme-use/theme-use.component'
 import { ThemeApplyComponent } from './theme-detail/theme-apply/theme-apply.component'
 import { ThemePropsComponent } from './theme-detail/theme-props/theme-props.component'
 import { ThemeInternComponent } from './theme-detail/theme-intern/theme-intern.component'
 import { ThemeColorsComponent } from './theme-detail/theme-colors/theme-colors.component'
-import { ThemeUseComponent } from './theme-detail/theme-use/theme-use.component'
-import { ThemeDesignerComponent } from './theme-designer/theme-designer.component'
-import { ThemeCreateComponent } from './theme-create/theme-create.component'
 
 const routes: Routes = [
   {
@@ -26,28 +25,11 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
-    path: 'new',
-    component: ThemeDesignerComponent,
-    data: {
-      breadcrumb: 'BREADCRUMBS.CREATE',
-      breadcrumbFn: (data: any) => `${data.labeli18n}`
-    },
-    resolve: { labeli18n: LabelResolver }
-  },
-  {
     path: ':name',
     component: ThemeDetailComponent,
+    runGuardsAndResolvers: 'paramsChange',
     data: {
       breadcrumb: 'BREADCRUMBS.DETAIL',
-      breadcrumbFn: (data: any) => `${data.labeli18n}`
-    },
-    resolve: { labeli18n: LabelResolver }
-  },
-  {
-    path: ':name/edit',
-    component: ThemeDesignerComponent,
-    data: {
-      breadcrumb: 'BREADCRUMBS.EDIT',
       breadcrumbFn: (data: any) => `${data.labeli18n}`
     },
     resolve: { labeli18n: LabelResolver }
@@ -59,7 +41,6 @@ const routes: Routes = [
     ThemeCreateComponent,
     ThemeDeleteComponent,
     ThemeDetailComponent,
-    ThemeDesignerComponent,
     ThemeImportComponent,
     ThemeApplyComponent,
     ThemePropsComponent,

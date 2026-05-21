@@ -3,17 +3,13 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms'
-import { ActivatedRoute, ActivatedRouteSnapshot, provideRouter, Router } from '@angular/router'
+import { provideRouter } from '@angular/router'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 import { of, throwError } from 'rxjs'
-import { ConfirmationService } from 'primeng/api'
-import { DropdownModule } from 'primeng/dropdown'
 
 import { PortalMessageService } from '@onecx/angular-integration-interface'
-import { APP_CONFIG } from '@onecx/portal-integration-angular'
 
 import { Theme, ThemesAPIService } from 'src/app/shared/generated'
-import { environment } from 'src/environments/environment'
 import { ThemeCreateComponent } from './theme-create.component'
 
 const theme: Theme = {
@@ -23,28 +19,18 @@ const theme: Theme = {
   description: 'description'
 }
 
-class MockRouter {
-  navigate = jasmine.createSpy('navigate')
-}
-
 describe('ThemeCreateComponent', () => {
   let component: ThemeCreateComponent
   let fixture: ComponentFixture<ThemeCreateComponent>
-  const mockRouter = new MockRouter()
 
   const themeApiServiceSpy = { createTheme: jasmine.createSpy('createTheme').and.returnValue(of({})) }
   const msgServiceSpy = jasmine.createSpyObj<PortalMessageService>('PortalMessageService', ['success', 'error'])
-  const mockActivatedRouteSnapshot: Partial<ActivatedRouteSnapshot> = { params: { id: 'mockId' } }
-  const mockActivatedRoute: Partial<ActivatedRoute> = {
-    snapshot: mockActivatedRouteSnapshot as ActivatedRouteSnapshot
-  }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ThemeCreateComponent],
       imports: [
         ReactiveFormsModule,
-        DropdownModule,
         TranslateTestingModule.withTranslations({
           de: require('src/assets/i18n/de.json'),
           en: require('src/assets/i18n/en.json')
@@ -53,13 +39,9 @@ describe('ThemeCreateComponent', () => {
       providers: [
         provideHttpClientTesting(),
         provideHttpClient(),
-        provideRouter([{ path: '', component: ThemeCreateComponent }]),
-        { provide: APP_CONFIG, useValue: environment },
-        { provide: Router, useValue: mockRouter },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
+        provideRouter([]),
         { provide: PortalMessageService, useValue: msgServiceSpy },
-        { provide: ThemesAPIService, useValue: themeApiServiceSpy },
-        ConfirmationService
+        { provide: ThemesAPIService, useValue: themeApiServiceSpy }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents()
@@ -86,23 +68,70 @@ describe('ThemeCreateComponent', () => {
     expect(component).toBeTruthy()
   })
 
-  it('should create a theme', () => {
-    themeApiServiceSpy.createTheme.and.returnValue(of({ resource: theme }))
+  describe('ngOnChanges', () => {
+    it('should reset form and patch values from themeToBeCreated', () => {
+      component.themeToBeCreated = theme
 
-    component.saveTheme()
+      component.ngOnChanges()
 
-    expect(msgServiceSpy.success).toHaveBeenCalledWith({ summaryKey: 'ACTIONS.CREATE.MESSAGE.OK' })
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['./name'], { relativeTo: mockActivatedRoute })
+      expect(component.formGroup.value.name).toBe(theme.name)
+      expect(component.formGroup.value.displayName).toBe(theme.displayName)
+      expect(component.formGroup.value.description).toBe(theme.description)
+    })
+
+    it('should reset form without patching when themeToBeCreated is undefined', () => {
+      component.formGroup.patchValue({ name: 'existingName' })
+      component.themeToBeCreated = undefined
+
+      component.ngOnChanges()
+
+      expect(component.formGroup.value.name).toBeNull()
+    })
   })
 
-  it('should display error when theme creation fails', () => {
-    const errorResponse = { status: 400, statusText: 'Error on creating a theme' }
-    themeApiServiceSpy.createTheme.and.returnValue(throwError(() => errorResponse))
-    spyOn(console, 'error')
+  describe('closeDialog', () => {
+    it('should reset form and emit visibleChange false', () => {
+      spyOn(component.visibleChange, 'emit')
+      component.formGroup.patchValue({ name: 'test' })
 
-    component.saveTheme()
+      component.closeDialog()
 
-    expect(msgServiceSpy.error).toHaveBeenCalledWith({ summaryKey: 'ACTIONS.CREATE.MESSAGE.NOK' })
-    expect(console.error).toHaveBeenCalledWith('createTheme', errorResponse)
+      expect(component.formGroup.value.name).toBeNull()
+      expect(component.visibleChange.emit).toHaveBeenCalledWith(false)
+    })
+  })
+
+  describe('saveTheme', () => {
+    it('should create a theme and emit themeCreated', () => {
+      spyOn(component.themeCreated, 'emit')
+      themeApiServiceSpy.createTheme.and.returnValue(of({ resource: theme }))
+
+      component.saveTheme()
+
+      expect(msgServiceSpy.success).toHaveBeenCalledWith({ summaryKey: 'ACTIONS.CREATE.MESSAGE.OK' })
+      expect(component.themeCreated.emit).toHaveBeenCalledWith(theme)
+    })
+
+    it('should use themeToBeCreated properties when set', () => {
+      spyOn(component.themeCreated, 'emit')
+      component.themeToBeCreated = { ...theme, properties: { general: { 'primary-color': '#000' } } }
+      themeApiServiceSpy.createTheme.and.returnValue(of({ resource: theme }))
+
+      component.saveTheme()
+
+      const callArgs = themeApiServiceSpy.createTheme.calls.mostRecent().args[0]
+      expect(callArgs.createThemeRequest.resource.properties).toEqual({ general: { 'primary-color': '#000' } })
+    })
+
+    it('should display error when theme creation fails', () => {
+      const errorResponse = { status: 400, statusText: 'Error on creating a theme' }
+      themeApiServiceSpy.createTheme.and.returnValue(throwError(() => errorResponse))
+      spyOn(console, 'error')
+
+      component.saveTheme()
+
+      expect(msgServiceSpy.error).toHaveBeenCalledWith({ summaryKey: 'ACTIONS.CREATE.MESSAGE.NOK' })
+      expect(console.error).toHaveBeenCalledWith('createTheme', errorResponse)
+    })
   })
 })

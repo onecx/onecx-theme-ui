@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core'
 import { Location } from '@angular/common'
-import { FormControl, FormGroup, Validators } from '@angular/forms'
-import { ActivatedRoute } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateService } from '@ngx-translate/core'
 import { Observable, catchError, combineLatest, finalize, first, map, of } from 'rxjs'
 import { Message } from 'primeng/api'
@@ -37,6 +36,7 @@ export class ThemeDetailComponent implements OnInit {
   public changeMode: 'VIEW' | 'EDIT' | 'CREATE' = 'VIEW'
   public autoApply = false
   public themeDeleteVisible = false
+  public themeCreateVisible = false
   public showOperatorMessage = true // display initially only
   public selectedTabIndex = 0
   public dateFormat = 'medium'
@@ -56,16 +56,17 @@ export class ThemeDetailComponent implements OnInit {
   public themeForUse: Theme | undefined
   public themeForProps: Theme | undefined
   public themeForColors: Theme | undefined
+  public themeForCreation: Theme | undefined
   // image
   public imageBasePath = this.imageApi.configuration.basePath
   public RefType = RefType
-  public saveAsForm: FormGroup
 
   // Partial theme with undefined values for internal use (copying, editing) to prevent issues with form patching and image url handling when required properties are missing
-  private readonly unchangeableThemeData = {
+  private readonly undefinedThemeData = {
     id: undefined,
     name: undefined,
     operator: undefined,
+    modificationCount: undefined,
     modificationDate: undefined,
     modificationUser: undefined,
     creationDate: undefined,
@@ -75,6 +76,7 @@ export class ThemeDetailComponent implements OnInit {
   constructor(
     private readonly user: UserService,
     private readonly route: ActivatedRoute,
+    private readonly router: Router,
     private readonly location: Location,
     private readonly themeApi: ThemesAPIService,
     private readonly themeService: ThemeService,
@@ -85,17 +87,22 @@ export class ThemeDetailComponent implements OnInit {
     this.dateFormat = this.user.lang$.getValue() === 'de' ? 'dd.MM.yyyy HH:mm:ss' : 'medium'
     this.themeName = route.snapshot.paramMap.get('name')
     this.changeMode = this.themeName ? 'VIEW' : 'CREATE'
-    // FORMs
-    this.saveAsForm = new FormGroup({
-      themeName: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(100)]),
-      displayName: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(100)])
-    })
   }
 
   ngOnInit(): void {
     this.prepareDialogTranslations()
     this.getTheme()
     this.getThemes()
+    // Re-initialize the component when the route parameter changes (e.g. after creating a new theme)
+    this.route.paramMap.subscribe((params) => {
+      const newThemeName = params.get('name')
+      if (newThemeName && newThemeName !== this.themeName) {
+        this.themeName = newThemeName
+        this.prepareDialogTranslations()
+        this.getTheme()
+        this.getThemes()
+      }
+    })
   }
 
   public changeAutoApply(value: boolean): void {
@@ -198,13 +205,14 @@ export class ThemeDetailComponent implements OnInit {
     this.preparePageActions(this.isThemeUsedByWorkspace, theme)
   }
 
-  private onSave(): void {
+  private getThemeDataFromSubComponents(): Theme | undefined {
     // Trigger save on sub components (return false on validation error to prevent saving)
-    if (!this.ThemePropsComponent.onSave()) return
-    if (!this.ThemeColorsComponent.onSave()) return
+    if (!this.ThemePropsComponent.onUpdateTheme()) return undefined
+    if (!this.ThemeColorsComponent.onUpdateTheme()) return undefined
 
     let themeData = this.ThemePropsComponent.theme
-    if (!themeData) return
+    console.log('getThemeDataFromSubComponents', themeData)
+    if (!themeData) return undefined
     themeData = {
       ...themeData,
       id: undefined,
@@ -220,6 +228,13 @@ export class ThemeDetailComponent implements OnInit {
       ...this.ThemePropsComponent.theme?.properties, // font only
       ...this.ThemeColorsComponent.theme?.properties // colors only
     }
+    return themeData
+  }
+
+  private onUpdateTheme(): void {
+    const themeData = this.getThemeDataFromSubComponents()
+    if (!themeData) return
+    // save
     if (this.theme?.id)
       this.themeApi
         .updateTheme({
@@ -240,6 +255,43 @@ export class ThemeDetailComponent implements OnInit {
         })
   }
 
+  // SAVE AS => collect current theme data and pass it to the creation dialog
+  public onSaveAs(copyOfPrefix: string): void {
+    let themeData: Theme | undefined
+    if (this.changeMode === 'EDIT') {
+      themeData = this.getThemeDataFromSubComponents()
+      if (!themeData) return
+    } else {
+      themeData = this.theme
+    }
+    if (!themeData) return
+    this.themeForCreation = {
+      ...themeData,
+      ...this.undefinedThemeData,
+      name: copyOfPrefix + themeData.name,
+      displayName: copyOfPrefix + themeData.displayName
+    }
+    console.log('onSaveAs themeForCreation:', this.themeForCreation)
+    this.themeCreateVisible = true
+  }
+
+  // Feedback from creation dialog, if a new theme was created
+  public onThemeCreated(createdTheme: Theme): void {
+    console.log('onThemeCreated', createdTheme)
+    this.themeCreateVisible = false
+    this.themeForCreation = undefined
+    this.router.navigate(['../' + createdTheme.name], { relativeTo: this.route })
+  }
+  public onHideCreateDialog(visible: boolean): void {
+    if (!visible) {
+      this.themeCreateVisible = false
+      this.themeForCreation = undefined
+    }
+  }
+
+  /**
+   * EXPORT
+   */
   public onExportTheme(theme: Theme): void {
     if (theme?.name) {
       const exportThemeRequest: ExportThemeRequest = { names: [theme.name] }
@@ -304,7 +356,10 @@ export class ThemeDetailComponent implements OnInit {
         'ACTIONS.CANCEL',
         'ACTIONS.TOOLTIPS.CANCEL',
         'ACTIONS.SAVE',
-        'ACTIONS.TOOLTIPS.SAVE'
+        'ACTIONS.TOOLTIPS.SAVE',
+        'ACTIONS.SAVE_AS',
+        'ACTIONS.TOOLTIPS.SAVE_AS',
+        'ACTIONS.COPY_OF'
       ])
       .pipe(
         map((data) => {
@@ -356,12 +411,34 @@ export class ThemeDetailComponent implements OnInit {
               id: 'th_detail_page_action_save',
               label: data['ACTIONS.SAVE'],
               title: data['ACTIONS.TOOLTIPS.SAVE'],
-              actionCallback: () => this.onSave(),
+              actionCallback: () => this.onUpdateTheme(),
               permission: this.changeMode === 'EDIT' ? 'THEME#EDIT' : 'THEME#CREATE',
               icon: 'pi pi-save',
               show: 'always',
               conditional: true,
               showCondition: this.changeMode === 'EDIT' || this.changeMode === 'CREATE'
+            },
+            {
+              id: 'th_detail_page_action_save_as_on_edit',
+              label: data['ACTIONS.SAVE_AS'],
+              title: data['ACTIONS.TOOLTIPS.SAVE_AS'],
+              actionCallback: () => this.onSaveAs(data['ACTIONS.COPY_OF']),
+              icon: 'pi pi-plus-circle',
+              show: 'always',
+              conditional: true,
+              showCondition: this.changeMode === 'EDIT' || this.changeMode === 'CREATE',
+              permission: 'THEME#CREATE'
+            },
+            {
+              id: 'th_detail_page_action_save_as_on_view',
+              label: data['ACTIONS.SAVE_AS'],
+              title: data['ACTIONS.TOOLTIPS.SAVE_AS'],
+              actionCallback: () => this.onSaveAs(data['ACTIONS.COPY_OF']),
+              icon: 'pi pi-plus-circle',
+              show: 'asOverflow',
+              conditional: true,
+              showCondition: this.theme !== undefined && this.changeMode === 'VIEW',
+              permission: 'THEME#CREATE'
             },
             {
               id: 'th_detail_page_action_delete',
@@ -372,14 +449,16 @@ export class ThemeDetailComponent implements OnInit {
               icon: 'pi pi-trash',
               show: 'asOverflow',
               conditional: true,
-              showCondition: this.changeMode === 'VIEW' && theme !== undefined
+              showCondition: theme !== undefined && this.changeMode === 'VIEW'
             }
           ]
         })
       )
   }
 
-  // USE THEME AS TEMPLATE
+  /**
+   * TEMPLATING
+   */
   private getThemeById(id: string): Observable<GetThemeResponse> {
     return this.themeApi.getThemeById({ id: id })
   }
@@ -394,9 +473,10 @@ export class ThemeDetailComponent implements OnInit {
       }
       this.themeForProps = {
         ...response.resource,
-        ...this.unchangeableThemeData,
+        ...this.undefinedThemeData,
         name: name,
-        displayName: data['ACTIONS.COPY_OF'] + response.resource.displayName
+        displayName: data['ACTIONS.COPY_OF'] + response.resource.displayName,
+        modificationCount: this.theme?.modificationCount
       }
       this.themeForColors = response.resource
       console.log('themeForColors', this.themeForColors)

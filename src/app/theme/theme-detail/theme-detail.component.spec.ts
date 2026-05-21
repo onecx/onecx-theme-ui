@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { Location } from '@angular/common'
 import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { ActivatedRoute, provideRouter } from '@angular/router'
+import { ActivatedRoute, Router, provideRouter } from '@angular/router'
 import { TranslateModule } from '@ngx-translate/core'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 import { BehaviorSubject, of, throwError } from 'rxjs'
@@ -141,6 +141,58 @@ describe('ThemeDetailComponent', () => {
 
       component['getTheme']()
 
+      expect(themeApiSpy.getThemeByName).not.toHaveBeenCalled()
+    })
+
+    it('should re-initialize when route param changes to a new name', () => {
+      const route = TestBed.inject(ActivatedRoute)
+      const paramMapSubject = new BehaviorSubject(route.snapshot.paramMap)
+      spyOnProperty(route, 'paramMap').and.returnValue(paramMapSubject.asObservable())
+      themeApiSpy.getThemeByName.calls.reset()
+      themeApiSpy.searchThemes.calls.reset()
+
+      component['themeName'] = 'oldName'
+      component.ngOnInit()
+
+      // Emit a new param with a different name
+      paramMapSubject.next({ get: () => 'newName', has: () => true, getAll: () => [], keys: [] } as any)
+
+      expect(component['themeName']).toBe('newName')
+      expect(themeApiSpy.getThemeByName).toHaveBeenCalled()
+      expect(themeApiSpy.searchThemes).toHaveBeenCalled()
+    })
+
+    it('should not re-initialize when route param is the same as current themeName', () => {
+      const route = TestBed.inject(ActivatedRoute)
+      const paramMapSubject = new BehaviorSubject(route.snapshot.paramMap)
+      spyOnProperty(route, 'paramMap').and.returnValue(paramMapSubject.asObservable())
+
+      component['themeName'] = 'sameName'
+      component.ngOnInit()
+      themeApiSpy.getThemeByName.calls.reset()
+      themeApiSpy.searchThemes.calls.reset()
+
+      // Emit param with same name
+      paramMapSubject.next({ get: () => 'sameName', has: () => true, getAll: () => [], keys: [] } as any)
+
+      expect(themeApiSpy.getThemeByName).not.toHaveBeenCalled()
+      expect(themeApiSpy.searchThemes).not.toHaveBeenCalled()
+    })
+
+    it('should not re-initialize when route param name is null', () => {
+      const route = TestBed.inject(ActivatedRoute)
+      const paramMapSubject = new BehaviorSubject(route.snapshot.paramMap)
+      spyOnProperty(route, 'paramMap').and.returnValue(paramMapSubject.asObservable())
+
+      component['themeName'] = 'existingName'
+      component.ngOnInit()
+      themeApiSpy.getThemeByName.calls.reset()
+      themeApiSpy.searchThemes.calls.reset()
+
+      // Emit param with null name
+      paramMapSubject.next({ get: () => null, has: () => false, getAll: () => [], keys: [] } as any)
+
+      expect(component['themeName']).toBe('existingName')
       expect(themeApiSpy.getThemeByName).not.toHaveBeenCalled()
     })
   })
@@ -432,11 +484,11 @@ describe('ThemeDetailComponent', () => {
   })
 
   describe('preparePageActions', () => {
-    it('should create 6 actions', (done: DoneFn) => {
+    it('should create 8 actions', (done: DoneFn) => {
       component.preparePageActions(true, theme)
 
       component.actions$.subscribe((actions) => {
-        expect(actions.length).toBe(6)
+        expect(actions.length).toBe(8)
         done()
       })
     })
@@ -451,6 +503,7 @@ describe('ThemeDetailComponent', () => {
 
     it('should show back, export, edit, delete in VIEW mode', (done: DoneFn) => {
       component.changeMode = 'VIEW'
+      component.theme = theme // needed for save_as_on_view condition (this.theme !== undefined)
       component.preparePageActions(false, theme)
 
       component.actions$.subscribe((actions) => {
@@ -460,12 +513,18 @@ describe('ThemeDetailComponent', () => {
         const deleteAction = actions.find((a) => a.id === 'th_detail_page_action_delete')
         const cancel = actions.find((a) => a.id === 'th_detail_page_action_cancel')
         const save = actions.find((a) => a.id === 'th_detail_page_action_save')
+        const saveAsOnView = actions.find((a) => a.id === 'th_detail_page_action_save_as_on_view')
+        const saveAsOnEdit = actions.find((a) => a.id === 'th_detail_page_action_save_as_on_edit')
         expect(back!.showCondition).toBeTrue()
         expect(exportAction!.showCondition).toBeTrue()
         expect(edit!.showCondition).toBeTrue()
         expect(deleteAction!.showCondition).toBeTrue()
         expect(cancel!.showCondition).toBeFalse()
         expect(save!.showCondition).toBeFalse()
+        // save_as_on_edit: shown in EDIT/CREATE — hidden in VIEW
+        expect(saveAsOnEdit!.showCondition).toBeFalse()
+        // save_as_on_view: shown in VIEW when this.theme is set
+        expect(saveAsOnView!.showCondition).toBeTrue()
         done()
       })
     })
@@ -478,9 +537,15 @@ describe('ThemeDetailComponent', () => {
         const cancel = actions.find((a) => a.id === 'th_detail_page_action_cancel')
         const save = actions.find((a) => a.id === 'th_detail_page_action_save')
         const back = actions.find((a) => a.id === 'th_detail_page_action_back')
+        const saveAsOnEdit = actions.find((a) => a.id === 'th_detail_page_action_save_as_on_edit')
+        const saveAsOnView = actions.find((a) => a.id === 'th_detail_page_action_save_as_on_view')
         expect(cancel!.showCondition).toBeTrue()
         expect(save!.showCondition).toBeTrue()
         expect(back!.showCondition).toBeFalse()
+        // save_as_on_edit: shown in EDIT/CREATE
+        expect(saveAsOnEdit!.showCondition).toBeTrue()
+        // save_as_on_view: hidden in EDIT (this.theme may or may not be set, but mode isn't VIEW)
+        expect(saveAsOnView!.showCondition).toBeFalse()
         done()
       })
     })
@@ -560,7 +625,7 @@ describe('ThemeDetailComponent', () => {
     it('should trigger save action callback', (done: DoneFn) => {
       component.changeMode = 'EDIT'
       component.ThemePropsComponent = {
-        onSave: () => false,
+        onUpdateTheme: () => false,
         theme: undefined
       } as any
       component.preparePageActions(false, theme)
@@ -571,6 +636,33 @@ describe('ThemeDetailComponent', () => {
         done()
       })
       expect().nothing() // to satisfy linter about no expectations in subscribe block
+    })
+
+    it('should trigger save_as callback in EDIT/CREATE mode', (done: DoneFn) => {
+      spyOn(component, 'onSaveAs')
+      component.changeMode = 'EDIT'
+      component.preparePageActions(false, theme)
+
+      component.actions$.subscribe((actions) => {
+        const saveAsOnEdit = actions.find((a) => a.id === 'th_detail_page_action_save_as_on_edit')
+        saveAsOnEdit!.actionCallback()
+        expect(component.onSaveAs).toHaveBeenCalled()
+        done()
+      })
+    })
+
+    it('should trigger save_as callback in VIEW mode (overflow)', (done: DoneFn) => {
+      spyOn(component, 'onSaveAs')
+      component.changeMode = 'VIEW'
+      component.theme = theme
+      component.preparePageActions(false, theme)
+
+      component.actions$.subscribe((actions) => {
+        const saveAsOnView = actions.find((a) => a.id === 'th_detail_page_action_save_as_on_view')
+        saveAsOnView!.actionCallback()
+        expect(component.onSaveAs).toHaveBeenCalled()
+        done()
+      })
     })
   })
 
@@ -614,17 +706,17 @@ describe('ThemeDetailComponent', () => {
     })
   })
 
-  describe('onSave', () => {
+  describe('onUpdateTheme', () => {
     let mockThemePropsComponent: any
     let mockThemeColorsComponent: any
 
     beforeEach(() => {
       mockThemePropsComponent = {
-        onSave: jasmine.createSpy('onSave').and.returnValue(true),
+        onUpdateTheme: jasmine.createSpy('onUpdateTheme').and.returnValue(true),
         theme: { ...theme, properties: {} }
       }
       mockThemeColorsComponent = {
-        onSave: jasmine.createSpy('onSave').and.returnValue(true),
+        onUpdateTheme: jasmine.createSpy('onUpdateTheme').and.returnValue(true),
         theme: { properties: { primary: '#fff' } }
       }
       component.ThemePropsComponent = mockThemePropsComponent
@@ -638,10 +730,10 @@ describe('ThemeDetailComponent', () => {
       themeApiSpy.updateTheme.and.returnValue(of({ resource: updatedTheme }) as any)
       themeApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
 
-      component['onSave']()
+      component['onUpdateTheme']()
 
-      expect(mockThemePropsComponent.onSave).toHaveBeenCalled()
-      expect(mockThemeColorsComponent.onSave).toHaveBeenCalled()
+      expect(mockThemePropsComponent.onUpdateTheme).toHaveBeenCalled()
+      expect(mockThemeColorsComponent.onUpdateTheme).toHaveBeenCalled()
       expect(themeApiSpy.updateTheme).toHaveBeenCalledWith(jasmine.objectContaining({ id: 'themeId' }))
       expect(msgServiceSpy.success).toHaveBeenCalledWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.OK' })
       // subscribe to theme$ to cover the Observable subscriber
@@ -651,27 +743,27 @@ describe('ThemeDetailComponent', () => {
       })
     })
 
-    it('should not proceed if ThemePropsComponent.onSave returns false', () => {
-      mockThemePropsComponent.onSave.and.returnValue(false)
+    it('should not proceed if ThemePropsComponent.onUpdateTheme returns false', () => {
+      mockThemePropsComponent.onUpdateTheme.and.returnValue(false)
 
-      component['onSave']()
+      component['onUpdateTheme']()
 
-      expect(mockThemeColorsComponent.onSave).not.toHaveBeenCalled()
+      expect(mockThemeColorsComponent.onUpdateTheme).not.toHaveBeenCalled()
       expect(themeApiSpy.updateTheme).not.toHaveBeenCalled()
     })
 
     it('should not proceed if themeData is undefined', () => {
       mockThemePropsComponent.theme = undefined
 
-      component['onSave']()
+      component['onUpdateTheme']()
 
       expect(themeApiSpy.updateTheme).not.toHaveBeenCalled()
     })
 
-    it('should not proceed if ThemeColorsComponent.onSave returns false', () => {
-      mockThemeColorsComponent.onSave.and.returnValue(false)
+    it('should not proceed if ThemeColorsComponent.onUpdateTheme returns false', () => {
+      mockThemeColorsComponent.onUpdateTheme.and.returnValue(false)
 
-      component['onSave']()
+      component['onUpdateTheme']()
 
       expect(themeApiSpy.updateTheme).not.toHaveBeenCalled()
     })
@@ -681,7 +773,7 @@ describe('ThemeDetailComponent', () => {
       themeApiSpy.updateTheme.and.returnValue(throwError(() => errorResponse))
       spyOn(console, 'error')
 
-      component['onSave']()
+      component['onUpdateTheme']()
 
       expect(console.error).toHaveBeenCalledWith('updateTheme', errorResponse)
       expect(msgServiceSpy.error).toHaveBeenCalledWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.NOK' })
@@ -692,7 +784,7 @@ describe('ThemeDetailComponent', () => {
       themeApiSpy.updateTheme.and.returnValue(of({ resource: theme }) as any)
       themeApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
 
-      component['onSave']()
+      component['onUpdateTheme']()
 
       const callArgs = themeApiSpy.updateTheme.calls.mostRecent().args[0]
       expect(callArgs.updateThemeRequest!.resource.logoUrl).toBeUndefined()
@@ -703,7 +795,7 @@ describe('ThemeDetailComponent', () => {
     it('should not call updateTheme when component theme has no id', () => {
       component.theme = { ...theme, id: undefined }
 
-      component['onSave']()
+      component['onUpdateTheme']()
 
       expect(themeApiSpy.updateTheme).not.toHaveBeenCalled()
     })
@@ -713,7 +805,7 @@ describe('ThemeDetailComponent', () => {
       themeApiSpy.updateTheme.and.returnValue(of({ resource: theme }) as any)
       themeApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
 
-      component['onSave']()
+      component['onUpdateTheme']()
 
       const callArgs = themeApiSpy.updateTheme.calls.mostRecent().args[0]
       expect(callArgs.updateThemeRequest!.resource.properties).toBeDefined()
@@ -765,6 +857,113 @@ describe('ThemeDetailComponent', () => {
       expect(component.messages.length).toBe(1)
       expect(component.messages[0].severity).toBe('warn')
       expect(component.messages[0].id).toBe('ws_detail_operator_message')
+    })
+  })
+
+  describe('onSaveAs', () => {
+    const copyOfPrefix = 'Copy of '
+
+    it('should set themeForCreation and open dialog in VIEW mode', () => {
+      component.changeMode = 'VIEW'
+      component.theme = theme
+
+      component.onSaveAs(copyOfPrefix)
+
+      expect(component.themeCreateVisible).toBeTrue()
+      expect(component.themeForCreation).toBeDefined()
+      expect(component.themeForCreation!.name).toBe(copyOfPrefix + theme.name)
+      expect(component.themeForCreation!.displayName).toBe(copyOfPrefix + theme.displayName)
+    })
+
+    it('should reset metadata fields on themeForCreation', () => {
+      component.changeMode = 'VIEW'
+      component.theme = theme
+
+      component.onSaveAs(copyOfPrefix)
+
+      expect(component.themeForCreation!.id).toBeUndefined()
+      expect(component.themeForCreation!.operator).toBeUndefined()
+      expect(component.themeForCreation!.modificationCount).toBeUndefined()
+    })
+
+    it('should not open dialog if theme is undefined in VIEW mode', () => {
+      component.changeMode = 'VIEW'
+      component.theme = undefined
+
+      component.onSaveAs(copyOfPrefix)
+
+      expect(component.themeCreateVisible).toBeFalse()
+    })
+
+    it('should use sub-component data in EDIT mode', () => {
+      component.changeMode = 'EDIT'
+      component.ThemePropsComponent = {
+        onUpdateTheme: jasmine.createSpy().and.returnValue(true),
+        theme: { ...theme, properties: {} }
+      } as any
+      component.ThemeColorsComponent = {
+        onUpdateTheme: jasmine.createSpy().and.returnValue(true),
+        theme: { properties: {} }
+      } as any
+      component.theme = { ...theme, modificationCount: 2 }
+
+      component.onSaveAs(copyOfPrefix)
+
+      expect(component.themeCreateVisible).toBeTrue()
+      expect(component.themeForCreation!.name).toBe(copyOfPrefix + theme.name)
+    })
+
+    it('should not open dialog if sub-component data is invalid in EDIT mode', () => {
+      component.changeMode = 'EDIT'
+      component.ThemePropsComponent = {
+        onUpdateTheme: jasmine.createSpy().and.returnValue(false),
+        theme: undefined
+      } as any
+      component.ThemeColorsComponent = {
+        onUpdateTheme: jasmine.createSpy().and.returnValue(true),
+        theme: { properties: {} }
+      } as any
+
+      component.onSaveAs(copyOfPrefix)
+
+      expect(component.themeCreateVisible).toBeFalse()
+    })
+  })
+
+  describe('onThemeCreated', () => {
+    it('should close dialog, clear themeForCreation and navigate', () => {
+      const router = TestBed.inject(Router)
+      spyOn(router, 'navigate')
+      component.themeCreateVisible = true
+      component.themeForCreation = theme
+
+      component.onThemeCreated({ name: 'newTheme' })
+
+      expect(component.themeCreateVisible).toBeFalse()
+      expect(component.themeForCreation).toBeUndefined()
+      expect(router.navigate).toHaveBeenCalledWith(['../newTheme'], jasmine.any(Object))
+    })
+  })
+
+  describe('onHideCreateDialog', () => {
+    it('should close dialog and clear themeForCreation when visible is false', () => {
+      component.themeCreateVisible = true
+      component.themeForCreation = theme
+
+      component.onHideCreateDialog(false)
+
+      expect(component.themeCreateVisible).toBeFalse()
+      expect(component.themeForCreation).toBeUndefined()
+    })
+
+    it('should do nothing when visible is true', () => {
+      component.themeCreateVisible = true
+      component.themeForCreation = theme
+
+      component.onHideCreateDialog(true)
+
+      expect(component.themeCreateVisible).toBeTrue()
+      expect(component.themeForCreation).toEqual(theme)
     })
   })
 })

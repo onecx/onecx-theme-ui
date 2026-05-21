@@ -94,7 +94,7 @@ describe('ThemePropsComponent', () => {
       component.changeMode = 'EDIT'
       component.theme = undefined
       component.ngOnChanges({ theme: new SimpleChange(undefined, undefined, true) })
-      component.onSave()
+      component.onUpdateTheme()
 
       expect().nothing()
     })
@@ -104,7 +104,7 @@ describe('ThemePropsComponent', () => {
       component.theme = { ...validTheme, name: '' } // name is required, so form is invalid
       component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme, true) })
 
-      component.onSave()
+      component.onUpdateTheme()
 
       expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
     })
@@ -116,7 +116,7 @@ describe('ThemePropsComponent', () => {
       // manually invalidate the font form
       component.fontForm.controls['font-family'].setErrors({ invalid: true })
 
-      component.onSave()
+      component.onUpdateTheme()
 
       expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
     })
@@ -129,7 +129,7 @@ describe('ThemePropsComponent', () => {
       component.basicForm.controls['displayName'].setValue('new display name')
       component.fontForm.controls['font-family'].setValue('newFont')
 
-      component.onSave()
+      component.onUpdateTheme()
       expect(component.theme.displayName).toBe('new display name')
       //expect(component.fontForm.value['font-family']).toBe(component.theme.properties?.font?.['font-family'])
     })

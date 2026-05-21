@@ -1,27 +1,21 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core'
+import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateService } from '@ngx-translate/core'
 
 import { PortalMessageService } from '@onecx/angular-integration-interface'
 
-import { ThemesAPIService } from 'src/app/shared/generated'
+import { Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { themeVariables } from '../theme-detail/theme-variables'
-
-export type Theme = {
-  name: string
-  displayName?: string
-  logoUrl?: string
-  faviconUrl?: string
-}
 
 @Component({
   selector: 'app-theme-create',
   templateUrl: './theme-create.component.html',
   styleUrls: ['./theme-create.component.scss']
 })
-export class ThemeCreateComponent {
+export class ThemeCreateComponent implements OnChanges {
   @Input() visible = false
+  @Input() themeToBeCreated: Theme | undefined
   @Output() visibleChange = new EventEmitter<boolean>()
   @Output() themeCreated = new EventEmitter<Theme>()
 
@@ -41,6 +35,14 @@ export class ThemeCreateComponent {
     })
   }
 
+  public ngOnChanges(): void {
+    console.log('ngOnChanges themeToBeCreated:', this.themeToBeCreated)
+    this.formGroup.reset()
+    if (this.themeToBeCreated) {
+      this.formGroup.patchValue(this.themeToBeCreated)
+    }
+  }
+
   public closeDialog(): void {
     this.formGroup.reset()
     this.visibleChange.emit(false)
@@ -54,18 +56,22 @@ export class ThemeCreateComponent {
       for (const v of tv[1])
         currentVars[tv[0]][v] = getComputedStyle(document.documentElement).getPropertyValue(`--${v}`)
     }
+    const newTheme: Theme = {
+      ...this.themeToBeCreated,
+      ...this.formGroup.value,
+      properties: this.themeToBeCreated?.properties ?? currentVars
+    }
     // create
     this.themesApi
       .createTheme({
-        createThemeRequest: { resource: { ...this.formGroup.value, properties: currentVars } }
+        createThemeRequest: { resource: newTheme }
       })
       .pipe()
       .subscribe({
         next: (response) => {
+          console.log('theme created:', response)
           this.message.success({ summaryKey: 'ACTIONS.CREATE.MESSAGE.OK' })
-          this.closeDialog()
           this.themeCreated.emit(response.resource as Theme)
-          this.router.navigate(['./' + response.resource?.name], { relativeTo: this.route })
         },
         error: (err) => {
           this.message.error({ summaryKey: 'ACTIONS.CREATE.MESSAGE.NOK' })

@@ -152,7 +152,7 @@ describe('ThemeColorsComponent', () => {
       component.theme = theme
 
       component.ngOnChanges({ theme: new SimpleChange(undefined, theme, true) })
-      expect(component.onSave()).toBeTrue()
+      expect(component.onUpdateTheme()).toBeTrue()
 
       expect(component.theme.properties).toEqual(component.colorsForm.value)
     })
@@ -167,7 +167,7 @@ describe('ThemeColorsComponent', () => {
       component.colorsForm.markAsDirty()
       component.colorsForm.setErrors({ invalid: true })
 
-      component.onSave()
+      component.onUpdateTheme()
 
       expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
     })
@@ -176,7 +176,7 @@ describe('ThemeColorsComponent', () => {
       component.theme = undefined
 
       // no error thrown
-      expect(component.onSave()).toBeFalse()
+      expect(component.onUpdateTheme()).toBeFalse()
     })
   })
 

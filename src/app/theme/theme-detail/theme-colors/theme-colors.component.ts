@@ -97,7 +97,7 @@ export class ThemeColorsComponent implements OnChanges {
     if (theme.properties) this.colorsForm.patchValue(theme.properties)
   }
 
-  public onSave(): boolean {
+  public onUpdateTheme(): boolean {
     if (!this.theme) return false
     if (this.colorsForm.valid) {
       this.theme.properties = this.colorsForm.value

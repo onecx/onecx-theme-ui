@@ -146,6 +146,14 @@
     </p-tabView>
   </ocx-page-content>
 
+  <!-- CREATE -->
+  <app-theme-create
+    [visible]="themeCreateVisible"
+    (visibleChange)="onHideCreateDialog($event)"
+    [themeToBeCreated]="themeForCreation"
+    (themeCreated)="onThemeCreated($event)"
+  ></app-theme-create>
+
   <!-- DELETE -->
   <app-theme-delete
     [theme]="themeForUse"

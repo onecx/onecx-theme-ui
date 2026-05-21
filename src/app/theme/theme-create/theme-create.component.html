@@ -1,5 +1,5 @@
 <p-dialog
-  [header]="'DIALOG.HEADER.CREATE' | translate"
+  [header]="'DIALOG.HEADER.' + (themeToBeCreated ? 'SAVE_AS' : 'CREATE') | translate"
   [(visible)]="visible"
   [modal]="true"
   [closable]="true"
@@ -62,6 +62,14 @@
       </label>
     </span>
   </form>
+  <p-message
+    *ngIf="themeToBeCreated"
+    id="th_create_hint"
+    severity="info"
+    styleClass="m-3"
+    [text]="'ACTIONS.CREATE.THEME.HINT' | translate"
+  ></p-message>
+
   <ng-template pTemplate="footer">
     <div class="flex flex-wrap column-gap-2 row-gap-1 justify-content-end">
       <p-button

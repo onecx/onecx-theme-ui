@@ -106,7 +106,7 @@ export class ThemePropsComponent implements OnChanges {
   }
 
   // called by theme detail dialog: returns form values to theme detail component for saving
-  public onSave(): boolean {
+  public onUpdateTheme(): boolean {
     if (this.theme) {
       if (this.basicForm.valid) {
         Object.assign(this.theme, this.getFormData(this.basicForm))

@@ -9,6 +9,7 @@
     "CREATE": {
       "THEME": "Create",
       "THEME.TOOLTIP": "Create a new Theme",
+      "THEME.HINT": "The color values are taken from the current Theme.",
       "MESSAGE": {
         "THEME_ALREADY_EXISTS": "A Theme with that name already exists",
         "OK": "The Theme was created successfully",
@@ -110,7 +111,8 @@
       "DETAIL.SUBHEADER": "Theme Details",
       "CREATE": "Create Theme",
       "DELETE": "Delete Theme",
-      "EXPORT": "Export Theme"
+      "EXPORT": "Export Theme",
+      "SAVE_AS": "Save Theme As..."
     },
     "DETAIL": {
       "SPECIAL.SECTION": "Theme applying and template selection",

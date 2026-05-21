@@ -9,5 +9,5 @@
   },
   "files": ["src/test.ts", "src/polyfills.ts"],
   "exclude": ["src/app/shared/generated/**/*", "node_modules"],
-  "include": ["**/*.spec.ts", "**/*.d.ts"]
+  "include": ["src/app/**/*.spec.ts", "**/*.d.ts"]
 }
