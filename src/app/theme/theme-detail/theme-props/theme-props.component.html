@@ -57,7 +57,7 @@
   <!-- LOGO -->
   <div class="flex-grow-1 sm:h-3-5rem mt-2">
     <!-- helper inputs because p-fileupload does not work inside inputgroup -->
-    <input #fileUploadLogo hidden type="file" accept="image/*" (change)="onFileUpload($event, RefType.Logo)" />
+    <input #fileUploadLogo hidden type="file" accept="image/*" (change)="onFileUpload($event, LogoRefType.Logo)" />
     <div class="flex flex-wrap sm:flex-nowrap align-items-center row-gap-3 column-gap-4">
       <section
         class="w-4rem pl-2"
@@ -73,10 +73,10 @@
         <app-image-container
           id="th_detail_basic_logo_url_image"
           styleClass="max-h-3rem max-w-5rem border-round-sm"
-          [bffUrl]="bffUrl[RefType.Logo]"
+          [bffUrl]="bffUrl[LogoRefType.Logo]"
           [imageUrl]="basicForm.controls['logoUrl'].value"
           [cascadeUse]="false"
-          (imageLoadResult)="onImageLoadResult($event, RefType.Logo, basicForm.controls['logoUrl'].value)"
+          (imageLoadResult)="onImageLoadResult($event, LogoRefType.Logo, basicForm.controls['logoUrl'].value)"
         ></app-image-container>
       </div>
       <button
@@ -84,8 +84,8 @@
         id="th_detail_basic_action_remove_logo"
         icon="pi pi-trash"
         class="action-button p-button-icon-only"
-        [disabled]="!(bffUrl[RefType.Logo] && !basicForm.controls['logoUrl'].value)"
-        (click)="onRemoveImage(RefType.Logo)"
+        [disabled]="!(bffUrl[LogoRefType.Logo] && !basicForm.controls['logoUrl'].value)"
+        (click)="onRemoveImage(LogoRefType.Logo)"
         [ariaLabel]="'IMAGE.TOOLTIPS.REMOVE' | translate"
         [pTooltip]="'IMAGE.TOOLTIPS.REMOVE' | translate"
         tooltipPosition="top"
@@ -127,7 +127,7 @@
             id="ws_detail_props_item_logo_url_remove"
             class="p-inputgroup-addon bg-primary pseudo-button"
             [ngClass]="changeMode === 'EDIT' && LogoUrlInput.value ? 'cursor-pointer' : 'p-disabled'"
-            (click)="onRemoveImageUrl(RefType.Logo)"
+            (click)="onRemoveImageUrl(LogoRefType.Logo)"
             [attr.aria-label]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
             [pTooltip]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
             tooltipPosition="right"
@@ -148,7 +148,7 @@
       hidden
       type="file"
       accept="image/*"
-      (change)="onFileUpload($event, RefType.LogoSmall)"
+      (change)="onFileUpload($event, LogoRefType.LogoSmall)"
     />
     <div class="flex flex-wrap sm:flex-nowrap align-items-center row-gap-3 column-gap-4">
       <section
@@ -165,10 +165,10 @@
         <app-image-container
           id="th_detail_basic_logo_small_url_image"
           styleClass="max-h-3rem max-w-5rem border-round-sm"
-          [bffUrl]="bffUrl[RefType.LogoSmall]"
+          [bffUrl]="bffUrl[LogoRefType.LogoSmall]"
           [imageUrl]="basicForm.controls['smallLogoUrl'].value"
           [cascadeUse]="false"
-          (imageLoadResult)="onImageLoadResult($event, RefType.LogoSmall, basicForm.controls['smallLogoUrl'].value)"
+          (imageLoadResult)="onImageLoadResult($event, LogoRefType.LogoSmall, basicForm.controls['smallLogoUrl'].value)"
         ></app-image-container>
       </div>
       <button
@@ -176,8 +176,8 @@
         id="th_detail_basic_action_remove_logo_small"
         icon="pi pi-trash"
         class="action-button p-button-icon-only"
-        [disabled]="!(bffUrl[RefType.LogoSmall] && !basicForm.controls['smallLogoUrl'].value)"
-        (click)="onRemoveImage(RefType.LogoSmall)"
+        [disabled]="!(bffUrl[LogoRefType.LogoSmall] && !basicForm.controls['smallLogoUrl'].value)"
+        (click)="onRemoveImage(LogoRefType.LogoSmall)"
         [ariaLabel]="'IMAGE.TOOLTIPS.REMOVE' | translate"
         [pTooltip]="'IMAGE.TOOLTIPS.REMOVE' | translate"
         tooltipPosition="top"
@@ -221,7 +221,7 @@
             [ngClass]="
               changeMode === 'EDIT' && basicForm.controls['smallLogoUrl'].value ? 'cursor-pointer' : 'p-disabled'
             "
-            (click)="onRemoveImageUrl(RefType.LogoSmall)"
+            (click)="onRemoveImageUrl(LogoRefType.LogoSmall)"
             [attr.aria-label]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
             [pTooltip]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
             tooltipPosition="right"
@@ -237,7 +237,13 @@
   <!-- FAVICON -->
   <div class="flex-grow-1 sm:h-3-5rem">
     <!-- helper inputs because p-fileupload does not work inside inputgroup -->
-    <input #fileUploadFavicon hidden type="file" accept="image/*" (change)="onFileUpload($event, RefType.Favicon)" />
+    <input
+      #fileUploadFavicon
+      hidden
+      type="file"
+      accept="image/*"
+      (change)="onFileUpload($event, LogoRefType.Favicon)"
+    />
     <div class="flex flex-wrap sm:flex-nowrap align-items-center row-gap-3 column-gap-4">
       <section
         class="w-4rem pl-2"
@@ -253,10 +259,10 @@
         <app-image-container
           id="th_detail_basic_favicon_url_image"
           styleClass="max-h-3rem max-w-5rem border-round-sm"
-          [bffUrl]="bffUrl[RefType.Favicon]"
+          [bffUrl]="bffUrl[LogoRefType.Favicon]"
           [imageUrl]="basicForm.controls['faviconUrl'].value"
           [cascadeUse]="false"
-          (imageLoadResult)="onImageLoadResult($event, RefType.Favicon, basicForm.controls['faviconUrl'].value)"
+          (imageLoadResult)="onImageLoadResult($event, LogoRefType.Favicon, basicForm.controls['faviconUrl'].value)"
         ></app-image-container>
       </div>
       <button
@@ -264,8 +270,8 @@
         id="th_detail_basic_action_remove_favicon"
         icon="pi pi-trash"
         class="action-button p-button-icon-only"
-        [disabled]="!(bffUrl[RefType.Favicon] && !basicForm.controls['faviconUrl'].value)"
-        (click)="onRemoveImage(RefType.Favicon)"
+        [disabled]="!(bffUrl[LogoRefType.Favicon] && !basicForm.controls['faviconUrl'].value)"
+        (click)="onRemoveImage(LogoRefType.Favicon)"
         [ariaLabel]="'IMAGE.TOOLTIPS.REMOVE' | translate"
         [pTooltip]="'IMAGE.TOOLTIPS.REMOVE' | translate"
         tooltipPosition="top"
@@ -307,7 +313,7 @@
             id="ws_detail_props_item_favicon_url_remove"
             class="p-inputgroup-addon bg-primary pseudo-button"
             [ngClass]="changeMode === 'EDIT' && FaviconUrlInput.value ? 'cursor-pointer' : 'p-disabled'"
-            (click)="onRemoveImageUrl(RefType.Favicon)"
+            (click)="onRemoveImageUrl(LogoRefType.Favicon)"
             [attr.aria-label]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
             [pTooltip]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
             tooltipPosition="right"

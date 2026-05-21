@@ -7,10 +7,10 @@ import { TranslateTestingModule } from 'ngx-translate-testing'
 import { PortalMessageService } from '@onecx/angular-integration-interface'
 
 import { ThemePropsComponent } from './theme-props.component'
-import { MimeType, ImagesInternalAPIService, RefType, Theme } from 'src/app/shared/generated'
+import { MimeType, ImagesInternalAPIService, Theme } from 'src/app/shared/generated'
 import { of, throwError } from 'rxjs'
 import { HttpResponse } from '@angular/common/http'
-import { Utils } from 'src/app/shared/utils'
+import { Utils, LogoRefType } from 'src/app/shared/utils'
 
 const validTheme = {
   id: 'id',
@@ -141,11 +141,11 @@ describe('ThemePropsComponent', () => {
 
       beforeEach(() => {
         initTestComponent()
-        bffUrl = Utils.bffImageUrl(component.imageBasePath, validTheme.name, RefType.Logo)
+        bffUrl = Utils.bffImageUrl(component.imageBasePath, validTheme.name, LogoRefType.Logo)
       })
 
       it('call with undefined theme', () => {
-        expect(component.setBffImageUrl(undefined, RefType.Logo)).toBeUndefined()
+        expect(component.setBffImageUrl(undefined, LogoRefType.Logo)).toBeUndefined()
       })
 
       it('call without external URLs', () => {
@@ -155,7 +155,7 @@ describe('ThemePropsComponent', () => {
         component.ngOnChanges({ theme: new SimpleChange(undefined, theme, true) })
 
         expect(component.changeMode).toBe('EDIT')
-        expect(component.bffUrl[RefType.Logo]).toBe(bffUrl)
+        expect(component.bffUrl[LogoRefType.Logo]).toBe(bffUrl)
       })
     })
 
@@ -164,13 +164,13 @@ describe('ThemePropsComponent', () => {
       const bffUrl = '/base-path-to-logo'
       beforeEach(() => {
         initTestComponent()
-        component.bffUrl[RefType.Logo] = bffUrl
+        component.bffUrl[LogoRefType.Logo] = bffUrl
       })
 
       it('should emit header image with ext URL on successful load', () => {
         const emitSpy = spyOn(component.headerImageUrl, 'emit')
 
-        component.onImageLoadResult(true, RefType.Logo, extUrl)
+        component.onImageLoadResult(true, LogoRefType.Logo, extUrl)
 
         expect(emitSpy).toHaveBeenCalledWith(extUrl)
       })
@@ -178,7 +178,7 @@ describe('ThemePropsComponent', () => {
       it('should emit header image with bff URL when extUrl is empty', () => {
         const emitSpy = spyOn(component.headerImageUrl, 'emit')
 
-        component.onImageLoadResult(true, RefType.Logo, '')
+        component.onImageLoadResult(true, LogoRefType.Logo, '')
 
         expect(emitSpy).toHaveBeenCalledWith(bffUrl)
       })
@@ -186,19 +186,19 @@ describe('ThemePropsComponent', () => {
       it('should emit undefined and reset bff URL on failed load without ext URL', () => {
         const emitSpy = spyOn(component.headerImageUrl, 'emit')
 
-        component.onImageLoadResult(false, RefType.Logo)
+        component.onImageLoadResult(false, LogoRefType.Logo)
 
         expect(emitSpy).toHaveBeenCalledWith(undefined)
-        expect(component.bffUrl[RefType.Logo]).toBeUndefined()
+        expect(component.bffUrl[LogoRefType.Logo]).toBeUndefined()
       })
 
       it('should emit undefined on failed load with ext URL but keep bff URL', () => {
         const emitSpy = spyOn(component.headerImageUrl, 'emit')
 
-        component.onImageLoadResult(false, RefType.Logo, extUrl)
+        component.onImageLoadResult(false, LogoRefType.Logo, extUrl)
 
         expect(emitSpy).toHaveBeenCalledWith(undefined)
-        expect(component.bffUrl[RefType.Logo]).toBe(bffUrl)
+        expect(component.bffUrl[LogoRefType.Logo]).toBe(bffUrl)
       })
     })
 
@@ -218,40 +218,40 @@ describe('ThemePropsComponent', () => {
         expect(component.basicForm.get('faviconUrl')?.value).toBe(validTheme.faviconUrl)
 
         // clear external URLs
-        component.onRemoveImageUrl(RefType.Logo)
+        component.onRemoveImageUrl(LogoRefType.Logo)
         expect(component.basicForm.get('logoUrl')?.value).toBeNull()
 
-        component.onRemoveImageUrl(RefType.LogoSmall)
+        component.onRemoveImageUrl(LogoRefType.LogoSmall)
         expect(component.basicForm.get('smallLogoUrl')?.value).toBeNull()
       })
 
       it('should delete image - successful', () => {
         imgServiceSpy.deleteImage.and.returnValue(of({}))
         const emitSpy = spyOn(component.headerImageUrl, 'emit')
-        component.bffUrl[RefType.Logo] = 'some-logo-url'
-        component.bffUrl[RefType.LogoSmall] = 'some-small-logo-url'
-        component.bffUrl[RefType.Favicon] = 'some-favicon-url'
+        component.bffUrl[LogoRefType.Logo] = 'some-logo-url'
+        component.bffUrl[LogoRefType.LogoSmall] = 'some-small-logo-url'
+        component.bffUrl[LogoRefType.Favicon] = 'some-favicon-url'
 
-        component.onRemoveImage(RefType.Logo)
-        expect(component.bffUrl[RefType.Logo]).toBeUndefined()
+        component.onRemoveImage(LogoRefType.Logo)
+        expect(component.bffUrl[LogoRefType.Logo]).toBeUndefined()
         expect(emitSpy).toHaveBeenCalledWith(undefined)
 
-        component.onRemoveImage(RefType.LogoSmall)
-        expect(component.bffUrl[RefType.LogoSmall]).toBeUndefined()
+        component.onRemoveImage(LogoRefType.LogoSmall)
+        expect(component.bffUrl[LogoRefType.LogoSmall]).toBeUndefined()
 
-        component.onRemoveImage(RefType.Favicon)
-        expect(component.bffUrl[RefType.Favicon]).toBeUndefined()
+        component.onRemoveImage(LogoRefType.Favicon)
+        expect(component.bffUrl[LogoRefType.Favicon]).toBeUndefined()
       })
 
       it('should not change state on delete image error', () => {
         const errorResponse = { error: 'Cannot remove', statusText: 'Bad Request', status: 400 }
         imgServiceSpy.deleteImage.and.returnValue(throwError(() => errorResponse))
         spyOn(console, 'error')
-        component.bffUrl[RefType.Logo] = 'some-logo-url'
+        component.bffUrl[LogoRefType.Logo] = 'some-logo-url'
 
-        component.onRemoveImage(RefType.Logo)
+        component.onRemoveImage(LogoRefType.Logo)
 
-        expect(component.bffUrl[RefType.Logo]).toBe('some-logo-url')
+        expect(component.bffUrl[LogoRefType.Logo]).toBe('some-logo-url')
         expect(console.error).toHaveBeenCalledWith('deleteImage', errorResponse)
       })
     })
@@ -271,7 +271,7 @@ describe('ThemePropsComponent', () => {
           const file = new File([blob], 'test.png', { type: MimeType.Png })
           const event = { target: { files: [file] } }
 
-          component.onFileUpload(event as any, RefType.Logo)
+          component.onFileUpload(event as any, LogoRefType.Logo)
 
           expect(imgServiceSpy.uploadImage).not.toHaveBeenCalled()
         })
@@ -281,7 +281,7 @@ describe('ThemePropsComponent', () => {
           const largeFile = new File([largeBlob], 'test.png', { type: MimeType.Png })
           const event = { target: { files: [largeFile] } }
 
-          component.onFileUpload(event as any, RefType.Logo)
+          component.onFileUpload(event as any, LogoRefType.Logo)
 
           expect(msgServiceSpy.error).toHaveBeenCalledWith({
             summaryKey: 'IMAGE.CONSTRAINT.FAILED',
@@ -295,7 +295,7 @@ describe('ThemePropsComponent', () => {
           const file = new File([blob], 'test.wrong', { type: MimeType.Png })
           const event = { target: { files: [file] } }
 
-          component.onFileUpload(event as any, RefType.Logo)
+          component.onFileUpload(event as any, LogoRefType.Logo)
 
           expect(msgServiceSpy.error).toHaveBeenCalledWith({
             summaryKey: 'IMAGE.CONSTRAINT.FAILED',
@@ -307,7 +307,7 @@ describe('ThemePropsComponent', () => {
           const event = { target: { files: undefined } }
           component.basicForm.controls['name'].setValue('name')
 
-          component.onFileUpload(event as any, RefType.Logo)
+          component.onFileUpload(event as any, LogoRefType.Logo)
 
           expect(msgServiceSpy.error).toHaveBeenCalledWith({
             summaryKey: 'IMAGE.CONSTRAINT.FAILED',
@@ -328,7 +328,7 @@ describe('ThemePropsComponent', () => {
           const file = new File([blob], 'test.png', { type: fileType })
           const event = { target: { files: [file] } }
 
-          component.onFileUpload(event as any, RefType.Logo)
+          component.onFileUpload(event as any, LogoRefType.Logo)
 
           expect(msgServiceSpy.success).toHaveBeenCalledWith({ summaryKey: 'IMAGE.UPLOAD.OK' })
         })
@@ -344,7 +344,7 @@ describe('ThemePropsComponent', () => {
           const file = new File([blob], 'test.jpg', { type: fileType })
           const event = { target: { files: [file] } }
 
-          component.onFileUpload(event as any, RefType.Logo)
+          component.onFileUpload(event as any, LogoRefType.Logo)
 
           expect(msgServiceSpy.success).toHaveBeenCalledWith({ summaryKey: 'IMAGE.UPLOAD.OK' })
         })
@@ -360,7 +360,7 @@ describe('ThemePropsComponent', () => {
           const file = new File([blob], 'test.jpeg', { type: fileType })
           const event = { target: { files: [file] } }
 
-          component.onFileUpload(event as any, RefType.Logo)
+          component.onFileUpload(event as any, LogoRefType.Logo)
 
           expect(msgServiceSpy.success).toHaveBeenCalledWith({ summaryKey: 'IMAGE.UPLOAD.OK' })
         })
@@ -376,7 +376,7 @@ describe('ThemePropsComponent', () => {
           const file = new File([blob], 'test.svg', { type: fileType })
           const event = { target: { files: [file] } }
 
-          component.onFileUpload(event as any, RefType.Logo)
+          component.onFileUpload(event as any, LogoRefType.Logo)
 
           expect(msgServiceSpy.success).toHaveBeenCalledWith({ summaryKey: 'IMAGE.UPLOAD.OK' })
         })
@@ -392,7 +392,7 @@ describe('ThemePropsComponent', () => {
           const file = new File([blob], 'test.svg', { type: fileType })
           const event = { target: { files: [file] } }
 
-          component.onFileUpload(event as any, RefType.Logo)
+          component.onFileUpload(event as any, LogoRefType.Logo)
 
           expect(msgServiceSpy.success).toHaveBeenCalledWith({ summaryKey: 'IMAGE.UPLOAD.OK' })
         })
@@ -407,7 +407,7 @@ describe('ThemePropsComponent', () => {
           const file = new File([blob], 'favicon.png', { type: MimeType.Png })
           const event = { target: { files: [file] } }
 
-          component.onFileUpload(event as any, RefType.Favicon)
+          component.onFileUpload(event as any, LogoRefType.Favicon)
 
           expect(msgServiceSpy.success).toHaveBeenCalledWith({ summaryKey: 'IMAGE.UPLOAD.OK' })
         })
@@ -420,7 +420,7 @@ describe('ThemePropsComponent', () => {
           const file = new File([blob], 'favicon.png', { type: MimeType.Png })
           const event = { target: { files: [file] } }
 
-          component.onFileUpload(event as any, RefType.Favicon)
+          component.onFileUpload(event as any, LogoRefType.Favicon)
 
           expect(console.error).toHaveBeenCalledWith('uploadImage', errorResponse)
         })

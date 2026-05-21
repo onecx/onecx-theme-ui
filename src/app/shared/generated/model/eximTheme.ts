@@ -10,6 +10,7 @@
  * Do not edit the class manually.
  */
 import { Image } from './image';
+import { ThemeOverride } from './themeOverride';
 
 
 export interface EximTheme { 
@@ -23,6 +24,7 @@ export interface EximTheme {
     previewImageUrl?: string;
     assetsUpdateDate?: string;
     properties?: object;
+    overrides?: Array<ThemeOverride>;
     images?: { [key: string]: Image; };
     mandatory?: boolean;
 }

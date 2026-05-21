@@ -9,6 +9,7 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { ThemeOverride } from './themeOverride';
 
 
 export interface Theme { 
@@ -29,6 +30,7 @@ export interface Theme {
     previewImageUrl?: string;
     assetsUpdateDate?: string;
     properties?: object;
+    overrides?: Array<ThemeOverride>;
     operator?: boolean;
     mandatory?: boolean;
 }

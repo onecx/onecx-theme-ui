@@ -2,7 +2,12 @@ import { Location } from '@angular/common'
 import { catchError, first, of, tap } from 'rxjs'
 
 import { WorkspaceService } from '@onecx/angular-integration-interface'
-import { RefType } from 'src/app/shared/generated'
+
+export enum LogoRefType {
+  Logo = 'logo',
+  LogoSmall = 'logo-small',
+  Favicon = 'favicon'
+}
 
 // This object encapsulated function because ...
 //  ...Jasmine has problems to spying direct imported functions
@@ -49,7 +54,7 @@ const Utils = {
     else if (url) return url
     else return ''
   },
-  bffImageUrl(basePath: string | undefined, name: string | undefined, refType: RefType): string | undefined {
+  bffImageUrl(basePath: string | undefined, name: string | undefined, refType: LogoRefType): string | undefined {
     return name ? (basePath ?? '') + '/images/' + name + '/' + refType : undefined
   },
 

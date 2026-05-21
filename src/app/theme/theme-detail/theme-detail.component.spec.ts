@@ -11,8 +11,8 @@ import FileSaver from 'file-saver'
 
 import { PortalMessageService, ThemeService, UserService } from '@onecx/angular-integration-interface'
 
-import { ImagesInternalAPIService, RefType, Theme, ThemesAPIService } from 'src/app/shared/generated'
-import { Utils } from 'src/app/shared/utils'
+import { ImagesInternalAPIService, Theme, ThemesAPIService } from 'src/app/shared/generated'
+import { Utils, LogoRefType } from 'src/app/shared/utils'
 
 import { ThemeDetailComponent } from './theme-detail.component'
 
@@ -465,7 +465,7 @@ describe('ThemeDetailComponent', () => {
     it('should set headerImageUrl to bffImageUrl when no logoUrl', () => {
       component.prepareHeaderUrl({ ...theme, logoUrl: undefined })
 
-      expect(component.headerImageUrl).toBe(Utils.bffImageUrl(component.imageBasePath, theme.name, RefType.Logo))
+      expect(component.headerImageUrl).toBe(Utils.bffImageUrl(component.imageBasePath, theme.name, LogoRefType.Logo))
     })
 
     it('should do nothing if theme is undefined', () => {
