@@ -22,6 +22,8 @@ import { Utils } from 'src/app/shared/utils'
 import { ThemeColorsComponent } from './theme-colors/theme-colors.component'
 import { ThemePropsComponent } from './theme-props/theme-props.component'
 
+export type ChangeMode = 'VIEW' | 'EDIT'
+
 @Component({
   templateUrl: './theme-detail.component.html',
   styleUrls: ['./theme-detail.component.scss']
@@ -33,7 +35,7 @@ export class ThemeDetailComponent implements OnInit {
   // dialog
   public loading = true
   public exceptionKey: string | undefined = undefined
-  public changeMode: 'VIEW' | 'EDIT' | 'CREATE' = 'VIEW'
+  public changeMode: ChangeMode = 'VIEW'
   public autoApply = false
   public themeDeleteVisible = false
   public themeCreateVisible = false
@@ -86,10 +88,10 @@ export class ThemeDetailComponent implements OnInit {
   ) {
     this.dateFormat = this.user.lang$.getValue() === 'de' ? 'dd.MM.yyyy HH:mm:ss' : 'medium'
     this.themeName = route.snapshot.paramMap.get('name')
-    this.changeMode = this.themeName ? 'VIEW' : 'CREATE'
   }
 
   ngOnInit(): void {
+    // Common start
     this.prepareDialogTranslations()
     this.getTheme()
     // Re-initialize the component when the route parameter changes (e.g. after creating a new theme)
@@ -194,7 +196,7 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   // Change the mode to operate with the theme
-  private onChangeMode(requestedMode?: 'edit' | 'view', theme?: Theme): void {
+  private onChangeMode(requestedMode: 'edit' | 'view', theme?: Theme): void {
     if (requestedMode === 'view') {
       this.changeMode = 'VIEW'
       this.initSubComponentData(theme) // use originally loaded theme data
@@ -403,7 +405,7 @@ export class ThemeDetailComponent implements OnInit {
               icon: 'pi pi-times',
               show: 'always',
               conditional: true,
-              showCondition: this.changeMode === 'EDIT' || this.changeMode === 'CREATE'
+              showCondition: this.changeMode === 'EDIT'
             },
             {
               id: 'th_detail_page_action_save',
@@ -414,7 +416,7 @@ export class ThemeDetailComponent implements OnInit {
               icon: 'pi pi-save',
               show: 'always',
               conditional: true,
-              showCondition: this.changeMode === 'EDIT' || this.changeMode === 'CREATE'
+              showCondition: this.changeMode === 'EDIT'
             },
             {
               id: 'th_detail_page_action_save_as_on_edit',
@@ -424,7 +426,7 @@ export class ThemeDetailComponent implements OnInit {
               icon: 'pi pi-plus-circle',
               show: 'always',
               conditional: true,
-              showCondition: this.changeMode === 'EDIT' || this.changeMode === 'CREATE',
+              showCondition: this.changeMode === 'EDIT',
               permission: 'THEME#CREATE'
             },
             {
@@ -455,7 +457,7 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   /**
-   * TEMPLATING
+   * TEMPLATING: allow using properties from an existing theme => no creation of a new theme!
    */
   private getThemeById(id: string): Observable<GetThemeResponse> {
     return this.themeApi.getThemeById({ id: id })
@@ -465,9 +467,6 @@ export class ThemeDetailComponent implements OnInit {
     this.getThemeById(data.id).subscribe((response) => {
       // on creation the "name" can be edited
       let name = this.theme?.name // default: original name
-      if (this.changeMode === 'CREATE') {
-        name = data['ACTIONS.COPY_OF'] + response.resource.name // only here changeable
-      }
       this.themeForProps = {
         ...response.resource,
         ...this.undefinedThemeData,

@@ -6,6 +6,7 @@ import { Dropdown } from 'primeng/dropdown'
 
 import { Theme } from 'src/app/shared/generated'
 import { Utils } from 'src/app/shared/utils'
+import { ChangeMode } from '../theme-detail.component'
 
 @Component({
   selector: 'app-theme-apply',
@@ -16,7 +17,7 @@ import { Utils } from 'src/app/shared/utils'
 export class ThemeApplyComponent {
   @Input() theme: Theme | undefined
   @Input() themes$: Observable<Theme[]> | undefined
-  @Input() changeMode: 'VIEW' | 'EDIT' | 'CREATE' = 'VIEW'
+  @Input() changeMode: ChangeMode = 'VIEW'
   @Input() isCurrentTheme = true
   @Input() autoApply = true
   @Output() autoApplyChange = new EventEmitter<boolean>() // inform theme detail about change in auto apply to trigger message about it

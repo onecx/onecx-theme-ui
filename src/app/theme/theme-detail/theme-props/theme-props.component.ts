@@ -9,6 +9,7 @@ import { PortalMessageService } from '@onecx/angular-integration-interface'
 import { ImagesInternalAPIService, MimeType, RefType, Theme, UploadImageRequestParams } from 'src/app/shared/generated'
 import { Utils } from 'src/app/shared/utils'
 import { themeVariables } from '../theme-variables'
+import { ChangeMode } from '../theme-detail.component'
 
 @Component({
   selector: 'app-theme-props',
@@ -17,7 +18,7 @@ import { themeVariables } from '../theme-variables'
 })
 export class ThemePropsComponent implements OnChanges {
   @Input() theme: Theme | undefined
-  @Input() changeMode: 'VIEW' | 'EDIT' | 'CREATE' = 'VIEW'
+  @Input() changeMode: ChangeMode = 'VIEW'
   @Output() headerImageUrl = new EventEmitter<string>() // send logo url to detail header
 
   // data

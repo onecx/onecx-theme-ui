@@ -1,23 +1,5 @@
 <form [formGroup]="basicForm" class="mt-4 flex flex-column row-gap-4" errorTailor>
   <!-- THEME BASICs -->
-  <div *ngIf="changeMode === 'CREATE'" class="flex-grow-1">
-    <span class="p-float-label" controlErrorAnchor>
-      <input
-        pInputText
-        type="text"
-        id="th_detail_basic_field_name"
-        class="w-full pt-3 pb-2 text-responsive"
-        formControlName="name"
-        [ariaLabel]="'THEME.NAME' | translate"
-        [pTooltip]="'THEME.TOOLTIPS.NAME' | translate"
-        tooltipPosition="top"
-        tooltipEvent="hover"
-      />
-      <label class="ocx-required-label" for="th_detail_basic_field_name" aria-hidden="true">
-        {{ 'THEME.NAME' | translate }}
-      </label>
-    </span>
-  </div>
   <div
     class="flex flex-row flex-wrap justify-content-start align-items-center column-gap-4 sm:column-gap-5 md:column-gap-6 row-gap-2"
   >
@@ -73,7 +55,7 @@
   </div>
 
   <!-- LOGO -->
-  <div *ngIf="changeMode !== 'CREATE'" class="flex-grow-1 sm:h-3-5rem mt-2">
+  <div class="flex-grow-1 sm:h-3-5rem mt-2">
     <!-- helper inputs because p-fileupload does not work inside inputgroup -->
     <input #fileUploadLogo hidden type="file" accept="image/*" (change)="onFileUpload($event, RefType.Logo)" />
     <div class="flex flex-wrap sm:flex-nowrap align-items-center row-gap-3 column-gap-4">
@@ -159,7 +141,7 @@
   </div>
 
   <!-- LOGO SMALL -->
-  <div *ngIf="changeMode !== 'CREATE'" class="flex-grow-1 sm:h-3-5rem">
+  <div class="flex-grow-1 sm:h-3-5rem">
     <!-- helper inputs because p-fileupload does not work inside inputgroup -->
     <input
       #fileUploadLogoSmall
@@ -253,7 +235,7 @@
   </div>
 
   <!-- FAVICON -->
-  <div *ngIf="changeMode !== 'CREATE'" class="flex-grow-1 sm:h-3-5rem">
+  <div class="flex-grow-1 sm:h-3-5rem">
     <!-- helper inputs because p-fileupload does not work inside inputgroup -->
     <input #fileUploadFavicon hidden type="file" accept="image/*" (change)="onFileUpload($event, RefType.Favicon)" />
     <div class="flex flex-wrap sm:flex-nowrap align-items-center row-gap-3 column-gap-4">

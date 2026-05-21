@@ -117,10 +117,6 @@ describe('ThemeDetailComponent', () => {
       expect(component.dateFormat).toEqual('medium')
     })
 
-    it('should set changeMode to CREATE when no name in route', () => {
-      expect(component.changeMode).toEqual('CREATE')
-    })
-
     it('should set changeMode to VIEW when name is in route', () => {
       const route = TestBed.inject(ActivatedRoute)
       spyOn(route.snapshot.paramMap, 'get').and.returnValue('someName')
@@ -130,9 +126,12 @@ describe('ThemeDetailComponent', () => {
   })
 
   describe('ngOnInit', () => {
-    it('should call prepareDialogTranslations and getThemes on init', () => {
+    it('should call prepareDialogTranslations on init', () => {
+      spyOn(component as any, 'prepareDialogTranslations')
       component.ngOnInit()
+
       expect(component.messages.length).toBeGreaterThan(0)
+      expect(component['prepareDialogTranslations']).toHaveBeenCalled()
     })
 
     it('should not load theme if no themeName', () => {
@@ -149,7 +148,6 @@ describe('ThemeDetailComponent', () => {
       const paramMapSubject = new BehaviorSubject(route.snapshot.paramMap)
       spyOnProperty(route, 'paramMap').and.returnValue(paramMapSubject.asObservable())
       themeApiSpy.getThemeByName.calls.reset()
-      themeApiSpy.searchThemes.calls.reset()
 
       component['themeName'] = 'oldName'
       component.ngOnInit()
@@ -159,7 +157,6 @@ describe('ThemeDetailComponent', () => {
 
       expect(component['themeName']).toBe('newName')
       expect(themeApiSpy.getThemeByName).toHaveBeenCalled()
-      expect(themeApiSpy.searchThemes).toHaveBeenCalled()
     })
 
     it('should not re-initialize when route param is the same as current themeName', () => {
@@ -170,13 +167,11 @@ describe('ThemeDetailComponent', () => {
       component['themeName'] = 'sameName'
       component.ngOnInit()
       themeApiSpy.getThemeByName.calls.reset()
-      themeApiSpy.searchThemes.calls.reset()
 
       // Emit param with same name
       paramMapSubject.next({ get: () => 'sameName', has: () => true, getAll: () => [], keys: [] } as any)
 
       expect(themeApiSpy.getThemeByName).not.toHaveBeenCalled()
-      expect(themeApiSpy.searchThemes).not.toHaveBeenCalled()
     })
 
     it('should not re-initialize when route param name is null', () => {
@@ -187,7 +182,6 @@ describe('ThemeDetailComponent', () => {
       component['themeName'] = 'existingName'
       component.ngOnInit()
       themeApiSpy.getThemeByName.calls.reset()
-      themeApiSpy.searchThemes.calls.reset()
 
       // Emit param with null name
       paramMapSubject.next({ get: () => null, has: () => false, getAll: () => [], keys: [] } as any)
@@ -673,36 +667,22 @@ describe('ThemeDetailComponent', () => {
     })
 
     it('should switch to VIEW mode when forcedMode is view', () => {
-      component.changeMode = 'EDIT'
+      spyOn(component as any, 'preparePageActions')
 
       component['onChangeMode']('view', theme)
 
       expect(component.changeMode).toBe('VIEW')
+      expect(component['preparePageActions']).toHaveBeenCalled()
     })
 
-    it('should reinitialize sub component data when switching to VIEW with theme', () => {
-      component.changeMode = 'EDIT'
+    it('should toggle to EDIT and call getTheme', () => {
+      spyOn(component as any, 'getTheme')
+      spyOn(component as any, 'getThemes')
 
-      component['onChangeMode']('view', theme)
+      component['onChangeMode']('edit', theme)
 
-      expect(component.themeForProps).toEqual({ ...theme, id: undefined })
-      expect(component.themeForColors).toEqual({ properties: theme.properties })
-    })
-
-    it('should toggle from VIEW to EDIT and call getTheme', () => {
-      component.changeMode = 'VIEW'
-
-      component['onChangeMode'](undefined, theme)
-
-      expect(component.changeMode).toBe('EDIT')
-    })
-
-    it('should toggle from EDIT to VIEW', () => {
-      component.changeMode = 'EDIT'
-
-      component['onChangeMode'](undefined, theme)
-
-      expect(component.changeMode).toBe('VIEW')
+      expect(component['getTheme']).toHaveBeenCalledWith(true)
+      expect(component['getThemes']).toHaveBeenCalled()
     })
   })
 
@@ -823,18 +803,6 @@ describe('ThemeDetailComponent', () => {
       expect(themeApiSpy.getThemeById).toHaveBeenCalledWith({ id: '123' })
       expect(component.themeForColors).toEqual(templateTheme as any)
       expect(msgServiceSpy.info).toHaveBeenCalledWith({ summaryKey: 'THEME.TEMPLATE.CONFIRMATION.OK' })
-    })
-
-    it('should set name and displayName with COPY_OF prefix in CREATE mode', () => {
-      const templateTheme = { name: 'template', displayName: 'Template', properties: {} }
-      themeApiSpy.getThemeById.and.returnValue(of({ resource: templateTheme }) as any)
-      component.changeMode = 'CREATE'
-      spyOn(console, 'log')
-
-      component.useThemeAsTemplate({ id: '123', 'ACTIONS.COPY_OF': 'Copy of ' })
-
-      expect(component.themeForProps!.name).toBe('Copy of template')
-      expect(component.themeForProps!.displayName).toBe('Copy of Template')
     })
 
     it('should use component theme name in EDIT mode', () => {

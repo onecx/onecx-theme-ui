@@ -7,6 +7,7 @@ import { PortalMessageService } from '@onecx/angular-integration-interface'
 import { Theme } from 'src/app/shared/generated'
 import { themeVariables } from '../theme-variables'
 import { debounceTime } from 'rxjs'
+import { ChangeMode } from '../theme-detail.component'
 
 @Component({
   selector: 'app-theme-colors',
@@ -15,7 +16,7 @@ import { debounceTime } from 'rxjs'
 })
 export class ThemeColorsComponent implements OnChanges {
   @Input() theme: Theme | undefined
-  @Input() changeMode: 'VIEW' | 'EDIT' | 'CREATE' = 'VIEW'
+  @Input() changeMode: ChangeMode = 'VIEW'
   @Input() autoApply = false
 
   // Form
