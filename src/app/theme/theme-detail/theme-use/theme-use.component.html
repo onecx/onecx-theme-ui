@@ -7,9 +7,9 @@
   >
   </ocx-slot>
   <div *ngIf="workspaceData$ | async as workspaces" class="sm:pt-2 pb-2 sm:pb-3 px-3">
-    <div *ngIf="workspaces.length === 0; else themeUsed">{{ 'THEME.WORKSPACES_USING_THEME.UNUSED' | translate }}</div>
+    <div *ngIf="workspaces.length === 0; else themeUsed">{{ 'DIALOG.WORKSPACES_USING_THEME.UNUSED' | translate }}</div>
     <ng-template #themeUsed>
-      {{ 'THEME.WORKSPACES_USING_THEME.USED' | translate }}
+      {{ 'DIALOG.WORKSPACES_USING_THEME.USED' | translate }}
       <ul class="ml-0 mt-2">
         <li *ngFor="let w of workspaces" class="mb-1">
           @if (workspaceEndpointExist) {
@@ -33,6 +33,6 @@
     </ng-template>
   </div>
   <ng-template #SlotNotConfigured>
-    <div class="sm:pt-2 pb-2 sm:pb-3 px-3">{{ 'THEME.WORKSPACES_USING_THEME.MISSING_COMPONENT' | translate }}</div>
+    <div class="sm:pt-2 pb-2 sm:pb-3 px-3">{{ 'DIALOG.WORKSPACES_USING_THEME.MISSING_COMPONENT' | translate }}</div>
   </ng-template>
 </ng-container>

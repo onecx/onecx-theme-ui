@@ -11,7 +11,7 @@ const Utils = {
     return [0, 400, 401, 403, 404, 500].includes(status) ? status : 0
   },
 
-  limitText(text: string | null, limit: number): string {
+  limitText(text: string | null | undefined, limit: number): string {
     if (text) {
       return text.length < limit ? text : text.substring(0, limit) + '...'
     } else {
@@ -94,6 +94,14 @@ const Utils = {
       )
       .subscribe((ex) => (exist = ex))
     return exist
+  },
+
+  /**
+   * Endpoints
+   */
+  getPropertyValue<T = any>(obj: Record<string, T> | undefined, prop: string): T | undefined {
+    if (!obj) return undefined
+    return obj[prop]
   }
 }
 

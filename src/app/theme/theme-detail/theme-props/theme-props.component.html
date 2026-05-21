@@ -1,0 +1,361 @@
+<form [formGroup]="basicForm" class="mt-4 flex flex-column row-gap-4" errorTailor>
+  <!-- THEME BASICs -->
+  <div
+    class="flex flex-row flex-wrap justify-content-start align-items-center column-gap-4 sm:column-gap-5 md:column-gap-6 row-gap-2"
+  >
+    <span class="flex-grow-1 p-float-label" controlErrorAnchor>
+      <input
+        pInputText
+        minlength="2"
+        maxlength="255"
+        type="text"
+        id="th_detail_basic_field_display_name"
+        class="w-full pt-3 pb-2 text-responsive"
+        formControlName="displayName"
+        [ariaLabel]="'THEME.DISPLAY_NAME' | translate"
+        [pTooltip]="'THEME.TOOLTIPS.DISPLAY_NAME' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      />
+      <label class="ocx-required-label" for="th_detail_basic_field_display_name" aria-hidden="true">
+        {{ 'THEME.DISPLAY_NAME' | translate }}
+      </label>
+    </span>
+    <div class="md:w-10rem">
+      <p-checkbox
+        ngDefaultControl
+        type="text"
+        id="th_detail_basic_field_mandatory"
+        styleClass="cursor-auto shadow-none"
+        formControlName="mandatory"
+        [binary]="true"
+        [label]="'INTERNAL.MANDATORY' | translate"
+        [ariaLabel]="'INTERNAL.MANDATORY' | translate"
+        [pTooltip]="'INTERNAL.TOOLTIPS.MANDATORY' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      ></p-checkbox>
+    </div>
+  </div>
+  <div class="flex-grow-1 p-float-label">
+    <input
+      pInputText
+      type="text"
+      id="th_detail_basic_field_description"
+      class="w-full pt-3 pb-2 text-responsive"
+      formControlName="description"
+      [ariaLabel]="'THEME.TOOLTIPS.DESCRIPTION' | translate"
+      [pTooltip]="'THEME.TOOLTIPS.DESCRIPTION' | translate"
+      tooltipPosition="top"
+      tooltipEvent="hover"
+    />
+    <label for="th_detail_basic_field_description" aria-hidden="true">
+      {{ 'THEME.DESCRIPTION' | translate }}
+    </label>
+  </div>
+
+  <!-- LOGO -->
+  <div class="flex-grow-1 sm:h-3-5rem mt-2">
+    <!-- helper inputs because p-fileupload does not work inside inputgroup -->
+    <input #fileUploadLogo hidden type="file" accept="image/*" (change)="onFileUpload($event, RefType.Logo)" />
+    <div class="flex flex-wrap sm:flex-nowrap align-items-center row-gap-3 column-gap-4">
+      <section
+        class="w-4rem pl-2"
+        style="color: var(--emphasis-medium)"
+        [pTooltip]="'IMAGE.TOOLTIPS.LOGO' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+        aria-hidden="true"
+      >
+        {{ 'IMAGE.LOGO' | translate }}
+      </section>
+      <div class="w-5rem text-center">
+        <app-image-container
+          id="th_detail_basic_logo_url_image"
+          styleClass="max-h-3rem max-w-5rem border-round-sm"
+          [bffUrl]="bffUrl[RefType.Logo]"
+          [imageUrl]="basicForm.controls['logoUrl'].value"
+          [cascadeUse]="false"
+          (imageLoadResult)="onImageLoadResult($event, RefType.Logo, basicForm.controls['logoUrl'].value)"
+        ></app-image-container>
+      </div>
+      <button
+        pButton
+        id="th_detail_basic_action_remove_logo"
+        icon="pi pi-trash"
+        class="action-button p-button-icon-only"
+        [disabled]="!(bffUrl[RefType.Logo] && !basicForm.controls['logoUrl'].value)"
+        (click)="onRemoveImage(RefType.Logo)"
+        [ariaLabel]="'IMAGE.TOOLTIPS.REMOVE' | translate"
+        [pTooltip]="'IMAGE.TOOLTIPS.REMOVE' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      ></button>
+      <button
+        pButton
+        id="th_detail_basic_action_upload_logo"
+        icon="pi pi-upload"
+        class="action-button p-button-icon-only"
+        [disabled]="LogoUrlInput.value"
+        (click)="fileUploadLogo.click()"
+        [ariaLabel]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
+        [pTooltip]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      ></button>
+      <div class="flex flex-column row-gap-1 flex-grow-1">
+        <div class="p-inputgroup">
+          <span class="p-float-label w-full">
+            <input
+              #LogoUrlInput
+              pInputText
+              type="text"
+              id="th_detail_basic_field_logo_url"
+              class="w-full pt-3 pb-2 text-responsive"
+              formControlName="logoUrl"
+              [ariaLabel]="('IMAGE.LOGO' | translate) + ':  ' + ('IMAGE.TOOLTIPS.URL' | translate)"
+              [pTooltip]="('IMAGE.TOOLTIPS.URL' | translate) + ('VALIDATION.HINTS.FORMAT_IMAGE_URL' | translate)"
+              tooltipPosition="top"
+              tooltipEvent="hover"
+              [escape]="false"
+            />
+            <label for="th_detail_basic_field_logo_url" aria-hidden="true">
+              {{ 'IMAGE.LOGO_URL' | translate }}
+            </label>
+          </span>
+          <button
+            id="ws_detail_props_item_logo_url_remove"
+            class="p-inputgroup-addon bg-primary pseudo-button"
+            [ngClass]="changeMode === 'EDIT' && LogoUrlInput.value ? 'cursor-pointer' : 'p-disabled'"
+            (click)="onRemoveImageUrl(RefType.Logo)"
+            [attr.aria-label]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
+            [pTooltip]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
+            tooltipPosition="right"
+            tooltipEvent="hover"
+          >
+            <span class="pi pi-trash" aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGO SMALL -->
+  <div class="flex-grow-1 sm:h-3-5rem">
+    <!-- helper inputs because p-fileupload does not work inside inputgroup -->
+    <input
+      #fileUploadLogoSmall
+      hidden
+      type="file"
+      accept="image/*"
+      (change)="onFileUpload($event, RefType.LogoSmall)"
+    />
+    <div class="flex flex-wrap sm:flex-nowrap align-items-center row-gap-3 column-gap-4">
+      <section
+        class="w-4rem pl-2"
+        style="color: var(--emphasis-medium)"
+        [pTooltip]="'IMAGE.TOOLTIPS.LOGO_SMALL' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+        aria-hidden="true"
+      >
+        {{ 'IMAGE.LOGO_SMALL' | translate }}
+      </section>
+      <div class="w-5rem text-center">
+        <app-image-container
+          id="th_detail_basic_logo_small_url_image"
+          styleClass="max-h-3rem max-w-5rem border-round-sm"
+          [bffUrl]="bffUrl[RefType.LogoSmall]"
+          [imageUrl]="basicForm.controls['smallLogoUrl'].value"
+          [cascadeUse]="false"
+          (imageLoadResult)="onImageLoadResult($event, RefType.LogoSmall, basicForm.controls['smallLogoUrl'].value)"
+        ></app-image-container>
+      </div>
+      <button
+        pButton
+        id="th_detail_basic_action_remove_logo_small"
+        icon="pi pi-trash"
+        class="action-button p-button-icon-only"
+        [disabled]="!(bffUrl[RefType.LogoSmall] && !basicForm.controls['smallLogoUrl'].value)"
+        (click)="onRemoveImage(RefType.LogoSmall)"
+        [ariaLabel]="'IMAGE.TOOLTIPS.REMOVE' | translate"
+        [pTooltip]="'IMAGE.TOOLTIPS.REMOVE' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      ></button>
+      <button
+        pButton
+        id="th_detail_basic_action_upload_logo_small"
+        icon="pi pi-upload"
+        class="action-button p-button-icon-only"
+        [disabled]="basicForm.controls['smallLogoUrl'].value"
+        (click)="fileUploadLogoSmall.click()"
+        [ariaLabel]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
+        [pTooltip]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      ></button>
+      <div class="flex flex-column row-gap-1 flex-grow-1">
+        <div class="p-inputgroup">
+          <span class="p-float-label w-full">
+            <input
+              #SmallLogoUrlInput
+              pInputText
+              type="text"
+              id="th_detail_basic_field_logo_small_url"
+              class="w-full pt-3 pb-2 text-responsive"
+              formControlName="smallLogoUrl"
+              [ariaLabel]="('IMAGE.LOGO_SMALL' | translate) + ':  ' + ('IMAGE.TOOLTIPS.URL' | translate)"
+              [pTooltip]="('IMAGE.TOOLTIPS.URL' | translate) + ('VALIDATION.HINTS.FORMAT_IMAGE_URL' | translate)"
+              tooltipPosition="top"
+              tooltipEvent="hover"
+              [escape]="false"
+            />
+            <label for="th_detail_basic_field_logo_small_url" aria-hidden="true">
+              {{ 'IMAGE.LOGO_URL' | translate }}
+            </label>
+          </span>
+          <button
+            id="ws_detail_props_item_logo_small_url_remove"
+            class="p-inputgroup-addon bg-primary pseudo-button"
+            [ngClass]="
+              changeMode === 'EDIT' && basicForm.controls['smallLogoUrl'].value ? 'cursor-pointer' : 'p-disabled'
+            "
+            (click)="onRemoveImageUrl(RefType.LogoSmall)"
+            [attr.aria-label]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
+            [pTooltip]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
+            tooltipPosition="right"
+            tooltipEvent="hover"
+          >
+            <span class="pi pi-trash" aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAVICON -->
+  <div class="flex-grow-1 sm:h-3-5rem">
+    <!-- helper inputs because p-fileupload does not work inside inputgroup -->
+    <input #fileUploadFavicon hidden type="file" accept="image/*" (change)="onFileUpload($event, RefType.Favicon)" />
+    <div class="flex flex-wrap sm:flex-nowrap align-items-center row-gap-3 column-gap-4">
+      <section
+        class="w-4rem pl-2"
+        style="color: var(--emphasis-medium)"
+        [pTooltip]="'IMAGE.TOOLTIPS.FAVICON' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+        aria-hidden="true"
+      >
+        {{ 'IMAGE.FAVICON' | translate }}
+      </section>
+      <div class="w-5rem text-center">
+        <app-image-container
+          id="th_detail_basic_favicon_url_image"
+          styleClass="max-h-3rem max-w-5rem border-round-sm"
+          [bffUrl]="bffUrl[RefType.Favicon]"
+          [imageUrl]="basicForm.controls['faviconUrl'].value"
+          [cascadeUse]="false"
+          (imageLoadResult)="onImageLoadResult($event, RefType.Favicon, basicForm.controls['faviconUrl'].value)"
+        ></app-image-container>
+      </div>
+      <button
+        pButton
+        id="th_detail_basic_action_remove_favicon"
+        icon="pi pi-trash"
+        class="action-button p-button-icon-only"
+        [disabled]="!(bffUrl[RefType.Favicon] && !basicForm.controls['faviconUrl'].value)"
+        (click)="onRemoveImage(RefType.Favicon)"
+        [ariaLabel]="'IMAGE.TOOLTIPS.REMOVE' | translate"
+        [pTooltip]="'IMAGE.TOOLTIPS.REMOVE' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      ></button>
+      <button
+        pButton
+        id="th_detail_basic_action_upload_favicon"
+        icon="pi pi-upload"
+        class="action-button p-button-icon-only"
+        [disabled]="basicForm.controls['faviconUrl'].value"
+        (click)="fileUploadFavicon.click()"
+        [ariaLabel]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
+        [pTooltip]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      ></button>
+      <div class="flex flex-column row-gap-1 flex-grow-1">
+        <div class="p-inputgroup">
+          <span class="p-float-label w-full">
+            <input
+              #FaviconUrlInput
+              pInputText
+              type="text"
+              id="th_detail_basic_field_favicon_url"
+              class="w-full pt-3 pb-2 text-responsive"
+              formControlName="faviconUrl"
+              [ariaLabel]="('IMAGE.FAVICON' | translate) + ':  ' + ('IMAGE.TOOLTIPS.URL' | translate)"
+              [pTooltip]="('IMAGE.TOOLTIPS.URL' | translate) + ('VALIDATION.HINTS.FORMAT_IMAGE_URL' | translate)"
+              tooltipPosition="top"
+              tooltipEvent="hover"
+              [escape]="false"
+            />
+            <label for="th_detail_basic_field_favicon_url" aria-hidden="true">
+              {{ 'IMAGE.FAVICON_URL' | translate }}
+            </label>
+          </span>
+          <button
+            id="ws_detail_props_item_favicon_url_remove"
+            class="p-inputgroup-addon bg-primary pseudo-button"
+            [ngClass]="changeMode === 'EDIT' && FaviconUrlInput.value ? 'cursor-pointer' : 'p-disabled'"
+            (click)="onRemoveImageUrl(RefType.Favicon)"
+            [attr.aria-label]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
+            [pTooltip]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
+            tooltipPosition="right"
+            tooltipEvent="hover"
+          >
+            <span class="pi pi-trash" aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<div class="my-4 text-center border-bottom-1" style="border-color: var(--p-stone-300)">
+  <div class="h-1rem mb-2 text-xl text-600 font-bold">{{ 'THEME.GROUPS.FONT' | translate }}</div>
+</div>
+
+<form [formGroup]="fontForm" class="flex flex-column sm:flex-row gap-4">
+  <div class="flex-grow-1">
+    <span class="p-float-label">
+      <input
+        pInputText
+        type="text"
+        id="th_detail_font_font_family"
+        class="w-full pt-3 pb-2 text-responsive"
+        formControlName="font-family"
+        [ariaLabel]="'THEME.TOOLTIPS.FONT_FAMILY' | translate"
+        [pTooltip]="'THEME.TOOLTIPS.FONT_FAMILY' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      />
+      <label for="th_detail_font_font_family" aria-hidden="true">{{ 'THEME.FONT_FAMILY' | translate }}</label>
+    </span>
+  </div>
+  <div class="flex-grow-1">
+    <span class="p-float-label">
+      <input
+        pInputText
+        type="text"
+        id="th_detail_font_font_size"
+        class="w-full pt-3 pb-2 text-responsive"
+        formControlName="font-size"
+        [ariaLabel]="'THEME.TOOLTIPS.FONT_SIZE' | translate"
+        [pTooltip]="'THEME.TOOLTIPS.FONT_SIZE' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      />
+      <label for="th_detail_font_font_size" aria-hidden="true">{{ 'THEME.FONT_SIZE' | translate }}</label>
+    </span>
+  </div>
+</form>

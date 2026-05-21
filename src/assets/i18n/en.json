@@ -9,6 +9,7 @@
     "CREATE": {
       "THEME": "Create",
       "THEME.TOOLTIP": "Create a new Theme",
+      "THEME.HINT": "The color values are taken from the current Theme.",
       "MESSAGE": {
         "THEME_ALREADY_EXISTS": "A Theme with that name already exists",
         "OK": "The Theme was created successfully",
@@ -72,6 +73,7 @@
     "SAVE_AS": "Save as ...",
     "UPLOAD": "Upload",
     "TOOLTIPS": {
+      "CANCEL": "Cancel and discard changes",
       "CANCEL_AND_CLOSE": "Cancel and close dialog",
       "SAVE": "Save changes",
       "SAVE_AS": "Save as new Theme"
@@ -102,10 +104,6 @@
     }
   },
   "DIALOG": {
-    "SEARCH": {
-      "CRITERIA": "Search Criteria",
-      "RESULTS": "Search Results"
-    },
     "HEADER": {
       "SEARCH": "Theme Management",
       "SEARCH.SUBHEADER": "Creation and editing of Theme",
@@ -113,17 +111,40 @@
       "DETAIL.SUBHEADER": "Theme Details",
       "CREATE": "Create Theme",
       "DELETE": "Delete Theme",
-      "EXPORT": "Export Theme"
+      "EXPORT": "Export Theme",
+      "SAVE_AS": "Save Theme As..."
+    },
+    "DETAIL": {
+      "SPECIAL.SECTION": "Theme applying and template selection",
+      "AUTO_APPLY": {
+        "LABEL": "Auto apply changes",
+        "TOOLTIP": "If this option is switched on, then all changes (font, colors) are automatically applied to the current page.",
+        "CURRENT_THEME": "Changes are applied immediately upon saving, as this is the currently used theme."
+      },
+      "THEME_SELECTOR": "Select Theme as Template"
+    },
+    "SEARCH": {
+      "CRITERIA": "Search Criteria",
+      "RESULTS": "Search Results"
     },
     "TABS": {
+      "COLORS": "Colors",
+      "COLORS.TOOLTIP": "Color values of the Theme",
+      "EXTRAS": "Extras",
+      "EXTRAS.TOOLTIP": "Additional properties of the Theme (Fonts, Iconsets etc.)",
       "INTERN": "Internal",
-      "INTERN_TOOLTIP": "Internal information",
-      "PROPERTIES": "Properties",
-      "PROPERTIES_TOOLTIP": "Properties of the Theme",
+      "INTERN.TOOLTIP": "Internal information",
+      "PROPS": "Basic Properties",
+      "PROPS.TOOLTIP": "Basic properties of the Theme",
       "USE": "Use",
-      "USE_TOOLTIP": "List of Workspaces using the Theme",
+      "USE.TOOLTIP": "List of Workspaces using the Theme",
       "VARIABLES": "Theme Variables",
-      "VARIABLES_TOOLTIP": "JSON representation of Theme Variables"
+      "VARIABLES.TOOLTIP": "JSON representation of Theme Variables"
+    },
+    "WORKSPACES_USING_THEME": {
+      "MISSING_COMPONENT": "Information on using the Theme in a Workspace could not be obtained.",
+      "USED": "The Theme is used by the following Workspaces: ",
+      "UNUSED": "The Theme is not used by any Workspace."
     },
     "DATAVIEW": {
       "FILTER": "Filter",
@@ -144,7 +165,7 @@
     "FAVICON": "Favicon",
     "FAVICON_URL": "External Favicon URL",
     "LOGO": "Logo",
-    "LOGO_SMALL": "Logo (small)",
+    "LOGO_SMALL": "Logo small",
     "LOGO_URL": "External Logo URL",
     "UPLOAD": {
       "OK": "The file was uploaded successfully",
@@ -173,22 +194,18 @@
     "DESIGNER.EDIT.SUBHEADER": "Change Theme Details",
     "DESIGNER.CREATE.SUBHEADER": "Create a new Theme",
     "DESIGNER.TOP.SECTION": "Theme applying and template selection",
-    "DETAIL.AUTO_APPLY": "Auto apply changes",
-    "DETAIL.AUTO_APPLY.TOOLTIP": "If this option is switched on, then all changes (font, colors) are automatically applied to the current page.",
-    "DETAIL.AUTO_APPLY_CURRENT_THEME": "Changes are applied immediately upon saving, as this is the currently used theme.",
-    "DETAIL.THEME_SELECTOR": "Select Theme as Template",
     "NO_PROPERTIES": "No properties specified",
-    "WORKSPACES_USING_THEME": {
-      "MISSING_COMPONENT": "Information on using the Theme in a Workspace could not be obtained.",
-      "USED": "The Theme is used by the following Workspaces: ",
-      "UNUSED": "The Theme is not used by any Workspace."
+    "COLORS": {
+      "GENERAL": "General Colors",
+      "TOPBAR": "Topbar Colors",
+      "SIDEBAR": "Menu Colors"
     },
     "IMPORT": {
       "HEADER": "Import Theme",
-      "IMPORT_THEME_SUCCESS": "The Theme was sucessfully imported.",
+      "IMPORT_THEME_SUCCESS": "The Theme was successfully imported.",
       "IMPORT_THEME_FAIL": "An error occurred, the Theme was not imported.",
       "NAME_EXISTS_MESSAGE": "A Theme with this name already exists. Its definition is overwritten.",
-      "DISPLAY_NAME_EXISTS_MESSAGE": "A Theme with this display name already exists. ",
+      "DISPLAY_NAME_EXISTS_MESSAGE": "A Theme with this display name already exists. Importing is possible, but it will result in Themes with the same display name.",
       "THEME_COLOR_PRIMARY": "Primary color",
       "THEME_COLOR_SECONDARY": "Secondary color",
       "THEME_COLOR_TEXT": "Text color",
@@ -197,11 +214,11 @@
     },
     "TEMPLATE": {
       "SELECTOR": "Select Theme template",
-      "SELECTOR.TOOLTIP": "Choose an existing Theme and use it as a template",
+      "SELECTOR.TOOLTIP": "Choose an existing Theme and use their values (e.g. colors, fonts, etc.) in current Theme.",
       "CONFIRMATION": {
         "HEADER": "Replace Theme values",
-        "MESSAGE": "Should all values be replaced by the values of \"{{ITEM}}\"?",
-        "OK": "Values was replaced - They are not yet saved"
+        "MESSAGE": "Should all values (colors, fonts, etc.) be replaced by the values of \"{{ITEM}}\"?",
+        "OK": "Values were replaced. Please save the Theme to apply the changes."
       }
     },
     "GROUPS": {
@@ -215,12 +232,14 @@
     "VERSION": "Version",
     "DESCRIPTION": "Description",
     "CSS_FILE": "CSS File",
+    "FONT_FAMILY": "Font Family",
+    "FONT_SIZE": "Font Size",
     "TOOLTIPS": {
       "ID": "Unique technical ID of the Theme",
       "NAME": "Unique name of the Theme, cannot be changed. Used as reference to the Theme.",
       "DISPLAY_NAME": "Display Name",
-      "FONT_FAMILY": "Select Font family",
-      "FONT_SIZE": "Select Font size",
+      "FONT_FAMILY": "Used font family (CSS property: font-family), e.g. 'Arial', 'Times New Roman', etc.",
+      "FONT_SIZE": "Used basic font size (CSS property: font-size), e.g. '16px', '1em', etc.",
       "ITEM_COLOR": "Select a Color",
       "ITEM_COLOR_PICKER": "Select a color with the color picker",
       "VERSION": "Version of the Theme",
@@ -242,7 +261,8 @@
       "FILETYPE_PATTERN_ERROR_2": "Your file does not match the allowed filetypes: .png, .jpg, .jpeg"
     },
     "HINTS": {
-      "FORMAT_URL": "Format: "
+      "FORMAT_URL": "Format: ",
+      "FORMAT_IMAGE_URL": "<br/>Format: http(s)://path-to-image"
     }
   },
   "EXCEPTIONS": {
