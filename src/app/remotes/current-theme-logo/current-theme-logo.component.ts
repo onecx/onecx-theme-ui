@@ -13,8 +13,8 @@ import {
 import { Theme, ThemeService } from '@onecx/angular-integration-interface'
 import { PortalCoreModule } from '@onecx/portal-integration-angular'
 
-import { Configuration, RefType, ThemesAPIService } from 'src/app/shared/generated'
-import { Utils } from 'src/app/shared/utils'
+import { Configuration, ThemesAPIService } from 'src/app/shared/generated'
+import { Utils, LogoRefType } from 'src/app/shared/utils'
 import { environment } from 'src/environments/environment'
 
 @Component({
@@ -100,8 +100,8 @@ export class OneCXCurrentThemeLogoComponent implements ocxRemoteComponent, ocxRe
       this.log('getImageUrl => ' + this.imageUrl)
       return this.imageUrl
     } else if (['url', 'image'].includes(prioType)) {
-      this.log('getImageUrl => ' + Utils.bffImageUrl(this.themeApi.configuration.basePath, themeName, RefType.Logo))
-      return Utils.bffImageUrl(this.themeApi.configuration.basePath, themeName, RefType.Logo)
+      this.log('getImageUrl => ' + Utils.bffImageUrl(this.themeApi.configuration.basePath, themeName, LogoRefType.Logo))
+      return Utils.bffImageUrl(this.themeApi.configuration.basePath, themeName, LogoRefType.Logo)
     } else if (['url', 'image', 'default'].includes(prioType) && this.useDefaultLogo && this.defaultImageUrl !== '') {
       // if user wants to have the default (as asset)
       return this.defaultImageUrl

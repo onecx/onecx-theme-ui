@@ -6,8 +6,8 @@ import { DataView } from 'primeng/dataview'
 
 import { Action, DataViewControlTranslations } from '@onecx/portal-integration-angular'
 
-import { ImagesInternalAPIService, RefType, Theme, ThemesAPIService } from 'src/app/shared/generated'
-import { Utils } from 'src/app/shared/utils'
+import { ImagesInternalAPIService, Theme, ThemesAPIService } from 'src/app/shared/generated'
+import { Utils, LogoRefType } from 'src/app/shared/utils'
 
 @Component({
   templateUrl: './theme-search.component.html',
@@ -27,7 +27,7 @@ export class ThemeSearchComponent implements OnInit {
   public Utils = Utils
   // image
   public imageBasePath = this.imageApi.configuration.basePath
-  public RefType = RefType
+  public LogoRefType = LogoRefType
   // data
   public themes$!: Observable<Theme[]>
   @ViewChild(DataView) dv: DataView | undefined

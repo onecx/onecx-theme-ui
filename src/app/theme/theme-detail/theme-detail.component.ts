@@ -9,14 +9,8 @@ import FileSaver from 'file-saver'
 import { PortalMessageService, ThemeService, UserService } from '@onecx/angular-integration-interface'
 import { Action } from '@onecx/angular-accelerator'
 
-import {
-  ExportThemeRequest,
-  ImagesInternalAPIService,
-  RefType,
-  Theme,
-  ThemesAPIService
-} from 'src/app/shared/generated'
-import { Utils } from 'src/app/shared/utils'
+import { ExportThemeRequest, ImagesInternalAPIService, Theme, ThemesAPIService } from 'src/app/shared/generated'
+import { Utils, LogoRefType } from 'src/app/shared/utils'
 
 import { ThemeColorsComponent } from './theme-colors/theme-colors.component'
 import { ThemePropsComponent } from './theme-props/theme-props.component'
@@ -60,7 +54,6 @@ export class ThemeDetailComponent implements OnInit {
   public themeForCreation: Theme | undefined
   // image
   public imageBasePath = this.imageApi.configuration.basePath
-  public RefType = RefType
 
   // Partial theme with undefined values for internal use (copying, editing) to prevent issues with form patching and image url handling when required properties are missing
   private readonly undefinedThemeData = {
@@ -317,7 +310,7 @@ export class ThemeDetailComponent implements OnInit {
   public prepareHeaderUrl(theme?: Theme): void {
     if (!theme) return undefined
     if (theme.logoUrl) this.headerImageUrl = theme.logoUrl
-    else this.headerImageUrl = Utils.bffImageUrl(this.imageBasePath, theme.name, RefType.Logo)
+    else this.headerImageUrl = Utils.bffImageUrl(this.imageBasePath, theme.name, LogoRefType.Logo)
   }
 
   private prepareDialogTranslations(): void {

@@ -1,6 +1,5 @@
 import { of, throwError } from 'rxjs'
-import { RefType } from './generated'
-import { Utils } from './utils'
+import { Utils, LogoRefType } from './utils'
 
 describe('util functions', () => {
   describe('http error status', () => {
@@ -161,7 +160,7 @@ describe('util functions', () => {
       const basePath = 'base'
       const name = 'name'
 
-      const preparedUrl = Utils.bffImageUrl(basePath, name, RefType.Logo)
+      const preparedUrl = Utils.bffImageUrl(basePath, name, LogoRefType.Logo)
 
       expect(preparedUrl).toBe('base/images/name/logo')
     })
@@ -170,7 +169,7 @@ describe('util functions', () => {
       const basePath = undefined
       const name = 'name'
 
-      const preparedUrl = Utils.bffImageUrl(basePath, name, RefType.Logo)
+      const preparedUrl = Utils.bffImageUrl(basePath, name, LogoRefType.Logo)
 
       expect(preparedUrl).toBe('/images/name/logo')
     })
@@ -179,7 +178,7 @@ describe('util functions', () => {
       const basePath = 'base'
       const name = undefined
 
-      const preparedUrl = Utils.bffImageUrl(basePath, name, RefType.Favicon)
+      const preparedUrl = Utils.bffImageUrl(basePath, name, LogoRefType.Favicon)
 
       expect(preparedUrl).toBeUndefined()
     })

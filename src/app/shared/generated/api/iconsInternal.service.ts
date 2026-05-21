@@ -19,11 +19,11 @@ import { CustomHttpParameterCodec }                          from '../encoder';
 import { Observable }                                        from 'rxjs';
 
 // @ts-ignore
-import { AvailableImageTypes } from '../model/availableImageTypes';
+import { GetIconSetsResponse } from '../model/getIconSetsResponse';
 // @ts-ignore
-import { ImageInfo } from '../model/imageInfo';
+import { IconCriteria } from '../model/iconCriteria';
 // @ts-ignore
-import { MimeType } from '../model/mimeType';
+import { IconListResponse } from '../model/iconListResponse';
 // @ts-ignore
 import { ProblemDetailResponse } from '../model/problemDetailResponse';
 
@@ -32,24 +32,22 @@ import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables'
 import { Configuration }                                     from '../configuration';
 
 
-export interface DeleteImageRequestParams {
+export interface DeleteIconSetByRefIdAndPrefixRequestParams {
     refId: string;
-    refType: string;
+    prefix: string;
 }
 
-export interface GetAvailableImageTypesRequestParams {
+export interface FindIconSetsByRefIdRequestParams {
     refId: string;
 }
 
-export interface GetImageRequestParams {
+export interface FindIconsByCriteriaRequestParams {
     refId: string;
-    refType: string;
+    iconCriteria: IconCriteria;
 }
 
-export interface UploadImageRequestParams {
-    mimeType: MimeType;
+export interface UploadIconSetRequestParams {
     refId: string;
-    refType: string;
     body: Blob;
 }
 
@@ -57,7 +55,7 @@ export interface UploadImageRequestParams {
 @Injectable({
   providedIn: 'any'
 })
-export class ImagesInternalAPIService {
+export class IconsInternalAPIService {
 
     protected basePath = 'http://onecx-theme-bff:8080';
     public defaultHeaders = new HttpHeaders();
@@ -119,22 +117,22 @@ export class ImagesInternalAPIService {
     }
 
     /**
-     * Delete an image by its reference id and type
+     * Delete icon set by reference id and prefix
      * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public deleteImage(requestParameters: DeleteImageRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext}): Observable<any>;
-    public deleteImage(requestParameters: DeleteImageRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext}): Observable<HttpResponse<any>>;
-    public deleteImage(requestParameters: DeleteImageRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext}): Observable<HttpEvent<any>>;
-    public deleteImage(requestParameters: DeleteImageRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: undefined, context?: HttpContext}): Observable<any> {
+    public deleteIconSetByRefIdAndPrefix(requestParameters: DeleteIconSetByRefIdAndPrefixRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any>;
+    public deleteIconSetByRefIdAndPrefix(requestParameters: DeleteIconSetByRefIdAndPrefixRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpResponse<any>>;
+    public deleteIconSetByRefIdAndPrefix(requestParameters: DeleteIconSetByRefIdAndPrefixRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpEvent<any>>;
+    public deleteIconSetByRefIdAndPrefix(requestParameters: DeleteIconSetByRefIdAndPrefixRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any> {
         const refId = requestParameters.refId;
         if (refId === null || refId === undefined) {
-            throw new Error('Required parameter refId was null or undefined when calling deleteImage.');
+            throw new Error('Required parameter refId was null or undefined when calling deleteIconSetByRefIdAndPrefix.');
         }
-        const refType = requestParameters.refType;
-        if (refType === null || refType === undefined) {
-            throw new Error('Required parameter refType was null or undefined when calling deleteImage.');
+        const prefix = requestParameters.prefix;
+        if (prefix === null || prefix === undefined) {
+            throw new Error('Required parameter prefix was null or undefined when calling deleteIconSetByRefIdAndPrefix.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -143,6 +141,7 @@ export class ImagesInternalAPIService {
         if (localVarHttpHeaderAcceptSelected === undefined) {
             // to determine the Accept header
             const httpHeaderAccepts: string[] = [
+                'application/json'
             ];
             localVarHttpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
         }
@@ -167,7 +166,7 @@ export class ImagesInternalAPIService {
             }
         }
 
-        let localVarPath = `/images/${this.configuration.encodeParam({name: "refId", value: refId, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "refType", value: refType, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}`;
+        let localVarPath = `/iconsets/${this.configuration.encodeParam({name: "refId", value: refId, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "prefix", value: prefix, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}`;
         return this.httpClient.request<any>('delete', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
@@ -181,18 +180,18 @@ export class ImagesInternalAPIService {
     }
 
     /**
-     * Get available image types
+     * Retrieve all icon sets by reference id
      * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getAvailableImageTypes(requestParameters: GetAvailableImageTypesRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<AvailableImageTypes>;
-    public getAvailableImageTypes(requestParameters: GetAvailableImageTypesRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpResponse<AvailableImageTypes>>;
-    public getAvailableImageTypes(requestParameters: GetAvailableImageTypesRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpEvent<AvailableImageTypes>>;
-    public getAvailableImageTypes(requestParameters: GetAvailableImageTypesRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any> {
+    public findIconSetsByRefId(requestParameters: FindIconSetsByRefIdRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<GetIconSetsResponse>;
+    public findIconSetsByRefId(requestParameters: FindIconSetsByRefIdRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpResponse<GetIconSetsResponse>>;
+    public findIconSetsByRefId(requestParameters: FindIconSetsByRefIdRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpEvent<GetIconSetsResponse>>;
+    public findIconSetsByRefId(requestParameters: FindIconSetsByRefIdRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any> {
         const refId = requestParameters.refId;
         if (refId === null || refId === undefined) {
-            throw new Error('Required parameter refId was null or undefined when calling getAvailableImageTypes.');
+            throw new Error('Required parameter refId was null or undefined when calling findIconSetsByRefId.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -226,8 +225,8 @@ export class ImagesInternalAPIService {
             }
         }
 
-        let localVarPath = `/images/${this.configuration.encodeParam({name: "refId", value: refId, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/availableTypes`;
-        return this.httpClient.request<AvailableImageTypes>('get', `${this.configuration.basePath}${localVarPath}`,
+        let localVarPath = `/iconsets/${this.configuration.encodeParam({name: "refId", value: refId, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}`;
+        return this.httpClient.request<GetIconSetsResponse>('get', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,
@@ -240,89 +239,25 @@ export class ImagesInternalAPIService {
     }
 
     /**
-     * Get an image by its reference id and type
+     * Retrieve icons by list of names and refId
      * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getImage(requestParameters: GetImageRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'image/*' | 'application/json', context?: HttpContext}): Observable<Blob>;
-    public getImage(requestParameters: GetImageRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'image/*' | 'application/json', context?: HttpContext}): Observable<HttpResponse<Blob>>;
-    public getImage(requestParameters: GetImageRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'image/*' | 'application/json', context?: HttpContext}): Observable<HttpEvent<Blob>>;
-    public getImage(requestParameters: GetImageRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'image/*' | 'application/json', context?: HttpContext}): Observable<any> {
+    public findIconsByCriteria(requestParameters: FindIconsByCriteriaRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<IconListResponse>;
+    public findIconsByCriteria(requestParameters: FindIconsByCriteriaRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpResponse<IconListResponse>>;
+    public findIconsByCriteria(requestParameters: FindIconsByCriteriaRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpEvent<IconListResponse>>;
+    public findIconsByCriteria(requestParameters: FindIconsByCriteriaRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any> {
         const refId = requestParameters.refId;
         if (refId === null || refId === undefined) {
-            throw new Error('Required parameter refId was null or undefined when calling getImage.');
+            throw new Error('Required parameter refId was null or undefined when calling findIconsByCriteria.');
         }
-        const refType = requestParameters.refType;
-        if (refType === null || refType === undefined) {
-            throw new Error('Required parameter refType was null or undefined when calling getImage.');
+        const iconCriteria = requestParameters.iconCriteria;
+        if (iconCriteria === null || iconCriteria === undefined) {
+            throw new Error('Required parameter iconCriteria was null or undefined when calling findIconsByCriteria.');
         }
 
         let localVarHeaders = this.defaultHeaders;
-
-        let localVarHttpHeaderAcceptSelected: string | undefined = options && options.httpHeaderAccept;
-        if (localVarHttpHeaderAcceptSelected === undefined) {
-            // to determine the Accept header
-            const httpHeaderAccepts: string[] = [
-                'image/*',
-                'application/json'
-            ];
-            localVarHttpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        }
-        if (localVarHttpHeaderAcceptSelected !== undefined) {
-            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
-        }
-
-        let localVarHttpContext: HttpContext | undefined = options && options.context;
-        if (localVarHttpContext === undefined) {
-            localVarHttpContext = new HttpContext();
-        }
-
-
-        let localVarPath = `/images/${this.configuration.encodeParam({name: "refId", value: refId, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "refType", value: refType, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}`;
-        return this.httpClient.request('get', `${this.configuration.basePath}${localVarPath}`,
-            {
-                context: localVarHttpContext,
-                responseType: "blob",
-                withCredentials: this.configuration.withCredentials,
-                headers: localVarHeaders,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * Upload an image by its reference id and type
-     * @param requestParameters
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public uploadImage(requestParameters: UploadImageRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<ImageInfo>;
-    public uploadImage(requestParameters: UploadImageRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpResponse<ImageInfo>>;
-    public uploadImage(requestParameters: UploadImageRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpEvent<ImageInfo>>;
-    public uploadImage(requestParameters: UploadImageRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any> {
-        const mimeType = requestParameters.mimeType;
-        if (mimeType === null || mimeType === undefined) {
-            throw new Error('Required parameter mimeType was null or undefined when calling uploadImage.');
-        }
-        const refId = requestParameters.refId;
-        if (refId === null || refId === undefined) {
-            throw new Error('Required parameter refId was null or undefined when calling uploadImage.');
-        }
-        const refType = requestParameters.refType;
-        if (refType === null || refType === undefined) {
-            throw new Error('Required parameter refType was null or undefined when calling uploadImage.');
-        }
-        const body = requestParameters.body;
-        if (body === null || body === undefined) {
-            throw new Error('Required parameter body was null or undefined when calling uploadImage.');
-        }
-
-        let localVarHeaders = this.defaultHeaders;
-        if (mimeType !== undefined && mimeType !== null) {
-            localVarHeaders = localVarHeaders.set('mimeType', String(mimeType));
-        }
 
         let localVarHttpHeaderAcceptSelected: string | undefined = options && options.httpHeaderAccept;
         if (localVarHttpHeaderAcceptSelected === undefined) {
@@ -344,7 +279,7 @@ export class ImagesInternalAPIService {
 
         // to determine the Content-Type header
         const consumes: string[] = [
-            'image/*'
+            'application/json'
         ];
         const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
         if (httpContentTypeSelected !== undefined) {
@@ -362,8 +297,81 @@ export class ImagesInternalAPIService {
             }
         }
 
-        let localVarPath = `/images/${this.configuration.encodeParam({name: "refId", value: refId, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "refType", value: refType, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}`;
-        return this.httpClient.request<ImageInfo>('post', `${this.configuration.basePath}${localVarPath}`,
+        let localVarPath = `/icons/${this.configuration.encodeParam({name: "refId", value: refId, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}`;
+        return this.httpClient.request<IconListResponse>('post', `${this.configuration.basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                body: iconCriteria,
+                responseType: <any>responseType_,
+                withCredentials: this.configuration.withCredentials,
+                headers: localVarHeaders,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * Upload an icon set by its reference id
+     * @param requestParameters
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public uploadIconSet(requestParameters: UploadIconSetRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any>;
+    public uploadIconSet(requestParameters: UploadIconSetRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpResponse<any>>;
+    public uploadIconSet(requestParameters: UploadIconSetRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpEvent<any>>;
+    public uploadIconSet(requestParameters: UploadIconSetRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any> {
+        const refId = requestParameters.refId;
+        if (refId === null || refId === undefined) {
+            throw new Error('Required parameter refId was null or undefined when calling uploadIconSet.');
+        }
+        const body = requestParameters.body;
+        if (body === null || body === undefined) {
+            throw new Error('Required parameter body was null or undefined when calling uploadIconSet.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        let localVarHttpHeaderAcceptSelected: string | undefined = options && options.httpHeaderAccept;
+        if (localVarHttpHeaderAcceptSelected === undefined) {
+            // to determine the Accept header
+            const httpHeaderAccepts: string[] = [
+                'application/json'
+            ];
+            localVarHttpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        }
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        let localVarHttpContext: HttpContext | undefined = options && options.context;
+        if (localVarHttpContext === undefined) {
+            localVarHttpContext = new HttpContext();
+        }
+
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
+        }
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/iconsets/${this.configuration.encodeParam({name: "refId", value: refId, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}`;
+        return this.httpClient.request<any>('post', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 body: body,

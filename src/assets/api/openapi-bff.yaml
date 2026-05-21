@@ -250,7 +250,7 @@ paths:
       in: path
       required: true
       schema:
-       $ref: "#/components/schemas/RefType"
+       type: string
    responses:
     "200":
      description: Image retrieved successfully
@@ -288,7 +288,7 @@ paths:
       in: path
       required: true
       schema:
-       $ref: "#/components/schemas/RefType"
+       type: string
    operationId: uploadImage
    requestBody:
     required: true
@@ -325,18 +325,218 @@ paths:
       in: path
       required: true
       schema:
-       $ref: "#/components/schemas/RefType"
+       type: string
    responses:
     "204":
      description: Image deleted successfully
+ /images/{refId}/availableTypes:
+  get:
+   x-onecx:
+    permissions:
+     themes:
+      - read
+   tags:
+    - imagesInternal
+   description: Get available image types
+   operationId: getAvailableImageTypes
+   parameters:
+    - name: refId
+      in: path
+      required: true
+      schema:
+       type: string
+   responses:
+    "200":
+     description: Available image types retrieved successfully
+     content:
+      application/json:
+       schema:
+        $ref: '#/components/schemas/AvailableImageTypes'
+ /icons/{refId}:
+  post:
+   x-onecx:
+    permissions:
+     themes:
+      - read
+   tags:
+    - iconsInternal
+   description: Retrieve icons by list of names and refId
+   parameters:
+    - name: refId
+      in: path
+      required: true
+      schema:
+       type: string
+   operationId: findIconsByCriteria
+   requestBody:
+    required: true
+    content:
+     application/json:
+      schema:
+       $ref: '#/components/schemas/IconCriteria'
+   responses:
+    "200":
+     description: Icons retrieved successfully
+     content:
+      application/json:
+       schema:
+        $ref: '#/components/schemas/IconListResponse'
+    "400":
+     description: Bad Request
+     content:
+      application/json:
+       schema:
+        $ref: '#/components/schemas/ProblemDetailResponse'
+ /iconsets/{refId}:
+  get:
+   x-onecx:
+     permissions:
+       themes:
+         - read
+   tags:
+     - iconsInternal
+   description: Retrieve all icon sets by reference id
+   parameters:
+     - name: refId
+       in: path
+       required: true
+       schema:
+         type: string
+   operationId: findIconSetsByRefId
+   responses:
+     "200":
+       description: Icon sets retrieved successfully
+       content:
+         application/json:
+           schema:
+             $ref: '#/components/schemas/GetIconSetsResponse'
+     "400":
+       description: Bad request
+       content:
+         application/json:
+           schema:
+             $ref: '#/components/schemas/ProblemDetailResponse'
+  post:
+   x-onecx:
+    permissions:
+     themes:
+      - write
+   tags:
+    - iconsInternal
+   description: Upload an icon set by its reference id
+   parameters:
+    - name: refId
+      in: path
+      required: true
+      schema:
+       type: string
+   operationId: uploadIconSet
+   requestBody:
+    required: true
+    content:
+     application/json:
+      schema:
+       type: string
+       format: binary
+   responses:
+    "201":
+     description: Icon uploaded successfully
+    "400":
+     description: Bad Request
+     content:
+      application/json:
+       schema:
+        $ref: '#/components/schemas/ProblemDetailResponse'
+ /iconsets/{refId}/{prefix}:
+   delete:
+     x-onecx:
+       permissions:
+         themes:
+           - delete
+     tags:
+       - iconsInternal
+     description: Delete icon set by reference id and prefix
+     parameters:
+       - name: refId
+         in: path
+         required: true
+         schema:
+           type: string
+       - name: prefix
+         in: path
+         required: true
+         schema:
+           type: string
+     operationId: deleteIconSetByRefIdAndPrefix
+     responses:
+       "204":
+         description: Iconset deleted successfully
+       "400":
+         description: Bad request
+         content:
+           application/json:
+             schema:
+               $ref: '#/components/schemas/ProblemDetailResponse'
 components:
  schemas:
+  GetIconSetsResponse:
+   type: object
+   properties:
+     iconSets:
+       type: array
+       items:
+         $ref: '#/components/schemas/IconSet'
+  IconSet:
+   type: object
+   required:
+     - refId
+     - prefix
   RefType:
    type: string
    enum: [ logo, logo-small, favicon ]
   MimeType:
    type: string
    enum: [ "image/x-icon", "image/svg+xml", "image/png", "image/jpg", "image/jpeg" ]
+  AvailableImageTypes:
+   type: object
+   properties:
+    types:
+     type: array
+     items:
+      type: string
+  IconCriteria:
+   type: object
+   required:
+    - names
+   properties:
+    prefix:
+     type: string
+    names:
+     type: array
+     items:
+      type: string
+  IconListResponse:
+   type: object
+   properties:
+    icons:
+     type: array
+     items:
+      $ref: '#/components/schemas/Icon'
+  Icon:
+   type: object
+   required:
+    - name
+    - type
+    - body
+   properties:
+    name:
+     type: string
+    type:
+     type: string
+    body:
+     type: string
+    parent:
+     type: string
   Theme:
    type: object
    properties:
@@ -377,6 +577,10 @@ components:
      type: string
     properties:
      type: object
+    overrides:
+     type: array
+     items:
+      $ref: '#/components/schemas/ThemeOverride'
     operator:
      type: boolean
     mandatory:
@@ -420,6 +624,10 @@ components:
      type: string
     properties:
      type: object
+    overrides:
+     type: array
+     items:
+      $ref: '#/components/schemas/ThemeOverride'
     mandatory:
      type: boolean
      default: false
@@ -601,11 +809,27 @@ components:
      type: string
     properties:
      type: object
+    overrides:
+     type: array
+     items:
+      $ref: '#/components/schemas/ThemeOverride'
     images:
      $ref: '#/components/schemas/Images'
     mandatory:
      type: boolean
      default: false
+  ThemeOverride:
+   type: object
+   properties:
+    type:
+     $ref: '#/components/schemas/OverrideType'
+    value:
+     type: string
+  OverrideType:
+   type: string
+   enum:
+    - PRIMENG
+    - CSS
   Images:
    type: object
    nullable: false
