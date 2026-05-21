@@ -11,7 +11,6 @@ import { Action } from '@onecx/angular-accelerator'
 
 import {
   ExportThemeRequest,
-  GetThemeResponse,
   ImagesInternalAPIService,
   RefType,
   Theme,
@@ -92,6 +91,7 @@ export class ThemeDetailComponent implements OnInit {
 
   ngOnInit(): void {
     // Common start
+    this.theme = undefined
     this.prepareDialogTranslations()
     this.getTheme()
     // Re-initialize the component when the route parameter changes (e.g. after creating a new theme)
@@ -125,7 +125,7 @@ export class ThemeDetailComponent implements OnInit {
           console.error('getThemeByName', err)
           this.prepareHeaderUrl()
           this.preparePageActions(true)
-          return of({})
+          return of(undefined)
         }),
         finalize(() => {
           this.loading = false
@@ -405,7 +405,7 @@ export class ThemeDetailComponent implements OnInit {
               icon: 'pi pi-times',
               show: 'always',
               conditional: true,
-              showCondition: this.changeMode === 'EDIT'
+              showCondition: this.theme !== undefined && this.changeMode === 'EDIT'
             },
             {
               id: 'th_detail_page_action_save',
@@ -416,7 +416,7 @@ export class ThemeDetailComponent implements OnInit {
               icon: 'pi pi-save',
               show: 'always',
               conditional: true,
-              showCondition: this.changeMode === 'EDIT'
+              showCondition: this.theme !== undefined && this.changeMode === 'EDIT'
             },
             {
               id: 'th_detail_page_action_save_as_on_edit',
@@ -426,7 +426,7 @@ export class ThemeDetailComponent implements OnInit {
               icon: 'pi pi-plus-circle',
               show: 'always',
               conditional: true,
-              showCondition: this.changeMode === 'EDIT',
+              showCondition: this.theme !== undefined && this.changeMode === 'EDIT',
               permission: 'THEME#CREATE'
             },
             {
@@ -459,18 +459,12 @@ export class ThemeDetailComponent implements OnInit {
   /**
    * TEMPLATING: allow using properties from an existing theme => no creation of a new theme!
    */
-  private getThemeById(id: string): Observable<GetThemeResponse> {
-    return this.themeApi.getThemeById({ id: id })
-  }
-
   public useThemeAsTemplate(data: any): any {
-    this.getThemeById(data.id).subscribe((response) => {
-      // on creation the "name" can be edited
-      let name = this.theme?.name // default: original name
+    this.themeApi.getThemeById({ id: data.id }).subscribe((response) => {
       this.themeForProps = {
         ...response.resource,
         ...this.undefinedThemeData,
-        name: name,
+        name: this.theme?.name,
         displayName: data['ACTIONS.COPY_OF'] + response.resource.displayName,
         modificationCount: this.theme?.modificationCount
       }

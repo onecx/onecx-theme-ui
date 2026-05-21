@@ -498,6 +498,7 @@ describe('ThemeDetailComponent', () => {
     it('should show back, export, edit, delete in VIEW mode', (done: DoneFn) => {
       component.changeMode = 'VIEW'
       component.theme = theme // needed for save_as_on_view condition (this.theme !== undefined)
+
       component.preparePageActions(false, theme)
 
       component.actions$.subscribe((actions) => {
@@ -525,6 +526,8 @@ describe('ThemeDetailComponent', () => {
 
     it('should show cancel, save in EDIT mode', (done: DoneFn) => {
       component.changeMode = 'EDIT'
+      component.theme = theme
+
       component.preparePageActions(false, theme)
 
       component.actions$.subscribe((actions) => {
