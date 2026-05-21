@@ -328,16 +328,16 @@ describe('ThemeDetailComponent', () => {
     })
   })
 
-  describe('changeAutoApply', () => {
+  describe('onChangeAutoApply', () => {
     it('should set autoApply to true and show info message', () => {
-      component.changeAutoApply(true)
+      component.onChangeAutoApply(true)
 
       expect(component.autoApply).toBeTrue()
       expect(msgServiceSpy.info).toHaveBeenCalledWith({ summaryKey: 'INTERNAL.AUTO_APPLY_MESSAGE' })
     })
 
     it('should set autoApply to false without showing info message', () => {
-      component.changeAutoApply(false)
+      component.onChangeAutoApply(false)
 
       expect(component.autoApply).toBeFalse()
       expect(msgServiceSpy.info).not.toHaveBeenCalled()
@@ -666,7 +666,7 @@ describe('ThemeDetailComponent', () => {
     })
   })
 
-  describe('toggleEditMode', () => {
+  describe('onChangeMode', () => {
     beforeEach(() => {
       component['themeName'] = theme.name!
       themeApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
@@ -675,7 +675,7 @@ describe('ThemeDetailComponent', () => {
     it('should switch to VIEW mode when forcedMode is view', () => {
       component.changeMode = 'EDIT'
 
-      component['toggleEditMode']('view', theme)
+      component['onChangeMode']('view', theme)
 
       expect(component.changeMode).toBe('VIEW')
     })
@@ -683,7 +683,7 @@ describe('ThemeDetailComponent', () => {
     it('should reinitialize sub component data when switching to VIEW with theme', () => {
       component.changeMode = 'EDIT'
 
-      component['toggleEditMode']('view', theme)
+      component['onChangeMode']('view', theme)
 
       expect(component.themeForProps).toEqual({ ...theme, id: undefined })
       expect(component.themeForColors).toEqual({ properties: theme.properties })
@@ -692,7 +692,7 @@ describe('ThemeDetailComponent', () => {
     it('should toggle from VIEW to EDIT and call getTheme', () => {
       component.changeMode = 'VIEW'
 
-      component['toggleEditMode'](undefined, theme)
+      component['onChangeMode'](undefined, theme)
 
       expect(component.changeMode).toBe('EDIT')
     })
@@ -700,7 +700,7 @@ describe('ThemeDetailComponent', () => {
     it('should toggle from EDIT to VIEW', () => {
       component.changeMode = 'EDIT'
 
-      component['toggleEditMode'](undefined, theme)
+      component['onChangeMode'](undefined, theme)
 
       expect(component.changeMode).toBe('VIEW')
     })

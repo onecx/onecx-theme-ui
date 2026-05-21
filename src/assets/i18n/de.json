@@ -214,7 +214,7 @@
     },
     "TEMPLATE": {
       "SELECTOR": "Theme-Vorlage wählen",
-      "SELECTOR.TOOLTIP": "Wählen Sie ein bestehendes Theme aus und verwenden Sie dessen Werte (z. B. Farben, Schriftarten usw.) im aktuellen Theme.",
+      "SELECTOR.TOOLTIP": "Wählen Sie ein bestehendes Theme aus um dessen Werte (z. B. Farben, Schriftarten usw.) im aktuellen Theme zu verwenden.",
       "CONFIRMATION": {
         "HEADER": "Themewerte ersetzen",
         "MESSAGE": "Sollen alle Werte (Farben, Schriftarten, etc.) durch die Werte von \"{{ITEM}}\" ersetzt werden?",

@@ -36,7 +36,6 @@ export class ThemeCreateComponent implements OnChanges {
   }
 
   public ngOnChanges(): void {
-    console.log('ngOnChanges themeToBeCreated:', this.themeToBeCreated)
     this.formGroup.reset()
     if (this.themeToBeCreated) {
       this.formGroup.patchValue(this.themeToBeCreated)
@@ -69,7 +68,6 @@ export class ThemeCreateComponent implements OnChanges {
       .pipe()
       .subscribe({
         next: (response) => {
-          console.log('theme created:', response)
           this.message.success({ summaryKey: 'ACTIONS.CREATE.MESSAGE.OK' })
           this.themeCreated.emit(response.resource as Theme)
         },

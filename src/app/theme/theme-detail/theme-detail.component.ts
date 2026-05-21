@@ -92,25 +92,17 @@ export class ThemeDetailComponent implements OnInit {
   ngOnInit(): void {
     this.prepareDialogTranslations()
     this.getTheme()
-    this.getThemes()
     // Re-initialize the component when the route parameter changes (e.g. after creating a new theme)
     this.route.paramMap.subscribe((params) => {
       const newThemeName = params.get('name')
       if (newThemeName && newThemeName !== this.themeName) {
         this.themeName = newThemeName
-        this.prepareDialogTranslations()
+        this.changeMode = 'VIEW'
         this.getTheme()
-        this.getThemes()
       }
     })
   }
 
-  public changeAutoApply(value: boolean): void {
-    this.autoApply = value
-    if (this.autoApply) {
-      this.msgService.info({ summaryKey: 'INTERNAL.AUTO_APPLY_MESSAGE' })
-    }
-  }
   private getTheme(switchToEdit?: boolean) {
     if (!this.themeName) return
     this.loading = true
@@ -148,6 +140,8 @@ export class ThemeDetailComponent implements OnInit {
     this.themeForProps = { ...theme, id: undefined }
     this.themeForColors = { properties: theme.properties } // only pass properties to colors component
   }
+
+  // Get themes for the template dropdown
   private getThemes(): void {
     // for using themes as templates
     this.themes$ = this.themeApi.searchThemes({ searchThemeRequest: {} }).pipe(
@@ -178,7 +172,7 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   /**
-   * UI EVENTS
+   * OTHER UI EVENTS
    */
   public onBack(): void {
     this.location.back()
@@ -192,17 +186,24 @@ export class ThemeDetailComponent implements OnInit {
     }
   }
 
-  private toggleEditMode(forcedMode?: 'edit' | 'view', theme?: Theme): void {
-    if (forcedMode === 'view') {
+  public onChangeAutoApply(value: boolean): void {
+    this.autoApply = value
+    if (this.autoApply) {
+      this.msgService.info({ summaryKey: 'INTERNAL.AUTO_APPLY_MESSAGE' })
+    }
+  }
+
+  // Change the mode to operate with the theme
+  private onChangeMode(requestedMode?: 'edit' | 'view', theme?: Theme): void {
+    if (requestedMode === 'view') {
       this.changeMode = 'VIEW'
-    } else {
-      this.changeMode = this.changeMode === 'EDIT' ? 'VIEW' : 'EDIT'
-      this.getTheme(this.changeMode === 'EDIT')
-    }
-    if (this.changeMode === 'VIEW' && theme) {
       this.initSubComponentData(theme) // use originally loaded theme data
+      this.preparePageActions(this.isThemeUsedByWorkspace, theme)
     }
-    this.preparePageActions(this.isThemeUsedByWorkspace, theme)
+    if (requestedMode === 'edit') {
+      this.getTheme(true)
+      this.getThemes()
+    }
   }
 
   private getThemeDataFromSubComponents(): Theme | undefined {
@@ -211,7 +212,6 @@ export class ThemeDetailComponent implements OnInit {
     if (!this.ThemeColorsComponent.onUpdateTheme()) return undefined
 
     let themeData = this.ThemePropsComponent.theme
-    console.log('getThemeDataFromSubComponents', themeData)
     if (!themeData) return undefined
     themeData = {
       ...themeData,
@@ -244,7 +244,7 @@ export class ThemeDetailComponent implements OnInit {
         .subscribe({
           next: (data) => {
             this.msgService.success({ summaryKey: 'ACTIONS.EDIT.MESSAGE.OK' })
-            this.toggleEditMode('view', data.resource)
+            this.onChangeMode('view', data.resource)
             // update observable with response data
             this.theme$ = new Observable((sub) => sub.next(data.resource))
           },
@@ -271,13 +271,11 @@ export class ThemeDetailComponent implements OnInit {
       name: copyOfPrefix + themeData.name,
       displayName: copyOfPrefix + themeData.displayName
     }
-    console.log('onSaveAs themeForCreation:', this.themeForCreation)
     this.themeCreateVisible = true
   }
 
   // Feedback from creation dialog, if a new theme was created
   public onThemeCreated(createdTheme: Theme): void {
-    console.log('onThemeCreated', createdTheme)
     this.themeCreateVisible = false
     this.themeForCreation = undefined
     this.router.navigate(['../' + createdTheme.name], { relativeTo: this.route })
@@ -389,7 +387,7 @@ export class ThemeDetailComponent implements OnInit {
               id: 'th_detail_page_action_edit',
               label: data['ACTIONS.EDIT.LABEL'],
               title: data['ACTIONS.EDIT.TOOLTIP'],
-              actionCallback: () => this.toggleEditMode('edit', theme!),
+              actionCallback: () => this.onChangeMode('edit', theme!),
               permission: 'THEME#EDIT',
               icon: 'pi pi-pencil',
               show: 'always',
@@ -400,7 +398,7 @@ export class ThemeDetailComponent implements OnInit {
               id: 'th_detail_page_action_cancel',
               label: data['ACTIONS.CANCEL'],
               title: data['ACTIONS.TOOLTIPS.CANCEL'],
-              actionCallback: () => this.toggleEditMode('view', theme!),
+              actionCallback: () => this.onChangeMode('view', theme!),
               permission: 'THEME#VIEW',
               icon: 'pi pi-times',
               show: 'always',
@@ -464,7 +462,6 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   public useThemeAsTemplate(data: any): any {
-    console.log('useThemeAsTemplate', data)
     this.getThemeById(data.id).subscribe((response) => {
       // on creation the "name" can be edited
       let name = this.theme?.name // default: original name
@@ -479,7 +476,6 @@ export class ThemeDetailComponent implements OnInit {
         modificationCount: this.theme?.modificationCount
       }
       this.themeForColors = response.resource
-      console.log('themeForColors', this.themeForColors)
       this.msgService.info({ summaryKey: 'THEME.TEMPLATE.CONFIRMATION.OK' })
     })
   }

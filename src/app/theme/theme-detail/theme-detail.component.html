@@ -67,7 +67,7 @@
             [changeMode]="changeMode"
             [isCurrentTheme]="isCurrentTheme"
             [autoApply]="autoApply"
-            (autoApplyChange)="changeAutoApply($event)"
+            (autoApplyChange)="onChangeAutoApply($event)"
             (templatingThemeData)="useThemeAsTemplate($event)"
           ></app-theme-apply>
           <app-theme-props [theme]="themeForProps" [changeMode]="changeMode"></app-theme-props>
@@ -96,7 +96,7 @@
             [changeMode]="changeMode"
             [isCurrentTheme]="isCurrentTheme"
             [autoApply]="autoApply"
-            (autoApplyChange)="changeAutoApply($event)"
+            (autoApplyChange)="onChangeAutoApply($event)"
             (templatingThemeData)="useThemeAsTemplate($event)"
           ></app-theme-apply>
           <app-theme-colors
