@@ -177,7 +177,7 @@ export class ThemeDetailComponent implements OnInit {
     if (theme) {
       this.showOperatorMessage = false
       this.selectedTabIndex = $event.index
-      if (this.selectedTabIndex === 2) this.themeForUse = theme
+      if (this.selectedTabIndex === 3) this.themeForUse = theme
     }
   }
 
