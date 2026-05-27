@@ -1,6 +1,7 @@
 <p-dialog
   [header]="'DIALOG.HEADER.' + (themeToBeCreated ? 'SAVE_AS' : 'CREATE') | translate"
-  [(visible)]="visible"
+  [visible]="visible"
+  (visibleChange)="visibleChange.emit(false)"
   [modal]="true"
   [closable]="true"
   [draggable]="true"
@@ -61,21 +62,22 @@
         {{ 'THEME.DESCRIPTION' | translate }}
       </label>
     </span>
-  </form>
-  <p-message
-    *ngIf="!themeToBeCreated"
-    id="th_create_hint"
-    severity="info"
-    styleClass="m-3"
-    [text]="'ACTIONS.CREATE.THEME.HINT' | translate"
-  ></p-message>
 
+    <div class="text-center">
+      <p-message
+        *ngIf="!themeToBeCreated"
+        id="th_create_hint"
+        severity="info"
+        [text]="'ACTIONS.CREATE.THEME.HINT' | translate"
+      ></p-message>
+    </div>
+  </form>
   <ng-template pTemplate="footer">
     <div class="flex flex-wrap column-gap-2 row-gap-1 justify-content-end">
       <p-button
         id="ws_create_action_cancel"
         icon="pi pi-times"
-        (onClick)="closeDialog()"
+        (onClick)="visibleChange.emit(false)"
         [label]="'ACTIONS.CANCEL' | translate"
         [ariaLabel]="'ACTIONS.CANCEL' | translate"
         [pTooltip]="'ACTIONS.TOOLTIPS.CANCEL' | translate"

@@ -24,8 +24,9 @@ import { FileSelectEvent } from 'primeng/fileupload'
   styleUrls: ['./theme-import.component.scss']
 })
 export class ThemeImportComponent implements OnChanges, AfterViewInit {
-  @Input() public displayThemeImport = false
   @Input() public themes: Theme[] = []
+  @Input() public visible = false
+  @Output() visibleChange = new EventEmitter<boolean>()
   @Output() public uploadEmitter = new EventEmitter<boolean>()
 
   @ViewChild('themeNameInput') themeNameInput!: HTMLInputElement
@@ -53,7 +54,7 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
   }
 
   ngOnChanges(): void {
-    if (this.displayThemeImport) {
+    if (this.visible) {
       this.httpHeaders = new HttpHeaders()
       this.httpHeaders = this.httpHeaders.set('Content-Type', 'application/json')
     }
