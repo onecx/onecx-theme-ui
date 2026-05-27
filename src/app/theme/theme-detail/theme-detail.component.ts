@@ -155,18 +155,6 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   /**
-   * DELETE
-   */
-  public onDeleteTheme(theme: Theme): void {
-    this.themeForUse = theme // force checking use in workspaces
-    this.themeDeleteVisible = true
-  }
-
-  public onThemeDeletion(): void {
-    this.themeDeleteVisible = false
-  }
-
-  /**
    * OTHER UI EVENTS
    */
   public onBack(): void {
@@ -201,6 +189,9 @@ export class ThemeDetailComponent implements OnInit {
     }
   }
 
+  /**
+   * SAVE
+   */
   private getThemeDataFromSubComponents(): Theme | undefined {
     // Trigger save on sub components (return false on validation error to prevent saving)
     if (!this.ThemePropsComponent.onUpdateTheme()) return undefined
@@ -269,7 +260,9 @@ export class ThemeDetailComponent implements OnInit {
     this.themeCreateVisible = true
   }
 
-  // Feedback from creation dialog, if a new theme was created
+  /**
+   * CREATE
+   */
   public onThemeCreated(createdTheme: Theme): void {
     this.themeCreateVisible = false
     this.themeForCreation = undefined
@@ -280,6 +273,19 @@ export class ThemeDetailComponent implements OnInit {
       this.themeCreateVisible = false
       this.themeForCreation = undefined
     }
+  }
+
+  /**
+   * DELETE
+   */
+  public onDeleteTheme(theme: Theme): void {
+    this.themeForUse = theme // force checking use in workspaces
+    this.themeDeleteVisible = true
+  }
+
+  public onThemeDeleteClosed(deleted: boolean): void {
+    this.themeDeleteVisible = false
+    if (deleted) this.router.navigate(['..'], { relativeTo: this.route })
   }
 
   /**

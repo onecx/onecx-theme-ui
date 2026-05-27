@@ -186,15 +186,16 @@
 
     <!-- CREATE -->
     <app-theme-create
-      [visible]="createDialogVisible"
-      (visibleChange)="onHideCreateDialog($event)"
+      [visible]="themeCreateVisible"
+      (visibleChange)="themeCreateVisible = $event"
       (themeCreated)="onThemeCreated($event)"
     ></app-theme-create>
 
     <!-- IMPORT -->
     <app-theme-import
       [themes]="themes"
-      [displayThemeImport]="importDialogVisible"
+      [visible]="themeImportVisible"
+      (visibleChange)="themeImportVisible = $event"
       (uploadEmitter)="onThemeUpload($event)"
     ></app-theme-import>
   </ocx-page-content>

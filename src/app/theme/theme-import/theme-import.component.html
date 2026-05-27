@@ -1,6 +1,7 @@
 <p-dialog
   [header]="'THEME.IMPORT.HEADER' | translate"
-  [(visible)]="displayThemeImport"
+  [visible]="visible"
+  (visibleChange)="visibleChange.emit(false)"
   [draggable]="true"
   [resizable]="true"
   [closable]="true"

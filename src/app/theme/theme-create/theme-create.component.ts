@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
-import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateService } from '@ngx-translate/core'
 
 import { PortalMessageService } from '@onecx/angular-integration-interface'
@@ -22,8 +21,6 @@ export class ThemeCreateComponent implements OnChanges {
   public formGroup: FormGroup
 
   constructor(
-    private readonly router: Router,
-    private readonly route: ActivatedRoute,
     private readonly themesApi: ThemesAPIService,
     private readonly message: PortalMessageService,
     private readonly translate: TranslateService
@@ -70,6 +67,7 @@ export class ThemeCreateComponent implements OnChanges {
         next: (response) => {
           this.message.success({ summaryKey: 'ACTIONS.CREATE.MESSAGE.OK' })
           this.themeCreated.emit(response.resource as Theme)
+          this.visibleChange.emit(false)
         },
         error: (err) => {
           this.message.error({ summaryKey: 'ACTIONS.CREATE.MESSAGE.NOK' })

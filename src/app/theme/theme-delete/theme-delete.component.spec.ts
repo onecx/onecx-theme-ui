@@ -73,7 +73,6 @@ describe('ThemeDeleteComponent', () => {
       component.onDeleteTheme({ id: 'themeId' } as any)
 
       expect(component.visible).toBe(false)
-      expect(router.navigate).toHaveBeenCalledOnceWith(['..'], jasmine.any(Object))
       expect(msgServiceSpy.success).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.DELETE.THEME_OK' })
     })
 

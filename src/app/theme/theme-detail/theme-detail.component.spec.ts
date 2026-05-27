@@ -349,24 +349,24 @@ describe('ThemeDetailComponent', () => {
   describe('onTabChange', () => {
     it('should set showOperatorMessage to false and set selectedTabIndex', () => {
       component.showOperatorMessage = true
-      const event = { index: 2 }
+      const event = { index: 3 }
 
       component.onTabChange(event, theme)
 
       expect(component.showOperatorMessage).toBeFalse()
-      expect(component.selectedTabIndex).toBe(2)
+      expect(component.selectedTabIndex).toBe(3)
       expect(component.themeForUse).toEqual(theme)
     })
 
-    it('should set themeForUse when tabIndex is 2', () => {
-      const event = { index: 2 }
+    it('should set themeForUse when tabIndex is 3', () => {
+      const event = { index: 3 }
 
       component.onTabChange(event, theme)
 
       expect(component.themeForUse).toEqual(theme)
     })
 
-    it('should not set themeForUse when tabIndex is not 2', () => {
+    it('should not set themeForUse when tabIndex is not 3', () => {
       component.themeForUse = undefined
       const event = { index: 1 }
 
@@ -399,8 +399,20 @@ describe('ThemeDetailComponent', () => {
     it('should hide delete dialog', () => {
       component.themeDeleteVisible = true
 
-      component.onThemeDeletion()
+      component.onThemeDeleteClosed(false)
 
+      expect(component.themeDeleteVisible).toBeFalse()
+    })
+
+    it('should hide delete dialog on theme deleted', () => {
+      const router = TestBed.inject(Router)
+      spyOn(router, 'navigate')
+      themeApiSpy.deleteTheme.and.returnValue(of({}) as any)
+      component.themeDeleteVisible = true
+
+      component.onThemeDeleteClosed(true)
+
+      expect(router.navigate).toHaveBeenCalledOnceWith(['..'], jasmine.any(Object))
       expect(component.themeDeleteVisible).toBeFalse()
     })
   })

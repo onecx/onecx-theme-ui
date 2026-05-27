@@ -1,18 +1,19 @@
 <p-dialog
   [header]="'ACTIONS.DELETE.TOOLTIP' | translate"
   [visible]="visible"
+  (visibleChange)="visibleChange.emit(false)"
   [modal]="true"
   [closable]="true"
   [draggable]="true"
   [resizable]="true"
   [dismissableMask]="true"
-  [style]="{ 'max-width': '425px' }"
+  [style]="{ 'max-width': '450px' }"
 >
   <div class="flex column-gap-3 row-gap-1 justify-content-start align-items-center">
     <div
       [ngClass]="theme ? 'text-3xl danger-action-text pi pi-question-circle' : 'text-2xl pi pi-spinner pi-spin'"
     ></div>
-    <div class="flex flex-column row-gap-3">
+    <div class="w-full flex flex-column row-gap-3">
       @if (theme) {
         <p-message
           *ngIf="theme.mandatory"

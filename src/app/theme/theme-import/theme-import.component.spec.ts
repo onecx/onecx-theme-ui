@@ -52,7 +52,7 @@ describe('ThemeImportComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ThemeImportComponent)
     component = fixture.componentInstance
-    component.displayThemeImport = true
+    component.visible = true
     component.themes = themes
     component.formGroup = formGroup
     fixture.detectChanges()

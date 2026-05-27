@@ -94,7 +94,7 @@ describe('ThemeSearchComponent', () => {
     expect(actions.length).toBe(2)
 
     actions[0].actionCallback()
-    expect(component.createDialogVisible).toBe(true)
+    expect(component.themeCreateVisible).toBe(true)
 
     spyOn(component, 'onImportThemeClick')
     actions[1].actionCallback()
@@ -195,30 +195,30 @@ describe('ThemeSearchComponent', () => {
   })
 
   it('should show import dialog on import theme click', () => {
-    component.importDialogVisible = false
+    component.themeImportVisible = false
     component.onImportThemeClick()
-    expect(component.importDialogVisible).toBe(true)
+    expect(component.themeImportVisible).toBe(true)
   })
   it('should hide import dialog on import close', () => {
-    component.importDialogVisible = true
+    component.themeImportVisible = true
     component.onThemeUpload(false)
-    expect(component.importDialogVisible).toBe(false)
+    expect(component.themeImportVisible).toBe(false)
   })
   it('should hide import dialog on import close and reload', () => {
     spyOn(component, 'loadThemes')
-    component.importDialogVisible = true
+    component.themeImportVisible = true
     component.onThemeUpload(true)
-    expect(component.importDialogVisible).toBe(false)
+    expect(component.themeImportVisible).toBe(false)
     expect(component.loadThemes).toHaveBeenCalledTimes(1)
   })
 
-  it('should set createDialogVisible on onHideCreateDialog', () => {
-    component.createDialogVisible = true
+  it('should set themeCreateVisible on onHideCreateDialog', () => {
+    component.themeCreateVisible = true
     component.onHideCreateDialog(false)
-    expect(component.createDialogVisible).toBe(false)
+    expect(component.themeCreateVisible).toBe(false)
 
     component.onHideCreateDialog(true)
-    expect(component.createDialogVisible).toBe(true)
+    expect(component.themeCreateVisible).toBe(true)
   })
 
   it('should navigate to created theme on onThemeCreated', () => {
