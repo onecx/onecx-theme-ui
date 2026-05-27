@@ -7,8 +7,7 @@ import { Theme, ThemesAPIService } from 'src/app/shared/generated'
 
 @Component({
   selector: 'app-theme-delete',
-  templateUrl: './theme-delete.component.html',
-  styleUrls: ['./theme-delete.component.scss']
+  templateUrl: './theme-delete.component.html'
 })
 export class ThemeDeleteComponent {
   @Input() theme: Theme | undefined
