@@ -22,8 +22,8 @@ export class ThemeSearchComponent implements OnInit {
   public sortField = 'displayName'
   public sortOrder = 1
   public actions$: Observable<Action[]> | undefined
-  public importDialogVisible = false
-  public createDialogVisible = false
+  public themeImportVisible = false
+  public themeCreateVisible = false
   public Utils = Utils
   // image
   public imageBasePath = this.imageApi.configuration.basePath
@@ -98,7 +98,7 @@ export class ThemeSearchComponent implements OnInit {
             {
               label: data['ACTIONS.CREATE.THEME'],
               title: data['ACTIONS.CREATE.THEME.TOOLTIP'],
-              actionCallback: () => (this.createDialogVisible = true),
+              actionCallback: () => (this.themeCreateVisible = true),
               permission: 'THEME#CREATE',
               icon: 'pi pi-plus',
               show: 'always'
@@ -117,7 +117,7 @@ export class ThemeSearchComponent implements OnInit {
   }
 
   public onHideCreateDialog(visible: boolean): void {
-    this.createDialogVisible = visible
+    this.themeCreateVisible = visible
   }
   public onThemeCreated(theme: Theme): void {
     this.router.navigate(['./' + theme.name], { relativeTo: this.route })
@@ -136,10 +136,10 @@ export class ThemeSearchComponent implements OnInit {
     this.sortOrder = asc ? -1 : 1
   }
   public onImportThemeClick(): void {
-    this.importDialogVisible = true
+    this.themeImportVisible = true
   }
   public onThemeUpload(uploaded: boolean) {
-    this.importDialogVisible = false
+    this.themeImportVisible = false
     if (uploaded) this.loadThemes()
   }
 }
