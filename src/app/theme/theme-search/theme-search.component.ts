@@ -116,7 +116,7 @@ export class ThemeSearchComponent implements OnInit {
       )
   }
 
-  public onHideCreateDialog(visible: boolean): void {
+  public onThemeCreateClosed(visible: boolean): void {
     this.themeCreateVisible = visible
   }
   public onThemeCreated(theme: Theme): void {

@@ -53,14 +53,7 @@
         tooltipPosition="top"
         tooltipEvent="hover"
       >
-        <p-message
-          *ngIf="exceptionKey"
-          id="th_detail_basic_message_error"
-          severity="error"
-          styleClass="m-3"
-          [text]="exceptionKey | translate"
-        ></p-message>
-        <div *ngIf="!exceptionKey" class="mx-3 mt-1 mb-2">
+        <div class="mt-1 mb-2 mx-0 sm:mx-2">
           <app-theme-apply
             [theme]="theme"
             [themes$]="themes$"
@@ -82,14 +75,7 @@
         tooltipPosition="top"
         tooltipEvent="hover"
       >
-        <p-message
-          *ngIf="exceptionKey"
-          id="th_detail_color_message_error"
-          severity="error"
-          styleClass="m-3"
-          [text]="exceptionKey | translate"
-        ></p-message>
-        <div *ngIf="!exceptionKey" class="mx-2 mt-1 mb-2">
+        <div class="mt-1 mb-2 mx-0 sm:mx-2">
           <app-theme-apply
             [theme]="theme"
             [themes$]="themes$"
@@ -149,16 +135,16 @@
   <!-- CREATE -->
   <app-theme-create
     [visible]="themeCreateVisible"
-    (visibleChange)="onHideCreateDialog($event)"
+    (visibleChange)="onThemeCreateClosed($event)"
     [themeToBeCreated]="themeForCreation"
     (themeCreated)="onThemeCreated($event)"
   ></app-theme-create>
 
   <!-- DELETE -->
   <app-theme-delete
-    [theme]="themeForUse"
-    [isUsedByWorkspace]="isThemeUsedByWorkspace"
     [visible]="themeDeleteVisible"
     (visibleChange)="onThemeDeleteClosed($event)"
+    [theme]="themeForUse"
+    [isUsedByWorkspace]="isThemeUsedByWorkspace"
   ></app-theme-delete>
 </ocx-portal-page>
