@@ -212,12 +212,12 @@ describe('ThemeSearchComponent', () => {
     expect(component.loadThemes).toHaveBeenCalledTimes(1)
   })
 
-  it('should set themeCreateVisible on onHideCreateDialog', () => {
+  it('should set themeCreateVisible on onThemeCreateClosed', () => {
     component.themeCreateVisible = true
-    component.onHideCreateDialog(false)
+    component.onThemeCreateClosed(false)
     expect(component.themeCreateVisible).toBe(false)
 
-    component.onHideCreateDialog(true)
+    component.onThemeCreateClosed(true)
     expect(component.themeCreateVisible).toBe(true)
   })
 

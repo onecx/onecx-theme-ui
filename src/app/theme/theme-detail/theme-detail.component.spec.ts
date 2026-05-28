@@ -928,12 +928,12 @@ describe('ThemeDetailComponent', () => {
     })
   })
 
-  describe('onHideCreateDialog', () => {
+  describe('onThemeCreateClosed', () => {
     it('should close dialog and clear themeForCreation when visible is false', () => {
       component.themeCreateVisible = true
       component.themeForCreation = theme
 
-      component.onHideCreateDialog(false)
+      component.onThemeCreateClosed(false)
 
       expect(component.themeCreateVisible).toBeFalse()
       expect(component.themeForCreation).toBeUndefined()
@@ -943,7 +943,7 @@ describe('ThemeDetailComponent', () => {
       component.themeCreateVisible = true
       component.themeForCreation = theme
 
-      component.onHideCreateDialog(true)
+      component.onThemeCreateClosed(true)
 
       expect(component.themeCreateVisible).toBeTrue()
       expect(component.themeForCreation).toEqual(theme)

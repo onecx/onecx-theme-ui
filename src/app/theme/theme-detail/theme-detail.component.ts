@@ -268,7 +268,7 @@ export class ThemeDetailComponent implements OnInit {
     this.themeForCreation = undefined
     this.router.navigate(['../' + createdTheme.name], { relativeTo: this.route })
   }
-  public onHideCreateDialog(visible: boolean): void {
+  public onThemeCreateClosed(visible: boolean): void {
     if (!visible) {
       this.themeCreateVisible = false
       this.themeForCreation = undefined
