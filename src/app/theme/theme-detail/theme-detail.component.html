@@ -44,7 +44,7 @@
     </ng-container>
 
     @if (!loading && !exceptionKey) {
-      <p-tabs value="0" (onChange)="onTabChange($event, theme)">
+      <p-tabs value="0" (valueChange)="onTabChange($event, theme)">
         <p-tablist>
           <p-tab
             value="0"
@@ -52,44 +52,47 @@
             [pTooltip]="'DIALOG.TABS.PROPS.TOOLTIP' | translate"
             tooltipPosition="top"
             tooltipEvent="hover"
-            >{{ 'DIALOG.TABS.PROPS' | translate }}</p-tab
-          >
+            >{{ 'DIALOG.TABS.PROPS' | translate }}
+          </p-tab>
           <p-tab
             value="1"
             [ariaLabel]="'DIALOG.TABS.COLORS' | translate"
             [pTooltip]="'DIALOG.TABS.COLORS.TOOLTIP' | translate"
             tooltipPosition="top"
             tooltipEvent="hover"
-            >{{ 'DIALOG.TABS.COLORS' | translate }}</p-tab
-          >
+            >{{ 'DIALOG.TABS.COLORS' | translate }}
+          </p-tab>
           <p-tab
             value="2"
+            [disabled]="changeMode !== 'VIEW'"
             [ariaLabel]="'DIALOG.TABS.VARIABLES' | translate"
             [pTooltip]="'DIALOG.TABS.VARIABLES.TOOLTIP' | translate"
             tooltipPosition="top"
             tooltipEvent="hover"
-            >{{ 'DIALOG.TABS.VARIABLES' | translate }}</p-tab
-          >
+            >{{ 'DIALOG.TABS.VARIABLES' | translate }}
+          </p-tab>
           <p-tab
             value="3"
+            [disabled]="changeMode !== 'VIEW'"
             [ariaLabel]="'DIALOG.TABS.USE' | translate"
             [pTooltip]="'DIALOG.TABS.USE.TOOLTIP' | translate"
             tooltipPosition="top"
             tooltipEvent="hover"
-            >{{ 'DIALOG.TABS.USE' | translate }}</p-tab
-          >
+            >{{ 'DIALOG.TABS.USE' | translate }}
+          </p-tab>
           <p-tab
             value="4"
+            [disabled]="changeMode !== 'VIEW'"
             [ariaLabel]="'DIALOG.TABS.INTERN' | translate"
             [pTooltip]="'DIALOG.TABS.INTERN.TOOLTIP' | translate"
             tooltipPosition="top"
             tooltipEvent="hover"
-            >{{ 'DIALOG.TABS.INTERN' | translate }}</p-tab
-          >
+            >{{ 'DIALOG.TABS.INTERN' | translate }}
+          </p-tab>
         </p-tablist>
         <!-- PROPS -->
         <p-tabpanel value="0">
-          <div class="mt-1 mb-2 mx-0 sm:mx-2">
+          <div class="mt-1 mb-3 mx-0 sm:mx-2">
             <app-theme-apply
               [theme]="theme"
               [themes$]="themes$"
@@ -105,7 +108,7 @@
 
         <!-- COLORS -->
         <p-tabpanel value="1">
-          <div class="mt-1 mb-2 mx-0 sm:mx-2">
+          <div class="mt-1 mb-2 mx-0 sm:mx-3">
             <app-theme-apply
               [theme]="theme"
               [themes$]="themes$"
@@ -126,17 +129,21 @@
         @if (changeMode === 'VIEW') {
           <!-- VARIABLES -->
           <p-tabpanel value="2" id="th_detail_panel_variables">
-            <pre class="my-0 pt-1 pb-0 card surface-50">{{ theme?.properties | json }}</pre>
+            <pre class="my-2 mx-3 pt-1 pb-0 surface-50">{{ theme?.properties | json }}</pre>
           </p-tabpanel>
 
           <!-- USE -->
           <p-tabpanel value="3">
-            <app-theme-use [themeName]="themeForUse?.name" (used)="preparePageActions($event, theme)"></app-theme-use>
+            <div class="m-2">
+              <app-theme-use [themeName]="themeForUse?.name" (used)="preparePageActions($event, theme)"></app-theme-use>
+            </div>
           </p-tabpanel>
 
           <!-- INTERN -->
           <p-tabpanel value="4">
-            <app-theme-intern [theme]="theme" [dateFormat]="dateFormat"></app-theme-intern>
+            <div class="m-2 mt-4">
+              <app-theme-intern [theme]="theme" [dateFormat]="dateFormat"></app-theme-intern>
+            </div>
           </p-tabpanel>
         }
       </p-tabs>

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 
 import { Select, SelectModule } from 'primeng/select'
@@ -8,11 +8,12 @@ import { ButtonModule } from 'primeng/button'
 import { ConfirmDialogModule } from 'primeng/confirmdialog'
 import { ConfirmPopupModule } from 'primeng/confirmpopup'
 import { DialogModule } from 'primeng/dialog'
+import { FloatLabelModule } from 'primeng/floatlabel'
 import { MessageModule } from 'primeng/message'
 import { ToastModule } from 'primeng/toast'
+import { ToggleSwitchModule } from 'primeng/toggleswitch'
 import { TooltipModule } from 'primeng/tooltip'
 import { ConfirmationService } from 'primeng/api'
-import { Dropdown } from 'primeng/dropdown'
 
 import { firstValueFrom, map, Observable } from 'rxjs'
 
@@ -29,11 +30,13 @@ import { ChangeMode } from '../theme-detail.component'
     ConfirmPopupModule,
     ButtonModule,
     DialogModule,
+    FloatLabelModule,
     MessageModule,
     FormsModule,
     ReactiveFormsModule,
     SelectModule,
     TranslateModule,
+    ToggleSwitchModule,
     TooltipModule,
     ToastModule
   ],

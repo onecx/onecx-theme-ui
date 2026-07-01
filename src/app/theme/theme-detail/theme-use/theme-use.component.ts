@@ -1,18 +1,11 @@
-import { Component, DestroyRef, EventEmitter, Inject, inject, Input, OnChanges, Output } from '@angular/core'
+import { Component, DestroyRef, EventEmitter, inject, Input, OnChanges, Output } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { Router, RouterModule } from '@angular/router'
 import { TranslateModule } from '@ngx-translate/core'
-import { BehaviorSubject, Observable, of, ReplaySubject } from 'rxjs'
+import { BehaviorSubject, Observable, of } from 'rxjs'
 import { TooltipModule } from 'primeng/tooltip'
 
-import {
-  AngularRemoteComponentsModule,
-  ocxRemoteComponent,
-  ocxRemoteWebcomponent,
-  SlotService,
-  SLOT_SERVICE
-} from '@onecx/angular-remote-components'
-import { REMOTE_COMPONENT_CONFIG, RemoteComponentConfig } from '@onecx/angular-utils'
+import { SlotService, SLOT_SERVICE, AngularRemoteComponentsModule } from '@onecx/angular-remote-components'
 import { WorkspaceService } from '@onecx/angular-integration-interface'
 
 import { Utils } from 'src/app/shared/utils'
@@ -44,10 +37,7 @@ export function slotInitializer(slotService: SlotService) {
   providers: [{ provide: SLOT_SERVICE, useExisting: SlotService }],
   templateUrl: './theme-use.component.html'
 })
-export class ThemeUseComponent implements ocxRemoteComponent, ocxRemoteWebcomponent, OnChanges {
-  @Input() set ocxRemoteComponentConfig(config: RemoteComponentConfig) {
-    this.ocxInitRemoteComponent(config)
-  }
+export class ThemeUseComponent implements OnChanges {
   @Input() themeName: string | undefined
   @Output() used = new EventEmitter<boolean>()
 
@@ -60,16 +50,12 @@ export class ThemeUseComponent implements ocxRemoteComponent, ocxRemoteWebcompon
   public workspaceEndpointExist = false
 
   constructor(
-    @Inject(REMOTE_COMPONENT_CONFIG) private readonly remoteComponentConfig: ReplaySubject<RemoteComponentConfig>,
     private readonly router: Router,
     private readonly slotService: SlotService,
     private readonly workspaceService: WorkspaceService
   ) {
+    slotInitializer(slotService)
     this.isComponentDefined$ = this.slotService.isSomeComponentDefinedForSlot(this.slotName)
-  }
-
-  public ocxInitRemoteComponent(config: RemoteComponentConfig): void {
-    this.remoteComponentConfig.next(config)
   }
 
   public ngOnChanges(): void {

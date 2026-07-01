@@ -86,7 +86,7 @@
           <ng-template pTemplate="listItem" let-item>
             <article
               [id]="'th_search_data_list_row_' + item.name"
-              class="py-1 px-3 flex flex-row flex-nowrap justify-content-start align-items-center column-gap-3 hover:bg-gray-200 cursor-pointer"
+              class="py-1 px-3 w-full flex flex-row flex-nowrap justify-content-start align-items-center column-gap-3 hover:bg-gray-200 cursor-pointer"
               [attr.aria-label]="item.displayName"
               [routerLink]="['./', item.name]"
             >
@@ -143,7 +143,8 @@
           <ng-template pTemplate="gridItem" let-item>
             <div class="col-6 md:col-4 lg:col-4 xl:col-3 p-2">
               <p-card
-                styleClass="cursor-pointer hover:bg-gray-200 text-center m-2 pb-1"
+                [style]="{ margin: '0rem;' }"
+                styleClass="cursor-pointer hover:bg-gray-200 text-center m-2 p-1"
                 [attr.aria-label]="item.name"
                 (click)="onAppClick(item)"
                 (keydown.enter)="onAppClick(item)"
@@ -152,7 +153,7 @@
               >
                 <div
                   [id]="'th_search_data_grid_row_' + item.name + '_display_name'"
-                  class="font-bold text-base sm:text-lg md:text-xl lg:text-2xl text-responsive"
+                  class="py-1 font-bold text-base sm:text-lg md:text-xl lg:text-2xl text-responsive"
                   [pTooltip]="item.displayName?.length < 20 ? undefined : item.displayName"
                   tooltipPosition="top"
                   tooltipEvent="hover"
@@ -182,22 +183,20 @@
                     ></div>
                   }
                 </div>
-                <div class="flex flex-column justify-content-between gap-1 text-center">
-                  <div
-                    [id]="'th_search_data_grid_row_' + item.name + '_name'"
-                    class="text-xs sm:text-sm text-responsive"
-                    [attr.aria-label]="'Name'"
-                    [pTooltip]="item.name.length < 30 ? '' : item.displayName"
-                    tooltipPosition="top"
-                    tooltipEvent="hover"
-                    role="note"
-                  >
-                    {{ item.name }}
-                  </div>
+                <div
+                  [id]="'th_search_data_grid_row_' + item.name + '_name'"
+                  class="py-1 text-xs sm:text-sm text-responsive"
+                  [attr.aria-label]="'Name'"
+                  [pTooltip]="item.name.length < 30 ? '' : item.displayName"
+                  tooltipPosition="top"
+                  tooltipEvent="hover"
+                  role="note"
+                >
+                  {{ item.name }}
                 </div>
                 <app-theme-color-box
                   [properties]="item.properties"
-                  styleClass="h-05rem md:h-1rem mb-2 m-auto"
+                  styleClass="h-05rem md:h-1rem my-1"
                   aria-hidden="true"
                 />
               </p-card>

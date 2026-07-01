@@ -1,19 +1,17 @@
 import { Component, OnInit, ViewChild } from '@angular/core'
-import { CommonModule } from '@angular/common'
-import { Location } from '@angular/common'
+import { CommonModule, Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { Observable, catchError, combineLatest, finalize, first, map, of } from 'rxjs'
 import FileSaver from 'file-saver'
 
-import { Message, MessageModule } from 'primeng/message'
+import { MessageModule } from 'primeng/message'
 import { TabsModule } from 'primeng/tabs'
 import { TooltipModule } from 'primeng/tooltip'
 
 import { PortalMessageService, ThemeService, UserService } from '@onecx/angular-integration-interface'
 
-import { AngularAcceleratorModule, Action } from '@onecx/angular-accelerator'
-import {} from '@onecx/angular-accelerator'
+import { Action, AngularAcceleratorModule } from '@onecx/angular-accelerator'
 import { PortalPageComponent } from '@onecx/angular-utils'
 
 import { ExportThemeRequest, ImagesInternalAPIService, Theme, ThemesAPIService } from 'src/app/shared/generated'
@@ -30,7 +28,6 @@ import { ThemeDeleteComponent } from '../theme-delete/theme-delete.component'
 export type ChangeMode = 'VIEW' | 'EDIT'
 
 @Component({
-  templateUrl: './theme-detail.component.html',
   standalone: true,
   imports: [
     AngularAcceleratorModule,
@@ -48,6 +45,7 @@ export type ChangeMode = 'VIEW' | 'EDIT'
     ThemePropsComponent,
     ThemeColorsComponent
   ],
+  templateUrl: './theme-detail.component.html',
   styleUrls: ['./theme-detail.component.scss']
 })
 export class ThemeDetailComponent implements OnInit {
@@ -187,10 +185,10 @@ export class ThemeDetailComponent implements OnInit {
     this.location.back()
   }
 
-  public onTabChange($event: any, theme?: Theme): void {
+  public onTabChange(tabValue: string | number, theme?: Theme): void {
     if (theme) {
       this.showOperatorMessage = false
-      this.selectedTabIndex = $event.index
+      this.selectedTabIndex = typeof tabValue === 'string' ? Number(tabValue) : tabValue
       if (this.selectedTabIndex === 3) this.themeForUse = theme
     }
   }

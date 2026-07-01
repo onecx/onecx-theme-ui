@@ -19,10 +19,12 @@
 
 @mixin ocx-required-label {
   // Keep a visible required marker even when external theme styles are missing.
-  .p-floatlabel > label.ocx-required-label::after {
-    content: ' *';
-    color: var(--red-500, #ef4444);
-    font-weight: 600;
+  :host ::ng-deep {
+    .p-floatlabel > label.ocx-required-label::after {
+      content: ' *';
+      color: var(--red-500, #ef4444);
+      font-weight: 600;
+    }
   }
 }
 
@@ -301,6 +303,17 @@
     .table-header-wrapper span:first-child {
       margin-right: 10px !important;
     }
+
+    /* establish grid-nogutter */
+    .p-dataview .p-dataview-content {
+      margin: 0;
+      padding: 0;
+      border-top: var(--table-header-border);
+      > .grid {
+        gap: 0 !important;
+        padding: 0;
+      }
+    }
   }
 }
 
@@ -326,16 +339,22 @@
   :host ::ng-deep {
     .p-dataview-list .p-dataview-content .p-grid > * {
       &:nth-child(even) {
-        background-color: var(--table-body-row-even-bg);
+        background-color: var(
+          --onecx-theme-onecx-theme-ui-datatable-row-even-background,
+          var(--table-body-row-even-bg, rgba(0, 0, 0, 0.02))
+        );
       }
     }
   }
 }
 @mixin dataview-list-flex-zebra-rows {
   :host ::ng-deep {
-    .p-dataview-list .p-dataview-content section > article {
+    .p-dataview-list .p-dataview-content article {
       &:nth-child(even) {
-        background-color: var(--table-body-row-even-bg);
+        background-color: var(
+          --onecx-theme-onecx-theme-ui-datatable-row-even-background,
+          var(--table-body-row-even-bg, rgba(0, 0, 0, 0.02))
+        );
       }
     }
   }
@@ -343,7 +362,10 @@
 @mixin dropdown-zebra-rows {
   :host ::ng-deep {
     .p-dropdown-panel .p-dropdown-items *:nth-child(even) .p-dropdown-item {
-      background-color: var(--table-body-row-even-bg);
+      background-color: var(
+        --onecx-theme-onecx-theme-ui-datatable-row-even-background,
+        var(--table-body-row-even-bg, rgba(0, 0, 0, 0.02))
+      );
     }
   }
 }
@@ -351,12 +373,18 @@
   :host ::ng-deep {
     .p-listbox:not(.p-disabled) .p-listbox-item:not(.p-highlight):not(.p-disabled) {
       &:nth-child(even) {
-        background-color: var(--table-body-row-even-bg);
+        background-color: var(
+          --onecx-theme-onecx-theme-ui-datatable-row-even-background,
+          var(--table-body-row-even-bg, rgba(0, 0, 0, 0.02))
+        );
       }
     }
     .p-orderlist:not(.p-disabled) .p-orderlist-item:not(.p-highlight):not(.p-disabled) {
       &:nth-child(even) {
-        background-color: var(--table-body-row-even-bg);
+        background-color: var(
+          --onecx-theme-onecx-theme-ui-datatable-row-even-background,
+          var(--table-body-row-even-bg, rgba(0, 0, 0, 0.02))
+        );
       }
     }
   }
@@ -365,7 +393,10 @@
   :host ::ng-deep {
     .p-picklist-list li {
       &:nth-child(even) {
-        background-color: var(--table-body-row-even-bg);
+        background-color: var(
+          --onecx-theme-onecx-theme-ui-datatable-row-even-background,
+          var(--table-body-row-even-bg, rgba(0, 0, 0, 0.02))
+        );
       }
     }
   }

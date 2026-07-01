@@ -347,9 +347,8 @@ describe('ThemeDetailComponent', () => {
   describe('onTabChange', () => {
     it('should set showOperatorMessage to false and set selectedTabIndex', () => {
       component.showOperatorMessage = true
-      const event = { index: 3 }
 
-      component.onTabChange(event, theme)
+      component.onTabChange(3, theme)
 
       expect(component.showOperatorMessage).toBeFalse()
       expect(component.selectedTabIndex).toBe(3)
@@ -357,18 +356,15 @@ describe('ThemeDetailComponent', () => {
     })
 
     it('should set themeForUse when tabIndex is 3', () => {
-      const event = { index: 3 }
-
-      component.onTabChange(event, theme)
+      component.onTabChange(3, theme)
 
       expect(component.themeForUse).toEqual(theme)
     })
 
     it('should not set themeForUse when tabIndex is not 3', () => {
       component.themeForUse = undefined
-      const event = { index: 1 }
 
-      component.onTabChange(event, theme)
+      component.onTabChange(1, theme)
 
       expect(component.selectedTabIndex).toBe(1)
       expect(component.themeForUse).toBeUndefined()
@@ -376,9 +372,8 @@ describe('ThemeDetailComponent', () => {
 
     it('should do nothing if theme is undefined', () => {
       component.showOperatorMessage = true
-      const event = { index: 1 }
 
-      component.onTabChange(event, undefined)
+      component.onTabChange(1, undefined)
 
       expect(component.showOperatorMessage).toBeTrue()
     })

@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core'
+import { Component, DestroyRef, inject, OnDestroy, OnInit } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { CommonModule } from '@angular/common'
 import { ActivatedRoute, Router, RouterModule } from '@angular/router'
@@ -14,21 +14,14 @@ import { MessageModule } from 'primeng/message'
 import { ToastModule } from 'primeng/toast'
 import { TooltipModule } from 'primeng/tooltip'
 
-import {
-  Action,
-  AngularAcceleratorModule,
-  ColumnType,
-  RowListGridData,
-  DataSortDirection,
-  DataTableColumn,
-  ObjectUtils
-} from '@onecx/angular-accelerator'
+import { Action, AngularAcceleratorModule, RowListGridData, DataSortDirection } from '@onecx/angular-accelerator'
 import { PortalPageComponent } from '@onecx/angular-utils'
 
-import { ImagesInternalAPIService, Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { Utils, LogoRefType } from 'src/app/shared/utils'
+import { ImagesInternalAPIService, Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeColorBoxComponent } from 'src/app/shared/theme-color-box/theme-color-box.component'
 import { ImageContainerComponent } from 'src/app/shared/image-container/image-container.component'
+
 import { ThemeCreateComponent } from '../theme-create/theme-create.component'
 import { ThemeImportComponent } from '../theme-import/theme-import.component'
 
@@ -56,7 +49,8 @@ import { ThemeImportComponent } from '../theme-import/theme-import.component'
   templateUrl: './theme-search.component.html',
   styleUrls: ['./theme-search.component.scss']
 })
-export class ThemeSearchComponent implements OnInit {
+export class ThemeSearchComponent implements OnInit, OnDestroy {
+  private readonly destroy$ = new Subject()
   // data
   private readonly destroyRef = inject(DestroyRef)
   private readonly dataSubject$ = new BehaviorSubject<RowListGridData[]>([])
@@ -91,6 +85,10 @@ export class ThemeSearchComponent implements OnInit {
   ngOnInit(): void {
     this.prepareActionButtons()
     this.loadThemes()
+  }
+  public ngOnDestroy(): void {
+    this.destroy$.next(undefined)
+    this.destroy$.complete()
   }
 
   public loadThemes(): void {

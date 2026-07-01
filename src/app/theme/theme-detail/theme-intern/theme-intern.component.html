@@ -2,39 +2,43 @@
   <div
     class="ml-2 sm:ml-3 mb-1 flex flex-row flex-wrap justify-content-start align-items-center column-gap-7 row-gap-2"
   >
-    <p-checkbox
-      type="text"
-      inputId="th_detail_intern_item_operator"
-      styleClass="cursor-auto shadow-none"
-      [(ngModel)]="operator"
-      [binary]="true"
-      [disabled]="true"
-      [ariaLabel]="'INTERNAL.OPERATOR' | translate"
-      [pTooltip]="'INTERNAL.TOOLTIPS.OPERATOR' | translate"
-      tooltipPosition="top"
-      tooltipEvent="hover"
-    ></p-checkbox>
-    <label for="th_detail_intern_item_operator" class="ml-2">{{ 'INTERNAL.OPERATOR' | translate }}</label>
-    <p-checkbox
-      type="text"
-      inputId="th_detail_intern_item_mandatory"
-      styleClass="cursor-auto shadow-none"
-      [(ngModel)]="mandatory"
-      [binary]="true"
-      [disabled]="true"
-      [ariaLabel]="'INTERNAL.MANDATORY' | translate"
-      [pTooltip]="'INTERNAL.TOOLTIPS.MANDATORY' | translate"
-      tooltipPosition="top"
-      tooltipEvent="hover"
-    ></p-checkbox>
-    <label for="th_detail_intern_item_mandatory" class="ml-2">{{ 'INTERNAL.MANDATORY' | translate }}</label>
+    <div>
+      <p-checkbox
+        type="text"
+        inputId="th_detail_intern_item_operator"
+        styleClass="cursor-auto shadow-none"
+        [(ngModel)]="operator"
+        [binary]="true"
+        [disabled]="true"
+        [ariaLabel]="'INTERNAL.OPERATOR' | translate"
+        [pTooltip]="'INTERNAL.TOOLTIPS.OPERATOR' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      ></p-checkbox>
+      <label for="th_detail_intern_item_operator" class="ml-2">{{ 'INTERNAL.OPERATOR' | translate }}</label>
+    </div>
+    <div>
+      <p-checkbox
+        type="text"
+        inputId="th_detail_intern_item_mandatory"
+        styleClass="cursor-auto shadow-none"
+        [(ngModel)]="mandatory"
+        [binary]="true"
+        [disabled]="true"
+        [ariaLabel]="'INTERNAL.MANDATORY' | translate"
+        [pTooltip]="'INTERNAL.TOOLTIPS.MANDATORY' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      ></p-checkbox>
+      <label for="th_detail_intern_item_mandatory" class="ml-2">{{ 'INTERNAL.MANDATORY' | translate }}</label>
+    </div>
   </div>
 
-  <div class="w-12 mb-1 p-float-label">
+  <p-float-label variant="on" class="w-full mb-1">
     <input
       pInputText
       type="text"
-      class="w-full"
+      class="w-full pt-3 pb-2 text-responsive"
       id="th_detail_item_name"
       [value]="theme?.name"
       [disabled]="true"
@@ -43,11 +47,13 @@
       tooltipPosition="top"
       tooltipEvent="hover"
     />
-    <label for="th_detail_item_name" aria-hidden="true">{{ 'THEME.NAME' | translate }}</label>
-  </div>
+    <label class="ocx-required-label" for="th_detail_item_name" aria-hidden="true">
+      {{ 'THEME.NAME' | translate }}
+    </label>
+  </p-float-label>
 
   <div class="flex flex-wrap row-gap-3 sm:row-gap-4">
-    <div class="w-12 sm:w-5 sm:pr-3 p-float-label mb-1">
+    <p-float-label variant="on" class="w-full mb-1 w-12 sm:w-5 sm:pr-3">
       <input
         pInputText
         type="text"
@@ -61,28 +67,26 @@
         tooltipEvent="hover"
       />
       <label for="th_detail_item_creationDate" aria-hidden="true">{{ 'INTERNAL.CREATION_DATE' | translate }}</label>
-    </div>
-    <div class="w-12 sm:w-7 sm:pl-3 p-float-label mb-1">
-      <span class="p-float-label mb-1">
-        <input
-          pInputText
-          type="text"
-          id="th_detail_item_creationUser"
-          class="w-full pt-3 pb-2 text-responsive"
-          [value]="theme?.creationUser"
-          [disabled]="true"
-          [ariaLabel]="'INTERNAL.CREATION_USER' | translate"
-          [pTooltip]="'INTERNAL.TOOLTIPS.CREATION_USER' | translate"
-          tooltipPosition="top"
-          tooltipEvent="hover"
-        />
-        <label for="th_detail_item_creationUser" aria-hidden="true">{{ 'INTERNAL.CREATION_USER' | translate }}</label>
-      </span>
-    </div>
+    </p-float-label>
+    <p-float-label variant="on" class="w-12 sm:w-7 sm:pl-3 mb-1">
+      <input
+        pInputText
+        type="text"
+        id="th_detail_item_creationUser"
+        class="w-full pt-3 pb-2 text-responsive"
+        [value]="theme?.creationUser"
+        [disabled]="true"
+        [ariaLabel]="'INTERNAL.CREATION_USER' | translate"
+        [pTooltip]="'INTERNAL.TOOLTIPS.CREATION_USER' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      />
+      <label for="th_detail_item_creationUser" aria-hidden="true">{{ 'INTERNAL.CREATION_USER' | translate }}</label>
+    </p-float-label>
   </div>
 
   <div class="flex flex-wrap row-gap-3 sm:row-gap-4">
-    <div class="w-12 sm:w-5 sm:pr-3 p-float-label mb-1">
+    <p-float-label variant="on" class="w-full mb-1 w-12 sm:w-5 sm:pr-3">
       <input
         pInputText
         type="text"
@@ -98,8 +102,8 @@
       <label for="th_detail_item_modificationDate" aria-hidden="true">
         {{ 'INTERNAL.MODIFICATION_DATE' | translate }}
       </label>
-    </div>
-    <div class="w-12 sm:w-7 sm:pl-3 p-float-label mb-1">
+    </p-float-label>
+    <p-float-label variant="on" class="w-12 sm:w-7 sm:pl-3 mb-1">
       <input
         pInputText
         type="text"
@@ -115,6 +119,6 @@
       <label for="th_detail_item_modificationUser" aria-hidden="true">
         {{ 'INTERNAL.MODIFICATION_USER' | translate }}
       </label>
-    </div>
+    </p-float-label>
   </div>
 </div>

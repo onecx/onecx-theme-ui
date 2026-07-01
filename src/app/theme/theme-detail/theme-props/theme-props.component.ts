@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from
 import { CommonModule } from '@angular/common'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
+import { ReplaySubject } from 'rxjs'
 
 import { ButtonModule } from 'primeng/button'
 import { CheckboxModule } from 'primeng/checkbox'
@@ -11,7 +12,6 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon'
 import { MessageModule } from 'primeng/message'
 import { ToastModule } from 'primeng/toast'
 import { TooltipModule } from 'primeng/tooltip'
-import { ReplaySubject } from 'rxjs'
 
 import { getLocation } from '@onecx/accelerator'
 import { PortalMessageService } from '@onecx/angular-integration-interface'
@@ -27,9 +27,9 @@ import { ChangeMode } from '../theme-detail.component'
   selector: 'app-theme-props',
   standalone: true,
   imports: [
+    CommonModule,
     ButtonModule,
     CheckboxModule,
-    CommonModule,
     FloatLabelModule,
     FormsModule,
     InputGroupModule,

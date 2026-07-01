@@ -2,8 +2,10 @@ import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core
 import { CommonModule } from '@angular/common'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
+
 import { ButtonModule } from 'primeng/button'
 import { DialogModule } from 'primeng/dialog'
+import { FloatLabelModule } from 'primeng/floatlabel'
 import { MessageModule } from 'primeng/message'
 import { ToastModule } from 'primeng/toast'
 import { TooltipModule } from 'primeng/tooltip'
@@ -20,6 +22,7 @@ import { themeVariables } from '../theme-detail/theme-variables'
     CommonModule,
     ButtonModule,
     DialogModule,
+    FloatLabelModule,
     FormsModule,
     MessageModule,
     ReactiveFormsModule,

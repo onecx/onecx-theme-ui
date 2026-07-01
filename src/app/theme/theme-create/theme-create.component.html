@@ -13,14 +13,14 @@
   [breakpoints]="{ '991px': '700px' }"
 >
   <form [formGroup]="formGroup" class="pt-1 flex flex-wrap flex-column gap-4 justify-content-between">
-    <span class="p-float-label" controlErrorAnchor>
+    <p-float-label variant="on">
       <input
         pInputText
         type="text"
         id="th_create_form_name"
         class="w-full pt-3 pb-2"
         formControlName="name"
-        [attr.aria-label]="'THEME.NAME' | translate"
+        [ariaLabel]="'THEME.NAME' | translate"
         [pTooltip]="'THEME.TOOLTIPS.NAME' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
@@ -28,15 +28,15 @@
       <label class="ocx-required-label" for="th_create_form_name" aria-hidden="true">
         {{ 'THEME.NAME' | translate }}
       </label>
-    </span>
-    <span class="p-float-label" controlErrorAnchor>
+    </p-float-label>
+    <p-float-label variant="on">
       <input
         pInputText
         type="text"
         id="th_create_form_display_name"
         class="w-full pt-3 pb-2"
         formControlName="displayName"
-        [attr.aria-label]="'THEME.DISPLAY_NAME' | translate"
+        [ariaLabel]="'THEME.DISPLAY_NAME' | translate"
         [pTooltip]="'THEME.TOOLTIPS.DISPLAY_NAME' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
@@ -44,8 +44,8 @@
       <label class="ocx-required-label" for="th_create_form_display_name" aria-hidden="true">
         {{ 'THEME.DISPLAY_NAME' | translate }}
       </label>
-    </span>
-    <span class="p-float-label" controlErrorAnchor>
+    </p-float-label>
+    <p-float-label variant="on">
       <textarea
         class="w-full"
         pInputTextarea
@@ -53,7 +53,7 @@
         rows="3"
         id="th_create_form_description"
         formControlName="description"
-        [attr.aria-label]="'THEME.DESCRIPTION' | translate"
+        [ariaLabel]="'THEME.DESCRIPTION' | translate"
         [pTooltip]="'THEME.TOOLTIPS.DESCRIPTION' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
@@ -61,7 +61,7 @@
       <label for="th_create_form_description" aria-hidden="true">
         {{ 'THEME.DESCRIPTION' | translate }}
       </label>
-    </span>
+    </p-float-label>
 
     <div class="text-center">
       @if (!themeToBeCreated) {

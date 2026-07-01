@@ -14,38 +14,41 @@
           class="col-12 sm:col-6 md:col-4 lg:col-4 xl:col-3"
           [attr.aria-label]="('THEME.TOOLTIPS.ITEM_COLOR' | translate) + ': ' + item"
         >
-          <div class="px-2 p-inputgroup">
-            <p-float-label variant="on">
-              <input
-                pInputText
-                [id]="'th_designer_item_color_' + item"
-                class="pt-3 pb-2 text-responsive"
-                [formControlName]="item"
-                [value]="group.formGroup.value[item]"
-                [ariaLabel]="item"
-              />
-              <label [for]="'th_designer_item_color_' + item" aria-hidden="true"> {{ item }} </label>
-            </p-float-label>
-            <p-overlayPanel #op>
-              <ng-template pTemplate>
-                <div style="width: 240px; display: inline-block">
-                  <color-sketch [width]="220" [formControlName]="item"> </color-sketch>
-                </div>
-              </ng-template>
-            </p-overlayPanel>
-            <button
-              tabindex="0"
-              [id]="'th_designer_item_color_' + item + '_toggle'"
-              class="p-inputgroup-addon cursor-pointer pseudo-button"
-              (click)="op.toggle($event)"
-              (keyup)="op.toggle($event)"
-              [style.background-color]="group.formGroup.value[item]"
-              [ariaLabel]="'THEME.TOOLTIPS.ITEM_COLOR_PICKER' | translate"
-              [pTooltip]="'THEME.TOOLTIPS.ITEM_COLOR_PICKER' | translate"
-              tooltipPosition="top"
-              tooltipEvent="hover"
-            ></button>
-          </div>
+          <p-popover #op>
+            <ng-template pTemplate>
+              <div style="width: 240px; display: inline-block">
+                <color-sketch [width]="220" [formControlName]="item"> </color-sketch>
+              </div>
+            </ng-template>
+          </p-popover>
+
+          <p-float-label variant="on">
+            <input
+              pInputText
+              [id]="'th_detail_item_color_' + item"
+              class="pt-3 pb-2 text-responsive"
+              [formControlName]="item"
+              [value]="group.formGroup.value[item]"
+              [ariaLabel]="item"
+            />
+            <label [for]="'th_detail_item_color_' + item" aria-hidden="true"> {{ item }} </label>
+          </p-float-label>
+
+          <!--p-inputgroup class="w-auto px-2">
+            <p-inputgroup-addon>
+              <p-button
+                tabindex="0"
+                [id]="'th_detail_item_color_' + item + '_toggle'"
+                (onClick)="op.toggle($event)"
+                (onKeyup)="op.toggle($event)"
+                [style.background-color]="group.formGroup.value[item]"
+                [ariaLabel]="'THEME.TOOLTIPS.ITEM_COLOR_PICKER' | translate"
+                [pTooltip]="'THEME.TOOLTIPS.ITEM_COLOR_PICKER' | translate"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+              ></p-button>
+            </p-inputgroup-addon>
+          </p-inputgroup-->
         </article>
       }
     </form>

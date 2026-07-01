@@ -10,12 +10,12 @@
       tooltipPosition="top"
       tooltipEvent="hover"
     >
-      <p-inputSwitch
+      <p-toggleswitch
         inputId="th_detail_apply_auto_apply"
         name="autoApplyToggle"
         [(ngModel)]="autoApply"
         (ngModelChange)="autoApplyChange.emit($event)"
-      ></p-inputSwitch>
+      ></p-toggleswitch>
       <label for="th_detail_apply_auto_apply" aria-hidden="true">
         {{ 'DIALOG.DETAIL.AUTO_APPLY.LABEL' | translate }}
       </label>
@@ -28,7 +28,7 @@
       ></div>
     }
     <div class="field mb-0">
-      <span class="p-float-label min-w-rem-dropdown-template max-w-30rem">
+      <p-float-label variant="on" class="min-w-rem-dropdown-template max-w-30rem">
         @if (themes$ | async; as themes) {
           <p-select
             #themeTemplateBox
@@ -51,7 +51,7 @@
         <label for="th_detail_apply_theme_template" class="white-space-nowrap" aria-hidden="true">
           {{ 'THEME.TEMPLATE.SELECTOR' | translate }}
         </label>
-      </span>
+      </p-float-label>
     </div>
   </section>
 }

@@ -2,17 +2,19 @@ import { ChangeDetectorRef, Component, Input, OnChanges, SimpleChanges } from '@
 import { CommonModule } from '@angular/common'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, FormBuilder } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
+import { debounceTime } from 'rxjs'
 
 import { ButtonModule } from 'primeng/button'
 import { ColorSketchModule } from 'ngx-color/sketch'
 import { DialogModule } from 'primeng/dialog'
 import { FloatLabelModule } from 'primeng/floatlabel'
+import { InputGroupModule } from 'primeng/inputgroup'
+import { InputGroupAddonModule } from 'primeng/inputgroupaddon'
 import { MessageModule } from 'primeng/message'
-import { OverlayPanelModule } from 'primeng/overlaypanel'
+import { PopoverModule } from 'primeng/popover'
 import { PanelModule } from 'primeng/panel'
 import { ToastModule } from 'primeng/toast'
 import { TooltipModule } from 'primeng/tooltip'
-import { debounceTime } from 'rxjs'
 
 import { PortalMessageService } from '@onecx/angular-integration-interface'
 
@@ -31,8 +33,10 @@ import { ChangeMode } from '../theme-detail.component'
     FloatLabelModule,
     FormsModule,
     MessageModule,
-    OverlayPanelModule,
+    PopoverModule,
     PanelModule,
+    InputGroupModule,
+    InputGroupAddonModule,
     ReactiveFormsModule,
     ToastModule,
     TooltipModule,

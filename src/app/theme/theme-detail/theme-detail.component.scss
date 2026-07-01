@@ -2,7 +2,7 @@
 
 @include danger-action;
 @include ocx-text-responsive;
-@include ocx-p-floatlabel;
+@include ocx-required-label;
 @include ocx-p-inputgroup;
 @include ocx-p-message;
 @include ocx-p-tabs;
@@ -10,13 +10,23 @@
 @include dialog-footer-buttons;
 @include dialog-non-full-size-modal;
 @include readable-disabled-components;
-@include tabview-fix-color-selected-tab;
 
 :host ::ng-deep {
+  .ocx-content > div {
+    margin-bottom: 0 !important;
+    padding: 0 !important;
+  }
+  .p-tabs .p-tabpanels {
+    padding: 0;
+    &.non-modal-panels {
+      padding: 0.3rem 1rem;
+    }
+  }
+
   .max-w-11 {
     max-width: 90%;
   }
   .animation-delay-3000 {
-    animation-delay: 3000ms !important;
+    animation-delay: 1000ms !important;
   }
 }
