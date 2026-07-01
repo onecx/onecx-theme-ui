@@ -1,4 +1,3 @@
-import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { HttpResponse, provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
@@ -42,8 +41,7 @@ describe('ThemeImportComponent', () => {
         provideRouter([{ path: '', component: ThemeImportComponent }]),
         { provide: PortalMessageService, useValue: msgServiceSpy },
         { provide: ThemesAPIService, useValue: themeApiSpy }
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      ]
     }).compileComponents()
     msgServiceSpy.success.calls.reset()
     msgServiceSpy.error.calls.reset()

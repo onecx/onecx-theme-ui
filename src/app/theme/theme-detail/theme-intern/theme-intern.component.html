@@ -4,30 +4,30 @@
   >
     <p-checkbox
       type="text"
-      inputId="ws_detail_intern_item_operator"
+      inputId="th_detail_intern_item_operator"
       styleClass="cursor-auto shadow-none"
       [(ngModel)]="operator"
       [binary]="true"
       [disabled]="true"
-      [label]="'INTERNAL.OPERATOR' | translate"
       [ariaLabel]="'INTERNAL.OPERATOR' | translate"
       [pTooltip]="'INTERNAL.TOOLTIPS.OPERATOR' | translate"
       tooltipPosition="top"
       tooltipEvent="hover"
     ></p-checkbox>
+    <label for="th_detail_intern_item_operator" class="ml-2">{{ 'INTERNAL.OPERATOR' | translate }}</label>
     <p-checkbox
       type="text"
-      inputId="ws_detail_intern_item_mandatory"
+      inputId="th_detail_intern_item_mandatory"
       styleClass="cursor-auto shadow-none"
       [(ngModel)]="mandatory"
       [binary]="true"
       [disabled]="true"
-      [label]="'INTERNAL.MANDATORY' | translate"
       [ariaLabel]="'INTERNAL.MANDATORY' | translate"
       [pTooltip]="'INTERNAL.TOOLTIPS.MANDATORY' | translate"
       tooltipPosition="top"
       tooltipEvent="hover"
     ></p-checkbox>
+    <label for="th_detail_intern_item_mandatory" class="ml-2">{{ 'INTERNAL.MANDATORY' | translate }}</label>
   </div>
 
   <div class="w-12 mb-1 p-float-label">
@@ -38,7 +38,7 @@
       id="th_detail_item_name"
       [value]="theme?.name"
       [disabled]="true"
-      [attr.aria-label]="'THEME.NAME' | translate"
+      [ariaLabel]="'THEME.NAME' | translate"
       [pTooltip]="'THEME.TOOLTIPS.NAME' | translate"
       tooltipPosition="top"
       tooltipEvent="hover"
@@ -55,7 +55,7 @@
         class="w-full pt-3 pb-2 text-responsive"
         [value]="theme?.creationDate | date: dateFormat"
         [disabled]="true"
-        [attr.aria-label]="'INTERNAL.CREATION_DATE' | translate"
+        [ariaLabel]="'INTERNAL.CREATION_DATE' | translate"
         [pTooltip]="'INTERNAL.TOOLTIPS.CREATION_DATE' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
@@ -71,7 +71,7 @@
           class="w-full pt-3 pb-2 text-responsive"
           [value]="theme?.creationUser"
           [disabled]="true"
-          [attr.aria-label]="'INTERNAL.CREATION_USER' | translate"
+          [ariaLabel]="'INTERNAL.CREATION_USER' | translate"
           [pTooltip]="'INTERNAL.TOOLTIPS.CREATION_USER' | translate"
           tooltipPosition="top"
           tooltipEvent="hover"
@@ -90,7 +90,7 @@
         class="w-full pt-3 pb-2 text-responsive"
         [value]="theme?.modificationDate | date: dateFormat"
         [disabled]="true"
-        [attr.aria-label]="'INTERNAL.MODIFICATION_DATE' | translate"
+        [ariaLabel]="'INTERNAL.MODIFICATION_DATE' | translate"
         [pTooltip]="'INTERNAL.TOOLTIPS.MODIFICATION_DATE' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
@@ -107,7 +107,7 @@
         class="w-full pt-3 pb-2 text-responsive"
         [value]="theme?.modificationUser"
         [disabled]="true"
-        [attr.aria-label]="'INTERNAL.MODIFICATION_USER' | translate"
+        [ariaLabel]="'INTERNAL.MODIFICATION_USER' | translate"
         [pTooltip]="'INTERNAL.TOOLTIPS.MODIFICATION_USER' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"

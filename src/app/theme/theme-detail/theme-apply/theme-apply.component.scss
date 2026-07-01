@@ -1,4 +1,4 @@
-@import '/src/app/_th-mixins.scss';
+@use 'src/app/th-mixins.scss' as *;
 
 @include dropdown-zebra-rows;
 

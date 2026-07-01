@@ -1,24 +1,53 @@
 import { Component, OnInit, ViewChild } from '@angular/core'
+import { CommonModule } from '@angular/common'
 import { Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
-import { TranslateService } from '@ngx-translate/core'
+import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { Observable, catchError, combineLatest, finalize, first, map, of } from 'rxjs'
-import { Message } from 'primeng/api'
 import FileSaver from 'file-saver'
 
+import { Message, MessageModule } from 'primeng/message'
+import { TabsModule } from 'primeng/tabs'
+import { TooltipModule } from 'primeng/tooltip'
+
 import { PortalMessageService, ThemeService, UserService } from '@onecx/angular-integration-interface'
-import { Action } from '@onecx/angular-accelerator'
+
+import { AngularAcceleratorModule, Action } from '@onecx/angular-accelerator'
+import {} from '@onecx/angular-accelerator'
+import { PortalPageComponent } from '@onecx/angular-utils'
 
 import { ExportThemeRequest, ImagesInternalAPIService, Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { Utils, LogoRefType } from 'src/app/shared/utils'
 
+import { ThemeApplyComponent } from './theme-apply/theme-apply.component'
 import { ThemeColorsComponent } from './theme-colors/theme-colors.component'
 import { ThemePropsComponent } from './theme-props/theme-props.component'
+import { ThemeUseComponent } from './theme-use/theme-use.component'
+import { ThemeInternComponent } from './theme-intern/theme-intern.component'
+import { ThemeCreateComponent } from '../theme-create/theme-create.component'
+import { ThemeDeleteComponent } from '../theme-delete/theme-delete.component'
 
 export type ChangeMode = 'VIEW' | 'EDIT'
 
 @Component({
   templateUrl: './theme-detail.component.html',
+  standalone: true,
+  imports: [
+    AngularAcceleratorModule,
+    CommonModule,
+    MessageModule,
+    TabsModule,
+    TooltipModule,
+    TranslateModule,
+    PortalPageComponent,
+    ThemeCreateComponent,
+    ThemeDeleteComponent,
+    ThemeInternComponent,
+    ThemeUseComponent,
+    ThemeApplyComponent,
+    ThemePropsComponent,
+    ThemeColorsComponent
+  ],
   styleUrls: ['./theme-detail.component.scss']
 })
 export class ThemeDetailComponent implements OnInit {
@@ -35,11 +64,9 @@ export class ThemeDetailComponent implements OnInit {
   public showOperatorMessage = true // display initially only
   public selectedTabIndex = 0
   public dateFormat = 'medium'
-  public messages: Message[] = []
   public isThemeUsedByWorkspace = false
   public isCurrentTheme = false
   public Utils = Utils
-  private translations$: Observable<Message[]> | undefined
   // page header
   public actions$: Observable<Action[]> = of([])
   public headerImageUrl?: string
@@ -85,7 +112,6 @@ export class ThemeDetailComponent implements OnInit {
   ngOnInit(): void {
     // Common start
     this.theme = undefined
-    this.prepareDialogTranslations()
     this.getTheme()
     // Re-initialize the component when the route parameter changes (e.g. after creating a new theme)
     this.route.paramMap.subscribe((params) => {
@@ -317,25 +343,6 @@ export class ThemeDetailComponent implements OnInit {
     if (!theme) return undefined
     if (theme.logoUrl) this.headerImageUrl = theme.logoUrl
     else this.headerImageUrl = Utils.bffImageUrl(this.imageBasePath, theme.name, LogoRefType.Logo)
-  }
-
-  private prepareDialogTranslations(): void {
-    this.translations$ = this.translate.get(['INTERNAL.OPERATOR_MESSAGE', 'INTERNAL.OPERATOR_HINT']).pipe(
-      first(),
-      map((data) => {
-        return [
-          {
-            id: 'ws_detail_operator_message',
-            severity: 'warn',
-            life: 5000,
-            closable: true,
-            summary: data['INTERNAL.OPERATOR_HINT'],
-            detail: data['INTERNAL.OPERATOR_MESSAGE']
-          }
-        ]
-      })
-    )
-    this.translations$.subscribe((data) => (this.messages = data))
   }
 
   // default: we guess the Theme is in use so that deletion is not offered

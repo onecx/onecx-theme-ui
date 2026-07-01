@@ -1,18 +1,46 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core'
-import { FormControl, FormGroup, Validators } from '@angular/forms'
+import { CommonModule } from '@angular/common'
+import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
+import { TranslateModule, TranslateService } from '@ngx-translate/core'
+
+import { ButtonModule } from 'primeng/button'
+import { CheckboxModule } from 'primeng/checkbox'
+import { FloatLabelModule } from 'primeng/floatlabel'
+import { InputGroupModule } from 'primeng/inputgroup'
+import { InputGroupAddonModule } from 'primeng/inputgroupaddon'
+import { MessageModule } from 'primeng/message'
+import { ToastModule } from 'primeng/toast'
+import { TooltipModule } from 'primeng/tooltip'
 import { ReplaySubject } from 'rxjs'
-import { TranslateService } from '@ngx-translate/core'
 
 import { getLocation } from '@onecx/accelerator'
 import { PortalMessageService } from '@onecx/angular-integration-interface'
 
 import { ImagesInternalAPIService, MimeType, Theme, UploadImageRequestParams } from 'src/app/shared/generated'
 import { Utils, LogoRefType } from 'src/app/shared/utils'
+import { ImageContainerComponent } from 'src/app/shared/image-container/image-container.component'
+
 import { themeVariables } from '../theme-variables'
 import { ChangeMode } from '../theme-detail.component'
 
 @Component({
   selector: 'app-theme-props',
+  standalone: true,
+  imports: [
+    ButtonModule,
+    CheckboxModule,
+    CommonModule,
+    FloatLabelModule,
+    FormsModule,
+    InputGroupModule,
+    InputGroupAddonModule,
+    MessageModule,
+    ReactiveFormsModule,
+    ToastModule,
+    TooltipModule,
+    TranslateModule,
+    ImageContainerComponent
+  ],
   templateUrl: './theme-props.component.html',
   styleUrls: ['./theme-props.component.scss']
 })

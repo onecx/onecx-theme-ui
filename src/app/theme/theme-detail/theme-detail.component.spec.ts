@@ -1,4 +1,3 @@
-import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { Location } from '@angular/common'
 import { provideHttpClient } from '@angular/common/http'
@@ -72,8 +71,7 @@ describe('ThemeDetailComponent', () => {
         { provide: ThemesAPIService, useValue: themeApiSpy },
         { provide: ThemeService, useValue: mockThemeService },
         { provide: ImagesInternalAPIService, useValue: imgServiceSpy }
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      ]
     }).compileComponents()
   }))
 

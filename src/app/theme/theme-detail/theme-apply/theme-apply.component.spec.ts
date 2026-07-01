@@ -1,4 +1,3 @@
-import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { ReactiveFormsModule } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
@@ -28,8 +27,7 @@ describe('ThemeApplyComponent', () => {
           en: require('src/assets/i18n/en.json')
         }).withDefaultLanguage('de')
       ],
-      providers: [TranslateService, { provide: PortalMessageService, useValue: msgServiceSpy }, ConfirmationService],
-      schemas: [NO_ERRORS_SCHEMA]
+      providers: [TranslateService, { provide: PortalMessageService, useValue: msgServiceSpy }, ConfirmationService]
     }).compileComponents()
   }))
 

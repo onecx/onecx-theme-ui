@@ -1,11 +1,12 @@
 <!-- LOGO -->
-<img
-  *ngIf="imageUrl$ | async as url"
-  [id]="imageId ?? 'th_logo_' + themeName"
-  [class]="'border-round-sm ' + (imageStyleClass ?? '')"
-  [ocxSrc]="url"
-  [alt]="'Logo Theme ' + themeName"
-  [attr.aria-label]="'Logo Theme ' + themeName"
-  (error)="onImageLoadError(url)"
-  (load)="onImageLoad()"
-/>
+@if (imageUrl$ | async; as url) {
+  <img
+    [id]="imageId ?? 'th_logo_' + themeName"
+    [class]="'border-round-sm ' + (imageStyleClass ?? '')"
+    [ocxSrc]="url"
+    [alt]="'Logo Theme ' + themeName"
+    [attr.aria-label]="'Logo Theme ' + themeName"
+    (error)="onImageLoadError(url)"
+    (load)="onImageLoad()"
+  />
+}

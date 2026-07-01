@@ -1,6 +1,12 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core'
-import { FormControl, FormGroup, Validators } from '@angular/forms'
-import { TranslateService } from '@ngx-translate/core'
+import { CommonModule } from '@angular/common'
+import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
+import { TranslateModule, TranslateService } from '@ngx-translate/core'
+import { ButtonModule } from 'primeng/button'
+import { DialogModule } from 'primeng/dialog'
+import { MessageModule } from 'primeng/message'
+import { ToastModule } from 'primeng/toast'
+import { TooltipModule } from 'primeng/tooltip'
 
 import { PortalMessageService } from '@onecx/angular-integration-interface'
 
@@ -9,6 +15,18 @@ import { themeVariables } from '../theme-detail/theme-variables'
 
 @Component({
   selector: 'app-theme-create',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ButtonModule,
+    DialogModule,
+    FormsModule,
+    MessageModule,
+    ReactiveFormsModule,
+    TranslateModule,
+    TooltipModule,
+    ToastModule
+  ],
   templateUrl: './theme-create.component.html',
   styleUrls: ['./theme-create.component.scss']
 })

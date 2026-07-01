@@ -1,8 +1,20 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core'
-import { firstValueFrom, map, Observable } from 'rxjs'
-import { TranslateService } from '@ngx-translate/core'
+import { CommonModule } from '@angular/common'
+import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
+import { TranslateModule, TranslateService } from '@ngx-translate/core'
+
+import { Select, SelectModule } from 'primeng/select'
+import { ButtonModule } from 'primeng/button'
+import { ConfirmDialogModule } from 'primeng/confirmdialog'
+import { ConfirmPopupModule } from 'primeng/confirmpopup'
+import { DialogModule } from 'primeng/dialog'
+import { MessageModule } from 'primeng/message'
+import { ToastModule } from 'primeng/toast'
+import { TooltipModule } from 'primeng/tooltip'
 import { ConfirmationService } from 'primeng/api'
 import { Dropdown } from 'primeng/dropdown'
+
+import { firstValueFrom, map, Observable } from 'rxjs'
 
 import { Theme } from 'src/app/shared/generated'
 import { Utils } from 'src/app/shared/utils'
@@ -10,6 +22,21 @@ import { ChangeMode } from '../theme-detail.component'
 
 @Component({
   selector: 'app-theme-apply',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ConfirmDialogModule,
+    ConfirmPopupModule,
+    ButtonModule,
+    DialogModule,
+    MessageModule,
+    FormsModule,
+    ReactiveFormsModule,
+    SelectModule,
+    TranslateModule,
+    TooltipModule,
+    ToastModule
+  ],
   templateUrl: './theme-apply.component.html',
   styleUrls: ['./theme-apply.component.scss'],
   providers: [ConfirmationService]
@@ -31,12 +58,12 @@ export class ThemeApplyComponent {
   /***************************************************************************
    * TEMPLATING WITH EXISTING THEME
    */
-  public onSelectThemeTemplate(ev: any, themes: Theme[], box: Dropdown): void {
+  public onSelectThemeTemplate(ev: any, themes: Theme[], box: Select): void {
     const theme = themes.find((t) => t.name === ev.value)
     if (theme?.id && theme?.displayName) this.confirmUseThemeTemplate(theme.id, theme.displayName, box)
   }
 
-  private confirmUseThemeTemplate(id: string, dn: string, box: Dropdown) {
+  private confirmUseThemeTemplate(id: string, dn: string, box: Select): void {
     firstValueFrom(
       this.translate
         .get([
@@ -49,7 +76,7 @@ export class ThemeApplyComponent {
         .pipe(map((data) => this.displayConfirmationForUsingTemplate(id, dn, data, box)))
     )
   }
-  private displayConfirmationForUsingTemplate(themeId: string, themeName: string, data: any, box: Dropdown): void {
+  private displayConfirmationForUsingTemplate(themeId: string, themeName: string, data: any, box: Select): void {
     this.confirmation.confirm({
       key: 'template',
       icon: 'pi pi-question-circle',

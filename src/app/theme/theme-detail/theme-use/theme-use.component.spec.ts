@@ -1,4 +1,3 @@
-import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { TranslateTestingModule } from 'ngx-translate-testing'
@@ -24,8 +23,7 @@ describe('ThemeUseComponent', () => {
           en: require('src/assets/i18n/en.json')
         }).withDefaultLanguage('de')
       ],
-      providers: [TranslateService, { provide: WorkspaceService, useValue: workspaceServiceSpy }],
-      schemas: [NO_ERRORS_SCHEMA]
+      providers: [TranslateService, { provide: WorkspaceService, useValue: workspaceServiceSpy }]
     }).compileComponents()
   }))
 

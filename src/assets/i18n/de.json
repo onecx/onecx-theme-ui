@@ -105,8 +105,6 @@
   },
   "DIALOG": {
     "HEADER": {
-      "SEARCH": "Theme Verwaltung",
-      "SEARCH.SUBHEADER": "Erstellung und Bearbeitung von Themes",
       "DETAIL": "Anzeige und Bearbeitung der Theme-Eigenschaften",
       "DETAIL.SUBHEADER": "Theme Details",
       "CREATE": "Theme erstellen",
@@ -124,6 +122,8 @@
       "THEME_SELECTOR": "Ein Theme als Vorlage wählen"
     },
     "SEARCH": {
+      "HEADER": "Theme Verwaltung",
+      "SUBHEADER": "Erstellung und Bearbeitung von Themes",
       "CRITERIA": "Suchfelder",
       "RESULTS": "Suchergebnisse"
     },
@@ -147,11 +147,12 @@
       "UNUSED": "Das Theme wird von keinem Workspace verwendet."
     },
     "DATAVIEW": {
-      "FILTER": "Filter",
-      "PRODUCT_FILTER_TOOLTIP": "Filtern nach Applikation und Klassifikation",
-      "FILTER_OF": "Filter für ",
-      "FILTER_CLEAR": "Filter entfernen",
-      "FILTER_PLACEHOLDER": "Filter",
+      "FILTER": {
+        "LABEL": "Filter",
+        "OF": "Filter für ",
+        "CLEAR": "Filter entfernen",
+        "PLACEHOLDER": "Filter"
+      },
       "SORT_BY": "Sortiert nach",
       "SORT_DIRECTION_ASC": "aufsteigend",
       "SORT_DIRECTION_DESC": "absteigend",

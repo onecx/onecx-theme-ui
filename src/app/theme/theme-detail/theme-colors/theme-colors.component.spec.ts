@@ -1,4 +1,4 @@
-import { NO_ERRORS_SCHEMA, SimpleChange } from '@angular/core'
+import { SimpleChange } from '@angular/core'
 import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from '@angular/core/testing'
 import { ReactiveFormsModule } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
@@ -26,8 +26,7 @@ describe('ThemeColorsComponent', () => {
           en: require('src/assets/i18n/en.json')
         }).withDefaultLanguage('de')
       ],
-      providers: [TranslateService, { provide: PortalMessageService, useValue: msgServiceSpy }],
-      schemas: [NO_ERRORS_SCHEMA]
+      providers: [TranslateService, { provide: PortalMessageService, useValue: msgServiceSpy }]
     }).compileComponents()
   }))
 

@@ -1,4 +1,4 @@
-import { NO_ERRORS_SCHEMA, SimpleChange } from '@angular/core'
+import { SimpleChange } from '@angular/core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { ReactiveFormsModule } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
@@ -59,8 +59,7 @@ describe('ThemePropsComponent', () => {
         TranslateService,
         { provide: PortalMessageService, useValue: msgServiceSpy },
         { provide: ImagesInternalAPIService, useValue: imgServiceSpy }
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      ]
     }).compileComponents()
   }))
 

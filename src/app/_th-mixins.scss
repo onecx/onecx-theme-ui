@@ -2,45 +2,33 @@
  *  FORM - Control Improvements
  * **********************************************/
 
-/* displaying text like an input field with floating label */
-@mixin float-label-textbox {
-  :host {
-    .p-float-label {
-      display: block;
-      position: relative;
-      .ocx-float-label-textbox {
-        font-family: var(--font-family);
-        font-size: var(--input-text-font-size);
-        color: var(--emphasis-high);
-        background: var(--input-bg);
-        padding: var(--input-padding);
-        border: var(--input-border);
-        transition: var(--form-element-transition);
-        appearance: none;
-        border-radius: var(--border-radius);
-      }
-      .ocx-float-label {
-        position: absolute;
-        left: 0.75rem;
-        top: -0.5rem !important;
-        padding: 2px 4px;
-        margin-left: -4px;
-        margin-top: 0;
-        line-height: 1;
-        font-size: 12px;
-        pointer-events: none;
-        color: var(--emphasis-medium);
-        background-color: var(--input-bg);
-        transition-property: all;
-        transition-timing-function: ease;
-        transition-duration: var(--transition-duration);
+// Manipulate PrimeNG p-floatlabel
+@mixin ocx-p-floatlabel {
+  .p-floatlabel {
+    // Move the label only if embedded input control (input, textarea etc.) is filled or focussed
+    &.p-floatlabel-over {
+      &:has(.p-filled) label,
+      &:has(.p-focus) label {
+        top: -5px !important;
+        background-color: white;
+        padding: 0 0.5rem;
       }
     }
   }
 }
 
-@mixin displaying-text-responsive {
+@mixin ocx-required-label {
+  // Keep a visible required marker even when external theme styles are missing.
+  .p-floatlabel > label.ocx-required-label::after {
+    content: ' *';
+    color: var(--red-500, #ef4444);
+    font-weight: 600;
+  }
+}
+
+@mixin ocx-text-responsive {
   :host ::ng-deep {
+    --disabled-opacity: 0.7;
     .text-responsive {
       white-space: nowrap;
       overflow: hidden;
@@ -84,22 +72,20 @@
   }
 }
 
-@mixin prepare-inputgroup {
+@mixin ocx-p-inputgroup {
   :host ::ng-deep {
-    .inputgroup-dropdown-with-link {
-      border-right: none;
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
-    }
-    .input-field-correction .p-inputtext {
-      padding-top: 1rem !important;
-      padding-bottom: 0.5rem !important;
-    }
-    .pseudo-button:hover {
-      background: var(--button-hover-bg) !important;
-      cursor: pointer;
-      * {
-        background: var(--button-hover-bg) !important;
+    .p-inputgroupaddon {
+      > p-button {
+        display: flex;
+        height: 100%;
+        width: 100%;
+        > .p-button {
+          flex-grow: 1;
+        }
+      }
+      /* Manipulate the addon wrapper depends on button state inside */
+      &:has(.p-button.p-button-primary) {
+        border: none;
       }
     }
   }
@@ -293,9 +279,32 @@
 }
 
 /* **********************************************
- *  OneCX Widget - Layout Corrections
+ *  OCX Widgets
  * **********************************************/
-@mixin correct-search-criteria {
+@mixin ocx-interactive-data-view-fixes {
+  :host ::ng-deep {
+    /* fix base layout of interactive data view */
+    ocx-interactive-data-view > {
+      :first-child {
+        padding-top: 0 !important;
+      }
+      :not(:first-child) {
+        padding: 0.5rem 0 0 0 !important;
+      }
+    }
+    /* correct header layouting by lib */
+    .table-header-wrapper {
+      flex-direction: row !important;
+      justify-content: flex-start !important;
+      flex-wrap: nowrap !important;
+    }
+    .table-header-wrapper span:first-child {
+      margin-right: 10px !important;
+    }
+  }
+}
+
+@mixin ocx-search-criteria-fixes {
   :host ::ng-deep {
     .search-criteria-container > div {
       display: flex;
@@ -307,71 +316,6 @@
         flex-wrap: wrap;
         align-content: center;
         margin-top: unset;
-      }
-    }
-  }
-}
-
-@mixin search-criteria-select-button-slim {
-  :host ::ng-deep {
-    .slim-selectbutton {
-      display: flex;
-      flex-wrap: wrap;
-      flex-direction: column;
-      row-gap: 0.1rem;
-
-      .p-selectbutton .p-button {
-        text-align: center;
-        display: inline-block;
-        color: var(--emphasis-medium);
-        font-weight: var(--font-weight);
-        padding: 0.3rem 0.8rem;
-        border: var(--input-border);
-      }
-      .p-selectbutton-subtitle {
-        font-size: 0.8rem;
-        padding-left: 0.25rem;
-      }
-    }
-  }
-}
-@mixin search-criteria-select-button-filter {
-  :host ::ng-deep {
-    .filter-selectbutton {
-      .p-selectbutton .p-button {
-        opacity: 0.9 !important;
-        border: var(--toggle-button-border);
-        &.p-highlight {
-          background: var(--toggle-button-active-bg);
-          border-color: var(--toggle-button-active-border-color);
-        }
-        &:not(.p-disabled):not(.p-highlight):hover {
-          color: var(--text-color);
-          border-color: var(--toggle-button-hover-border-color);
-          background-color: var(--toggle-button-hover-bg);
-        }
-      }
-    }
-  }
-}
-@mixin search-criteria-select-button {
-  :host ::ng-deep {
-    .p-selectbutton-title {
-      width: 2rem;
-      text-align: right;
-    }
-    .search-criteria-selectbutton {
-      .p-selectbutton .p-button {
-        &.p-highlight {
-          color: var(--primary-text-color);
-          border-color: var(--toggle-button-hover-border-color);
-          background-color: var(--primary-color);
-        }
-        &:not(.p-disabled):not(.p-highlight):hover {
-          color: var(--primary-text-color);
-          border-color: var(--toggle-button-hover-border-color);
-          background-color: var(--button-hover-bg);
-        }
       }
     }
   }
@@ -449,6 +393,15 @@
   }
 }
 
+@mixin ocx-p-message {
+  :host ::ng-deep {
+    .p-message {
+      display: inline-grid;
+      min-width: 20rem;
+    }
+  }
+}
+
 /* **********************************************
  *  DIALOG
  * **********************************************/
@@ -510,6 +463,28 @@
 @mixin tabview-fix-color-selected-tab {
   :host ::ng-deep {
     --tabview-header-active-bg: rgb(from var(--primary-color) r g b / 0.12) !important;
+  }
+}
+
+/* **********************************************
+ *  TABs
+ * **********************************************/
+@mixin ocx-p-tabs {
+  :host ::ng-deep {
+    .p-tabs {
+      .p-tablist {
+        border-bottom: 1px solid var(--surface-300);
+      }
+      .p-tab {
+        padding: 0.75rem 1rem;
+        &.p-tab-active {
+          background-color: rgb(from var(--primary-color) r g b / 0.12);
+        }
+      }
+      .p-tabpanels {
+        padding: 1.5rem 0 0 0;
+      }
+    }
   }
 }
 

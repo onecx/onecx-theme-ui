@@ -1,5 +1,10 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core'
-import { TranslateService } from '@ngx-translate/core'
+import { CommonModule } from '@angular/common'
+import { TranslateModule, TranslateService } from '@ngx-translate/core'
+import { ButtonModule } from 'primeng/button'
+import { DialogModule } from 'primeng/dialog'
+import { MessageModule } from 'primeng/message'
+import { TooltipModule } from 'primeng/tooltip'
 
 import { PortalMessageService } from '@onecx/angular-integration-interface'
 
@@ -7,6 +12,8 @@ import { Theme, ThemesAPIService } from 'src/app/shared/generated'
 
 @Component({
   selector: 'app-theme-delete',
+  standalone: true,
+  imports: [CommonModule, ButtonModule, DialogModule, MessageModule, TranslateModule, TooltipModule],
   templateUrl: './theme-delete.component.html'
 })
 export class ThemeDeleteComponent {

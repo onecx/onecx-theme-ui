@@ -105,8 +105,6 @@
   },
   "DIALOG": {
     "HEADER": {
-      "SEARCH": "Theme Management",
-      "SEARCH.SUBHEADER": "Creation and editing of Theme",
       "DETAIL": "Display and editing of the Theme properties",
       "DETAIL.SUBHEADER": "Theme Details",
       "CREATE": "Create Theme",
@@ -124,6 +122,8 @@
       "THEME_SELECTOR": "Select Theme as Template"
     },
     "SEARCH": {
+      "HEADER": "Theme Management",
+      "SUBHEADER": "Creation and editing of Theme",
       "CRITERIA": "Search Criteria",
       "RESULTS": "Search Results"
     },
@@ -147,11 +147,12 @@
       "UNUSED": "The Theme is not used by any Workspace."
     },
     "DATAVIEW": {
-      "FILTER": "Filter",
-      "PRODUCT_FILTER_TOOLTIP": "Filter by Application and Classification",
-      "FILTER_OF": "Filter of ",
-      "FILTER_CLEAR": "Clear Filter",
-      "FILTER_PLACEHOLDER": "Filter",
+      "FILTER": {
+        "LABEL": "Filter",
+        "OF": "Filter of ",
+        "CLEAR": "Clear Filter",
+        "PLACEHOLDER": "Filter"
+      },
       "SORT_BY": "Sort By",
       "SORT_DIRECTION_ASC": "ascending",
       "SORT_DIRECTION_DESC": "descending",

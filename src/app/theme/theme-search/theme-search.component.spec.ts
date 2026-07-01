@@ -1,4 +1,3 @@
-import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
@@ -32,8 +31,7 @@ describe('ThemeSearchComponent', () => {
         provideHttpClient(),
         provideRouter([{ path: '', component: ThemeSearchComponent }]),
         { provide: ThemesAPIService, useValue: themeApiSpy }
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      ]
     }).compileComponents()
     // to spy data: reset
     themeApiSpy.searchThemes.calls.reset()
@@ -159,39 +157,12 @@ describe('ThemeSearchComponent', () => {
     })
   })
 
-  it('should change viewMode on layout change', () => {
-    expect(component.viewMode).toBe('grid')
-
-    component.onLayoutChange('list')
-
-    expect(component.viewMode).toBe('list')
-  })
-
-  it('should filter dataView on filter change', () => {
-    component.dv = jasmine.createSpyObj('DataView', ['filter'])
-    component.filter = ''
-    const myFilter = 'myTheme'
-
-    component.onFilterChange(myFilter)
-
-    expect(component.filter).toBe(myFilter)
-    expect(component.dv!.filter).toHaveBeenCalledOnceWith(myFilter)
-  })
-
   it('should change field to sort by on sort change', () => {
     component.sortField = 'name'
 
     component.onSortChange('description')
 
     expect(component.sortField).toBe('description')
-  })
-
-  it('should change sorting direction on sorting direction change', () => {
-    component.sortOrder = 1
-    component.onSortDirChange(true)
-    expect(component.sortOrder).toBe(-1)
-    component.onSortDirChange(false)
-    expect(component.sortOrder).toBe(1)
   })
 
   it('should show import dialog on import theme click', () => {

@@ -1,16 +1,43 @@
 import { ChangeDetectorRef, Component, Input, OnChanges, SimpleChanges } from '@angular/core'
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms'
-import { TranslateService } from '@ngx-translate/core'
+import { CommonModule } from '@angular/common'
+import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, FormBuilder } from '@angular/forms'
+import { TranslateModule, TranslateService } from '@ngx-translate/core'
+
+import { ButtonModule } from 'primeng/button'
+import { ColorSketchModule } from 'ngx-color/sketch'
+import { DialogModule } from 'primeng/dialog'
+import { FloatLabelModule } from 'primeng/floatlabel'
+import { MessageModule } from 'primeng/message'
+import { OverlayPanelModule } from 'primeng/overlaypanel'
+import { PanelModule } from 'primeng/panel'
+import { ToastModule } from 'primeng/toast'
+import { TooltipModule } from 'primeng/tooltip'
+import { debounceTime } from 'rxjs'
 
 import { PortalMessageService } from '@onecx/angular-integration-interface'
 
 import { Theme } from 'src/app/shared/generated'
 import { themeVariables } from '../theme-variables'
-import { debounceTime } from 'rxjs'
 import { ChangeMode } from '../theme-detail.component'
 
 @Component({
   selector: 'app-theme-colors',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ColorSketchModule,
+    ButtonModule,
+    DialogModule,
+    FloatLabelModule,
+    FormsModule,
+    MessageModule,
+    OverlayPanelModule,
+    PanelModule,
+    ReactiveFormsModule,
+    ToastModule,
+    TooltipModule,
+    TranslateModule
+  ],
   templateUrl: './theme-colors.component.html',
   styleUrls: ['./theme-colors.component.scss']
 })

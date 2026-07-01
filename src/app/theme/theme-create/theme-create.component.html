@@ -64,12 +64,9 @@
     </span>
 
     <div class="text-center">
-      <p-message
-        *ngIf="!themeToBeCreated"
-        id="th_create_hint"
-        severity="info"
-        [text]="'ACTIONS.CREATE.THEME.HINT' | translate"
-      ></p-message>
+      @if (!themeToBeCreated) {
+        <p-message id="th_create_hint" severity="info" [text]="'ACTIONS.CREATE.THEME.HINT' | translate"></p-message>
+      }
     </div>
   </form>
   <ng-template pTemplate="footer">

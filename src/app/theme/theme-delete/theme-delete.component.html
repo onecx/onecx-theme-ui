@@ -10,39 +10,44 @@
   [style]="{ 'max-width': '450px' }"
 >
   <div class="flex column-gap-3 row-gap-1 justify-content-start align-items-center">
-    <div
-      [ngClass]="theme ? 'text-3xl danger-action-text pi pi-question-circle' : 'text-2xl pi pi-spinner pi-spin'"
-    ></div>
+    <div [class]="theme ? 'text-3xl danger-action-text pi pi-question-circle' : 'text-2xl pi pi-spinner pi-spin'"></div>
     <div class="w-full flex flex-column row-gap-3">
       @if (theme) {
-        <p-message
-          *ngIf="theme.mandatory"
-          id="th_delete_reject_mandatory_message"
-          severity="info"
-          styleClass="p-2"
-          [text]="'ACTIONS.DELETE.MESSAGE_REJECT_MANDATORY' | translate"
-        ></p-message>
-        <p-message
-          *ngIf="!theme.mandatory && isUsedByWorkspace"
-          id="th_delete_reject_use_message"
-          severity="info"
-          styleClass="p-2"
-          [text]="'ACTIONS.DELETE.MESSAGE_REJECT_USE' | translate"
-        ></p-message>
-        <div *ngIf="!(theme.mandatory || isUsedByWorkspace)">
-          <div id="th_delete_message_text" class="font-bold">{{ 'ACTIONS.DELETE.THEME_MESSAGE' | translate }}</div>
-          <div id="th_delete_theme_display_name" class="my-2 font-bold danger-action-text text-center">
-            {{ theme.displayName }}
-          </div>
-          <div *ngIf="!theme.operator" class="mt-2">{{ 'ACTIONS.DELETE.MESSAGE_INFO' | translate }}</div>
+        @if (theme.mandatory) {
           <p-message
-            *ngIf="theme.operator"
-            id="th_delete_operator_hint"
+            id="th_delete_reject_mandatory_message"
             severity="info"
-            styleClass="mt-1 p-2"
-            [text]="'ACTIONS.DELETE.MESSAGE_INFO_OPERATOR' | translate"
+            styleClass="p-2"
+            [text]="'ACTIONS.DELETE.MESSAGE_REJECT_MANDATORY' | translate"
           ></p-message>
-        </div>
+        }
+        @if (!theme.mandatory && isUsedByWorkspace) {
+          <p-message
+            id="th_delete_reject_use_message"
+            severity="info"
+            styleClass="p-2"
+            [text]="'ACTIONS.DELETE.MESSAGE_REJECT_USE' | translate"
+          ></p-message>
+        }
+        @if (!(theme.mandatory || isUsedByWorkspace)) {
+          <div>
+            <div id="th_delete_message_text" class="font-bold">{{ 'ACTIONS.DELETE.THEME_MESSAGE' | translate }}</div>
+            <div id="th_delete_theme_display_name" class="my-2 font-bold danger-action-text text-center">
+              {{ theme.displayName }}
+            </div>
+            @if (!theme.operator) {
+              <div class="mt-2">{{ 'ACTIONS.DELETE.MESSAGE_INFO' | translate }}</div>
+            }
+            @if (theme.operator) {
+              <p-message
+                id="th_delete_operator_hint"
+                severity="info"
+                styleClass="mt-1 p-2"
+                [text]="'ACTIONS.DELETE.MESSAGE_INFO_OPERATOR' | translate"
+              ></p-message>
+            }
+          </div>
+        }
       } @else {
         <div id="th_delete_loading_theme" class="w-10rem font-bold text-center">
           {{ 'ACTIONS.LOADING' | translate }}

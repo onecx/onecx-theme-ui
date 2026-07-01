@@ -1,7 +1,12 @@
-@import 'src/app/_th-mixins.scss';
+@use 'src/app/th-mixins.scss' as *;
 
 @include danger-action;
-@include displaying-text-responsive;
+@include ocx-text-responsive;
+@include ocx-p-floatlabel;
+@include ocx-p-inputgroup;
+@include ocx-p-message;
+@include ocx-p-tabs;
+@include ocx-interactive-data-view-fixes;
 @include dialog-footer-buttons;
 @include dialog-non-full-size-modal;
 @include readable-disabled-components;

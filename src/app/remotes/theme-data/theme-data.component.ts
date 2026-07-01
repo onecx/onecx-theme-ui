@@ -1,20 +1,19 @@
-import { Component, EventEmitter, Inject, Input, OnChanges } from '@angular/core'
+import { Component, DestroyRef, EventEmitter, Inject, Input, OnChanges } from '@angular/core'
 import { CommonModule, Location } from '@angular/common'
-import { HttpClient } from '@angular/common/http'
 import { UntilDestroy } from '@ngneat/until-destroy'
-import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
+import { TranslateModule } from '@ngx-translate/core'
 import { BehaviorSubject, catchError, first, map, Observable, of, ReplaySubject } from 'rxjs'
 
 import {
   AngularRemoteComponentsModule,
-  BASE_URL,
-  RemoteComponentConfig,
   ocxRemoteComponent,
   ocxRemoteWebcomponent,
-  provideTranslateServiceForRoot
+  SLOT_SERVICE,
+  SlotService
 } from '@onecx/angular-remote-components'
-import { createRemoteComponentTranslateLoader } from '@onecx/angular-accelerator'
-import { PortalCoreModule } from '@onecx/portal-integration-angular'
+import { AngularAcceleratorModule } from '@onecx/angular-accelerator'
+import { REMOTE_COMPONENT_CONFIG, RemoteComponentConfig } from '@onecx/angular-utils'
+import { AppConfigService } from '@onecx/angular-integration-interface'
 
 import {
   Configuration,
@@ -23,7 +22,6 @@ import {
   SearchThemeRequest,
   SearchThemeResponse
 } from 'src/app/shared/generated'
-import { SharedModule } from 'src/app/shared/shared.module'
 import { Utils, LogoRefType } from 'src/app/shared/utils'
 import { environment } from 'src/environments/environment'
 
@@ -33,21 +31,8 @@ type DataType = 'logo' | 'favicon' | 'themes' | 'theme'
   selector: 'app-theme-data',
   templateUrl: './theme-data.component.html',
   standalone: true,
-  imports: [AngularRemoteComponentsModule, CommonModule, PortalCoreModule, TranslateModule, SharedModule],
-  providers: [
-    {
-      provide: BASE_URL,
-      useValue: new ReplaySubject<string>(1)
-    },
-    provideTranslateServiceForRoot({
-      isolate: true,
-      loader: {
-        provide: TranslateLoader,
-        useFactory: createRemoteComponentTranslateLoader,
-        deps: [HttpClient, BASE_URL]
-      }
-    })
-  ]
+  imports: [AngularAcceleratorModule, AngularRemoteComponentsModule, CommonModule, TranslateModule],
+  providers: [{ provide: SLOT_SERVICE, useExisting: SlotService }]
 })
 @UntilDestroy()
 export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWebcomponent, OnChanges {
@@ -75,17 +60,24 @@ export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWeb
   public defaultImageUrl: string | undefined = undefined
 
   constructor(
-    @Inject(BASE_URL) private readonly baseUrl: ReplaySubject<string>,
+    @Inject(REMOTE_COMPONENT_CONFIG)
+    private readonly remoteComponentConfig: ReplaySubject<RemoteComponentConfig>,
+    private readonly appConfigService: AppConfigService,
+    private readonly destroyRef: DestroyRef,
+    private readonly slotService: SlotService,
     private readonly themeApi: ThemesAPIService
   ) {}
 
-  ocxInitRemoteComponent(remoteComponentConfig: RemoteComponentConfig) {
-    this.baseUrl.next(remoteComponentConfig.baseUrl)
+  // initialize this component as remote
+  public ocxInitRemoteComponent(config: RemoteComponentConfig): void {
+    this.appConfigService.init(config.baseUrl)
+    this.remoteComponentConfig.next(config)
+    this.slotService.init()
     this.themeApi.configuration = new Configuration({
-      basePath: Location.joinWithSlash(remoteComponentConfig.baseUrl, environment.apiPrefix)
+      basePath: Location.joinWithSlash(config.baseUrl, environment.apiPrefix)
     })
     if (environment.DEFAULT_LOGO_PATH)
-      this.defaultImageUrl = Utils.prepareUrlPath(remoteComponentConfig.baseUrl, environment.DEFAULT_LOGO_PATH)
+      this.defaultImageUrl = Utils.prepareUrlPath(config.baseUrl, environment.DEFAULT_LOGO_PATH)
   }
 
   /**

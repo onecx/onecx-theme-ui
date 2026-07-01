@@ -1,66 +1,54 @@
-<div *ngIf="properties" [class]="'p-inputtext theme-color-box flex p-0 ' + styleClass">
-  <div
-    *ngIf="properties.general && properties.topbar"
-    class="theme-color"
-    [ngStyle]="{
-      'background-color': properties.general['primary-color'],
-      color: properties.topbar['topbar-text-color']
-    }"
-    [pTooltip]="'THEME.IMPORT.THEME_COLOR_PRIMARY' | translate"
-    tooltipPosition="top"
-    tooltipEvent="hover"
-  ></div>
-  <div
-    *ngIf="properties.general && properties.topbar"
-    class="theme-color"
-    [ngStyle]="{
-      'background-color': properties.general['secondary-color'],
-      color: properties.topbar['topbar-text-color']
-    }"
-    [pTooltip]="'THEME.IMPORT.THEME_COLOR_SECONDARY' | translate"
-    tooltipPosition="top"
-    tooltipEvent="hover"
-  ></div>
-  <div
-    *ngIf="properties.general && properties.topbar"
-    class="theme-color"
-    [ngStyle]="{
-      'background-color': properties.general['text-color'],
-      color: properties.topbar['topbar-text-color']
-    }"
-    [pTooltip]="'THEME.IMPORT.THEME_COLOR_TEXT' | translate"
-    tooltipPosition="top"
-    tooltipEvent="hover"
-  ></div>
-  <div
-    *ngIf="properties.topbar"
-    class="theme-color"
-    [ngStyle]="{
-      'background-color': properties.topbar['topbar-menu-button-text-color']
-    }"
-    [pTooltip]="'THEME.IMPORT.THEME_COLOR_TOP_MENU' | translate"
-    tooltipPosition="top"
-    tooltipEvent="hover"
-  ></div>
-  <div
-    *ngIf="properties.topbar"
-    class="theme-color"
-    [ngStyle]="{
-      'background-color': properties.topbar['topbar-menu-button-bg-color']
-    }"
-    [pTooltip]="'THEME.IMPORT.THEME_COLOR_TOP_MENU' | translate"
-    tooltipPosition="top"
-    tooltipEvent="hover"
-  ></div>
-  <div
-    *ngIf="properties.topbar"
-    class="theme-color"
-    [ngStyle]="{
-      'background-color': properties.topbar['topbar-left-bg-color'],
-      color: properties.topbar['topbar-text-color']
-    }"
-    [pTooltip]="'THEME.IMPORT.THEME_COLOR_TOP_LEFT' | translate"
-    tooltipPosition="top"
-    tooltipEvent="hover"
-  ></div>
-</div>
+@if (properties) {
+  <div [class]="'p-inputtext theme-color-box flex p-0 ' + styleClass">
+    @if (properties.general && properties.topbar) {
+      <div
+        class="theme-color"
+        [style.background-color]="properties.general['primary-color']"
+        [style.color]="properties.topbar['topbar-text-color']"
+        [pTooltip]="'THEME.IMPORT.THEME_COLOR_PRIMARY' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      ></div>
+      <div
+        class="theme-color"
+        [style.background-color]="properties.general['secondary-color']"
+        [style.color]="properties.topbar['topbar-text-color']"
+        [pTooltip]="'THEME.IMPORT.THEME_COLOR_SECONDARY' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      ></div>
+      <div
+        class="theme-color"
+        [style.background-color]="properties.general['text-color']"
+        [style.color]="properties.topbar['topbar-text-color']"
+        [pTooltip]="'THEME.IMPORT.THEME_COLOR_TEXT' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      ></div>
+    }
+    @if (properties.topbar) {
+      <div
+        class="theme-color"
+        [style.background-color]="properties.topbar['topbar-menu-button-text-color']"
+        [pTooltip]="'THEME.IMPORT.THEME_COLOR_TOP_MENU' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      ></div>
+      <div
+        class="theme-color"
+        [style.background-color]="properties.topbar['topbar-menu-button-bg-color']"
+        [pTooltip]="'THEME.IMPORT.THEME_COLOR_TOP_MENU' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      ></div>
+      <div
+        class="theme-color"
+        [style.background-color]="properties.topbar['topbar-left-bg-color']"
+        [style.color]="properties.topbar['topbar-text-color']"
+        [pTooltip]="'THEME.IMPORT.THEME_COLOR_TOP_LEFT' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      ></div>
+    }
+  </div>
+}
