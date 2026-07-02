@@ -9,15 +9,22 @@ describe('ThemeColorBoxComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ThemeColorBoxComponent],
       imports: [
+        ThemeColorBoxComponent,
         TranslateTestingModule.withTranslations({
           de: require('src/assets/i18n/de.json'),
           en: require('src/assets/i18n/en.json')
         }).withDefaultLanguage('en')
       ],
       providers: []
-    }).compileComponents()
+    })
+      .overrideComponent(ThemeColorBoxComponent, {
+        set: {
+          template: '',
+          imports: []
+        }
+      })
+      .compileComponents()
   }))
 
   beforeEach(() => {

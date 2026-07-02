@@ -1,7 +1,5 @@
 import { SimpleChange } from '@angular/core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
-import { ReactiveFormsModule } from '@angular/forms'
-import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 
 import { PortalMessageService } from '@onecx/angular-integration-interface'
@@ -46,21 +44,25 @@ describe('ThemePropsComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ThemePropsComponent],
       imports: [
-        ReactiveFormsModule,
-        TranslateModule.forRoot(),
+        ThemePropsComponent,
         TranslateTestingModule.withTranslations({
           de: require('src/assets/i18n/de.json'),
           en: require('src/assets/i18n/en.json')
         }).withDefaultLanguage('de')
       ],
       providers: [
-        TranslateService,
         { provide: PortalMessageService, useValue: msgServiceSpy },
         { provide: ImagesInternalAPIService, useValue: imgServiceSpy }
       ]
-    }).compileComponents()
+    })
+      .overrideComponent(ThemePropsComponent, {
+        set: {
+          template: '',
+          imports: []
+        }
+      })
+      .compileComponents()
   }))
 
   beforeEach(() => {

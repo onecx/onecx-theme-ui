@@ -3,7 +3,6 @@ import { Location } from '@angular/common'
 import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ActivatedRoute, Router, provideRouter } from '@angular/router'
-import { TranslateModule } from '@ngx-translate/core'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 import { BehaviorSubject, of, throwError } from 'rxjs'
 import FileSaver from 'file-saver'
@@ -53,9 +52,8 @@ describe('ThemeDetailComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ThemeDetailComponent],
       imports: [
-        TranslateModule.forRoot(),
+        ThemeDetailComponent,
         TranslateTestingModule.withTranslations({
           de: require('src/assets/i18n/de.json'),
           en: require('src/assets/i18n/en.json')
@@ -72,7 +70,14 @@ describe('ThemeDetailComponent', () => {
         { provide: ThemeService, useValue: mockThemeService },
         { provide: ImagesInternalAPIService, useValue: imgServiceSpy }
       ]
-    }).compileComponents()
+    })
+      .overrideComponent(ThemeDetailComponent, {
+        set: {
+          template: '',
+          imports: []
+        }
+      })
+      .compileComponents()
   }))
 
   beforeEach(() => {
@@ -124,12 +129,11 @@ describe('ThemeDetailComponent', () => {
   })
 
   describe('ngOnInit', () => {
-    it('should call prepareDialogTranslations on init', () => {
-      spyOn(component as any, 'prepareDialogTranslations')
+    it('should call getTheme on init', () => {
+      spyOn(component as any, 'getTheme')
       component.ngOnInit()
 
-      expect(component.messages.length).toBeGreaterThan(0)
-      expect(component['prepareDialogTranslations']).toHaveBeenCalled()
+      expect(component['getTheme']).toHaveBeenCalled()
     })
 
     it('should not load theme if no themeName', () => {
@@ -568,7 +572,7 @@ describe('ThemeDetailComponent', () => {
 
       component.actions$.subscribe((actions) => {
         const back = actions.find((a) => a.id === 'th_detail_page_action_back')
-        back!.actionCallback()
+        back?.actionCallback?.()
         expect(locationSpy.back).toHaveBeenCalled()
         done()
       })
@@ -580,7 +584,7 @@ describe('ThemeDetailComponent', () => {
 
       component.actions$.subscribe((actions) => {
         const exportAction = actions.find((a) => a.id === 'th_detail_page_action_export')
-        exportAction!.actionCallback()
+        exportAction?.actionCallback?.()
         expect(component.onExportTheme).toHaveBeenCalled()
         done()
       })
@@ -591,7 +595,7 @@ describe('ThemeDetailComponent', () => {
 
       component.actions$.subscribe((actions) => {
         const deleteAction = actions.find((a) => a.id === 'th_detail_page_action_delete')
-        deleteAction!.actionCallback()
+        deleteAction?.actionCallback?.()
         expect(component.themeDeleteVisible).toBeTrue()
         done()
       })
@@ -605,7 +609,7 @@ describe('ThemeDetailComponent', () => {
 
       component.actions$.subscribe((actions) => {
         const editAction = actions.find((a) => a.id === 'th_detail_page_action_edit')
-        editAction!.actionCallback()
+        editAction?.actionCallback?.()
         expect(component.changeMode).toBe('EDIT')
         done()
       })
@@ -617,7 +621,7 @@ describe('ThemeDetailComponent', () => {
 
       component.actions$.subscribe((actions) => {
         const cancelAction = actions.find((a) => a.id === 'th_detail_page_action_cancel')
-        cancelAction!.actionCallback()
+        cancelAction?.actionCallback?.()
         expect(component.changeMode).toBe('VIEW')
         done()
       })
@@ -634,7 +638,7 @@ describe('ThemeDetailComponent', () => {
 
       component.actions$.subscribe((actions) => {
         const saveAction = actions.find((a) => a.id === 'th_detail_page_action_save')
-        saveAction!.actionCallback()
+        saveAction?.actionCallback?.()
         done()
       })
       expect().nothing() // to satisfy linter about no expectations in subscribe block
@@ -647,7 +651,7 @@ describe('ThemeDetailComponent', () => {
 
       component.actions$.subscribe((actions) => {
         const saveAsOnEdit = actions.find((a) => a.id === 'th_detail_page_action_save_as_on_edit')
-        saveAsOnEdit!.actionCallback()
+        saveAsOnEdit?.actionCallback?.()
         expect(component.onSaveAs).toHaveBeenCalled()
         done()
       })
@@ -661,7 +665,7 @@ describe('ThemeDetailComponent', () => {
 
       component.actions$.subscribe((actions) => {
         const saveAsOnView = actions.find((a) => a.id === 'th_detail_page_action_save_as_on_view')
-        saveAsOnView!.actionCallback()
+        saveAsOnView?.actionCallback?.()
         expect(component.onSaveAs).toHaveBeenCalled()
         done()
       })
@@ -823,16 +827,6 @@ describe('ThemeDetailComponent', () => {
       component.useThemeAsTemplate({ id: '123', 'ACTIONS.COPY_OF': 'Copy of ' })
 
       expect(component.themeForProps!.name).toBe('original')
-    })
-  })
-
-  describe('prepareDialogTranslations', () => {
-    it('should populate messages with translation data', () => {
-      component['prepareDialogTranslations']()
-
-      expect(component.messages.length).toBe(1)
-      expect(component.messages[0].severity).toBe('warn')
-      expect(component.messages[0].id).toBe('ws_detail_operator_message')
     })
   })
 

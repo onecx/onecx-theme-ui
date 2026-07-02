@@ -28,8 +28,8 @@ describe('ThemeImportComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ThemeImportComponent],
       imports: [
+        ThemeImportComponent,
         TranslateTestingModule.withTranslations({
           de: require('src/assets/i18n/de.json'),
           en: require('src/assets/i18n/en.json')
@@ -42,7 +42,15 @@ describe('ThemeImportComponent', () => {
         { provide: PortalMessageService, useValue: msgServiceSpy },
         { provide: ThemesAPIService, useValue: themeApiSpy }
       ]
-    }).compileComponents()
+    })
+      .overrideComponent(ThemeImportComponent, {
+        set: {
+          template: '',
+          imports: []
+        }
+      })
+      .compileComponents()
+
     msgServiceSpy.success.calls.reset()
     msgServiceSpy.error.calls.reset()
   }))

@@ -2,10 +2,10 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { provideRouter, Router } from '@angular/router'
-import { TranslateService } from '@ngx-translate/core'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 import { of, throwError } from 'rxjs'
-import { DataViewModule } from 'primeng/dataview'
+
+import { DataSortDirection } from '@onecx/angular-accelerator'
 
 import { SearchThemeResponse, ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeSearchComponent } from './theme-search.component'
@@ -18,9 +18,8 @@ describe('ThemeSearchComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ThemeSearchComponent],
       imports: [
-        DataViewModule,
+        ThemeSearchComponent,
         TranslateTestingModule.withTranslations({
           de: require('src/assets/i18n/de.json'),
           en: require('src/assets/i18n/en.json')
@@ -32,7 +31,14 @@ describe('ThemeSearchComponent', () => {
         provideRouter([{ path: '', component: ThemeSearchComponent }]),
         { provide: ThemesAPIService, useValue: themeApiSpy }
       ]
-    }).compileComponents()
+    })
+      .overrideComponent(ThemeSearchComponent, {
+        set: {
+          template: '',
+          imports: []
+        }
+      })
+      .compileComponents()
     // to spy data: reset
     themeApiSpy.searchThemes.calls.reset()
     // to spy data: refill with neutral data
@@ -42,70 +48,60 @@ describe('ThemeSearchComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ThemeSearchComponent)
     component = fixture.componentInstance
-    fixture.detectChanges()
+    themeApiSpy.searchThemes.and.returnValue(of({}) as any)
   })
 
-  it('should create', () => {
-    expect(component).toBeTruthy()
+  afterEach(() => {
+    themeApiSpy.searchThemes.calls.reset()
   })
 
-  it('should load themes and translations on initialization', (done) => {
-    const translateService = TestBed.inject(TranslateService)
-    const actionsTranslations = {
-      'ACTIONS.CREATE.THEME': 'actionsCreateTheme',
-      'ACTIONS.CREATE.THEME.TOOLTIP': 'actionsCreateThemeTooltip',
-      'ACTIONS.IMPORT.LABEL': 'actionsImportLabel',
-      'ACTIONS.IMPORT.TOOLTIP': 'actionsImportTooltip'
-    }
-    const generalTranslations = {
-      'THEME.NAME': 'themeName',
-      'THEME.DESCRIPTION': 'themeDescription',
-      'DIALOG.DATAVIEW.SORT_BY': 'searchSort',
-      'DIALOG.DATAVIEW.FILTER': 'searchFilter',
-      'DIALOG.DATAVIEW.FILTER_OF': 'searchFilterOf'
-    }
-    spyOn(translateService, 'get').and.returnValues(of(actionsTranslations), of(generalTranslations))
-    const themesResponse = {
-      stream: [
-        { name: 'theme1', displayName: 'Theme 1' },
-        { name: 'theme2', displayName: 'Theme 2' }
-      ]
-    }
-    themeApiSpy.searchThemes.and.returnValue(of(themesResponse as SearchThemeResponse))
-
-    component.ngOnInit()
-
-    component.themes$.subscribe({
-      next: (result) => {
-        if (result) {
-          expect(result.length).toBe(2)
-          expect(result[0].name).toEqual('theme1')
-          expect(result[1].name).toEqual('theme2')
-        }
-        done()
-      },
-      error: done.fail
+  describe('initialization', () => {
+    it('should create', () => {
+      fixture.detectChanges()
+      expect(component).toBeTruthy()
     })
 
-    let actions: any = []
-    component.actions$!.subscribe((act) => (actions = act))
-    expect(actions.length).toBe(2)
+    it('should load themes and init actions on initialization', (done) => {
+      const themesResponse = {
+        stream: [
+          { name: 'theme1', displayName: 'Theme 1' },
+          { name: 'theme2', displayName: 'Theme 2' }
+        ]
+      }
+      themeApiSpy.searchThemes.and.returnValue(of(themesResponse as SearchThemeResponse))
+      fixture.detectChanges()
 
-    actions[0].actionCallback()
-    expect(component.themeCreateVisible).toBe(true)
+      component.data$.subscribe({
+        next: (result) => {
+          if (result) {
+            expect(result.length).toBe(2)
+            expect(result[0]['name']).toEqual('theme1')
+            expect(result[1]['name']).toEqual('theme2')
+          }
+          done()
+        },
+        error: done.fail
+      })
 
-    spyOn(component, 'onImportThemeClick')
-    actions[1].actionCallback()
-    expect(component.onImportThemeClick).toHaveBeenCalledTimes(1)
+      let actions: any = []
+      component.actions$!.subscribe((act) => (actions = act))
+      expect(actions.length).toBe(2)
+
+      actions[0].actionCallback()
+      expect(component.themeCreateVisible).toBe(true)
+
+      spyOn(component, 'onImportThemeClick')
+      actions[1].actionCallback()
+      expect(component.onImportThemeClick).toHaveBeenCalledTimes(1)
+    })
   })
 
   describe('search on init', () => {
     it('should manage no themes exists', (done) => {
       themeApiSpy.searchThemes.and.returnValue(of({ stream: [] } as SearchThemeResponse))
+      fixture.detectChanges()
 
-      component.ngOnInit()
-
-      component.themes$.subscribe({
+      component.data$.subscribe({
         next: (result) => {
           if (result) {
             expect(result.length).toBe(0)
@@ -120,10 +116,9 @@ describe('ThemeSearchComponent', () => {
       const errorResponse = { status: 403, statusText: 'No permissions' }
       themeApiSpy.searchThemes.and.returnValue(throwError(() => errorResponse))
       spyOn(console, 'error')
+      fixture.detectChanges()
 
-      component.ngOnInit()
-
-      component.themes$.subscribe({
+      component.data$.subscribe({
         next: (result) => {
           if (result) {
             expect(result.length).toBe(0)
@@ -140,15 +135,14 @@ describe('ThemeSearchComponent', () => {
       const errorResponse = { status: 405, statusText: 'something went wrong' }
       themeApiSpy.searchThemes.and.returnValue(throwError(() => errorResponse))
       spyOn(console, 'error')
+      fixture.detectChanges()
 
-      component.ngOnInit()
-
-      component.themes$.subscribe({
+      component.data$.subscribe({
         next: (result) => {
           if (result) {
             expect(result.length).toBe(0)
             expect(console.error).toHaveBeenCalledWith('searchThemes', errorResponse)
-            expect(component.exceptionKey).toEqual('EXCEPTIONS.HTTP_STATUS_0.THEME')
+            expect(component.exceptionKey).toEqual('EXCEPTIONS.HTTP_STATUS_405.THEME')
           }
           done()
         },
@@ -158,24 +152,28 @@ describe('ThemeSearchComponent', () => {
   })
 
   it('should change field to sort by on sort change', () => {
+    fixture.detectChanges()
     component.sortField = 'name'
 
-    component.onSortChange('description')
+    component.onSortChange({ sortColumn: 'description', sortDirection: DataSortDirection.DESCENDING })
 
     expect(component.sortField).toBe('description')
   })
 
   it('should show import dialog on import theme click', () => {
+    fixture.detectChanges()
     component.themeImportVisible = false
     component.onImportThemeClick()
     expect(component.themeImportVisible).toBe(true)
   })
   it('should hide import dialog on import close', () => {
+    fixture.detectChanges()
     component.themeImportVisible = true
     component.onThemeUpload(false)
     expect(component.themeImportVisible).toBe(false)
   })
   it('should hide import dialog on import close and reload', () => {
+    fixture.detectChanges()
     spyOn(component, 'loadThemes')
     component.themeImportVisible = true
     component.onThemeUpload(true)
@@ -184,6 +182,7 @@ describe('ThemeSearchComponent', () => {
   })
 
   it('should set themeCreateVisible on onThemeCreateClosed', () => {
+    fixture.detectChanges()
     component.themeCreateVisible = true
     component.onThemeCreateClosed(false)
     expect(component.themeCreateVisible).toBe(false)
@@ -193,6 +192,7 @@ describe('ThemeSearchComponent', () => {
   })
 
   it('should navigate to created theme on onThemeCreated', () => {
+    fixture.detectChanges()
     const router = TestBed.inject(Router)
     spyOn(router, 'navigate')
 

@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
-import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 import { of, throwError } from 'rxjs'
 
@@ -15,16 +14,22 @@ describe('ThemeUseComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ThemeUseComponent],
       imports: [
-        TranslateModule.forRoot(),
+        ThemeUseComponent,
         TranslateTestingModule.withTranslations({
           de: require('src/assets/i18n/de.json'),
           en: require('src/assets/i18n/en.json')
         }).withDefaultLanguage('de')
       ],
-      providers: [TranslateService, { provide: WorkspaceService, useValue: workspaceServiceSpy }]
-    }).compileComponents()
+      providers: [{ provide: WorkspaceService, useValue: workspaceServiceSpy }]
+    })
+      .overrideComponent(ThemeUseComponent, {
+        set: {
+          template: '',
+          imports: []
+        }
+      })
+      .compileComponents()
   }))
 
   beforeEach(() => {

@@ -1,12 +1,12 @@
-import { TestBed } from '@angular/core/testing'
-import { CommonModule } from '@angular/common'
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { NoopAnimationsModule } from '@angular/platform-browser/animations'
+import { provideNoopAnimations } from '@angular/platform-browser/animations'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 import { of, ReplaySubject } from 'rxjs'
 
-import { BASE_URL, RemoteComponentConfig } from '@onecx/angular-remote-components'
+import { SlotService } from '@onecx/angular-remote-components'
+import { REMOTE_COMPONENT_CONFIG, RemoteComponentConfig } from '@onecx/angular-utils'
 import { ThemeService } from '@onecx/angular-integration-interface'
 
 import { Theme } from 'src/app/shared/generated'
@@ -19,19 +19,25 @@ const theme1: Theme = {
 }
 
 describe('OneCXCurrentThemeLogoComponent', () => {
+  let component: OneCXCurrentThemeLogoComponent
+  let fixture: ComponentFixture<OneCXCurrentThemeLogoComponent>
+  let baseUrlSubject: ReplaySubject<any>
+
   class MockThemeService {
     currentTheme$ = { asObservable: () => of(theme1) }
   }
   let mockThemeService: MockThemeService
-
-  function setUp() {
-    const fixture = TestBed.createComponent(OneCXCurrentThemeLogoComponent)
-    const component = fixture.componentInstance
-    fixture.detectChanges()
-    return { fixture, component }
+  const slotServiceSpy = {
+    init: jasmine.createSpy('init'),
+    isSomeComponentDefinedForSlot: jasmine.createSpy('isSomeComponentDefinedForSlot').and.returnValue(of(false))
   }
 
-  let baseUrlSubject: ReplaySubject<any>
+  function initializeComponent() {
+    fixture = TestBed.createComponent(OneCXCurrentThemeLogoComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+  }
+
   beforeEach(() => {
     mockThemeService = new MockThemeService()
     baseUrlSubject = new ReplaySubject<any>(1)
@@ -41,37 +47,35 @@ describe('OneCXCurrentThemeLogoComponent', () => {
         TranslateTestingModule.withTranslations({
           de: require('src/assets/i18n/de.json'),
           en: require('src/assets/i18n/en.json')
-        }).withDefaultLanguage('en'),
-        NoopAnimationsModule
+        }).withDefaultLanguage('en')
       ],
       providers: [
+        { provide: REMOTE_COMPONENT_CONFIG, useValue: baseUrlSubject },
+        { provide: SlotService, useValue: slotServiceSpy },
+        { provide: ThemeService, useValue: mockThemeService },
         provideHttpClient(),
         provideHttpClientTesting(),
-        { provide: BASE_URL, useValue: baseUrlSubject },
-        { provide: ThemeService, useValue: mockThemeService }
+        provideNoopAnimations()
       ]
     })
       .overrideComponent(OneCXCurrentThemeLogoComponent, {
         set: {
-          imports: [TranslateTestingModule, CommonModule],
           providers: [{ provide: ThemeService, useValue: mockThemeService }]
         }
       })
       .compileComponents()
 
-    baseUrlSubject.next('base_url_mock')
+    slotServiceSpy.isSomeComponentDefinedForSlot.calls.reset()
   })
 
-  describe('initialize', () => {
+  describe('initialization', () => {
     it('should create', () => {
-      mockThemeService.currentTheme$ = { asObservable: () => of(theme1) }
-      const { component } = setUp()
-
+      initializeComponent()
       expect(component).toBeTruthy()
     })
 
     it('should call ocxInitRemoteComponent with the correct config', () => {
-      const { component } = setUp()
+      initializeComponent()
       const mockConfig: RemoteComponentConfig = {
         appId: 'appId',
         productName: 'prodName',
@@ -85,13 +89,14 @@ describe('OneCXCurrentThemeLogoComponent', () => {
       expect(component.ocxInitRemoteComponent).toHaveBeenCalledWith(mockConfig)
     })
 
-    it('should init remote component', (done: DoneFn) => {
-      const { component } = setUp()
+    it('should initialize remote component', (done: DoneFn) => {
+      const config = { baseUrl: 'base_url' } as RemoteComponentConfig
+      initializeComponent()
 
-      component.ocxInitRemoteComponent({ baseUrl: 'base_url' } as RemoteComponentConfig)
+      component.ocxInitRemoteComponent(config)
 
       baseUrlSubject.asObservable().subscribe((item) => {
-        expect(item).toEqual('base_url')
+        expect(item).toEqual(config)
         done()
       })
     })
@@ -99,7 +104,7 @@ describe('OneCXCurrentThemeLogoComponent', () => {
 
   describe('provide logo', () => {
     it('should load - initially', (done) => {
-      const { component } = setUp()
+      initializeComponent()
       component.logEnabled = true
       component.logPrefix = 'get image url'
       component.themeName = theme1.name
@@ -119,7 +124,7 @@ describe('OneCXCurrentThemeLogoComponent', () => {
 
     describe('provide logo - on error', () => {
       it('should load - failed - used: url', () => {
-        const { component } = setUp()
+        initializeComponent()
         component.logEnabled = true // log without prefix !
         component.themeName = theme1.name
         component.imageUrl = 'http://image/url'
@@ -128,7 +133,7 @@ describe('OneCXCurrentThemeLogoComponent', () => {
       })
 
       it('should use image - failed - use default', () => {
-        const { component } = setUp()
+        initializeComponent()
         component.logEnabled = false
         component.logPrefix = 'default logo'
         component.themeName = theme1.name
@@ -139,7 +144,7 @@ describe('OneCXCurrentThemeLogoComponent', () => {
 
     describe('provide logo - get url', () => {
       it('should get image url - use input image url', () => {
-        const { component } = setUp()
+        initializeComponent()
         component.logEnabled = false
         component.logPrefix = 'url'
         component.themeName = theme1.name
@@ -151,7 +156,7 @@ describe('OneCXCurrentThemeLogoComponent', () => {
       })
 
       it('should get url - use default image url', () => {
-        const { component } = setUp()
+        initializeComponent()
         component.logEnabled = false
         component.logPrefix = 'default url'
         component.themeName = theme1.name
@@ -164,7 +169,7 @@ describe('OneCXCurrentThemeLogoComponent', () => {
       })
 
       it('should get url - unknown prio type', () => {
-        const { component } = setUp()
+        initializeComponent()
         component.logEnabled = false
         component.logPrefix = 'default url'
         component.themeName = theme1.name

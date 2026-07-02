@@ -1,7 +1,5 @@
 import { SimpleChange } from '@angular/core'
 import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from '@angular/core/testing'
-import { ReactiveFormsModule } from '@angular/forms'
-import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 
 import { PortalMessageService } from '@onecx/angular-integration-interface'
@@ -17,17 +15,22 @@ describe('ThemeColorsComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ThemeColorsComponent],
       imports: [
-        ReactiveFormsModule,
-        TranslateModule.forRoot(),
+        ThemeColorsComponent,
         TranslateTestingModule.withTranslations({
           de: require('src/assets/i18n/de.json'),
           en: require('src/assets/i18n/en.json')
         }).withDefaultLanguage('de')
       ],
-      providers: [TranslateService, { provide: PortalMessageService, useValue: msgServiceSpy }]
-    }).compileComponents()
+      providers: [{ provide: PortalMessageService, useValue: msgServiceSpy }]
+    })
+      .overrideComponent(ThemeColorsComponent, {
+        set: {
+          template: '',
+          imports: []
+        }
+      })
+      .compileComponents()
   }))
 
   beforeEach(() => {

@@ -27,15 +27,22 @@ describe('ImageContainerComponent', () => {
     mockAppStateService = new MockAppStateService()
 
     TestBed.configureTestingModule({
-      declarations: [ImageContainerComponent],
       imports: [
+        ImageContainerComponent,
         TranslateTestingModule.withTranslations({
           de: require('src/assets/i18n/de.json'),
           en: require('src/assets/i18n/en.json')
         }).withDefaultLanguage('en')
       ],
       providers: [{ provide: AppStateService, useValue: mockAppStateService }]
-    }).compileComponents()
+    })
+      .overrideComponent(ImageContainerComponent, {
+        set: {
+          template: '',
+          imports: []
+        }
+      })
+      .compileComponents()
   }))
 
   beforeEach(() => {

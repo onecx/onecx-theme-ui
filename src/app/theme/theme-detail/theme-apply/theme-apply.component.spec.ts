@@ -1,34 +1,38 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
-import { ReactiveFormsModule } from '@angular/forms'
-import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 
 import { PortalMessageService } from '@onecx/angular-integration-interface'
 
 import { ThemeApplyComponent } from './theme-apply.component'
 import { ConfirmationService } from 'primeng/api'
-import { Dropdown } from 'primeng/dropdown'
+import { Select } from 'primeng/select'
 import { Theme } from 'src/app/shared/generated'
 
 describe('ThemeApplyComponent', () => {
   let component: ThemeApplyComponent
   let fixture: ComponentFixture<ThemeApplyComponent>
+
   let confirmationService: ConfirmationService
   const msgServiceSpy = jasmine.createSpyObj<PortalMessageService>('PortalMessageService', ['success', 'error'])
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ThemeApplyComponent],
       imports: [
-        ReactiveFormsModule,
-        TranslateModule.forRoot(),
+        ThemeApplyComponent,
         TranslateTestingModule.withTranslations({
           de: require('src/assets/i18n/de.json'),
           en: require('src/assets/i18n/en.json')
         }).withDefaultLanguage('de')
       ],
-      providers: [TranslateService, { provide: PortalMessageService, useValue: msgServiceSpy }, ConfirmationService]
-    }).compileComponents()
+      providers: [{ provide: PortalMessageService, useValue: msgServiceSpy }, ConfirmationService]
+    })
+      .overrideComponent(ThemeApplyComponent, {
+        set: {
+          template: '',
+          imports: []
+        }
+      })
+      .compileComponents()
   }))
 
   beforeEach(() => {
@@ -57,10 +61,10 @@ describe('ThemeApplyComponent', () => {
   })
 
   describe('onSelectThemeTemplate', () => {
-    let dropdownMock: jasmine.SpyObj<Dropdown>
+    let dropdownMock: jasmine.SpyObj<Select>
 
     beforeEach(() => {
-      dropdownMock = jasmine.createSpyObj<Dropdown>('Dropdown', ['clear'])
+      dropdownMock = jasmine.createSpyObj<Select>('Select', ['clear'])
     })
 
     it('should not trigger confirmation if no theme matches the event value', () => {
