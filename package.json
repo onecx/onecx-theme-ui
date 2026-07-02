@@ -138,6 +138,7 @@
     "fast-uri": "^3.1.2",
     "basic-ftp": "^5.3.1",
     "@babel/plugin-transform-modules-systemjs": "^7.29.1",
-    "vite": "^7.3.1"
+    "vite": "^7.3.1",
+    "piscina": "^5.1.4"
   }
 }
