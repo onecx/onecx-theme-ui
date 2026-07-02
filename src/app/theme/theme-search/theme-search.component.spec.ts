@@ -1,19 +1,24 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { provideRouter, Router } from '@angular/router'
+import { ActivatedRoute, ActivatedRouteSnapshot, provideRouter, Router } from '@angular/router'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 import { of, throwError } from 'rxjs'
 
-import { DataSortDirection } from '@onecx/angular-accelerator'
+import { DataSortDirection, RowListGridData } from '@onecx/angular-accelerator'
 
-import { SearchThemeResponse, ThemesAPIService } from 'src/app/shared/generated'
+import { SearchThemeResponse, Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeSearchComponent } from './theme-search.component'
 
 describe('ThemeSearchComponent', () => {
   let component: ThemeSearchComponent
   let fixture: ComponentFixture<ThemeSearchComponent>
 
+  const mockRouter = { navigate: jasmine.createSpy('navigate') }
+  const mockActivatedRouteSnapshot: Partial<ActivatedRouteSnapshot> = { params: { id: 'mockId' } }
+  const mockActivatedRoute: Partial<ActivatedRoute> = {
+    snapshot: mockActivatedRouteSnapshot as ActivatedRouteSnapshot
+  }
   const themeApiSpy = { searchThemes: jasmine.createSpy('searchThemes').and.returnValue(of({})) }
 
   beforeEach(waitForAsync(() => {
@@ -29,7 +34,9 @@ describe('ThemeSearchComponent', () => {
         provideHttpClientTesting(),
         provideHttpClient(),
         provideRouter([{ path: '', component: ThemeSearchComponent }]),
-        { provide: ThemesAPIService, useValue: themeApiSpy }
+        { provide: ThemesAPIService, useValue: themeApiSpy },
+        { provide: Router, useValue: mockRouter },
+        { provide: ActivatedRoute, useValue: mockActivatedRoute }
       ]
     })
       .overrideComponent(ThemeSearchComponent, {
@@ -194,10 +201,104 @@ describe('ThemeSearchComponent', () => {
   it('should navigate to created theme on onThemeCreated', () => {
     fixture.detectChanges()
     const router = TestBed.inject(Router)
-    spyOn(router, 'navigate')
 
-    component.onThemeCreated({ name: 'new-theme' })
+    component.onThemeCreated({ name: 'new-theme' } as Theme)
 
     expect(router.navigate).toHaveBeenCalledWith(['./new-theme'], { relativeTo: (component as any).route })
+  })
+
+  describe('filter data', () => {
+    const itemData = [
+      { name: 'onecx', displayName: 'OneCX', description: 'OneCX theme' },
+      { name: 'user', displayName: 'User', description: 'User theme' }
+    ] as unknown as RowListGridData[]
+
+    it('should return early if data is not provided', () => {
+      component.onGlobalFilter('test', undefined)
+
+      expect(component.globalFilterValue).toBe('')
+      expect(component.filteredData).toBeUndefined()
+    })
+
+    it('should set filteredData to full data when value is empty', () => {
+      component.onGlobalFilter('', itemData)
+
+      expect(component.globalFilterValue).toBe('')
+      expect(component.filteredData).toBeUndefined()
+    })
+
+    it('should set filteredData to full data when value is undefined', () => {
+      component.onGlobalFilter(undefined, itemData)
+
+      expect(component.globalFilterValue).toBe('')
+      expect(component.filteredData).toBeUndefined()
+    })
+
+    it('should filter data by title field (case-insensitive)', () => {
+      component.onGlobalFilter('one', itemData)
+
+      expect(component.globalFilterValue).toBe('one')
+      expect(component.filteredData?.length).toBe(1)
+      expect((component.filteredData?.[0] as any).name).toBe('onecx')
+    })
+
+    it('should return empty array when no title matches', () => {
+      component.onGlobalFilter('nonexistent', itemData)
+
+      expect(component.globalFilterValue).toBe('nonexistent')
+      expect(component.filteredData?.length).toBe(0)
+    })
+
+    it('should clear global filter and reset filteredData', () => {
+      component.globalFilterValue = 'some filter'
+      component.filteredData = itemData as RowListGridData[]
+
+      component.onClearGlobalFilter()
+
+      expect(component.globalFilterValue).toBe('')
+      expect(component.filteredData).toBeUndefined()
+    })
+
+    it('should clear global filter and reset input element value', () => {
+      component.globalFilterValue = 'some filter'
+      component.filteredData = itemData
+      const input = document.createElement('input')
+      input.value = 'some filter'
+
+      component.onClearGlobalFilter(input)
+
+      expect(component.globalFilterValue).toBe('')
+      expect(component.filteredData).toBeUndefined()
+      expect(input.value).toBe('')
+    })
+  })
+
+  describe('navigation', () => {
+    it('should navigate to detail page when a tile is clicked', () => {
+      const theme: Theme = { name: 'onecx', displayName: 'OneCX', description: 'OneCX theme' }
+
+      component.onAppClick(theme as unknown as RowListGridData)
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['./', theme.name], { relativeTo: mockActivatedRoute })
+    })
+
+    it('should prevent navigation if name is missing', () => {
+      const theme: Theme = { displayName: 'OneCX', description: 'OneCX theme' }
+
+      component.onAppClick(theme as unknown as RowListGridData)
+
+      expect().nothing()
+    })
+  })
+
+  describe('conversion', () => {
+    it('should convert rows to Themes', () => {
+      const rows: RowListGridData[] = [
+        { name: 'onecx', displayName: 'OneCX', description: 'OneCX theme' } as unknown as RowListGridData
+      ]
+
+      component.convertToThemes(rows)
+
+      expect().nothing()
+    })
   })
 })

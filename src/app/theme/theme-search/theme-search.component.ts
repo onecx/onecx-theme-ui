@@ -117,7 +117,7 @@ export class ThemeSearchComponent implements OnInit, OnDestroy {
     return a.displayName!.toUpperCase().localeCompare(b.displayName!.toUpperCase())
   }
   public convertToThemes(data: RowListGridData[]): Theme[] {
-    return (data ?? []) as unknown[] as Theme[]
+    return data as unknown[] as Theme[]
   }
 
   private prepareActionButtons(): void {
@@ -161,10 +161,13 @@ export class ThemeSearchComponent implements OnInit, OnDestroy {
     if (!data) return
     this.globalFilterValue = value ?? ''
     if (this.globalFilterValue === '') this.filteredData = undefined
-    else
-      this.filteredData = data?.filter((row) =>
-        row['displayName']?.toString().toLowerCase().includes(this.globalFilterValue.toLowerCase())
+    else {
+      this.filteredData = data?.filter(
+        (row) =>
+          row['name']?.toString().toLowerCase().includes(this.globalFilterValue.toLowerCase()) ||
+          row['displayName']?.toString().toLowerCase().includes(this.globalFilterValue.toLowerCase())
       )
+    }
   }
 
   public onClearGlobalFilter(input?: HTMLInputElement): void {
@@ -181,7 +184,6 @@ export class ThemeSearchComponent implements OnInit, OnDestroy {
   public onAppClick(item: RowListGridData): void {
     const theme = item as unknown as Theme
     if (!theme?.name) return
-    console.log(theme.name)
     this.router.navigate(['./', theme.name], { relativeTo: this.route })
   }
 

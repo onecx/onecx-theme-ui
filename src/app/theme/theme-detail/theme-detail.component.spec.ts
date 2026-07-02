@@ -368,7 +368,7 @@ describe('ThemeDetailComponent', () => {
     it('should not set themeForUse when tabIndex is not 3', () => {
       component.themeForUse = undefined
 
-      component.onTabChange(1, theme)
+      component.onTabChange('1', theme)
 
       expect(component.selectedTabIndex).toBe(1)
       expect(component.themeForUse).toBeUndefined()

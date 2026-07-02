@@ -4,7 +4,8 @@ import { of, throwError } from 'rxjs'
 
 import { WorkspaceService } from '@onecx/angular-integration-interface'
 
-import { ThemeUseComponent, Workspace } from './theme-use.component'
+import { slotInitializer, ThemeUseComponent, Workspace } from './theme-use.component'
+import { SlotService } from '@onecx/angular-remote-components'
 
 describe('ThemeUseComponent', () => {
   let component: ThemeUseComponent
@@ -40,6 +41,21 @@ describe('ThemeUseComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy()
+  })
+
+  describe('slotInitializer', () => {
+    let slotService: jasmine.SpyObj<SlotService>
+
+    beforeEach(() => {
+      slotService = jasmine.createSpyObj('SlotService', ['init'])
+    })
+
+    it('should call SlotService.init', () => {
+      const initializer = slotInitializer(slotService)
+      initializer()
+
+      expect(slotService.init).toHaveBeenCalled()
+    })
   })
 
   describe('on changes', () => {
