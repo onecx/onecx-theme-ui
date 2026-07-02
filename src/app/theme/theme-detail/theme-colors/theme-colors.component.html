@@ -1,4 +1,5 @@
 <div class="my-3 flex flex-column row-gap-5">
+  <!-- step overall groups in this order: general, topbar, sidebar -->
   @for (group of groups; track group.key) {
     <div
       class="mb-4 text-center border-bottom-1"
@@ -9,46 +10,50 @@
     </div>
 
     <form [formGroup]="group.formGroup" class="grid grid-row-gap">
-      @for (item of themeVars[group.key]; track item) {
+      <!-- step overall variables in the group -->
+      @for (variable of themeVars[group.key]; track variable) {
         <article
           class="col-12 sm:col-6 md:col-4 lg:col-4 xl:col-3"
-          [attr.aria-label]="('THEME.TOOLTIPS.ITEM_COLOR' | translate) + ': ' + item"
+          [attr.aria-label]="('THEME.TOOLTIPS.ITEM_COLOR' | translate) + ': ' + variable"
         >
-          <p-popover #op>
-            <ng-template pTemplate>
-              <div style="width: 240px; display: inline-block">
-                <color-sketch [width]="220" [formControlName]="item"> </color-sketch>
-              </div>
-            </ng-template>
+          <p-popover #pop>
+            <div style="width: 240px; display: inline-block">
+              <color-sketch
+                [width]="220"
+                [color]="group.formGroup.value[variable]"
+                (onChange)="changeColorValue(group.key, variable, $event.color.hex)"
+              >
+              </color-sketch>
+            </div>
           </p-popover>
 
-          <p-float-label variant="on">
-            <input
-              pInputText
-              [id]="'th_detail_item_color_' + item"
-              class="pt-3 pb-2 text-responsive"
-              [formControlName]="item"
-              [value]="group.formGroup.value[item]"
-              [ariaLabel]="item"
-            />
-            <label [for]="'th_detail_item_color_' + item" aria-hidden="true"> {{ item }} </label>
-          </p-float-label>
-
-          <!--p-inputgroup class="w-auto px-2">
+          <p-inputgroup class="w-auto px-2">
+            <p-float-label variant="on">
+              <input
+                pInputText
+                [id]="'th_detail_item_color_' + variable"
+                class="w-full pt-3 pb-2 text-responsive"
+                [formControlName]="variable"
+                [value]="group.formGroup.value[variable]"
+                [ariaLabel]="variable"
+              />
+              <label [for]="'th_detail_item_color_' + variable" aria-hidden="true"> {{ variable }} </label>
+            </p-float-label>
             <p-inputgroup-addon>
               <p-button
                 tabindex="0"
-                [id]="'th_detail_item_color_' + item + '_toggle'"
-                (onClick)="op.toggle($event)"
-                (onKeyup)="op.toggle($event)"
-                [style.background-color]="group.formGroup.value[item]"
+                [id]="'th_detail_item_color_' + variable + '_toggle'"
+                (onClick)="pop.toggle($event)"
+                (onKeyup)="pop.toggle($event)"
+                [style]="{ 'background-color': group.formGroup.value[variable] }"
+                styleClass="border-none"
                 [ariaLabel]="'THEME.TOOLTIPS.ITEM_COLOR_PICKER' | translate"
                 [pTooltip]="'THEME.TOOLTIPS.ITEM_COLOR_PICKER' | translate"
                 tooltipPosition="top"
                 tooltipEvent="hover"
               ></p-button>
             </p-inputgroup-addon>
-          </p-inputgroup-->
+          </p-inputgroup>
         </article>
       }
     </form>

@@ -6,7 +6,7 @@ import { Observable, catchError, combineLatest, finalize, first, map, of } from 
 import FileSaver from 'file-saver'
 
 import { MessageModule } from 'primeng/message'
-import { TabsModule } from 'primeng/tabs'
+import { Tabs, TabsModule } from 'primeng/tabs'
 import { TooltipModule } from 'primeng/tooltip'
 
 import { PortalMessageService, ThemeService, UserService } from '@onecx/angular-integration-interface'
@@ -51,6 +51,7 @@ export type ChangeMode = 'VIEW' | 'EDIT'
 export class ThemeDetailComponent implements OnInit {
   @ViewChild(ThemePropsComponent, { static: false }) ThemePropsComponent!: ThemePropsComponent
   @ViewChild(ThemeColorsComponent, { static: false }) ThemeColorsComponent!: ThemeColorsComponent
+  @ViewChild(Tabs, { static: false }) tabComponent!: Tabs
 
   // dialog
   public loading = true
@@ -122,7 +123,7 @@ export class ThemeDetailComponent implements OnInit {
     })
   }
 
-  private getTheme(switchToEdit?: boolean) {
+  private getTheme(): void {
     if (!this.themeName) return
     this.loading = true
     combineLatest([
@@ -146,7 +147,7 @@ export class ThemeDetailComponent implements OnInit {
         }),
         finalize(() => {
           this.loading = false
-          if (switchToEdit === true) this.changeMode = 'EDIT'
+          this.tabComponent.value.set(this.selectedTabIndex) // Forces tab change
         })
       )
       .subscribe((theme) => {
@@ -190,13 +191,13 @@ export class ThemeDetailComponent implements OnInit {
       this.showOperatorMessage = false
       this.selectedTabIndex = typeof tabValue === 'string' ? Number(tabValue) : tabValue
       if (this.selectedTabIndex === 3) this.themeForUse = theme
-    }
+    } else this.selectedTabIndex === 0
   }
 
   public onChangeAutoApply(value: boolean): void {
     this.autoApply = value
     if (this.autoApply) {
-      this.msgService.info({ summaryKey: 'INTERNAL.AUTO_APPLY_MESSAGE' })
+      this.msgService.info({ summaryKey: 'DIALOG.DETAIL.AUTO_APPLY.MESSAGE' })
     }
   }
 
@@ -208,7 +209,8 @@ export class ThemeDetailComponent implements OnInit {
       this.preparePageActions(this.isThemeUsedByWorkspace, theme)
     }
     if (requestedMode === 'edit') {
-      this.getTheme(true)
+      this.changeMode = 'EDIT'
+      this.getTheme()
       this.getThemes()
     }
   }

@@ -116,6 +116,7 @@
       "SPECIAL.SECTION": "Theme applying and template selection",
       "AUTO_APPLY": {
         "LABEL": "Auto apply changes",
+        "MESSAGE": "All changes (font, colors) are automatically applied to the current page.",
         "TOOLTIP": "If this option is switched on, then all changes (font, colors) are automatically applied to the current page.",
         "CURRENT_THEME": "Changes are applied immediately upon saving, as this is the currently used theme."
       },

@@ -116,6 +116,7 @@
       "SPECIAL.SECTION": "Theme anwenden und Vorlage wählen",
       "AUTO_APPLY": {
         "LABEL": "Änderungen automatisch anwenden",
+        "MESSAGE": "Alle Änderungen (Schriftart, Farben) werden automatisch auf die aktuelle Seite angewendet.",
         "TOOLTIP": "Wenn diese Option eingeschaltet ist, dann werden alle Änderungen (Schriftart, Farben) automatisch auf die aktuelle Seite angewendet.",
         "CURRENT_THEME": "Änderungen werden beim Speichern sofort angewendet, da es das aktuell benutzte Theme ist"
       },

@@ -10,7 +10,6 @@ import {
   createTranslateLoader,
   MultiLanguageMissingTranslationHandler,
   PortalApiConfiguration,
-  providePermissionService,
   provideThemeConfig,
   provideTranslationPathFromMeta
 } from '@onecx/angular-utils'
@@ -35,13 +34,13 @@ const routes: Routes = [
 @NgModule({
   imports: [
     AppEntrypointComponent,
+    AngularAcceleratorModule,
     AngularAuthModule,
     BrowserModule,
     BrowserAnimationsModule,
-    AngularAcceleratorModule,
     RouterModule.forRoot(routes),
     TranslateModule.forRoot({
-      isolate: false,
+      isolate: true,
       loader: {
         provide: TranslateLoader,
         useFactory: createTranslateLoader,
@@ -61,7 +60,6 @@ const routes: Routes = [
       return initializerFn()
     }),
     provideTranslationPathFromMeta(import.meta.url, 'assets/i18n/'),
-    providePermissionService(),
     provideHttpClient(withInterceptorsFromDi()),
     provideThemeConfig()
   ]

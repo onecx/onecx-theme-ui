@@ -10,12 +10,7 @@ import { AngularAuthModule } from '@onecx/angular-auth'
 import { APP_CONFIG } from '@onecx/angular-integration-interface'
 import { AngularAcceleratorMissingTranslationHandler, AngularAcceleratorModule } from '@onecx/angular-accelerator'
 import { StandaloneShellModule, provideStandaloneProviders } from '@onecx/angular-standalone-shell'
-import {
-  createTranslateLoader,
-  providePermissionService,
-  provideThemeConfig,
-  provideTranslationPathFromMeta
-} from '@onecx/angular-utils'
+import { createTranslateLoader, provideThemeConfig, provideTranslationPathFromMeta } from '@onecx/angular-utils'
 
 import { environment } from 'src/environments/environment'
 import { AppComponent } from './app.component'
@@ -54,7 +49,6 @@ const routes: Routes = [
     provideHttpClient(withInterceptorsFromDi()),
     provideStandaloneProviders(),
     provideThemeConfig(),
-    providePermissionService(),
     provideAnimations()
   ]
 })

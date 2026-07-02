@@ -10,23 +10,6 @@
   </ocx-page-header>
 
   <ocx-content class="ocx-content">
-    @if (loading) {
-      <p-message
-        id="ws_detail_loading_message"
-        severity="info"
-        styleClass="m-3"
-        [text]="'ACTIONS.LOADING' | translate"
-      ></p-message>
-    }
-    @if (exceptionKey) {
-      <p-message
-        id="th_detail_error_message"
-        severity="error"
-        styleClass="m-3"
-        [text]="exceptionKey | translate"
-      ></p-message>
-    }
-
     <!-- showOperatorMessage -->
     <ng-container *ocxIfPermission="'THEME#EDIT'">
       @if (theme?.operator && showOperatorMessage) {
@@ -43,8 +26,22 @@
       }
     </ng-container>
 
-    @if (!loading && !exceptionKey) {
-      <p-tabs value="0" (valueChange)="onTabChange($event, theme)">
+    @if (loading) {
+      <p-message
+        id="ws_detail_loading_message"
+        severity="info"
+        styleClass="m-3"
+        [text]="'ACTIONS.LOADING' | translate"
+      ></p-message>
+    } @else if (exceptionKey) {
+      <p-message
+        id="th_detail_error_message"
+        severity="error"
+        styleClass="m-3"
+        [text]="exceptionKey | translate"
+      ></p-message>
+    } @else {
+      <p-tabs #tabComponent value="0" (valueChange)="onTabChange($event, theme)">
         <p-tablist>
           <p-tab
             value="0"
@@ -52,7 +49,8 @@
             [pTooltip]="'DIALOG.TABS.PROPS.TOOLTIP' | translate"
             tooltipPosition="top"
             tooltipEvent="hover"
-            >{{ 'DIALOG.TABS.PROPS' | translate }}
+          >
+            {{ 'DIALOG.TABS.PROPS' | translate }}
           </p-tab>
           <p-tab
             value="1"
@@ -60,7 +58,8 @@
             [pTooltip]="'DIALOG.TABS.COLORS.TOOLTIP' | translate"
             tooltipPosition="top"
             tooltipEvent="hover"
-            >{{ 'DIALOG.TABS.COLORS' | translate }}
+          >
+            {{ 'DIALOG.TABS.COLORS' | translate }}
           </p-tab>
           <p-tab
             value="2"
@@ -69,7 +68,8 @@
             [pTooltip]="'DIALOG.TABS.VARIABLES.TOOLTIP' | translate"
             tooltipPosition="top"
             tooltipEvent="hover"
-            >{{ 'DIALOG.TABS.VARIABLES' | translate }}
+          >
+            {{ 'DIALOG.TABS.VARIABLES' | translate }}
           </p-tab>
           <p-tab
             value="3"
@@ -78,7 +78,8 @@
             [pTooltip]="'DIALOG.TABS.USE.TOOLTIP' | translate"
             tooltipPosition="top"
             tooltipEvent="hover"
-            >{{ 'DIALOG.TABS.USE' | translate }}
+          >
+            {{ 'DIALOG.TABS.USE' | translate }}
           </p-tab>
           <p-tab
             value="4"
@@ -87,12 +88,13 @@
             [pTooltip]="'DIALOG.TABS.INTERN.TOOLTIP' | translate"
             tooltipPosition="top"
             tooltipEvent="hover"
-            >{{ 'DIALOG.TABS.INTERN' | translate }}
+          >
+            {{ 'DIALOG.TABS.INTERN' | translate }}
           </p-tab>
         </p-tablist>
         <!-- PROPS -->
         <p-tabpanel value="0">
-          <div class="mt-1 mb-3 mx-0 sm:mx-2">
+          <div class="mt-1 mb-3 mx-0 sm:mx-3">
             <app-theme-apply
               [theme]="theme"
               [themes$]="themes$"
@@ -109,20 +111,22 @@
         <!-- COLORS -->
         <p-tabpanel value="1">
           <div class="mt-1 mb-2 mx-0 sm:mx-3">
-            <app-theme-apply
-              [theme]="theme"
-              [themes$]="themes$"
-              [changeMode]="changeMode"
-              [isCurrentTheme]="isCurrentTheme"
-              [autoApply]="autoApply"
-              (autoApplyChange)="onChangeAutoApply($event)"
-              (templatingThemeData)="useThemeAsTemplate($event)"
-            ></app-theme-apply>
-            <app-theme-colors
-              [theme]="themeForColors"
-              [changeMode]="changeMode"
-              [autoApply]="autoApply"
-            ></app-theme-colors>
+            @if (theme) {
+              <app-theme-apply
+                [theme]="theme"
+                [themes$]="themes$"
+                [changeMode]="changeMode"
+                [isCurrentTheme]="isCurrentTheme"
+                [autoApply]="autoApply"
+                (autoApplyChange)="onChangeAutoApply($event)"
+                (templatingThemeData)="useThemeAsTemplate($event)"
+              ></app-theme-apply>
+              <app-theme-colors
+                [theme]="themeForColors"
+                [changeMode]="changeMode"
+                [autoApply]="autoApply"
+              ></app-theme-colors>
+            }
           </div>
         </p-tabpanel>
 

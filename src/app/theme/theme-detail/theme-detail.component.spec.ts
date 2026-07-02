@@ -230,14 +230,6 @@ describe('ThemeDetailComponent', () => {
       expect(component.autoApply).toBeFalse()
     })
 
-    it('should switch to EDIT mode when switchToEdit is true', () => {
-      themeApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
-
-      component['getTheme'](true)
-
-      expect(component.changeMode).toBe('EDIT')
-    })
-
     it('should handle error when getThemeByName fails', () => {
       const errorResponse = { error: { message: 'No permissions' }, status: 403 }
       themeApiSpy.getThemeByName.and.returnValue(throwError(() => errorResponse))
@@ -329,7 +321,7 @@ describe('ThemeDetailComponent', () => {
       component.onChangeAutoApply(true)
 
       expect(component.autoApply).toBeTrue()
-      expect(msgServiceSpy.info).toHaveBeenCalledWith({ summaryKey: 'INTERNAL.AUTO_APPLY_MESSAGE' })
+      expect(msgServiceSpy.info).toHaveBeenCalledWith({ summaryKey: 'DIALOG.DETAIL.AUTO_APPLY.MESSAGE' })
     })
 
     it('should set autoApply to false without showing info message', () => {
@@ -693,7 +685,7 @@ describe('ThemeDetailComponent', () => {
 
       component['onChangeMode']('edit', theme)
 
-      expect(component['getTheme']).toHaveBeenCalledWith(true)
+      expect(component['getTheme']).toHaveBeenCalledWith()
       expect(component['getThemes']).toHaveBeenCalled()
     })
   })
