@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core'
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core'
 import { CommonModule, Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
@@ -49,7 +49,7 @@ export type ChangeMode = 'VIEW' | 'EDIT'
   templateUrl: './theme-detail.component.html',
   styleUrls: ['./theme-detail.component.scss']
 })
-export class ThemeDetailComponent implements OnInit {
+export class ThemeDetailComponent implements OnInit, OnDestroy {
   @ViewChild(ThemePropsComponent, { static: false }) ThemePropsComponent!: ThemePropsComponent
   @ViewChild(ThemeColorsComponent, { static: false }) ThemeColorsComponent!: ThemeColorsComponent
   @ViewChild(Tabs, { static: false }) tabComponent!: Tabs
