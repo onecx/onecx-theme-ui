@@ -1,5 +1,4 @@
 import { NgModule } from '@angular/core'
-import { CommonModule } from '@angular/common'
 import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule, provideAnimations } from '@angular/platform-browser/animations'
@@ -24,11 +23,10 @@ const routes: Routes = [
 @NgModule({
   imports: [
     AppComponent,
-    CommonModule,
+    AngularAcceleratorModule,
+    AngularAuthModule,
     BrowserModule,
     BrowserAnimationsModule,
-    AngularAuthModule,
-    AngularAcceleratorModule,
     RouterModule.forRoot(routes, {
       initialNavigation: 'enabledBlocking',
       enableTracing: true

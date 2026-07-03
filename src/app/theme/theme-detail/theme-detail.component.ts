@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core'
 import { CommonModule, Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
-import { Observable, catchError, combineLatest, finalize, first, map, of } from 'rxjs'
+import { catchError, combineLatest, finalize, first, map, of, Observable, Subject } from 'rxjs'
 import FileSaver from 'file-saver'
 
 import { MessageModule } from 'primeng/message'
@@ -36,6 +36,7 @@ export type ChangeMode = 'VIEW' | 'EDIT'
     TabsModule,
     TooltipModule,
     TranslateModule,
+    // components
     PortalPageComponent,
     ThemeCreateComponent,
     ThemeDeleteComponent,
@@ -53,6 +54,7 @@ export class ThemeDetailComponent implements OnInit {
   @ViewChild(ThemeColorsComponent, { static: false }) ThemeColorsComponent!: ThemeColorsComponent
   @ViewChild(Tabs, { static: false }) tabComponent!: Tabs
 
+  private readonly destroy$ = new Subject()
   // dialog
   public loading = true
   public exceptionKey: string | undefined = undefined
@@ -121,6 +123,11 @@ export class ThemeDetailComponent implements OnInit {
         this.getTheme()
       }
     })
+  }
+
+  public ngOnDestroy(): void {
+    this.destroy$.next(undefined)
+    this.destroy$.complete()
   }
 
   private getTheme(): void {
