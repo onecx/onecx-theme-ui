@@ -20,8 +20,8 @@
             <div style="width: 240px; display: inline-block">
               <color-sketch
                 [width]="220"
-                [color]="group.formGroup.value[variable]"
-                (onChange)="changeColorValue(group.key, variable, $event.color.hex)"
+                [formControlName]="variable"
+                (onChange)="onChangeColorValue(group.key, variable, $event.color.hex)"
               >
               </color-sketch>
             </div>
@@ -31,27 +31,36 @@
             <p-float-label variant="on">
               <input
                 pInputText
+                type="text"
                 [id]="'th_detail_item_color_' + variable"
                 class="w-full pt-3 pb-2 text-responsive"
                 [formControlName]="variable"
-                [value]="group.formGroup.value[variable]"
                 [ariaLabel]="variable"
               />
               <label [for]="'th_detail_item_color_' + variable" aria-hidden="true"> {{ variable }} </label>
             </p-float-label>
             <p-inputgroup-addon>
-              <p-button
+              <!-- To update the button's background color when the color changes, 
+                   we need a simple HTML button, as PrimeNG does not support dynamic background color changes for buttons.
+                -->
+              <button
                 tabindex="0"
+                type="button"
                 [id]="'th_detail_item_color_' + variable + '_toggle'"
-                (onClick)="pop.toggle($event)"
-                (onKeyup)="pop.toggle($event)"
-                [style]="{ 'background-color': group.formGroup.value[variable] }"
-                styleClass="border-none"
-                [ariaLabel]="'THEME.TOOLTIPS.ITEM_COLOR_PICKER' | translate"
-                [pTooltip]="'THEME.TOOLTIPS.ITEM_COLOR_PICKER' | translate"
+                (click)="pop.toggle($event)"
+                (keyup)="pop.toggle($event)"
+                class="p-button p-component h-full w-full border-none"
+                [style.background-color]="group.formGroup.get(variable)?.value"
+                [disabled]="changeMode === 'VIEW'"
+                [attr.aria-label]="'THEME.TOOLTIPS.ITEM_COLOR_PICKER' | translate"
+                [pTooltip]="changeMode !== 'VIEW' ? ('THEME.TOOLTIPS.ITEM_COLOR_PICKER' | translate) : null"
                 tooltipPosition="top"
                 tooltipEvent="hover"
-              ></p-button>
+              >
+                @if (changeMode !== 'VIEW') {
+                  <span class="p-button-icon p-button-icon-left pi pi-palette"></span>
+                }
+              </button>
             </p-inputgroup-addon>
           </p-inputgroup>
         </article>

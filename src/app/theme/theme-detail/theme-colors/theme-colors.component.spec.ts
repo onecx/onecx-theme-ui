@@ -262,4 +262,65 @@ describe('ThemeColorsComponent', () => {
       expect(spy).toHaveBeenCalledWith('--menu-text-color-rgb', '153,204,255')
     }))
   })
+
+  describe('onChangeColorValue', () => {
+    it('should do nothing when changeMode is VIEW', () => {
+      component.changeMode = 'VIEW'
+      component.onChangeColorValue('general', 'primary-color', '#abcdef')
+
+      expect(component.generalForm.get('primary-color')?.value).toBeNull()
+    })
+
+    it('should update the form control value for a general variable', () => {
+      component.changeMode = 'EDIT'
+      component.onChangeColorValue('general', 'primary-color', '#abcdef')
+
+      expect(component.generalForm.get('primary-color')?.value).toBe('#abcdef')
+    })
+
+    it('should update the form control value for a topbar variable', () => {
+      component.changeMode = 'EDIT'
+      component.onChangeColorValue('topbar', 'topbar-bg-color', '#112233')
+
+      expect(component.topbarForm.get('topbar-bg-color')?.value).toBe('#112233')
+    })
+
+    it('should update the form control value for a sidebar variable', () => {
+      component.changeMode = 'EDIT'
+      component.onChangeColorValue('sidebar', 'menu-text-color', '#334455')
+
+      expect(component.sidebarForm.get('menu-text-color')?.value).toBe('#334455')
+    })
+
+    it('should apply CSS variable when autoApply is true', () => {
+      component.changeMode = 'EDIT'
+      component.autoApply = true
+      const spy = spyOn(document.documentElement.style, 'setProperty')
+
+      component.onChangeColorValue('general', 'primary-color', '#ff0000')
+
+      expect(spy).toHaveBeenCalledWith('--primary-color', '#ff0000')
+      expect(spy).toHaveBeenCalledWith('--primary-color-rgb', '255,0,0')
+    })
+
+    it('should not apply CSS variable when autoApply is false', () => {
+      component.changeMode = 'EDIT'
+      component.autoApply = false
+      const spy = spyOn(document.documentElement.style, 'setProperty')
+
+      component.onChangeColorValue('general', 'primary-color', '#ff0000')
+
+      expect(spy).not.toHaveBeenCalled()
+    })
+
+    it('should do nothing for an unknown group key', () => {
+      component.changeMode = 'EDIT'
+      const spy = spyOn(document.documentElement.style, 'setProperty')
+
+      // Should not throw; unknown key finds no group
+      expect(() => component.onChangeColorValue('unknown', 'primary-color', '#ff0000')).not.toThrow()
+      expect(component.generalForm.get('primary-color')?.value).toBeNull()
+      expect(spy).not.toHaveBeenCalled()
+    })
+  })
 })

@@ -63,7 +63,7 @@ export class ThemeDetailComponent implements OnInit, OnDestroy {
   public themeDeleteVisible = false
   public themeCreateVisible = false
   public showOperatorMessage = true // display initially only
-  public selectedTabIndex = 0
+  public selectedTabIndex = '0'
   public dateFormat = 'medium'
   public isThemeUsedByWorkspace = false
   public isCurrentTheme = false
@@ -196,9 +196,9 @@ export class ThemeDetailComponent implements OnInit, OnDestroy {
   public onTabChange(tabValue: string | number, theme?: Theme): void {
     if (theme) {
       this.showOperatorMessage = false
-      this.selectedTabIndex = typeof tabValue === 'string' ? Number(tabValue) : tabValue
-      if (this.selectedTabIndex === 3) this.themeForUse = theme
-    } else this.selectedTabIndex === 0
+      this.selectedTabIndex = typeof tabValue === 'number' ? tabValue.toString() : tabValue
+      if (this.selectedTabIndex === '3') this.themeForUse = theme
+    } else this.selectedTabIndex = '0'
   }
 
   public onChangeAutoApply(value: boolean): void {
@@ -209,14 +209,14 @@ export class ThemeDetailComponent implements OnInit, OnDestroy {
   }
 
   // Change the mode to operate with the theme
-  private onChangeMode(requestedMode: 'edit' | 'view', theme?: Theme): void {
-    if (requestedMode === 'view') {
-      this.changeMode = 'VIEW'
+  private onChangeMode(requestedMode: ChangeMode, theme?: Theme): void {
+    this.changeMode = requestedMode
+    if (requestedMode === 'VIEW') {
       this.initSubComponentData(theme) // use originally loaded theme data
       this.preparePageActions(this.isThemeUsedByWorkspace, theme)
     }
-    if (requestedMode === 'edit') {
-      this.changeMode = 'EDIT'
+    if (requestedMode === 'EDIT') {
+      if (Number(this.selectedTabIndex) > 1) this.selectedTabIndex = '0'
       this.getTheme()
       this.getThemes()
     }
@@ -263,7 +263,7 @@ export class ThemeDetailComponent implements OnInit, OnDestroy {
         .subscribe({
           next: (data) => {
             this.msgService.success({ summaryKey: 'ACTIONS.EDIT.MESSAGE.OK' })
-            this.onChangeMode('view', data.resource)
+            this.onChangeMode('VIEW', data.resource)
             // update observable with response data
             this.theme$ = new Observable((sub) => sub.next(data.resource))
           },
@@ -402,7 +402,7 @@ export class ThemeDetailComponent implements OnInit, OnDestroy {
               id: 'th_detail_page_action_edit',
               label: data['ACTIONS.EDIT.LABEL'],
               title: data['ACTIONS.EDIT.TOOLTIP'],
-              actionCallback: () => this.onChangeMode('edit', theme!),
+              actionCallback: () => this.onChangeMode('EDIT', theme!),
               permission: 'THEME#EDIT',
               icon: 'pi pi-pencil',
               show: 'always',
@@ -413,7 +413,7 @@ export class ThemeDetailComponent implements OnInit, OnDestroy {
               id: 'th_detail_page_action_cancel',
               label: data['ACTIONS.CANCEL'],
               title: data['ACTIONS.TOOLTIPS.CANCEL'],
-              actionCallback: () => this.onChangeMode('view', theme!),
+              actionCallback: () => this.onChangeMode('VIEW', theme!),
               permission: 'THEME#VIEW',
               icon: 'pi pi-times',
               show: 'always',

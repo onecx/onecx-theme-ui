@@ -133,10 +133,12 @@ export class ThemeColorsComponent implements OnChanges {
     if (theme.properties) this.colorsForm.patchValue(theme.properties)
   }
 
-  public changeColorValue(key: string, name: string, val: string): void {
-    console.log('changeColorValue', this.changeMode, key, name, val)
+  public onChangeColorValue(key: string, name: string, val: string): void {
     if (this.changeMode === 'VIEW') return
-    this.colorsForm.get(`${key}.${name}`)?.setValue(val)
+    this.groups
+      .find((g) => g.key === key)
+      ?.formGroup.get(name)
+      ?.setValue(val)
     if (this.autoApply) {
       this.updateCssVar(name, val)
     }

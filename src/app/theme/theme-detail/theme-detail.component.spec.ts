@@ -344,15 +344,15 @@ describe('ThemeDetailComponent', () => {
     it('should set showOperatorMessage to false and set selectedTabIndex', () => {
       component.showOperatorMessage = true
 
-      component.onTabChange(3, theme)
+      component.onTabChange('3', theme)
 
       expect(component.showOperatorMessage).toBeFalse()
-      expect(component.selectedTabIndex).toBe(3)
+      expect(component.selectedTabIndex).toBe('3')
       expect(component.themeForUse).toEqual(theme)
     })
 
     it('should set themeForUse when tabIndex is 3', () => {
-      component.onTabChange(3, theme)
+      component.onTabChange('3', theme)
 
       expect(component.themeForUse).toEqual(theme)
     })
@@ -360,16 +360,16 @@ describe('ThemeDetailComponent', () => {
     it('should not set themeForUse when tabIndex is not 3', () => {
       component.themeForUse = undefined
 
-      component.onTabChange('1', theme)
+      component.onTabChange(1, theme)
 
-      expect(component.selectedTabIndex).toBe(1)
+      expect(component.selectedTabIndex).toBe('1')
       expect(component.themeForUse).toBeUndefined()
     })
 
     it('should do nothing if theme is undefined', () => {
       component.showOperatorMessage = true
 
-      component.onTabChange(1, undefined)
+      component.onTabChange('1', undefined)
 
       expect(component.showOperatorMessage).toBeTrue()
     })
@@ -673,7 +673,7 @@ describe('ThemeDetailComponent', () => {
     it('should switch to VIEW mode when forcedMode is view', () => {
       spyOn(component as any, 'preparePageActions')
 
-      component['onChangeMode']('view', theme)
+      component['onChangeMode']('VIEW', theme)
 
       expect(component.changeMode).toBe('VIEW')
       expect(component['preparePageActions']).toHaveBeenCalled()
@@ -682,11 +682,13 @@ describe('ThemeDetailComponent', () => {
     it('should toggle to EDIT and call getTheme', () => {
       spyOn(component as any, 'getTheme')
       spyOn(component as any, 'getThemes')
+      component.selectedTabIndex = '2'
 
-      component['onChangeMode']('edit', theme)
+      component['onChangeMode']('EDIT', theme)
 
       expect(component['getTheme']).toHaveBeenCalledWith()
       expect(component['getThemes']).toHaveBeenCalled()
+      expect(component.selectedTabIndex).toBe('0')
     })
   })
 

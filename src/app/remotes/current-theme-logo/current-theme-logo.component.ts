@@ -20,10 +20,9 @@ import { environment } from 'src/environments/environment'
 
 @Component({
   selector: 'app-current-theme-logo',
-  templateUrl: './current-theme-logo.component.html',
   standalone: true,
   imports: [AngularAcceleratorModule, AngularRemoteComponentsModule, CommonModule],
-  providers: []
+  templateUrl: './current-theme-logo.component.html'
 })
 @UntilDestroy()
 export class OneCXCurrentThemeLogoComponent implements ocxRemoteComponent, ocxRemoteWebcomponent {

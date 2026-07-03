@@ -26,75 +26,75 @@
       }
     </ng-container>
 
-    @if (loading) {
-      <p-message
-        id="ws_detail_loading_message"
-        severity="info"
-        styleClass="m-3"
-        [text]="'ACTIONS.LOADING' | translate"
-      ></p-message>
-    } @else if (exceptionKey) {
-      <p-message
-        id="th_detail_error_message"
-        severity="error"
-        styleClass="m-3"
-        [text]="exceptionKey | translate"
-      ></p-message>
-    } @else {
-      <p-tabs #tabComponent value="0" (valueChange)="onTabChange($event, theme)">
-        <p-tablist>
-          <p-tab
-            value="0"
-            [ariaLabel]="'DIALOG.TABS.PROPS' | translate"
-            [pTooltip]="'DIALOG.TABS.PROPS.TOOLTIP' | translate"
-            tooltipPosition="top"
-            tooltipEvent="hover"
-          >
-            {{ 'DIALOG.TABS.PROPS' | translate }}
-          </p-tab>
-          <p-tab
-            value="1"
-            [ariaLabel]="'DIALOG.TABS.COLORS' | translate"
-            [pTooltip]="'DIALOG.TABS.COLORS.TOOLTIP' | translate"
-            tooltipPosition="top"
-            tooltipEvent="hover"
-          >
-            {{ 'DIALOG.TABS.COLORS' | translate }}
-          </p-tab>
-          <p-tab
-            value="2"
-            [disabled]="changeMode !== 'VIEW'"
-            [ariaLabel]="'DIALOG.TABS.VARIABLES' | translate"
-            [pTooltip]="'DIALOG.TABS.VARIABLES.TOOLTIP' | translate"
-            tooltipPosition="top"
-            tooltipEvent="hover"
-          >
-            {{ 'DIALOG.TABS.VARIABLES' | translate }}
-          </p-tab>
-          <p-tab
-            value="3"
-            [disabled]="changeMode !== 'VIEW'"
-            [ariaLabel]="'DIALOG.TABS.USE' | translate"
-            [pTooltip]="'DIALOG.TABS.USE.TOOLTIP' | translate"
-            tooltipPosition="top"
-            tooltipEvent="hover"
-          >
-            {{ 'DIALOG.TABS.USE' | translate }}
-          </p-tab>
-          <p-tab
-            value="4"
-            [disabled]="changeMode !== 'VIEW'"
-            [ariaLabel]="'DIALOG.TABS.INTERN' | translate"
-            [pTooltip]="'DIALOG.TABS.INTERN.TOOLTIP' | translate"
-            tooltipPosition="top"
-            tooltipEvent="hover"
-          >
-            {{ 'DIALOG.TABS.INTERN' | translate }}
-          </p-tab>
-        </p-tablist>
-        <!-- PROPS -->
-        <p-tabpanel value="0">
-          <div class="mt-1 mb-3 mx-0 sm:mx-3">
+    <p-tabs #tabComponent [(value)]="selectedTabIndex" (valueChange)="onTabChange($event, theme)">
+      <p-tablist>
+        <p-tab
+          value="0"
+          [ariaLabel]="'DIALOG.TABS.PROPS' | translate"
+          [pTooltip]="'DIALOG.TABS.PROPS.TOOLTIP' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
+        >
+          {{ 'DIALOG.TABS.PROPS' | translate }}
+        </p-tab>
+        <p-tab
+          value="1"
+          [ariaLabel]="'DIALOG.TABS.COLORS' | translate"
+          [pTooltip]="'DIALOG.TABS.COLORS.TOOLTIP' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
+        >
+          {{ 'DIALOG.TABS.COLORS' | translate }}
+        </p-tab>
+        <p-tab
+          value="2"
+          [disabled]="changeMode !== 'VIEW'"
+          [ariaLabel]="'DIALOG.TABS.VARIABLES' | translate"
+          [pTooltip]="'DIALOG.TABS.VARIABLES.TOOLTIP' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
+        >
+          {{ 'DIALOG.TABS.VARIABLES' | translate }}
+        </p-tab>
+        <p-tab
+          value="3"
+          [disabled]="changeMode !== 'VIEW'"
+          [ariaLabel]="'DIALOG.TABS.USE' | translate"
+          [pTooltip]="'DIALOG.TABS.USE.TOOLTIP' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
+        >
+          {{ 'DIALOG.TABS.USE' | translate }}
+        </p-tab>
+        <p-tab
+          value="4"
+          [disabled]="changeMode !== 'VIEW'"
+          [ariaLabel]="'DIALOG.TABS.INTERN' | translate"
+          [pTooltip]="'DIALOG.TABS.INTERN.TOOLTIP' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
+        >
+          {{ 'DIALOG.TABS.INTERN' | translate }}
+        </p-tab>
+      </p-tablist>
+      <!-- PROPS -->
+      <p-tabpanel value="0">
+        <div class="mt-1 mb-3 mx-0 sm:mx-3">
+          @if (loading) {
+            <p-message
+              id="ws_detail_loading_message"
+              severity="info"
+              styleClass="m-3"
+              [text]="'ACTIONS.LOADING' | translate"
+            ></p-message>
+          } @else if (exceptionKey) {
+            <p-message
+              id="th_detail_error_message"
+              severity="error"
+              styleClass="m-3"
+              [text]="exceptionKey | translate"
+            ></p-message>
+          } @else if (theme) {
             <app-theme-apply
               [theme]="theme"
               [themes$]="themes$"
@@ -105,53 +105,67 @@
               (templatingThemeData)="useThemeAsTemplate($event)"
             ></app-theme-apply>
             <app-theme-props [theme]="themeForProps" [changeMode]="changeMode"></app-theme-props>
+          }
+        </div>
+      </p-tabpanel>
+
+      <!-- COLORS -->
+      <p-tabpanel value="1">
+        <div class="mt-1 mb-2 mx-0 sm:mx-3">
+          @if (loading) {
+            <p-message
+              id="ws_detail_loading_message"
+              severity="info"
+              styleClass="m-3"
+              [text]="'ACTIONS.LOADING' | translate"
+            ></p-message>
+          } @else if (exceptionKey) {
+            <p-message
+              id="th_detail_error_message"
+              severity="error"
+              styleClass="m-3"
+              [text]="exceptionKey | translate"
+            ></p-message>
+          } @else if (theme) {
+            <app-theme-apply
+              [theme]="theme"
+              [themes$]="themes$"
+              [changeMode]="changeMode"
+              [isCurrentTheme]="isCurrentTheme"
+              [autoApply]="autoApply"
+              (autoApplyChange)="onChangeAutoApply($event)"
+              (templatingThemeData)="useThemeAsTemplate($event)"
+            ></app-theme-apply>
+            <app-theme-colors
+              [theme]="themeForColors"
+              [changeMode]="changeMode"
+              [autoApply]="autoApply"
+            ></app-theme-colors>
+          }
+        </div>
+      </p-tabpanel>
+
+      @if (changeMode === 'VIEW') {
+        <!-- VARIABLES -->
+        <p-tabpanel value="2" id="th_detail_panel_variables">
+          <pre class="my-2 mx-3 pt-1 pb-0 surface-50">{{ theme?.properties | json }}</pre>
+        </p-tabpanel>
+
+        <!-- USE -->
+        <p-tabpanel value="3">
+          <div class="m-2">
+            <app-theme-use [themeName]="themeForUse?.name" (used)="preparePageActions($event, theme)"></app-theme-use>
           </div>
         </p-tabpanel>
 
-        <!-- COLORS -->
-        <p-tabpanel value="1">
-          <div class="mt-1 mb-2 mx-0 sm:mx-3">
-            @if (theme) {
-              <app-theme-apply
-                [theme]="theme"
-                [themes$]="themes$"
-                [changeMode]="changeMode"
-                [isCurrentTheme]="isCurrentTheme"
-                [autoApply]="autoApply"
-                (autoApplyChange)="onChangeAutoApply($event)"
-                (templatingThemeData)="useThemeAsTemplate($event)"
-              ></app-theme-apply>
-              <app-theme-colors
-                [theme]="themeForColors"
-                [changeMode]="changeMode"
-                [autoApply]="autoApply"
-              ></app-theme-colors>
-            }
+        <!-- INTERN -->
+        <p-tabpanel value="4">
+          <div class="m-2 mt-4">
+            <app-theme-intern [theme]="theme" [dateFormat]="dateFormat"></app-theme-intern>
           </div>
         </p-tabpanel>
-
-        @if (changeMode === 'VIEW') {
-          <!-- VARIABLES -->
-          <p-tabpanel value="2" id="th_detail_panel_variables">
-            <pre class="my-2 mx-3 pt-1 pb-0 surface-50">{{ theme?.properties | json }}</pre>
-          </p-tabpanel>
-
-          <!-- USE -->
-          <p-tabpanel value="3">
-            <div class="m-2">
-              <app-theme-use [themeName]="themeForUse?.name" (used)="preparePageActions($event, theme)"></app-theme-use>
-            </div>
-          </p-tabpanel>
-
-          <!-- INTERN -->
-          <p-tabpanel value="4">
-            <div class="m-2 mt-4">
-              <app-theme-intern [theme]="theme" [dateFormat]="dateFormat"></app-theme-intern>
-            </div>
-          </p-tabpanel>
-        }
-      </p-tabs>
-    }
+      }
+    </p-tabs>
   </ocx-content>
 
   <!-- CREATE -->
