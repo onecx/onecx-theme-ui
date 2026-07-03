@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common'
 
 import { CheckboxModule } from 'primeng/checkbox'
 import { FloatLabelModule } from 'primeng/floatlabel'
+import { InputTextModule } from 'primeng/inputtext'
 import { TooltipModule } from 'primeng/tooltip'
 
 import { Theme } from 'src/app/shared/generated'
@@ -17,6 +18,7 @@ import { Theme } from 'src/app/shared/generated'
     CheckboxModule,
     FloatLabelModule,
     FormsModule,
+    InputTextModule,
     ReactiveFormsModule,
     TooltipModule,
     TranslateModule

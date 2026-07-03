@@ -10,6 +10,7 @@ import { DialogModule } from 'primeng/dialog'
 import { FloatLabelModule } from 'primeng/floatlabel'
 import { InputGroupModule } from 'primeng/inputgroup'
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon'
+import { InputTextModule } from 'primeng/inputtext'
 import { MessageModule } from 'primeng/message'
 import { PopoverModule } from 'primeng/popover'
 import { PanelModule } from 'primeng/panel'
@@ -21,22 +22,25 @@ import { PortalMessageService } from '@onecx/angular-integration-interface'
 import { Theme } from 'src/app/shared/generated'
 import { themeVariables } from '../theme-variables'
 import { ChangeMode } from '../theme-detail.component'
+import { AngularAcceleratorModule } from '@onecx/angular-accelerator'
 
 @Component({
   selector: 'app-theme-colors',
   standalone: true,
   imports: [
+    AngularAcceleratorModule,
     CommonModule,
     ColorSketchModule,
     ButtonModule,
     DialogModule,
     FloatLabelModule,
     FormsModule,
-    MessageModule,
-    PopoverModule,
-    PanelModule,
     InputGroupModule,
     InputGroupAddonModule,
+    InputTextModule,
+    MessageModule,
+    PanelModule,
+    PopoverModule,
     ReactiveFormsModule,
     ToastModule,
     TooltipModule,

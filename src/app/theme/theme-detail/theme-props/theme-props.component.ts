@@ -9,6 +9,7 @@ import { CheckboxModule } from 'primeng/checkbox'
 import { FloatLabelModule } from 'primeng/floatlabel'
 import { InputGroupModule } from 'primeng/inputgroup'
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon'
+import { InputTextModule } from 'primeng/inputtext'
 import { MessageModule } from 'primeng/message'
 import { ToastModule } from 'primeng/toast'
 import { TooltipModule } from 'primeng/tooltip'
@@ -34,6 +35,7 @@ import { ChangeMode } from '../theme-detail.component'
     FormsModule,
     InputGroupModule,
     InputGroupAddonModule,
+    InputTextModule,
     MessageModule,
     ReactiveFormsModule,
     ToastModule,
