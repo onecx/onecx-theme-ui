@@ -6,7 +6,8 @@ import {
   Input,
   Output,
   ViewChild,
-  OnChanges
+  OnChanges,
+  model
 } from '@angular/core'
 import { HttpHeaders } from '@angular/common/http'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
@@ -16,6 +17,8 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { ButtonModule } from 'primeng/button'
 import { DialogModule } from 'primeng/dialog'
 import { FileUploadModule, FileSelectEvent } from 'primeng/fileupload'
+import { FloatLabelModule } from 'primeng/floatlabel'
+import { InputTextModule } from 'primeng/inputtext'
 import { MessageModule } from 'primeng/message'
 import { ToastModule } from 'primeng/toast'
 import { TooltipModule } from 'primeng/tooltip'
@@ -32,7 +35,9 @@ import { ThemeColorBoxComponent } from 'src/app/shared/theme-color-box/theme-col
     ButtonModule,
     DialogModule,
     FileUploadModule,
+    FloatLabelModule,
     FormsModule,
+    InputTextModule,
     MessageModule,
     ReactiveFormsModule,
     TranslateModule,
@@ -45,11 +50,11 @@ import { ThemeColorBoxComponent } from 'src/app/shared/theme-color-box/theme-col
 })
 export class ThemeImportComponent implements OnChanges, AfterViewInit {
   @Input() public themes: Theme[] = []
-  @Input() public visible = false
-  @Output() visibleChange = new EventEmitter<boolean>()
   @Output() public uploadEmitter = new EventEmitter<boolean>()
 
   @ViewChild('themeNameInput') themeNameInput!: HTMLInputElement
+
+  public visible = model.required<boolean>()
 
   public themeNameExists = false
   public displayNameExists = false
@@ -74,7 +79,7 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
   }
 
   ngOnChanges(): void {
-    if (this.visible) {
+    if (this.visible()) {
       this.httpHeaders = new HttpHeaders()
       this.httpHeaders = this.httpHeaders.set('Content-Type', 'application/json')
     }

@@ -207,17 +207,12 @@
     }
 
     <!-- CREATE -->
-    <app-theme-create
-      [visible]="themeCreateVisible"
-      (visibleChange)="themeCreateVisible = $event"
-      (themeCreated)="onThemeCreated($event)"
-    ></app-theme-create>
+    <app-theme-create [(visible)]="themeCreateVisible" (themeCreated)="onThemeCreated($event)"></app-theme-create>
 
     <!-- IMPORT -->
     <app-theme-import
       [themes]="convertToThemes(data)"
-      [visible]="themeImportVisible"
-      (visibleChange)="themeImportVisible = $event"
+      [(visible)]="themeImportVisible"
       (uploadEmitter)="onThemeUpload($event)"
     ></app-theme-import>
   </ocx-content>

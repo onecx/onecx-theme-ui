@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core'
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { AsyncPipe } from '@angular/common'
 import { ActivatedRoute, Router, RouterModule } from '@angular/router'
@@ -65,8 +65,8 @@ export class ThemeSearchComponent implements OnInit {
   public sortDirection: DataSortDirection = DataSortDirection.ASCENDING
   public sortField = 'displayName'
 
-  public themeImportVisible = false
-  public themeCreateVisible = false
+  public themeImportVisible = signal(false)
+  public themeCreateVisible = signal(false)
   public Utils = Utils
 
   // image
@@ -124,7 +124,7 @@ export class ThemeSearchComponent implements OnInit {
             {
               label: data['ACTIONS.CREATE.THEME'],
               title: data['ACTIONS.CREATE.THEME.TOOLTIP'],
-              actionCallback: () => (this.themeCreateVisible = true),
+              actionCallback: () => this.themeCreateVisible.set(true),
               permission: 'THEME#CREATE',
               icon: 'pi pi-plus',
               show: 'always'
@@ -142,9 +142,6 @@ export class ThemeSearchComponent implements OnInit {
       )
   }
 
-  public onThemeCreateClosed(visible: boolean): void {
-    this.themeCreateVisible = visible
-  }
   public onThemeCreated(theme: Theme): void {
     this.router.navigate(['./' + theme.name], { relativeTo: this.route })
   }
@@ -183,10 +180,11 @@ export class ThemeSearchComponent implements OnInit {
   }
 
   public onImportThemeClick(): void {
-    this.themeImportVisible = true
+    this.themeImportVisible.set(true)
   }
+
   public onThemeUpload(uploaded: boolean) {
-    this.themeImportVisible = false
+    this.themeImportVisible.set(false)
     if (uploaded) this.loadThemes()
   }
 }

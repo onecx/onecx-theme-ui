@@ -95,7 +95,7 @@ describe('ThemeSearchComponent', () => {
       expect(actions.length).toBe(2)
 
       actions[0].actionCallback()
-      expect(component.themeCreateVisible).toBe(true)
+      expect(component.themeCreateVisible()).toBeTrue()
 
       spyOn(component, 'onImportThemeClick')
       actions[1].actionCallback()
@@ -169,33 +169,29 @@ describe('ThemeSearchComponent', () => {
 
   it('should show import dialog on import theme click', () => {
     fixture.detectChanges()
-    component.themeImportVisible = false
+
+    component.themeImportVisible.set(false)
     component.onImportThemeClick()
-    expect(component.themeImportVisible).toBe(true)
+
+    expect(component.themeImportVisible()).toBe(true)
   })
   it('should hide import dialog on import close', () => {
     fixture.detectChanges()
-    component.themeImportVisible = true
+
+    component.themeImportVisible.set(true)
     component.onThemeUpload(false)
-    expect(component.themeImportVisible).toBe(false)
+
+    expect(component.themeImportVisible()).toBeFalse()
   })
   it('should hide import dialog on import close and reload', () => {
     fixture.detectChanges()
     spyOn(component, 'loadThemes')
-    component.themeImportVisible = true
+
+    component.themeImportVisible.set(true)
     component.onThemeUpload(true)
-    expect(component.themeImportVisible).toBe(false)
+
+    expect(component.themeImportVisible()).toBeFalse()
     expect(component.loadThemes).toHaveBeenCalledTimes(1)
-  })
-
-  it('should set themeCreateVisible on onThemeCreateClosed', () => {
-    fixture.detectChanges()
-    component.themeCreateVisible = true
-    component.onThemeCreateClosed(false)
-    expect(component.themeCreateVisible).toBe(false)
-
-    component.onThemeCreateClosed(true)
-    expect(component.themeCreateVisible).toBe(true)
   })
 
   it('should navigate to created theme on onThemeCreated', () => {
