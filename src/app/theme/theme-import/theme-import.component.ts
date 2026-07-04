@@ -8,10 +8,11 @@ import {
   ViewChild,
   OnChanges
 } from '@angular/core'
-import { CommonModule } from '@angular/common'
 import { HttpHeaders } from '@angular/common/http'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
+import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
+
 import { ButtonModule } from 'primeng/button'
 import { DialogModule } from 'primeng/dialog'
 import { FileUploadModule, FileSelectEvent } from 'primeng/fileupload'
@@ -19,19 +20,16 @@ import { MessageModule } from 'primeng/message'
 import { ToastModule } from 'primeng/toast'
 import { TooltipModule } from 'primeng/tooltip'
 
-import { ActivatedRoute, Router } from '@angular/router'
-
 import { PortalMessageService } from '@onecx/angular-integration-interface'
 
 import { Theme, ThemesAPIService, ThemeSnapshot } from 'src/app/shared/generated'
-import { ThemeColorBoxComponent } from '../../shared/theme-color-box/theme-color-box.component'
+import { ThemeColorBoxComponent } from 'src/app/shared/theme-color-box/theme-color-box.component'
 
 @Component({
   selector: 'app-theme-import',
   standalone: true,
   imports: [
     ButtonModule,
-    CommonModule,
     DialogModule,
     FileUploadModule,
     FormsModule,

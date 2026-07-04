@@ -1,5 +1,5 @@
 import { Component, DestroyRef, EventEmitter, Inject, Input, OnChanges } from '@angular/core'
-import { CommonModule, Location } from '@angular/common'
+import { AsyncPipe, Location } from '@angular/common'
 import { UntilDestroy } from '@ngneat/until-destroy'
 import { TranslateModule } from '@ngx-translate/core'
 import { BehaviorSubject, catchError, first, map, Observable, of, ReplaySubject } from 'rxjs'
@@ -31,7 +31,7 @@ type DataType = 'logo' | 'favicon' | 'themes' | 'theme'
   selector: 'app-theme-data',
   templateUrl: './theme-data.component.html',
   standalone: true,
-  imports: [AngularAcceleratorModule, AngularRemoteComponentsModule, CommonModule, TranslateModule],
+  imports: [AngularAcceleratorModule, AngularRemoteComponentsModule, AsyncPipe, TranslateModule],
   providers: [{ provide: SLOT_SERVICE, useExisting: SlotService }]
 })
 @UntilDestroy()

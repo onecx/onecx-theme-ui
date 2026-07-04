@@ -1,5 +1,4 @@
 import { ChangeDetectorRef, Component, Input, OnChanges, SimpleChanges } from '@angular/core'
-import { CommonModule } from '@angular/common'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, FormBuilder } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { debounceTime } from 'rxjs'
@@ -17,19 +16,18 @@ import { PanelModule } from 'primeng/panel'
 import { ToastModule } from 'primeng/toast'
 import { TooltipModule } from 'primeng/tooltip'
 
+import { AngularAcceleratorModule } from '@onecx/angular-accelerator'
 import { PortalMessageService } from '@onecx/angular-integration-interface'
 
 import { Theme } from 'src/app/shared/generated'
 import { themeVariables } from '../theme-variables'
 import { ChangeMode } from '../theme-detail.component'
-import { AngularAcceleratorModule } from '@onecx/angular-accelerator'
 
 @Component({
   selector: 'app-theme-colors',
   standalone: true,
   imports: [
     AngularAcceleratorModule,
-    CommonModule,
     ColorSketchModule,
     ButtonModule,
     DialogModule,

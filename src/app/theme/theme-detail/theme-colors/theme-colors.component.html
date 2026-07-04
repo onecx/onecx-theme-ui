@@ -50,6 +50,9 @@
                 (click)="pop.toggle($event)"
                 (keyup)="pop.toggle($event)"
                 class="p-button p-component h-full w-full border-none"
+                [style.color]="
+                  group.formGroup.get(variable)?.value === '#FFFFFF' ? 'var(--p-stone-400)' : 'var(--p-stone-200)'
+                "
                 [style.background-color]="group.formGroup.get(variable)?.value"
                 [disabled]="changeMode === 'VIEW'"
                 [attr.aria-label]="'THEME.TOOLTIPS.ITEM_COLOR_PICKER' | translate"

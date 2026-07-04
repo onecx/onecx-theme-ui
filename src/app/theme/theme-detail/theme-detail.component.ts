@@ -1,6 +1,6 @@
 import { Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
-import { CommonModule, Location } from '@angular/common'
+import { AsyncPipe, JsonPipe, Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { catchError, combineLatest, finalize, first, map, of, Observable } from 'rxjs'
@@ -15,8 +15,8 @@ import { PortalMessageService, ThemeService, UserService } from '@onecx/angular-
 import { Action, AngularAcceleratorModule } from '@onecx/angular-accelerator'
 import { PortalPageComponent } from '@onecx/angular-utils'
 
-import { ExportThemeRequest, ImagesInternalAPIService, Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { Utils, LogoRefType } from 'src/app/shared/utils'
+import { ExportThemeRequest, ImagesInternalAPIService, Theme, ThemesAPIService } from 'src/app/shared/generated'
 
 import { ThemeApplyComponent } from './theme-apply/theme-apply.component'
 import { ThemeColorsComponent } from './theme-colors/theme-colors.component'
@@ -32,7 +32,8 @@ export type ChangeMode = 'VIEW' | 'EDIT'
   standalone: true,
   imports: [
     AngularAcceleratorModule,
-    CommonModule,
+    AsyncPipe,
+    JsonPipe,
     MessageModule,
     TabsModule,
     TooltipModule,
@@ -106,12 +107,11 @@ export class ThemeDetailComponent implements OnInit {
     private readonly msgService: PortalMessageService,
     private readonly translate: TranslateService,
     private readonly imageApi: ImagesInternalAPIService
-  ) {
-    this.dateFormat = this.user.lang$.getValue() === 'de' ? 'dd.MM.yyyy HH:mm:ss' : 'medium'
-    this.themeName = route.snapshot.paramMap.get('name')
-  }
+  ) {}
 
   ngOnInit(): void {
+    this.dateFormat = this.user.lang$.getValue() === 'de' ? 'dd.MM.yyyy HH:mm:ss' : 'medium'
+    this.themeName = this.route.snapshot.paramMap.get('name')
     // Common start
     this.theme = undefined
     this.getTheme()

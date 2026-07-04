@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core'
-import { CommonModule } from '@angular/common'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { ReplaySubject } from 'rxjs'
@@ -17,8 +16,8 @@ import { TooltipModule } from 'primeng/tooltip'
 import { getLocation } from '@onecx/accelerator'
 import { PortalMessageService } from '@onecx/angular-integration-interface'
 
-import { ImagesInternalAPIService, MimeType, Theme, UploadImageRequestParams } from 'src/app/shared/generated'
 import { Utils, LogoRefType } from 'src/app/shared/utils'
+import { ImagesInternalAPIService, MimeType, Theme, UploadImageRequestParams } from 'src/app/shared/generated'
 import { ImageContainerComponent } from 'src/app/shared/image-container/image-container.component'
 
 import { themeVariables } from '../theme-variables'
@@ -28,7 +27,6 @@ import { ChangeMode } from '../theme-detail.component'
   selector: 'app-theme-props',
   standalone: true,
   imports: [
-    CommonModule,
     ButtonModule,
     CheckboxModule,
     FloatLabelModule,

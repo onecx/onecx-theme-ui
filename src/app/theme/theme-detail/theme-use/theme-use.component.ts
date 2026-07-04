@@ -1,6 +1,6 @@
 import { Component, DestroyRef, EventEmitter, inject, Input, OnChanges, Output } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
-import { CommonModule } from '@angular/common'
+import { AsyncPipe } from '@angular/common'
 import { Router, RouterModule } from '@angular/router'
 import { TranslateModule } from '@ngx-translate/core'
 import { BehaviorSubject, Observable, of, Subscription } from 'rxjs'
@@ -34,7 +34,7 @@ export function slotInitializer(slotService: SlotService) {
 @Component({
   selector: 'app-theme-use',
   standalone: true,
-  imports: [AngularRemoteComponentsModule, CommonModule, RouterModule, TooltipModule, TranslateModule],
+  imports: [AngularRemoteComponentsModule, AsyncPipe, RouterModule, TooltipModule, TranslateModule],
   providers: [{ provide: SLOT_SERVICE, useExisting: SlotService }],
   templateUrl: './theme-use.component.html'
 })

@@ -1,114 +1,116 @@
-<p-dialog
-  [header]="'THEME.IMPORT.HEADER' | translate"
-  [visible]="visible"
-  (visibleChange)="visibleChange.emit(false)"
-  [draggable]="true"
-  [resizable]="true"
-  [closable]="true"
-  [modal]="true"
-  (onHide)="onImportThemeHide()"
-  [style]="{ 'max-width': '700px' }"
->
-  <p-fileUpload
-    inputId="th_import_upload"
-    mode="advanced"
-    name="file"
-    accept=".json"
-    [maxFileSize]="1000000"
-    [headers]="httpHeaders"
-    [customUpload]="true"
-    (onClear)="onImportThemeClear()"
-    (onRemove)="onImportThemeClear()"
-    (onSelect)="onImportThemeSelect($event)"
-    (uploadHandler)="onThemeUpload()"
-    [showUploadButton]="formGroup.valid && !themeImportError"
-    [uploadLabel]="'ACTIONS.UPLOAD' | translate"
-    [cancelLabel]="'ACTIONS.CANCEL' | translate"
-    [chooseLabel]="'ACTIONS.CHOOSE' | translate"
-  ></p-fileUpload>
-  @if (themeSnapshot) {
-    <form [formGroup]="formGroup" class="flex flex-wrap justify-content-start align-items-center gap-3 mt-4">
-      <span class="p-float-label w-full md:w-15rem" controlErrorAnchor>
-        <input
-          #themeNameInput
-          pInputText
-          type="text"
-          id="th_import_theme_name"
-          class="w-full pt-3 pb-2 text-responsive"
-          formControlName="themeName"
-          (keyup)="onThemeNameChange()"
-          [attr.aria-label]="'THEME.THEME_NAME' | translate"
-          [pTooltip]="'THEME.THEME_NAME' | translate"
+@if (visible) {
+  <p-dialog
+    [header]="'THEME.IMPORT.HEADER' | translate"
+    [visible]="visible"
+    (visibleChange)="visibleChange.emit(false)"
+    [draggable]="true"
+    [resizable]="true"
+    [closable]="true"
+    [modal]="true"
+    (onHide)="onImportThemeHide()"
+    [style]="{ 'max-width': '700px' }"
+  >
+    <p-fileUpload
+      inputId="th_import_upload"
+      mode="advanced"
+      name="file"
+      accept=".json"
+      [maxFileSize]="1000000"
+      [headers]="httpHeaders"
+      [customUpload]="true"
+      (onClear)="onImportThemeClear()"
+      (onRemove)="onImportThemeClear()"
+      (onSelect)="onImportThemeSelect($event)"
+      (uploadHandler)="onThemeUpload()"
+      [showUploadButton]="formGroup.valid && !themeImportError"
+      [uploadLabel]="'ACTIONS.UPLOAD' | translate"
+      [cancelLabel]="'ACTIONS.CANCEL' | translate"
+      [chooseLabel]="'ACTIONS.CHOOSE' | translate"
+    ></p-fileUpload>
+    @if (themeSnapshot) {
+      <form [formGroup]="formGroup" class="flex flex-wrap justify-content-start align-items-center gap-3 mt-4">
+        <span class="p-float-label w-full md:w-15rem" controlErrorAnchor>
+          <input
+            #themeNameInput
+            pInputText
+            type="text"
+            id="th_import_theme_name"
+            class="w-full pt-3 pb-2 text-responsive"
+            formControlName="themeName"
+            (keyup)="onThemeNameChange()"
+            [attr.aria-label]="'THEME.THEME_NAME' | translate"
+            [pTooltip]="'THEME.THEME_NAME' | translate"
+            tooltipPosition="top"
+            tooltipEvent="hover"
+          />
+          <label class="ocx-required-label" for="th_import_theme_name" aria-hidden="true">
+            {{ 'THEME.THEME_NAME' | translate }}
+          </label>
+        </span>
+        <span class="p-float-label w-full md:w-15rem" controlErrorAnchor>
+          <input
+            pInputText
+            type="text"
+            id="th_import_theme_display_name"
+            class="w-full pt-3 pb-2 text-responsive"
+            formControlName="displayName"
+            (keyup)="onThemeNameChange()"
+            [attr.aria-label]="'THEME.DISPLAY_NAME' | translate"
+            [pTooltip]="'THEME.DISPLAY_NAME' | translate"
+            tooltipPosition="top"
+            tooltipEvent="hover"
+          />
+          <label class="ocx-required-label" for="th_import_theme_display_name" aria-hidden="true">
+            {{ 'THEME.DISPLAY_NAME' | translate }}
+          </label>
+        </span>
+        @if (properties) {
+          <app-theme-color-box [properties]="properties" styleClass="h-inputtext w-15rem" aria-hidden="true" />
+        }
+        @if (!properties) {
+          <div role="note">{{ 'THEME.NO_PROPERTIES' | translate }}</div>
+        }
+      </form>
+    }
+
+    @if (themeSnapshot && themeNameExists) {
+      <p-message
+        severity="warn"
+        styleClass="mt-3"
+        id="th_import_name_exists_message"
+        [text]="'THEME.IMPORT.NAME_EXISTS_MESSAGE' | translate"
+      ></p-message>
+    }
+    @if (themeSnapshot && !themeNameExists && displayNameExists) {
+      <p-message
+        severity="warn"
+        styleClass="mt-3"
+        id="th_import_display_name_exists_message"
+        [text]="'THEME.IMPORT.DISPLAY_NAME_EXISTS_MESSAGE' | translate"
+      ></p-message>
+    }
+    @if (themeImportError) {
+      <p-message
+        severity="error"
+        styleClass="mt-3"
+        id="th_import_parse_error"
+        [text]="'VALIDATION.ERRORS.PARSE_ERROR' | translate"
+      ></p-message>
+    }
+
+    <ng-template pTemplate="footer">
+      <div class="flex flex-wrap column-gap-2 row-gap-1 justify-content-end">
+        <p-button
+          icon="pi pi-times"
+          id="th_import_button_close"
+          (onClick)="onImportThemeHide()"
+          [label]="'ACTIONS.NAVIGATION.CLOSE' | translate"
+          [ariaLabel]="'ACTIONS.NAVIGATION.CLOSE' | translate"
+          [pTooltip]="'ACTIONS.NAVIGATION.CLOSE.TOOLTIP' | translate"
           tooltipPosition="top"
           tooltipEvent="hover"
-        />
-        <label class="ocx-required-label" for="th_import_theme_name" aria-hidden="true">
-          {{ 'THEME.THEME_NAME' | translate }}
-        </label>
-      </span>
-      <span class="p-float-label w-full md:w-15rem" controlErrorAnchor>
-        <input
-          pInputText
-          type="text"
-          id="th_import_theme_display_name"
-          class="w-full pt-3 pb-2 text-responsive"
-          formControlName="displayName"
-          (keyup)="onThemeNameChange()"
-          [attr.aria-label]="'THEME.DISPLAY_NAME' | translate"
-          [pTooltip]="'THEME.DISPLAY_NAME' | translate"
-          tooltipPosition="top"
-          tooltipEvent="hover"
-        />
-        <label class="ocx-required-label" for="th_import_theme_display_name" aria-hidden="true">
-          {{ 'THEME.DISPLAY_NAME' | translate }}
-        </label>
-      </span>
-      @if (properties) {
-        <app-theme-color-box [properties]="properties" styleClass="h-inputtext w-15rem" aria-hidden="true" />
-      }
-      @if (!properties) {
-        <div role="note">{{ 'THEME.NO_PROPERTIES' | translate }}</div>
-      }
-    </form>
-  }
-
-  @if (themeSnapshot && themeNameExists) {
-    <p-message
-      severity="warn"
-      styleClass="mt-3"
-      id="th_import_name_exists_message"
-      [text]="'THEME.IMPORT.NAME_EXISTS_MESSAGE' | translate"
-    ></p-message>
-  }
-  @if (themeSnapshot && !themeNameExists && displayNameExists) {
-    <p-message
-      severity="warn"
-      styleClass="mt-3"
-      id="th_import_display_name_exists_message"
-      [text]="'THEME.IMPORT.DISPLAY_NAME_EXISTS_MESSAGE' | translate"
-    ></p-message>
-  }
-  @if (themeImportError) {
-    <p-message
-      severity="error"
-      styleClass="mt-3"
-      id="th_import_parse_error"
-      [text]="'VALIDATION.ERRORS.PARSE_ERROR' | translate"
-    ></p-message>
-  }
-
-  <ng-template pTemplate="footer">
-    <div class="flex flex-wrap column-gap-2 row-gap-1 justify-content-end">
-      <p-button
-        icon="pi pi-times"
-        id="th_import_button_close"
-        (onClick)="onImportThemeHide()"
-        [label]="'ACTIONS.NAVIGATION.CLOSE' | translate"
-        [ariaLabel]="'ACTIONS.NAVIGATION.CLOSE' | translate"
-        [pTooltip]="'ACTIONS.NAVIGATION.CLOSE.TOOLTIP' | translate"
-        tooltipPosition="top"
-        tooltipEvent="hover"
-      ></p-button>
-    </div>
-  </ng-template>
-</p-dialog>
+        ></p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
+}

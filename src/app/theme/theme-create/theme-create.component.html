@@ -1,97 +1,99 @@
-<p-dialog
-  [header]="'DIALOG.HEADER.' + (themeToBeCreated ? 'SAVE_AS' : 'CREATE') | translate"
-  [visible]="visible"
-  (visibleChange)="visibleChange.emit(false)"
-  [modal]="true"
-  [closable]="true"
-  [draggable]="true"
-  [resizable]="true"
-  [dismissableMask]="true"
-  [contentStyle]="{ overflow: 'auto' }"
-  [style]="{ width: '500px' }"
-  styleClass="disable-max-height-preset"
-  [breakpoints]="{ '991px': '700px' }"
->
-  <form [formGroup]="formGroup" class="pt-1 flex flex-wrap flex-column gap-4 justify-content-between">
-    <p-float-label variant="on">
-      <input
-        pInputText
-        type="text"
-        id="th_create_form_name"
-        class="w-full pt-3 pb-2"
-        formControlName="name"
-        [ariaLabel]="'THEME.NAME' | translate"
-        [pTooltip]="'THEME.TOOLTIPS.NAME' | translate"
-        tooltipPosition="top"
-        tooltipEvent="hover"
-      />
-      <label class="ocx-required-label" for="th_create_form_name" aria-hidden="true">
-        {{ 'THEME.NAME' | translate }}
-      </label>
-    </p-float-label>
-    <p-float-label variant="on">
-      <input
-        pInputText
-        type="text"
-        id="th_create_form_display_name"
-        class="w-full pt-3 pb-2"
-        formControlName="displayName"
-        [ariaLabel]="'THEME.DISPLAY_NAME' | translate"
-        [pTooltip]="'THEME.TOOLTIPS.DISPLAY_NAME' | translate"
-        tooltipPosition="top"
-        tooltipEvent="hover"
-      />
-      <label class="ocx-required-label" for="th_create_form_display_name" aria-hidden="true">
-        {{ 'THEME.DISPLAY_NAME' | translate }}
-      </label>
-    </p-float-label>
-    <p-float-label variant="on">
-      <textarea
-        class="w-full"
-        pInputTextarea
-        autoresize="true"
-        rows="3"
-        id="th_create_form_description"
-        formControlName="description"
-        [ariaLabel]="'THEME.DESCRIPTION' | translate"
-        [pTooltip]="'THEME.TOOLTIPS.DESCRIPTION' | translate"
-        tooltipPosition="top"
-        tooltipEvent="hover"
-      ></textarea>
-      <label for="th_create_form_description" aria-hidden="true">
-        {{ 'THEME.DESCRIPTION' | translate }}
-      </label>
-    </p-float-label>
+@if (visible) {
+  <p-dialog
+    [header]="'DIALOG.HEADER.' + (themeToBeCreated ? 'SAVE_AS' : 'CREATE') | translate"
+    [visible]="visible"
+    (visibleChange)="visibleChange.emit(false)"
+    [modal]="true"
+    [closable]="true"
+    [draggable]="true"
+    [resizable]="true"
+    [dismissableMask]="true"
+    [contentStyle]="{ overflow: 'auto' }"
+    [style]="{ width: '500px' }"
+    styleClass="disable-max-height-preset"
+    [breakpoints]="{ '991px': '700px' }"
+  >
+    <form [formGroup]="formGroup" class="pt-1 flex flex-wrap flex-column gap-4 justify-content-between">
+      <p-float-label variant="on">
+        <input
+          pInputText
+          type="text"
+          id="th_create_form_name"
+          class="w-full pt-3 pb-2"
+          formControlName="name"
+          [ariaLabel]="'THEME.NAME' | translate"
+          [pTooltip]="'THEME.TOOLTIPS.NAME' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
+        />
+        <label class="ocx-required-label" for="th_create_form_name" aria-hidden="true">
+          {{ 'THEME.NAME' | translate }}
+        </label>
+      </p-float-label>
+      <p-float-label variant="on">
+        <input
+          pInputText
+          type="text"
+          id="th_create_form_display_name"
+          class="w-full pt-3 pb-2"
+          formControlName="displayName"
+          [ariaLabel]="'THEME.DISPLAY_NAME' | translate"
+          [pTooltip]="'THEME.TOOLTIPS.DISPLAY_NAME' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
+        />
+        <label class="ocx-required-label" for="th_create_form_display_name" aria-hidden="true">
+          {{ 'THEME.DISPLAY_NAME' | translate }}
+        </label>
+      </p-float-label>
+      <p-float-label variant="on">
+        <textarea
+          class="w-full"
+          pInputTextarea
+          autoresize="true"
+          rows="3"
+          id="th_create_form_description"
+          formControlName="description"
+          [ariaLabel]="'THEME.DESCRIPTION' | translate"
+          [pTooltip]="'THEME.TOOLTIPS.DESCRIPTION' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
+        ></textarea>
+        <label for="th_create_form_description" aria-hidden="true">
+          {{ 'THEME.DESCRIPTION' | translate }}
+        </label>
+      </p-float-label>
 
-    <div class="text-center">
-      @if (!themeToBeCreated) {
-        <p-message id="th_create_hint" severity="info" [text]="'ACTIONS.CREATE.THEME.HINT' | translate"></p-message>
-      }
-    </div>
-  </form>
-  <ng-template pTemplate="footer">
-    <div class="flex flex-wrap column-gap-2 row-gap-1 justify-content-end">
-      <p-button
-        id="ws_create_action_cancel"
-        icon="pi pi-times"
-        (onClick)="visibleChange.emit(false)"
-        [label]="'ACTIONS.CANCEL' | translate"
-        [ariaLabel]="'ACTIONS.CANCEL' | translate"
-        [pTooltip]="'ACTIONS.TOOLTIPS.CANCEL' | translate"
-        tooltipPosition="top"
-        tooltipEvent="hover"
-      ></p-button>
-      <p-button
-        id="ws_create_action_save"
-        icon="pi pi-plus"
-        [disabled]="!formGroup.valid"
-        (onClick)="saveTheme()"
-        [label]="'ACTIONS.CREATE.THEME' | translate"
-        [ariaLabel]="'ACTIONS.CREATE.THEME.TOOLTIP' | translate"
-        [pTooltip]="'ACTIONS.CREATE.THEME.TOOLTIP' | translate"
-        tooltipPosition="top"
-        tooltipEvent="hover"
-      ></p-button>
-    </div>
-  </ng-template>
-</p-dialog>
+      <div class="text-center">
+        @if (!themeToBeCreated) {
+          <p-message id="th_create_hint" severity="info" [text]="'ACTIONS.CREATE.THEME.HINT' | translate"></p-message>
+        }
+      </div>
+    </form>
+    <ng-template pTemplate="footer">
+      <div class="flex flex-wrap column-gap-2 row-gap-1 justify-content-end">
+        <p-button
+          id="ws_create_action_cancel"
+          icon="pi pi-times"
+          (onClick)="visibleChange.emit(false)"
+          [label]="'ACTIONS.CANCEL' | translate"
+          [ariaLabel]="'ACTIONS.CANCEL' | translate"
+          [pTooltip]="'ACTIONS.TOOLTIPS.CANCEL' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
+        ></p-button>
+        <p-button
+          id="ws_create_action_save"
+          icon="pi pi-plus"
+          [disabled]="!formGroup.valid"
+          (onClick)="saveTheme()"
+          [label]="'ACTIONS.CREATE.THEME' | translate"
+          [ariaLabel]="'ACTIONS.CREATE.THEME.TOOLTIP' | translate"
+          [pTooltip]="'ACTIONS.CREATE.THEME.TOOLTIP' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
+        ></p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
+}

@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges } from '@angular/core'
+import { DatePipe } from '@angular/common'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { TranslateModule } from '@ngx-translate/core'
-import { CommonModule } from '@angular/common'
 
 import { CheckboxModule } from 'primeng/checkbox'
 import { FloatLabelModule } from 'primeng/floatlabel'
@@ -14,7 +14,7 @@ import { Theme } from 'src/app/shared/generated'
   selector: 'app-theme-intern',
   standalone: true,
   imports: [
-    CommonModule,
+    DatePipe,
     CheckboxModule,
     FloatLabelModule,
     FormsModule,
@@ -31,8 +31,6 @@ export class ThemeInternComponent implements OnChanges {
 
   public mandatory = false
   public operator = false
-
-  constructor() {}
 
   public ngOnChanges(): void {
     if (this.theme) {

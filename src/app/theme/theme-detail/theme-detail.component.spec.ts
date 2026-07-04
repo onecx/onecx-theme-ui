@@ -163,10 +163,10 @@ describe('ThemeDetailComponent', () => {
 
     it('should not re-initialize when route param is the same as current themeName', () => {
       const route = TestBed.inject(ActivatedRoute)
+      spyOn(route.snapshot.paramMap, 'get').and.callFake((key: string) => (key === 'name' ? 'sameName' : null))
       const paramMapSubject = new BehaviorSubject(route.snapshot.paramMap)
       spyOnProperty(route, 'paramMap').and.returnValue(paramMapSubject.asObservable())
 
-      component['themeName'] = 'sameName'
       component.ngOnInit()
       themeApiSpy.getThemeByName.calls.reset()
 
@@ -178,10 +178,10 @@ describe('ThemeDetailComponent', () => {
 
     it('should not re-initialize when route param name is null', () => {
       const route = TestBed.inject(ActivatedRoute)
+      spyOn(route.snapshot.paramMap, 'get').and.callFake((key: string) => (key === 'name' ? 'existingName' : null))
       const paramMapSubject = new BehaviorSubject(route.snapshot.paramMap)
       spyOnProperty(route, 'paramMap').and.returnValue(paramMapSubject.asObservable())
 
-      component['themeName'] = 'existingName'
       component.ngOnInit()
       themeApiSpy.getThemeByName.calls.reset()
 

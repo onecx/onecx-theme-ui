@@ -1,7 +1,8 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core'
-import { CommonModule } from '@angular/common'
+import { AsyncPipe } from '@angular/common'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
+import { firstValueFrom, map, Observable } from 'rxjs'
 
 import { Select, SelectModule } from 'primeng/select'
 import { ButtonModule } from 'primeng/button'
@@ -15,8 +16,6 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch'
 import { TooltipModule } from 'primeng/tooltip'
 import { ConfirmationService } from 'primeng/api'
 
-import { firstValueFrom, map, Observable } from 'rxjs'
-
 import { Theme } from 'src/app/shared/generated'
 import { Utils } from 'src/app/shared/utils'
 import { ChangeMode } from '../theme-detail.component'
@@ -25,7 +24,7 @@ import { ChangeMode } from '../theme-detail.component'
   selector: 'app-theme-apply',
   standalone: true,
   imports: [
-    CommonModule,
+    AsyncPipe,
     ConfirmDialogModule,
     ConfirmPopupModule,
     ButtonModule,

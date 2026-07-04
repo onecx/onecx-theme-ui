@@ -66,7 +66,6 @@
     "@webcomponents/webcomponentsjs": "^2.8.0",
     "file-saver": "^2.0.5",
     "keycloak-js": "^25.0.6",
-    "ngx-filesaver": "^19.0.0",
     "ngx-color": "^10.1.0",
     "primeflex": "^4.0.0",
     "primeicons": "^7.0.0",

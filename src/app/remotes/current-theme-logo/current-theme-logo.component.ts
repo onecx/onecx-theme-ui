@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Inject, Input } from '@angular/core'
-import { CommonModule, Location } from '@angular/common'
+import { AsyncPipe, Location } from '@angular/common'
 import { UntilDestroy } from '@ngneat/until-destroy'
 import { BehaviorSubject, first, Observable, ReplaySubject } from 'rxjs'
 
@@ -19,7 +19,7 @@ import { environment } from 'src/environments/environment'
 @Component({
   selector: 'app-current-theme-logo',
   standalone: true,
-  imports: [AngularAcceleratorModule, AngularRemoteComponentsModule, CommonModule],
+  imports: [AngularAcceleratorModule, AngularRemoteComponentsModule, AsyncPipe],
   templateUrl: './current-theme-logo.component.html'
 })
 @UntilDestroy()

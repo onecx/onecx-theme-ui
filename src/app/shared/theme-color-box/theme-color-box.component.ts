@@ -1,12 +1,11 @@
 import { Component, Input } from '@angular/core'
-import { CommonModule } from '@angular/common'
 import { TranslateModule } from '@ngx-translate/core'
 import { TooltipModule } from 'primeng/tooltip'
 
 @Component({
   selector: 'app-theme-color-box',
   standalone: true,
-  imports: [CommonModule, TooltipModule, TranslateModule],
+  imports: [TooltipModule, TranslateModule],
   styleUrls: ['./theme-color-box.component.scss'],
   templateUrl: './theme-color-box.component.html'
 })

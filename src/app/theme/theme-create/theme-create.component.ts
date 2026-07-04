@@ -1,11 +1,11 @@
 import { Component, DestroyRef, EventEmitter, inject, Input, OnChanges, Output } from '@angular/core'
-import { CommonModule } from '@angular/common'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 
 import { ButtonModule } from 'primeng/button'
 import { DialogModule } from 'primeng/dialog'
 import { FloatLabelModule } from 'primeng/floatlabel'
+import { TextareaModule } from 'primeng/textarea'
 import { InputTextModule } from 'primeng/inputtext'
 import { MessageModule } from 'primeng/message'
 import { ToastModule } from 'primeng/toast'
@@ -21,11 +21,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
   selector: 'app-theme-create',
   standalone: true,
   imports: [
-    CommonModule,
     ButtonModule,
     DialogModule,
     FloatLabelModule,
     FormsModule,
+    TextareaModule,
     InputTextModule,
     MessageModule,
     ReactiveFormsModule,
