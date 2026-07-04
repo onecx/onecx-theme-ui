@@ -23,8 +23,7 @@ import { Theme } from 'src/app/shared/generated'
     TooltipModule,
     TranslateModule
   ],
-  templateUrl: './theme-intern.component.html',
-  styleUrls: ['./theme-intern.component.scss']
+  templateUrl: './theme-intern.component.html'
 })
 export class ThemeInternComponent implements OnChanges {
   @Input() theme: Theme | undefined

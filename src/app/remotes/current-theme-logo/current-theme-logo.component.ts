@@ -10,9 +10,7 @@ import {
 } from '@onecx/angular-remote-components'
 import { AngularAcceleratorModule } from '@onecx/angular-accelerator'
 import { REMOTE_COMPONENT_CONFIG, RemoteComponentConfig } from '@onecx/angular-utils'
-import { AppConfigService } from '@onecx/angular-integration-interface'
-
-import { Theme, ThemeService } from '@onecx/angular-integration-interface'
+import { AppConfigService, Theme, ThemeService } from '@onecx/angular-integration-interface'
 
 import { Configuration, ThemesAPIService } from 'src/app/shared/generated'
 import { Utils, LogoRefType } from 'src/app/shared/utils'
