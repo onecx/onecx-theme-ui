@@ -1,9 +1,9 @@
-import { Component, DestroyRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core'
+import { Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { CommonModule, Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
-import { catchError, combineLatest, finalize, first, map, of, Observable, Subject } from 'rxjs'
+import { catchError, combineLatest, finalize, first, map, of, Observable } from 'rxjs'
 import FileSaver from 'file-saver'
 
 import { MessageModule } from 'primeng/message'

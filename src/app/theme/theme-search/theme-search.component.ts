@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { CommonModule } from '@angular/common'
 import { ActivatedRoute, Router, RouterModule } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
-import { BehaviorSubject, catchError, finalize, map, Observable, of, Subject, Subscription } from 'rxjs'
+import { BehaviorSubject, catchError, finalize, map, Observable, of, Subscription } from 'rxjs'
 
 import { ButtonModule } from 'primeng/button'
 import { CardModule } from 'primeng/card'
