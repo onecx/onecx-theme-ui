@@ -29,7 +29,7 @@ const routes: Routes = [
     BrowserAnimationsModule,
     RouterModule.forRoot(routes, {
       initialNavigation: 'enabledBlocking',
-      enableTracing: true
+      enableTracing: false
     }),
     StandaloneShellModule,
     TranslateModule.forRoot({
@@ -50,8 +50,4 @@ const routes: Routes = [
     provideAnimations()
   ]
 })
-export class AppModule {
-  constructor() {
-    console.info('OneCX Theme Module constructor')
-  }
-}
+export class AppModule {}

@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnDestroy, OnInit } from '@angular/core'
+import { Component, DestroyRef, inject, OnInit } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { CommonModule } from '@angular/common'
 import { ActivatedRoute, Router, RouterModule } from '@angular/router'
@@ -49,8 +49,7 @@ import { ThemeImportComponent } from '../theme-import/theme-import.component'
   templateUrl: './theme-search.component.html',
   styleUrls: ['./theme-search.component.scss']
 })
-export class ThemeSearchComponent implements OnInit, OnDestroy {
-  private readonly destroy$ = new Subject()
+export class ThemeSearchComponent implements OnInit {
   // data
   private readonly destroyRef = inject(DestroyRef)
   private readonly dataSubject$ = new BehaviorSubject<RowListGridData[]>([])
@@ -85,10 +84,6 @@ export class ThemeSearchComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.prepareActionButtons()
     this.loadThemes()
-  }
-  public ngOnDestroy(): void {
-    this.destroy$.next(undefined)
-    this.destroy$.complete()
   }
 
   public loadThemes(): void {

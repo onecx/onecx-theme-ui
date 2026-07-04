@@ -1,8 +1,9 @@
 import { Component, DestroyRef, EventEmitter, inject, Input, OnChanges, Output } from '@angular/core'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { CommonModule } from '@angular/common'
 import { Router, RouterModule } from '@angular/router'
 import { TranslateModule } from '@ngx-translate/core'
-import { BehaviorSubject, Observable, of } from 'rxjs'
+import { BehaviorSubject, Observable, of, Subscription } from 'rxjs'
 import { TooltipModule } from 'primeng/tooltip'
 
 import { SlotService, SLOT_SERVICE, AngularRemoteComponentsModule } from '@onecx/angular-remote-components'
@@ -42,6 +43,7 @@ export class ThemeUseComponent implements OnChanges {
   @Output() used = new EventEmitter<boolean>()
 
   private readonly destroyRef = inject(DestroyRef)
+  private slotSubscription: Subscription | undefined
   // receive the slot output
   public slotName = 'onecx-workspace-data'
   public slotEmitter = new EventEmitter<Workspace[]>()
@@ -61,7 +63,8 @@ export class ThemeUseComponent implements OnChanges {
   public ngOnChanges(): void {
     if (this.themeName) {
       // receive response from workspace
-      this.slotEmitter.subscribe((res) => {
+      this.slotSubscription?.unsubscribe()
+      this.slotSubscription = this.slotEmitter.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((res) => {
         this.workspaceData$.next(res)
         if (res.length > 0) this.used.emit(true)
         else this.used.emit(false)

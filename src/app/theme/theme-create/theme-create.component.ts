@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core'
+import { Component, DestroyRef, EventEmitter, inject, Input, OnChanges, Output } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
@@ -6,6 +6,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { ButtonModule } from 'primeng/button'
 import { DialogModule } from 'primeng/dialog'
 import { FloatLabelModule } from 'primeng/floatlabel'
+import { InputTextModule } from 'primeng/inputtext'
 import { MessageModule } from 'primeng/message'
 import { ToastModule } from 'primeng/toast'
 import { TooltipModule } from 'primeng/tooltip'
@@ -14,6 +15,7 @@ import { PortalMessageService } from '@onecx/angular-integration-interface'
 
 import { Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { themeVariables } from '../theme-detail/theme-variables'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 
 @Component({
   selector: 'app-theme-create',
@@ -24,6 +26,7 @@ import { themeVariables } from '../theme-detail/theme-variables'
     DialogModule,
     FloatLabelModule,
     FormsModule,
+    InputTextModule,
     MessageModule,
     ReactiveFormsModule,
     TranslateModule,
@@ -39,6 +42,7 @@ export class ThemeCreateComponent implements OnChanges {
   @Output() visibleChange = new EventEmitter<boolean>()
   @Output() themeCreated = new EventEmitter<Theme>()
 
+  private readonly destroyRef = inject(DestroyRef)
   public formGroup: FormGroup
 
   constructor(
@@ -83,7 +87,7 @@ export class ThemeCreateComponent implements OnChanges {
       .createTheme({
         createThemeRequest: { resource: newTheme }
       })
-      .pipe()
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
           this.message.success({ summaryKey: 'ACTIONS.CREATE.MESSAGE.OK' })

@@ -1,4 +1,5 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core'
+import { Component, DestroyRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { CommonModule, Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
@@ -49,12 +50,12 @@ export type ChangeMode = 'VIEW' | 'EDIT'
   templateUrl: './theme-detail.component.html',
   styleUrls: ['./theme-detail.component.scss']
 })
-export class ThemeDetailComponent implements OnInit, OnDestroy {
+export class ThemeDetailComponent implements OnInit {
   @ViewChild(ThemePropsComponent, { static: false }) ThemePropsComponent!: ThemePropsComponent
   @ViewChild(ThemeColorsComponent, { static: false }) ThemeColorsComponent!: ThemeColorsComponent
   @ViewChild(Tabs, { static: false }) tabComponent!: Tabs
 
-  private readonly destroy$ = new Subject()
+  private readonly destroyRef = inject(DestroyRef)
   // dialog
   public loading = true
   public exceptionKey: string | undefined = undefined
@@ -115,7 +116,7 @@ export class ThemeDetailComponent implements OnInit, OnDestroy {
     this.theme = undefined
     this.getTheme()
     // Re-initialize the component when the route parameter changes (e.g. after creating a new theme)
-    this.route.paramMap.subscribe((params) => {
+    this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const newThemeName = params.get('name')
       if (newThemeName && newThemeName !== this.themeName) {
         this.themeName = newThemeName
@@ -123,11 +124,6 @@ export class ThemeDetailComponent implements OnInit, OnDestroy {
         this.getTheme()
       }
     })
-  }
-
-  public ngOnDestroy(): void {
-    this.destroy$.next(undefined)
-    this.destroy$.complete()
   }
 
   private getTheme(): void {
