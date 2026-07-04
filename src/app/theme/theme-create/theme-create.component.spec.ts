@@ -54,6 +54,7 @@ describe('ThemeCreateComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ThemeCreateComponent)
     component = fixture.componentInstance
+    fixture.componentRef.setInput('visible', false)
     component.formGroup = new FormGroup({
       name: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(50)]),
       displayName: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(100)]),
@@ -94,14 +95,13 @@ describe('ThemeCreateComponent', () => {
   })
 
   describe('closeDialog', () => {
-    it('should reset form and emit visibleChange false', () => {
-      spyOn(component.visibleChange, 'emit')
+    it('should reset form and set visible to false', () => {
       component.formGroup.patchValue({ name: 'test' })
 
       component.closeDialog()
 
       expect(component.formGroup.value.name).toBeNull()
-      expect(component.visibleChange.emit).toHaveBeenCalledWith(false)
+      expect(component.visible()).toBeFalse()
     })
   })
 

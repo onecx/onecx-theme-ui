@@ -170,7 +170,7 @@
 
   <!-- CREATE -->
   <app-theme-create
-    [visible]="themeCreateVisible"
+    [(visible)]="themeCreateVisible"
     (visibleChange)="onThemeCreateClosed($event)"
     [themeToBeCreated]="themeForCreation"
     (themeCreated)="onThemeCreated($event)"
@@ -178,8 +178,8 @@
 
   <!-- DELETE -->
   <app-theme-delete
-    [visible]="themeDeleteVisible"
-    (visibleChange)="onThemeDeleteClosed($event)"
+    [(visible)]="themeDeleteVisible"
+    [(deleted)]="onThemeDeleted"
     [theme]="themeForUse"
     [isUsedByWorkspace]="isThemeUsedByWorkspace"
   ></app-theme-delete>

@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core'
+import { Component, DestroyRef, effect, inject, OnInit, signal, ViewChild } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { AsyncPipe, JsonPipe, Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -62,8 +62,9 @@ export class ThemeDetailComponent implements OnInit {
   public exceptionKey: string | undefined = undefined
   public changeMode: ChangeMode = 'VIEW'
   public autoApply = false
-  public themeDeleteVisible = false
-  public themeCreateVisible = false
+  public onThemeDeleted = signal(false)
+  public themeDeleteVisible = signal(false)
+  public themeCreateVisible = signal(false)
   public showOperatorMessage = true // display initially only
   public selectedTabIndex = '0'
   public dateFormat = 'medium'
@@ -107,7 +108,13 @@ export class ThemeDetailComponent implements OnInit {
     private readonly msgService: PortalMessageService,
     private readonly translate: TranslateService,
     private readonly imageApi: ImagesInternalAPIService
-  ) {}
+  ) {
+    effect(() => {
+      if (this.onThemeDeleted()) {
+        this.router.navigate(['..'], { relativeTo: this.route })
+      }
+    })
+  }
 
   ngOnInit(): void {
     this.dateFormat = this.user.lang$.getValue() === 'de' ? 'dd.MM.yyyy HH:mm:ss' : 'medium'
@@ -286,20 +293,20 @@ export class ThemeDetailComponent implements OnInit {
       name: copyOfPrefix + themeData.name,
       displayName: copyOfPrefix + themeData.displayName
     }
-    this.themeCreateVisible = true
+    this.themeCreateVisible.set(true)
   }
 
   /**
    * CREATE
    */
   public onThemeCreated(createdTheme: Theme): void {
-    this.themeCreateVisible = false
+    this.themeCreateVisible.set(false)
     this.themeForCreation = undefined
     this.router.navigate(['../' + createdTheme.name], { relativeTo: this.route })
   }
   public onThemeCreateClosed(visible: boolean): void {
     if (!visible) {
-      this.themeCreateVisible = false
+      this.themeCreateVisible.set(false)
       this.themeForCreation = undefined
     }
   }
@@ -309,12 +316,7 @@ export class ThemeDetailComponent implements OnInit {
    */
   public onDeleteTheme(theme: Theme): void {
     this.themeForUse = theme // force checking use in workspaces
-    this.themeDeleteVisible = true
-  }
-
-  public onThemeDeleteClosed(deleted: boolean): void {
-    this.themeDeleteVisible = false
-    if (deleted) this.router.navigate(['..'], { relativeTo: this.route })
+    this.themeDeleteVisible.set(true)
   }
 
   /**

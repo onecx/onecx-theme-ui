@@ -21,6 +21,7 @@ describe('ThemeDeleteComponent', () => {
   function initTestComponent(): void {
     fixture = TestBed.createComponent(ThemeDeleteComponent)
     component = fixture.componentInstance
+    fixture.componentRef.setInput('visible', false)
     fixture.detectChanges()
   }
 
@@ -75,7 +76,7 @@ describe('ThemeDeleteComponent', () => {
 
       component.onDeleteTheme({ id: 'themeId' } as any)
 
-      expect(component.visible).toBe(false)
+      expect(component.visible()).toBeFalse()
       expect(msgServiceSpy.success).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.DELETE.THEME_OK' })
     })
 
@@ -86,7 +87,7 @@ describe('ThemeDeleteComponent', () => {
 
       component.onDeleteTheme({ id: 'themeId' } as any)
 
-      expect(component.visible).toBe(false)
+      expect(component.visible()).toBeFalse()
       expect(console.error).toHaveBeenCalledWith('deleteTheme', errorResponse)
       expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({
         summaryKey: 'ACTIONS.DELETE.THEME_NOK',

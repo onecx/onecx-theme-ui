@@ -1,8 +1,8 @@
-@if (visible) {
+@if (visible()) {
   <p-dialog
     [header]="'ACTIONS.DELETE.TOOLTIP' | translate"
-    [visible]="visible"
-    (visibleChange)="visibleChange.emit(false)"
+    [visible]="true"
+    (visibleChange)="visible.set(false)"
     [modal]="true"
     [closable]="true"
     [draggable]="true"
@@ -58,7 +58,7 @@
           <p-button
             icon="pi pi-times"
             id="th_delete_action_close"
-            (onClick)="visibleChange.emit(false)"
+            (onClick)="visible.set(false)"
             [label]="'ACTIONS.NAVIGATION.CLOSE' | translate"
             [pTooltip]="'ACTIONS.NAVIGATION.CLOSE.TOOLTIP' | translate"
             tooltipPosition="top"
@@ -68,7 +68,7 @@
           <p-button
             icon="pi pi-times"
             id="th_delete_action_no"
-            (onClick)="visibleChange.emit(false)"
+            (onClick)="visible.set(false)"
             [label]="'ACTIONS.CONFIRMATION.NO' | translate"
             [pTooltip]="'ACTIONS.CONFIRMATION.NO.TOOLTIP' | translate"
             tooltipPosition="top"

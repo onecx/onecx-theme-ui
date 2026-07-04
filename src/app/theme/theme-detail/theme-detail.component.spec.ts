@@ -377,32 +377,23 @@ describe('ThemeDetailComponent', () => {
 
   describe('Theme deletion', () => {
     it('should show delete dialog', () => {
-      component.themeDeleteVisible = false
+      component.themeDeleteVisible.set(false)
 
       component.onDeleteTheme(theme)
 
-      expect(component.themeDeleteVisible).toBeTrue()
+      expect(component.themeDeleteVisible()).toBeTrue()
       expect(component.themeForUse).toEqual(theme)
     })
 
-    it('should hide delete dialog', () => {
-      component.themeDeleteVisible = true
-
-      component.onThemeDeleteClosed(false)
-
-      expect(component.themeDeleteVisible).toBeFalse()
-    })
-
-    it('should hide delete dialog on theme deleted', () => {
+    it('should navigate back on theme deleted', () => {
       const router = TestBed.inject(Router)
       spyOn(router, 'navigate')
-      themeApiSpy.deleteTheme.and.returnValue(of({}) as any)
-      component.themeDeleteVisible = true
 
-      component.onThemeDeleteClosed(true)
+      component.onThemeDeleted.set(true) // signal that theme was deleted
+      fixture.detectChanges()
+      TestBed.flushEffects()
 
       expect(router.navigate).toHaveBeenCalledOnceWith(['..'], jasmine.any(Object))
-      expect(component.themeDeleteVisible).toBeFalse()
     })
   })
 
@@ -588,7 +579,7 @@ describe('ThemeDetailComponent', () => {
       component.actions$.subscribe((actions) => {
         const deleteAction = actions.find((a) => a.id === 'th_detail_page_action_delete')
         deleteAction?.actionCallback?.()
-        expect(component.themeDeleteVisible).toBeTrue()
+        expect(component.themeDeleteVisible()).toBeTrue()
         done()
       })
     })
@@ -833,7 +824,7 @@ describe('ThemeDetailComponent', () => {
 
       component.onSaveAs(copyOfPrefix)
 
-      expect(component.themeCreateVisible).toBeTrue()
+      expect(component.themeCreateVisible()).toBeTrue()
       expect(component.themeForCreation).toBeDefined()
       expect(component.themeForCreation!.name).toBe(copyOfPrefix + theme.name)
       expect(component.themeForCreation!.displayName).toBe(copyOfPrefix + theme.displayName)
@@ -856,7 +847,7 @@ describe('ThemeDetailComponent', () => {
 
       component.onSaveAs(copyOfPrefix)
 
-      expect(component.themeCreateVisible).toBeFalse()
+      expect(component.themeCreateVisible()).toBeFalse()
     })
 
     it('should use sub-component data in EDIT mode', () => {
@@ -873,7 +864,7 @@ describe('ThemeDetailComponent', () => {
 
       component.onSaveAs(copyOfPrefix)
 
-      expect(component.themeCreateVisible).toBeTrue()
+      expect(component.themeCreateVisible()).toBeTrue()
       expect(component.themeForCreation!.name).toBe(copyOfPrefix + theme.name)
     })
 
@@ -890,7 +881,7 @@ describe('ThemeDetailComponent', () => {
 
       component.onSaveAs(copyOfPrefix)
 
-      expect(component.themeCreateVisible).toBeFalse()
+      expect(component.themeCreateVisible()).toBeFalse()
     })
   })
 
@@ -898,12 +889,12 @@ describe('ThemeDetailComponent', () => {
     it('should close dialog, clear themeForCreation and navigate', () => {
       const router = TestBed.inject(Router)
       spyOn(router, 'navigate')
-      component.themeCreateVisible = true
+      component.themeCreateVisible.set(true)
       component.themeForCreation = theme
 
       component.onThemeCreated({ name: 'newTheme' })
 
-      expect(component.themeCreateVisible).toBeFalse()
+      expect(component.themeCreateVisible()).toBeFalse()
       expect(component.themeForCreation).toBeUndefined()
       expect(router.navigate).toHaveBeenCalledWith(['../newTheme'], jasmine.any(Object))
     })
@@ -911,22 +902,22 @@ describe('ThemeDetailComponent', () => {
 
   describe('onThemeCreateClosed', () => {
     it('should close dialog and clear themeForCreation when visible is false', () => {
-      component.themeCreateVisible = true
+      component.themeCreateVisible.set(true)
       component.themeForCreation = theme
 
       component.onThemeCreateClosed(false)
 
-      expect(component.themeCreateVisible).toBeFalse()
+      expect(component.themeCreateVisible()).toBeFalse()
       expect(component.themeForCreation).toBeUndefined()
     })
 
     it('should do nothing when visible is true', () => {
-      component.themeCreateVisible = true
+      component.themeCreateVisible.set(true)
       component.themeForCreation = theme
 
       component.onThemeCreateClosed(true)
 
-      expect(component.themeCreateVisible).toBeTrue()
+      expect(component.themeCreateVisible()).toBeTrue()
       expect(component.themeForCreation).toEqual(theme)
     })
   })

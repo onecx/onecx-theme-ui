@@ -1,4 +1,4 @@
-import { Component, DestroyRef, EventEmitter, inject, Input, OnChanges, Output } from '@angular/core'
+import { Component, DestroyRef, EventEmitter, inject, Input, model, OnChanges, Output } from '@angular/core'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 
@@ -37,10 +37,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
   styleUrls: ['./theme-create.component.scss']
 })
 export class ThemeCreateComponent implements OnChanges {
-  @Input() visible = false
   @Input() themeToBeCreated: Theme | undefined
-  @Output() visibleChange = new EventEmitter<boolean>()
   @Output() themeCreated = new EventEmitter<Theme>()
+
+  public visible = model.required<boolean>()
 
   private readonly destroyRef = inject(DestroyRef)
   public formGroup: FormGroup
@@ -66,7 +66,7 @@ export class ThemeCreateComponent implements OnChanges {
 
   public closeDialog(): void {
     this.formGroup.reset()
-    this.visibleChange.emit(false)
+    this.visible.set(false)
   }
 
   public saveTheme(): void {
@@ -92,7 +92,7 @@ export class ThemeCreateComponent implements OnChanges {
         next: (response) => {
           this.message.success({ summaryKey: 'ACTIONS.CREATE.MESSAGE.OK' })
           this.themeCreated.emit(response.resource as Theme)
-          this.visibleChange.emit(false)
+          this.visible.set(false)
         },
         error: (err) => {
           this.message.error({ summaryKey: 'ACTIONS.CREATE.MESSAGE.NOK' })

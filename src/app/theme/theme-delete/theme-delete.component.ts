@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core'
+import { Component, EventEmitter, Input, model, Output } from '@angular/core'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 
 import { ButtonModule } from 'primeng/button'
@@ -19,8 +19,9 @@ import { Theme, ThemesAPIService } from 'src/app/shared/generated'
 export class ThemeDeleteComponent {
   @Input() theme: Theme | undefined
   @Input() isUsedByWorkspace = false
-  @Input() visible = false
-  @Output() visibleChange = new EventEmitter<boolean>()
+
+  public visible = model.required<boolean>()
+  public deleted = model<boolean>(false)
 
   constructor(
     private readonly themeApi: ThemesAPIService,
@@ -35,7 +36,8 @@ export class ThemeDeleteComponent {
     if (theme?.id)
       this.themeApi.deleteTheme({ id: theme.id }).subscribe({
         next: () => {
-          this.visibleChange.emit(true)
+          this.visible.set(false)
+          this.deleted.set(true)
           this.msgService.success({ summaryKey: 'ACTIONS.DELETE.THEME_OK' })
         },
         error: (err) => {
