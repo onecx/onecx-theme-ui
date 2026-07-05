@@ -1,14 +1,4 @@
-import {
-  AfterViewInit,
-  Component,
-  ChangeDetectorRef,
-  EventEmitter,
-  Input,
-  Output,
-  ViewChild,
-  OnChanges,
-  model
-} from '@angular/core'
+import { AfterViewInit, Component, ChangeDetectorRef, Input, ViewChild, OnChanges, model } from '@angular/core'
 import { HttpHeaders } from '@angular/common/http'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -50,11 +40,11 @@ import { ThemeColorBoxComponent } from 'src/app/shared/theme-color-box/theme-col
 })
 export class ThemeImportComponent implements OnChanges, AfterViewInit {
   @Input() public themes: Theme[] = []
-  @Output() public uploadEmitter = new EventEmitter<boolean>()
 
   @ViewChild('themeNameInput') themeNameInput!: HTMLInputElement
 
   public visible = model.required<boolean>()
+  public uploaded = model.required<boolean>()
 
   public themeNameExists = false
   public displayNameExists = false
@@ -72,6 +62,7 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
     private readonly msgService: PortalMessageService,
     private readonly cd: ChangeDetectorRef
   ) {
+    this.uploaded.set(false)
     this.formGroup = new FormGroup({
       themeName: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(100)]),
       displayName: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(100)])
@@ -123,9 +114,6 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
     )
   }
 
-  public onImportThemeHide(): void {
-    this.uploadEmitter.emit(false)
-  }
   public onImportThemeClear(): void {
     this.themeSnapshot = null
     this.themeImportError = false
@@ -151,7 +139,7 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
         next: () => {
           this.msgService.success({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_SUCCESS' })
           this.onImportThemeClear()
-          this.uploadEmitter.emit(true)
+          this.uploaded.set(true)
           this.router.navigate([`./${this.formGroup.controls['themeName'].value}`], { relativeTo: this.route })
         },
         error: () => {

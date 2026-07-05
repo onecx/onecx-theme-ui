@@ -1,4 +1,4 @@
-import { Component, DestroyRef, EventEmitter, inject, Input, model, OnChanges, Output } from '@angular/core'
+import { Component, DestroyRef, inject, Input, model, OnChanges } from '@angular/core'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 
@@ -38,9 +38,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 })
 export class ThemeCreateComponent implements OnChanges {
   @Input() themeToBeCreated: Theme | undefined
-  @Output() themeCreated = new EventEmitter<Theme>()
 
   public visible = model.required<boolean>()
+  public created = model.required<Theme | undefined>()
 
   private readonly destroyRef = inject(DestroyRef)
   public formGroup: FormGroup
@@ -91,7 +91,7 @@ export class ThemeCreateComponent implements OnChanges {
       .subscribe({
         next: (response) => {
           this.message.success({ summaryKey: 'ACTIONS.CREATE.MESSAGE.OK' })
-          this.themeCreated.emit(response.resource as Theme)
+          this.created.set(response.resource as Theme)
           this.visible.set(false)
         },
         error: (err) => {

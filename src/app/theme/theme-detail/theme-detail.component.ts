@@ -83,6 +83,7 @@ export class ThemeDetailComponent implements OnInit {
   public themeForProps: Theme | undefined
   public themeForColors: Theme | undefined
   public themeForCreation: Theme | undefined
+  public themeCreated = signal<Theme | undefined>(undefined)
   // image
   public imageBasePath = this.imageApi.configuration.basePath
 
@@ -112,6 +113,12 @@ export class ThemeDetailComponent implements OnInit {
     effect(() => {
       if (this.onThemeDeleted()) {
         this.router.navigate(['..'], { relativeTo: this.route })
+      }
+      const theme = this.themeCreated()
+      if (theme) {
+        this.themeCreateVisible.set(false)
+        this.themeForCreation = undefined
+        this.router.navigate(['../' + theme.name], { relativeTo: this.route })
       }
     })
   }
@@ -299,11 +306,6 @@ export class ThemeDetailComponent implements OnInit {
   /**
    * CREATE
    */
-  public onThemeCreated(createdTheme: Theme): void {
-    this.themeCreateVisible.set(false)
-    this.themeForCreation = undefined
-    this.router.navigate(['../' + createdTheme.name], { relativeTo: this.route })
-  }
   public onThemeCreateClosed(visible: boolean): void {
     if (!visible) {
       this.themeCreateVisible.set(false)

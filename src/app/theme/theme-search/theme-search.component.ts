@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core'
+import { Component, DestroyRef, effect, inject, OnInit, signal } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { AsyncPipe } from '@angular/common'
 import { ActivatedRoute, Router, RouterModule } from '@angular/router'
@@ -67,6 +67,8 @@ export class ThemeSearchComponent implements OnInit {
 
   public themeImportVisible = signal(false)
   public themeCreateVisible = signal(false)
+  public themeCreated = signal<Theme | undefined>(undefined)
+  public themeImported = signal(false)
   public Utils = Utils
 
   // image
@@ -79,7 +81,18 @@ export class ThemeSearchComponent implements OnInit {
     private readonly themeApi: ThemesAPIService,
     private readonly translate: TranslateService,
     private readonly imageApi: ImagesInternalAPIService
-  ) {}
+  ) {
+    effect(() => {
+      const theme = this.themeCreated()
+      if (theme) {
+        this.router.navigate(['./' + theme.name], { relativeTo: this.route })
+      }
+      if (this.themeImported()) {
+        this.themeImportVisible.set(false)
+        this.loadThemes()
+      }
+    })
+  }
 
   ngOnInit(): void {
     this.prepareActionButtons()
@@ -142,10 +155,6 @@ export class ThemeSearchComponent implements OnInit {
       )
   }
 
-  public onThemeCreated(theme: Theme): void {
-    this.router.navigate(['./' + theme.name], { relativeTo: this.route })
-  }
-
   /**
    * FILTER & SORT Events
    */
@@ -181,10 +190,5 @@ export class ThemeSearchComponent implements OnInit {
 
   public onImportThemeClick(): void {
     this.themeImportVisible.set(true)
-  }
-
-  public onThemeUpload(uploaded: boolean) {
-    this.themeImportVisible.set(false)
-    if (uploaded) this.loadThemes()
   }
 }

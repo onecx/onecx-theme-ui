@@ -885,14 +885,16 @@ describe('ThemeDetailComponent', () => {
     })
   })
 
-  describe('onThemeCreated', () => {
+  describe('theme creation', () => {
     it('should close dialog, clear themeForCreation and navigate', () => {
       const router = TestBed.inject(Router)
       spyOn(router, 'navigate')
       component.themeCreateVisible.set(true)
       component.themeForCreation = theme
 
-      component.onThemeCreated({ name: 'newTheme' })
+      component.themeCreated.set({ name: 'newTheme' })
+      fixture.detectChanges()
+      TestBed.flushEffects()
 
       expect(component.themeCreateVisible()).toBeFalse()
       expect(component.themeForCreation).toBeUndefined()

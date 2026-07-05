@@ -173,7 +173,7 @@
     [(visible)]="themeCreateVisible"
     (visibleChange)="onThemeCreateClosed($event)"
     [themeToBeCreated]="themeForCreation"
-    (themeCreated)="onThemeCreated($event)"
+    [(created)]="themeCreated"
   ></app-theme-create>
 
   <!-- DELETE -->

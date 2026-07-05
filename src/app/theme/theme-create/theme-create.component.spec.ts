@@ -106,18 +106,16 @@ describe('ThemeCreateComponent', () => {
   })
 
   describe('saveTheme', () => {
-    it('should create a theme and emit themeCreated', () => {
-      spyOn(component.themeCreated, 'emit')
+    it('should create a theme and set created', () => {
       themeApiServiceSpy.createTheme.and.returnValue(of({ resource: theme }))
 
       component.saveTheme()
 
       expect(msgServiceSpy.success).toHaveBeenCalledWith({ summaryKey: 'ACTIONS.CREATE.MESSAGE.OK' })
-      expect(component.themeCreated.emit).toHaveBeenCalledWith(theme)
+      expect(component.created()).toEqual(theme)
     })
 
     it('should use themeToBeCreated properties when set', () => {
-      spyOn(component.themeCreated, 'emit')
       component.themeToBeCreated = { ...theme, properties: { general: { 'primary-color': '#000' } } }
       themeApiServiceSpy.createTheme.and.returnValue(of({ resource: theme }))
 

@@ -207,13 +207,13 @@
     }
 
     <!-- CREATE -->
-    <app-theme-create [(visible)]="themeCreateVisible" (themeCreated)="onThemeCreated($event)"></app-theme-create>
+    <app-theme-create [(visible)]="themeCreateVisible" [(created)]="themeCreated"></app-theme-create>
 
     <!-- IMPORT -->
     <app-theme-import
       [themes]="convertToThemes(data)"
       [(visible)]="themeImportVisible"
-      (uploadEmitter)="onThemeUpload($event)"
+      [(uploaded)]="themeImported"
     ></app-theme-import>
   </ocx-content>
 </ocx-portal-page>

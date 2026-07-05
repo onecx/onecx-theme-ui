@@ -175,30 +175,27 @@ describe('ThemeSearchComponent', () => {
 
     expect(component.themeImportVisible()).toBe(true)
   })
-  it('should hide import dialog on import close', () => {
-    fixture.detectChanges()
 
-    component.themeImportVisible.set(true)
-    component.onThemeUpload(false)
-
-    expect(component.themeImportVisible()).toBeFalse()
-  })
   it('should hide import dialog on import close and reload', () => {
     fixture.detectChanges()
     spyOn(component, 'loadThemes')
 
     component.themeImportVisible.set(true)
-    component.onThemeUpload(true)
+    component.themeImported.set(true)
+    fixture.detectChanges()
+    TestBed.flushEffects()
 
     expect(component.themeImportVisible()).toBeFalse()
     expect(component.loadThemes).toHaveBeenCalledTimes(1)
   })
 
-  it('should navigate to created theme on onThemeCreated', () => {
+  it('should navigate to created theme on theme creation', () => {
     fixture.detectChanges()
     const router = TestBed.inject(Router)
 
-    component.onThemeCreated({ name: 'new-theme' } as Theme)
+    component.themeCreated.set({ name: 'new-theme' } as Theme)
+    fixture.detectChanges()
+    TestBed.flushEffects()
 
     expect(router.navigate).toHaveBeenCalledWith(['./new-theme'], { relativeTo: (component as any).route })
   })

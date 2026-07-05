@@ -7,7 +7,6 @@
     [resizable]="true"
     [closable]="true"
     [modal]="true"
-    (onHide)="onImportThemeHide()"
     [style]="{ 'max-width': '700px' }"
   >
     <p-fileUpload
@@ -100,7 +99,7 @@
         <p-button
           icon="pi pi-times"
           id="th_import_button_close"
-          (onClick)="onImportThemeHide()"
+          (onClick)="visible.set(false)"
           [label]="'ACTIONS.NAVIGATION.CLOSE' | translate"
           [ariaLabel]="'ACTIONS.NAVIGATION.CLOSE' | translate"
           [pTooltip]="'ACTIONS.NAVIGATION.CLOSE.TOOLTIP' | translate"
