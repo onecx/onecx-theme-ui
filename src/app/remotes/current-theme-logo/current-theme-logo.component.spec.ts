@@ -50,12 +50,12 @@ describe('OneCXCurrentThemeLogoComponent', () => {
         }).withDefaultLanguage('en')
       ],
       providers: [
-        { provide: REMOTE_COMPONENT_CONFIG, useValue: baseUrlSubject },
-        { provide: SlotService, useValue: slotServiceSpy },
-        { provide: ThemeService, useValue: mockThemeService },
         provideHttpClient(),
         provideHttpClientTesting(),
-        provideNoopAnimations()
+        provideNoopAnimations(),
+        { provide: REMOTE_COMPONENT_CONFIG, useValue: baseUrlSubject },
+        { provide: SlotService, useValue: slotServiceSpy },
+        { provide: ThemeService, useValue: mockThemeService }
       ]
     })
       .overrideComponent(OneCXCurrentThemeLogoComponent, {

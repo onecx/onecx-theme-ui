@@ -35,8 +35,8 @@ describe('ThemeDeleteComponent', () => {
         }).withDefaultLanguage('de')
       ],
       providers: [
-        provideHttpClientTesting(),
         provideHttpClient(),
+        provideHttpClientTesting(),
         provideRouter([{ path: '', component: ThemeDeleteComponent }]),
         { provide: PortalMessageService, useValue: msgServiceSpy },
         { provide: ThemesAPIService, useValue: themesApiSpy }

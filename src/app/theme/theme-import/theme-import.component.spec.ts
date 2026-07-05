@@ -36,8 +36,8 @@ describe('ThemeImportComponent', () => {
         }).withDefaultLanguage('en')
       ],
       providers: [
-        provideHttpClientTesting(),
         provideHttpClient(),
+        provideHttpClientTesting(),
         provideRouter([{ path: '', component: ThemeImportComponent }]),
         { provide: PortalMessageService, useValue: msgServiceSpy },
         { provide: ThemesAPIService, useValue: themeApiSpy }

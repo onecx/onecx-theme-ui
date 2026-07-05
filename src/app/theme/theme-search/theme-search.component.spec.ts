@@ -31,8 +31,8 @@ describe('ThemeSearchComponent', () => {
         }).withDefaultLanguage('en')
       ],
       providers: [
-        provideHttpClientTesting(),
         provideHttpClient(),
+        provideHttpClientTesting(),
         provideRouter([{ path: '', component: ThemeSearchComponent }]),
         { provide: ThemesAPIService, useValue: themeApiSpy },
         { provide: Router, useValue: mockRouter },

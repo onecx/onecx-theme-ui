@@ -58,11 +58,11 @@ describe('OneCXThemeDataComponent', () => {
         }).withDefaultLanguage('en')
       ],
       providers: [
-        { provide: REMOTE_COMPONENT_CONFIG, useValue: baseUrlSubject },
-        { provide: SlotService, useValue: slotServiceSpy },
         provideHttpClient(),
         provideHttpClientTesting(),
-        provideNoopAnimations()
+        provideNoopAnimations(),
+        { provide: REMOTE_COMPONENT_CONFIG, useValue: baseUrlSubject },
+        { provide: SlotService, useValue: slotServiceSpy }
       ]
     })
       .overrideComponent(OneCXThemeDataComponent, {
