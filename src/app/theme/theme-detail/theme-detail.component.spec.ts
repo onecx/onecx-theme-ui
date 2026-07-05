@@ -392,6 +392,7 @@ describe('ThemeDetailComponent', () => {
       component.themeDeleted.set(true) // signal that theme was deleted
       fixture.detectChanges()
       TestBed.flushEffects()
+      component.onThemeDeleted(true) // signal that theme was deleted
 
       expect(router.navigate).toHaveBeenCalledOnceWith(['..'], jasmine.any(Object))
     })

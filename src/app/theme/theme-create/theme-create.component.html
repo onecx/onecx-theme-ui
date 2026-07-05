@@ -1,6 +1,6 @@
 @if (visible()) {
   <p-dialog
-    [header]="'DIALOG.HEADER.' + (themeToBeCreated ? 'SAVE_AS' : 'CREATE') | translate"
+    [header]="'DIALOG.HEADER.' + (themeToBeCreated() ? 'SAVE_AS' : 'CREATE') | translate"
     [visible]="true"
     (visibleChange)="visible.set(false)"
     [modal]="true"
@@ -64,7 +64,7 @@
         </label>
       </p-float-label>
 
-      @if (!themeToBeCreated) {
+      @if (!themeToBeCreated()) {
         <div class="text-center">
           <p-message id="th_create_hint" severity="info" [text]="'ACTIONS.CREATE.THEME.HINT' | translate"></p-message>
         </div>

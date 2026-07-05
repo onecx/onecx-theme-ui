@@ -1,4 +1,4 @@
-import { Component, DestroyRef, effect, inject, OnInit, signal, ViewChild } from '@angular/core'
+import { Component, DestroyRef, effect, inject, OnInit, signal, untracked, ViewChild } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { AsyncPipe, JsonPipe, Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -57,6 +57,11 @@ export class ThemeDetailComponent implements OnInit {
   @ViewChild(Tabs, { static: false }) tabComponent!: Tabs
 
   private readonly destroyRef = inject(DestroyRef)
+  // signals
+  public themeCreated = signal<Theme | undefined>(undefined)
+  public themeDeleted = signal<boolean>(false)
+  public themeDeleteVisible = signal<boolean>(false)
+  public themeCreateVisible = signal<boolean>(false)
   // dialog
   public loading = true
   public exceptionKey: string | undefined = undefined
@@ -68,11 +73,6 @@ export class ThemeDetailComponent implements OnInit {
   public isThemeUsedByWorkspace = false
   public isCurrentTheme = false
   public Utils = Utils
-  // signals
-  public themeCreated = signal<Theme | undefined>(undefined)
-  public themeDeleted = signal(false)
-  public themeDeleteVisible = signal(false)
-  public themeCreateVisible = signal(false)
   // page header
   public actions$: Observable<Action[]> = of([])
   public headerImageUrl?: string
@@ -113,7 +113,7 @@ export class ThemeDetailComponent implements OnInit {
   ) {
     effect(() => {
       if (this.themeDeleted()) {
-        this.router.navigate(['..'], { relativeTo: this.route })
+        this.themeDeleted.set(false)
       }
       const theme = this.themeCreated()
       if (theme) {
@@ -479,5 +479,11 @@ export class ThemeDetailComponent implements OnInit {
       this.themeForColors = response.resource
       this.msgService.info({ summaryKey: 'THEME.TEMPLATE.CONFIRMATION.OK' })
     })
+  }
+
+  public onThemeDeleted(deleted: boolean): void {
+    if (deleted) {
+      this.router.navigate(['..'], { relativeTo: this.route })
+    }
   }
 }

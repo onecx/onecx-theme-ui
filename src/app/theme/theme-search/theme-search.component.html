@@ -207,13 +207,17 @@
     }
 
     <!-- CREATE -->
-    <app-theme-create [(visible)]="themeCreateVisible" [(created)]="themeCreated"></app-theme-create>
+    <app-theme-create
+      [(visible)]="themeCreateVisible"
+      [(created)]="themeCreated"
+      [themeToBeCreated]="undefined"
+    ></app-theme-create>
 
     <!-- IMPORT -->
     <app-theme-import
-      [themes]="convertToThemes(data)"
       [(visible)]="themeImportVisible"
       [(uploaded)]="themeImported"
+      [themes]="convertToThemes(data)"
     ></app-theme-import>
   </ocx-content>
 </ocx-portal-page>

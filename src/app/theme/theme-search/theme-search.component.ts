@@ -50,6 +50,11 @@ import { ThemeImportComponent } from '../theme-import/theme-import.component'
   styleUrls: ['./theme-search.component.scss']
 })
 export class ThemeSearchComponent implements OnInit {
+  // signals
+  public themeImportVisible = signal(false)
+  public themeCreateVisible = signal(false)
+  public themeCreated = signal<Theme | undefined>(undefined)
+  public themeImported = signal(false)
   // data
   private readonly destroyRef = inject(DestroyRef)
   private readonly dataSubject$ = new BehaviorSubject<RowListGridData[]>([])
@@ -68,11 +73,6 @@ export class ThemeSearchComponent implements OnInit {
   // image
   public imageBasePath = this.imageApi.configuration.basePath
   public LogoRefType = LogoRefType
-  // signals
-  public themeImportVisible = signal(false)
-  public themeCreateVisible = signal(false)
-  public themeCreated = signal<Theme | undefined>(undefined)
-  public themeImported = signal(false)
 
   constructor(
     public readonly route: ActivatedRoute,

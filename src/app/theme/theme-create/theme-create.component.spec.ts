@@ -54,7 +54,6 @@ describe('ThemeCreateComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ThemeCreateComponent)
     component = fixture.componentInstance
-    fixture.componentRef.setInput('visible', false)
     component.formGroup = new FormGroup({
       name: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(50)]),
       displayName: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(100)]),
@@ -73,11 +72,11 @@ describe('ThemeCreateComponent', () => {
     expect(component).toBeTruthy()
   })
 
-  describe('ngOnChanges', () => {
+  describe('initialize dialog', () => {
     it('should reset form and patch values from themeToBeCreated', () => {
-      component.themeToBeCreated = theme
-
-      component.ngOnChanges()
+      component.themeToBeCreated.set(theme)
+      fixture.detectChanges()
+      TestBed.flushEffects()
 
       expect(component.formGroup.value.name).toBe(theme.name)
       expect(component.formGroup.value.displayName).toBe(theme.displayName)
@@ -85,10 +84,13 @@ describe('ThemeCreateComponent', () => {
     })
 
     it('should reset form without patching when themeToBeCreated is undefined', () => {
-      component.formGroup.patchValue({ name: 'existingName' })
-      component.themeToBeCreated = undefined
+      component.themeToBeCreated.set(theme)
+      fixture.detectChanges()
+      TestBed.flushEffects()
 
-      component.ngOnChanges()
+      component.themeToBeCreated.set(undefined)
+      fixture.detectChanges()
+      TestBed.flushEffects()
 
       expect(component.formGroup.value.name).toBeNull()
     })
@@ -116,7 +118,7 @@ describe('ThemeCreateComponent', () => {
     })
 
     it('should use themeToBeCreated properties when set', () => {
-      component.themeToBeCreated = { ...theme, properties: { general: { 'primary-color': '#000' } } }
+      component.themeToBeCreated.set({ ...theme, properties: { general: { 'primary-color': '#000' } } })
       themeApiServiceSpy.createTheme.and.returnValue(of({ resource: theme }))
 
       component.saveTheme()

@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, Input, model, OnChanges } from '@angular/core'
+import { Component, DestroyRef, effect, inject, model, OnChanges } from '@angular/core'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 
@@ -36,11 +36,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
   templateUrl: './theme-create.component.html',
   styleUrls: ['./theme-create.component.scss']
 })
-export class ThemeCreateComponent implements OnChanges {
-  @Input() themeToBeCreated: Theme | undefined
-
+export class ThemeCreateComponent {
   public visible = model.required<boolean>()
   public created = model.required<Theme | undefined>()
+  public themeToBeCreated = model<Theme | undefined>()
 
   private readonly destroyRef = inject(DestroyRef)
   public formGroup: FormGroup
@@ -56,13 +55,13 @@ export class ThemeCreateComponent implements OnChanges {
       displayName: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(100)]),
       description: new FormControl(null, [Validators.maxLength(255)])
     })
-  }
-
-  public ngOnChanges(): void {
-    this.formGroup.reset()
-    if (this.themeToBeCreated) {
-      this.formGroup.patchValue(this.themeToBeCreated)
-    }
+    effect(() => {
+      this.formGroup.reset()
+      const theme = this.themeToBeCreated()
+      if (theme) {
+        this.formGroup.patchValue(theme)
+      }
+    })
   }
 
   public closeDialog(): void {
@@ -79,9 +78,9 @@ export class ThemeCreateComponent implements OnChanges {
         currentVars[tv[0]][v] = getComputedStyle(document.documentElement).getPropertyValue(`--${v}`)
     }
     const newTheme: Theme = {
-      ...this.themeToBeCreated,
+      ...this.themeToBeCreated(),
       ...this.formGroup.value,
-      properties: this.themeToBeCreated?.properties ?? currentVars
+      properties: this.themeToBeCreated()?.properties ?? currentVars
     }
     // create
     this.themesApi

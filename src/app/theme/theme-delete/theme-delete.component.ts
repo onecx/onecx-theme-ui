@@ -1,4 +1,4 @@
-import { Component, Input, model } from '@angular/core'
+import { Component, effect, Input, model } from '@angular/core'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 
 import { ButtonModule } from 'primeng/button'
@@ -17,11 +17,12 @@ import { Theme, ThemesAPIService } from 'src/app/shared/generated'
   templateUrl: './theme-delete.component.html'
 })
 export class ThemeDeleteComponent {
-  @Input() theme: Theme | undefined
   @Input() isUsedByWorkspace = false
 
   public visible = model.required<boolean>()
   public deleted = model.required<boolean>()
+  public themeToBeDeleted = model<Theme | undefined>()
+  public theme: Theme | undefined
 
   constructor(
     private readonly themeApi: ThemesAPIService,
@@ -29,6 +30,9 @@ export class ThemeDeleteComponent {
     private readonly translate: TranslateService
   ) {
     this.deleted.set(false)
+    effect(() => {
+      this.theme = this.themeToBeDeleted()
+    })
   }
 
   /**
@@ -38,8 +42,8 @@ export class ThemeDeleteComponent {
     if (theme?.id)
       this.themeApi.deleteTheme({ id: theme.id }).subscribe({
         next: () => {
-          this.visible.set(false)
           this.deleted.set(true)
+          this.visible.set(false)
           this.msgService.success({ summaryKey: 'ACTIONS.DELETE.THEME_OK' })
         },
         error: (err) => {

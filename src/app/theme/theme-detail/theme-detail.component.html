@@ -179,7 +179,8 @@
   <app-theme-delete
     [(visible)]="themeDeleteVisible"
     [(deleted)]="themeDeleted"
-    [theme]="themeForUse"
+    (deletedChange)="onThemeDeleted($event)"
+    [themeToBeDeleted]="themeForUse"
     [isUsedByWorkspace]="isThemeUsedByWorkspace"
   ></app-theme-delete>
 </ocx-portal-page>
