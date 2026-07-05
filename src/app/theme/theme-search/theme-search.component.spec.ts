@@ -180,12 +180,10 @@ describe('ThemeSearchComponent', () => {
     fixture.detectChanges()
     spyOn(component, 'loadThemes')
 
-    component.themeImportVisible.set(true)
     component.themeImported.set(true)
     fixture.detectChanges()
     TestBed.flushEffects()
 
-    expect(component.themeImportVisible()).toBeFalse()
     expect(component.loadThemes).toHaveBeenCalledTimes(1)
   })
 

@@ -389,7 +389,7 @@ describe('ThemeDetailComponent', () => {
       const router = TestBed.inject(Router)
       spyOn(router, 'navigate')
 
-      component.onThemeDeleted.set(true) // signal that theme was deleted
+      component.themeDeleted.set(true) // signal that theme was deleted
       fixture.detectChanges()
       TestBed.flushEffects()
 
@@ -828,14 +828,6 @@ describe('ThemeDetailComponent', () => {
       expect(component.themeForCreation).toBeDefined()
       expect(component.themeForCreation!.name).toBe(copyOfPrefix + theme.name)
       expect(component.themeForCreation!.displayName).toBe(copyOfPrefix + theme.displayName)
-    })
-
-    it('should reset metadata fields on themeForCreation', () => {
-      component.changeMode = 'VIEW'
-      component.theme = theme
-
-      component.onSaveAs(copyOfPrefix)
-
       expect(component.themeForCreation!.id).toBeUndefined()
       expect(component.themeForCreation!.operator).toBeUndefined()
       expect(component.themeForCreation!.modificationCount).toBeUndefined()
@@ -886,41 +878,30 @@ describe('ThemeDetailComponent', () => {
   })
 
   describe('theme creation', () => {
-    it('should close dialog, clear themeForCreation and navigate', () => {
+    it('should clear theme for creation and navigate on theme creation', () => {
       const router = TestBed.inject(Router)
       spyOn(router, 'navigate')
-      component.themeCreateVisible.set(true)
       component.themeForCreation = theme
 
       component.themeCreated.set({ name: 'newTheme' })
       fixture.detectChanges()
       TestBed.flushEffects()
 
-      expect(component.themeCreateVisible()).toBeFalse()
       expect(component.themeForCreation).toBeUndefined()
       expect(router.navigate).toHaveBeenCalledWith(['../newTheme'], jasmine.any(Object))
     })
-  })
 
-  describe('onThemeCreateClosed', () => {
-    it('should close dialog and clear themeForCreation when visible is false', () => {
-      component.themeCreateVisible.set(true)
+    it('should clear theme for creation when dialog was closed', () => {
       component.themeForCreation = theme
+      component.themeCreateVisible.set(true)
+      fixture.detectChanges()
+      TestBed.flushEffects()
 
-      component.onThemeCreateClosed(false)
+      component.themeCreateVisible.set(false)
+      fixture.detectChanges()
+      TestBed.flushEffects()
 
-      expect(component.themeCreateVisible()).toBeFalse()
       expect(component.themeForCreation).toBeUndefined()
-    })
-
-    it('should do nothing when visible is true', () => {
-      component.themeCreateVisible.set(true)
-      component.themeForCreation = theme
-
-      component.onThemeCreateClosed(true)
-
-      expect(component.themeCreateVisible()).toBeTrue()
-      expect(component.themeForCreation).toEqual(theme)
     })
   })
 })

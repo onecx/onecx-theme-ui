@@ -21,13 +21,15 @@ export class ThemeDeleteComponent {
   @Input() isUsedByWorkspace = false
 
   public visible = model.required<boolean>()
-  public deleted = model<boolean>(false)
+  public deleted = model.required<boolean>()
 
   constructor(
     private readonly themeApi: ThemesAPIService,
     private readonly msgService: PortalMessageService,
     private readonly translate: TranslateService
-  ) {}
+  ) {
+    this.deleted.set(false)
+  }
 
   /**
    * DELETE

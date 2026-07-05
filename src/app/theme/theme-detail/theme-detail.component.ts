@@ -62,15 +62,17 @@ export class ThemeDetailComponent implements OnInit {
   public exceptionKey: string | undefined = undefined
   public changeMode: ChangeMode = 'VIEW'
   public autoApply = false
-  public onThemeDeleted = signal(false)
-  public themeDeleteVisible = signal(false)
-  public themeCreateVisible = signal(false)
   public showOperatorMessage = true // display initially only
   public selectedTabIndex = '0'
   public dateFormat = 'medium'
   public isThemeUsedByWorkspace = false
   public isCurrentTheme = false
   public Utils = Utils
+  // signals
+  public themeCreated = signal<Theme | undefined>(undefined)
+  public themeDeleted = signal(false)
+  public themeDeleteVisible = signal(false)
+  public themeCreateVisible = signal(false)
   // page header
   public actions$: Observable<Action[]> = of([])
   public headerImageUrl?: string
@@ -83,7 +85,6 @@ export class ThemeDetailComponent implements OnInit {
   public themeForProps: Theme | undefined
   public themeForColors: Theme | undefined
   public themeForCreation: Theme | undefined
-  public themeCreated = signal<Theme | undefined>(undefined)
   // image
   public imageBasePath = this.imageApi.configuration.basePath
 
@@ -111,14 +112,15 @@ export class ThemeDetailComponent implements OnInit {
     private readonly imageApi: ImagesInternalAPIService
   ) {
     effect(() => {
-      if (this.onThemeDeleted()) {
+      if (this.themeDeleted()) {
         this.router.navigate(['..'], { relativeTo: this.route })
       }
       const theme = this.themeCreated()
       if (theme) {
-        this.themeCreateVisible.set(false)
-        this.themeForCreation = undefined
         this.router.navigate(['../' + theme.name], { relativeTo: this.route })
+      }
+      if (!this.themeCreateVisible()) {
+        this.themeForCreation = undefined
       }
     })
   }
@@ -284,7 +286,10 @@ export class ThemeDetailComponent implements OnInit {
         })
   }
 
-  // SAVE AS => collect current theme data and pass it to the creation dialog
+  /**
+   * CREATE
+   */
+  // SAVE AS => prepare theme data and pass it to the creation dialog
   public onSaveAs(copyOfPrefix: string): void {
     let themeData: Theme | undefined
     if (this.changeMode === 'EDIT') {
@@ -301,16 +306,6 @@ export class ThemeDetailComponent implements OnInit {
       displayName: copyOfPrefix + themeData.displayName
     }
     this.themeCreateVisible.set(true)
-  }
-
-  /**
-   * CREATE
-   */
-  public onThemeCreateClosed(visible: boolean): void {
-    if (!visible) {
-      this.themeCreateVisible.set(false)
-      this.themeForCreation = undefined
-    }
   }
 
   /**

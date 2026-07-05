@@ -50,6 +50,7 @@ export class ThemeCreateComponent implements OnChanges {
     private readonly message: PortalMessageService,
     private readonly translate: TranslateService
   ) {
+    this.created.set(undefined)
     this.formGroup = new FormGroup({
       name: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(50)]),
       displayName: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(100)]),

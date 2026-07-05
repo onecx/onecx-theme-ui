@@ -64,16 +64,15 @@ export class ThemeSearchComponent implements OnInit {
   public globalFilterValue = ''
   public sortDirection: DataSortDirection = DataSortDirection.ASCENDING
   public sortField = 'displayName'
-
+  public Utils = Utils
+  // image
+  public imageBasePath = this.imageApi.configuration.basePath
+  public LogoRefType = LogoRefType
+  // signals
   public themeImportVisible = signal(false)
   public themeCreateVisible = signal(false)
   public themeCreated = signal<Theme | undefined>(undefined)
   public themeImported = signal(false)
-  public Utils = Utils
-
-  // image
-  public imageBasePath = this.imageApi.configuration.basePath
-  public LogoRefType = LogoRefType
 
   constructor(
     public readonly route: ActivatedRoute,
@@ -88,7 +87,6 @@ export class ThemeSearchComponent implements OnInit {
         this.router.navigate(['./' + theme.name], { relativeTo: this.route })
       }
       if (this.themeImported()) {
-        this.themeImportVisible.set(false)
         this.loadThemes()
       }
     })
