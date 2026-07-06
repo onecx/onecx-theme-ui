@@ -1,9 +1,9 @@
-import { Component, DestroyRef, effect, inject, OnInit, signal, ViewChild } from '@angular/core'
+import { Component, DestroyRef, effect, EventEmitter, inject, OnInit, signal, ViewChild } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { AsyncPipe, JsonPipe, Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
-import { catchError, combineLatest, finalize, first, map, of, Observable } from 'rxjs'
+import { catchError, combineLatest, finalize, first, map, of, Observable, Subscription } from 'rxjs'
 import FileSaver from 'file-saver'
 
 import { MessageModule } from 'primeng/message'
@@ -14,6 +14,7 @@ import { PortalMessageService, ThemeService, UserService } from '@onecx/angular-
 
 import { Action, AngularAcceleratorModule } from '@onecx/angular-accelerator'
 import { PortalPageComponent } from '@onecx/angular-utils'
+import { SlotService } from '@onecx/angular-remote-components'
 
 import { Utils, LogoRefType } from 'src/app/shared/utils'
 import { ExportThemeRequest, ImagesInternalAPIService, Theme, ThemesAPIService } from 'src/app/shared/generated'
@@ -21,12 +22,16 @@ import { ExportThemeRequest, ImagesInternalAPIService, Theme, ThemesAPIService }
 import { ThemeApplyComponent } from './theme-apply/theme-apply.component'
 import { ThemeColorsComponent } from './theme-colors/theme-colors.component'
 import { ThemePropsComponent } from './theme-props/theme-props.component'
-import { ThemeUseComponent } from './theme-use/theme-use.component'
+import { ThemeUseComponent, Workspace } from './theme-use/theme-use.component'
 import { ThemeInternComponent } from './theme-intern/theme-intern.component'
 import { ThemeCreateComponent } from '../theme-create/theme-create.component'
 import { ThemeDeleteComponent } from '../theme-delete/theme-delete.component'
 
 export type ChangeMode = 'VIEW' | 'EDIT'
+export type LoadingState = 'ready' | 'loading' | 'timeout'
+export function slotInitializer(slotService: SlotService) {
+  return () => slotService.init()
+}
 
 @Component({
   standalone: true,
@@ -58,10 +63,19 @@ export class ThemeDetailComponent implements OnInit {
 
   private readonly destroyRef = inject(DestroyRef)
   // signals
-  public themeCreated = signal<Theme | undefined>(undefined)
-  public themeDeleted = signal<boolean>(false)
-  public themeDeleteVisible = signal<boolean>(false)
-  public themeCreateVisible = signal<boolean>(false)
+  public readonly themeCreated = signal<Theme | undefined>(undefined)
+  public readonly themeDeleted = signal<boolean>(false)
+  public readonly themeDeleteVisible = signal<boolean>(false)
+  public readonly themeCreateVisible = signal<boolean>(false)
+  public readonly themeToBeDeleted = signal<Theme | undefined>(undefined)
+  public readonly checkThemeUse = signal<boolean>(false)
+  public readonly isComponentDefined = signal<boolean>(false)
+  public readonly themeUsed = signal<boolean>(false)
+  public readonly themeUsedName = signal<string | undefined>(undefined)
+  public readonly themeUsedByWorkspaces = signal<Workspace[]>([])
+  public readonly themeUseLoadingState = signal<LoadingState>('ready')
+  private themeUseTimeoutTimer: ReturnType<typeof setTimeout> | undefined
+
   // dialog
   public loading = true
   public exceptionKey: string | undefined = undefined
@@ -81,12 +95,15 @@ export class ThemeDetailComponent implements OnInit {
   public theme$!: Observable<Theme | undefined>
   public themes$!: Observable<Theme[]>
   public theme: Theme | undefined
-  public themeForUse: Theme | undefined
   public themeForProps: Theme | undefined
   public themeForColors: Theme | undefined
   public themeForCreation: Theme | undefined
   // image
   public imageBasePath = this.imageApi.configuration.basePath
+  // receive the slot output
+  public slotName = 'onecx-workspace-data'
+  public slotEmitter = new EventEmitter<Workspace[]>()
+  private slotSubscription: Subscription | undefined
 
   // Partial theme with undefined values for internal use (copying, editing) to prevent issues with form patching and image url handling when required properties are missing
   private readonly undefinedThemeData = {
@@ -109,8 +126,18 @@ export class ThemeDetailComponent implements OnInit {
     private readonly themeService: ThemeService,
     private readonly msgService: PortalMessageService,
     private readonly translate: TranslateService,
-    private readonly imageApi: ImagesInternalAPIService
+    private readonly imageApi: ImagesInternalAPIService,
+    private readonly slotService: SlotService
   ) {
+    slotInitializer(slotService)
+    this.slotService
+      .isSomeComponentDefinedForSlot(this.slotName)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((isDefined) => {
+        this.isComponentDefined.set(isDefined)
+      })
+    this.getWorkspaceData()
+
     effect(() => {
       if (this.themeDeleted()) {
         this.themeDeleted.set(false)
@@ -154,14 +181,14 @@ export class ThemeDetailComponent implements OnInit {
           this.isCurrentTheme = ct.name === response.resource.name
           this.autoApply = this.isCurrentTheme
           this.prepareHeaderUrl(response.resource)
-          this.preparePageActions(true, response.resource)
+          this.preparePageActions(response.resource)
           return response.resource
         }),
         catchError((err) => {
           this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + Utils.mapping_error_status(err.status) + '.THEME'
           console.error('getThemeByName', err)
           this.prepareHeaderUrl()
-          this.preparePageActions(true)
+          this.preparePageActions()
           return of(undefined)
         }),
         finalize(() => {
@@ -209,7 +236,9 @@ export class ThemeDetailComponent implements OnInit {
     if (theme) {
       this.showOperatorMessage = false
       this.selectedTabIndex = typeof tabValue === 'number' ? tabValue.toString() : tabValue
-      if (this.selectedTabIndex === '3') this.themeForUse = theme
+      if (this.selectedTabIndex === '3') {
+        this.startGettingThemeUseData(theme?.name)
+      }
     } else this.selectedTabIndex = '0'
   }
 
@@ -225,7 +254,7 @@ export class ThemeDetailComponent implements OnInit {
     this.changeMode = requestedMode
     if (requestedMode === 'VIEW') {
       this.initSubComponentData(theme) // use originally loaded theme data
-      this.preparePageActions(this.isThemeUsedByWorkspace, theme)
+      this.preparePageActions(theme)
     }
     if (requestedMode === 'EDIT') {
       if (Number(this.selectedTabIndex) > 1) this.selectedTabIndex = '0'
@@ -312,8 +341,38 @@ export class ThemeDetailComponent implements OnInit {
    * DELETE
    */
   public onDeleteTheme(theme: Theme): void {
-    this.themeForUse = theme // force checking use in workspaces
+    this.themeToBeDeleted.set(theme)
+    this.startGettingThemeUseData(theme?.name)
     this.themeDeleteVisible.set(true)
+  }
+
+  // Initialize the process of checking if the theme is used in workspaces, with a timeout to avoid long waits
+  private startGettingThemeUseData(themeName?: string): void {
+    this.themeUseLoadingState.set('loading')
+    if (this.themeUseTimeoutTimer) clearTimeout(this.themeUseTimeoutTimer)
+    this.themeUseTimeoutTimer = setTimeout(() => {
+      if (this.themeUseLoadingState() === 'loading') this.themeUseLoadingState.set('timeout')
+    }, 4000)
+    if (themeName) this.themeUsedName.set(themeName) // force checking use in workspaces
+  }
+  private stopGettingThemeUseData(workspaces: Workspace[]): void {
+    this.themeUsedByWorkspaces.set(workspaces)
+    this.themeUsed.set(workspaces.length > 0)
+    this.themeUseLoadingState.set('ready')
+    if (this.themeUseTimeoutTimer) {
+      clearTimeout(this.themeUseTimeoutTimer)
+      this.themeUseTimeoutTimer = undefined
+    }
+  }
+
+  private getWorkspaceData() {
+    // receive response from workspace service via slot
+    this.slotSubscription?.unsubscribe()
+    this.themeUsed.set(false)
+    this.slotSubscription = this.slotEmitter.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((res) => {
+      console.log('slot emitter', res)
+      this.stopGettingThemeUseData(res)
+    })
   }
 
   /**
@@ -348,8 +407,7 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   // default: we guess the Theme is in use so that deletion is not offered
-  public preparePageActions(inUse: boolean, theme?: Theme): void {
-    this.isThemeUsedByWorkspace = inUse
+  public preparePageActions(theme?: Theme): void {
     this.actions$ = this.translate
       .get([
         'ACTIONS.NAVIGATION.BACK',

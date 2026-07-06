@@ -4,3 +4,7 @@
 
 /* portal core */
 @use 'node_modules/@onecx/angular-accelerator/assets/styles.scss';
+
+.p-confirmdialog {
+  --onecx-theme-onecx-theme-ui-confirmdialog-icon-color: var(--danger-button-bg);
+}

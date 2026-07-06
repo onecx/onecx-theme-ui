@@ -24,6 +24,7 @@
       "MESSAGE_INFO_OPERATOR": "Dieses Theme wurde automatisiert erstellt. Es ist löschbar wird aber automatisiert wiederhergestellt.",
       "MESSAGE_REJECT_MANDATORY": "Das Theme ist gekennzeichnet als erforderlich für den Betrieb und kann deshalb nicht gelöscht werden.",
       "MESSAGE_REJECT_USE": "Das Theme wird von Workspaces benutzt und kann deshalb nicht gelöscht werden.",
+      "MESSAGE_TIMEOUT": "Es hat zu lange gedauert um die Benutzung des Themes zu ermitteln. Der Vorgang wurde abgebrochen.",
       "THEME_NOK": "Theme konnte nicht gelöscht werden",
       "THEME_OK": "Theme erfolgreich gelöscht"
     },

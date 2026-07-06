@@ -81,7 +81,7 @@ export class ThemeApplyComponent {
   private displayConfirmationForUsingTemplate(themeId: string, themeName: string, data: any, box: Select): void {
     this.confirmation.confirm({
       key: 'template',
-      icon: 'pi pi-question-circle',
+      icon: 'pi pi-question-circle danger-action-text',
       defaultFocus: 'reject',
       dismissableMask: true,
       closeOnEscape: true,

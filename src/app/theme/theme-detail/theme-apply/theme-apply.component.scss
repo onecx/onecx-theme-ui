@@ -6,15 +6,4 @@
   .min-w-rem-dropdown-template {
     min-width: 16rem;
   }
-
-  .p-dialog.p-confirm-dialog {
-    .p-confirm-dialog-icon {
-      color: var(--danger-button-bg);
-    }
-    .p-dialog-footer {
-      display: flex;
-      justify-content: flex-end;
-      gap: 0.5rem;
-    }
-  }
 }

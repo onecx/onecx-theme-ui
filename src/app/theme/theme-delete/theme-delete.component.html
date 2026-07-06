@@ -11,18 +11,35 @@
   >
     <ng-template pTemplate="content">
       <div class="flex column-gap-3 row-gap-1 justify-content-start align-items-center">
-        <div
-          [class]="theme ? 'text-3xl danger-action-text pi pi-question-circle' : 'text-2xl pi pi-spinner pi-spin'"
-        ></div>
+        @let icon =
+          useLoadingState() === 'loading'
+            ? 'pi-spinner pi-spin'
+            : useLoadingState() === 'timeout'
+              ? 'pi-exclamation-triangle'
+              : 'pi-question-circle';
+        <div [class]="'text-2xl danger-action-text pi ' + icon"></div>
+
         <div class="w-full mt-1 flex flex-column row-gap-3">
-          @if (theme) {
-            @if (theme.mandatory) {
+          @if (useLoadingState() === 'loading') {
+            <p-message
+              id="th_delete_loading_message"
+              severity="info"
+              [text]="'ACTIONS.LOADING' | translate"
+            ></p-message>
+          } @else if (useLoadingState() === 'timeout') {
+            <p-message
+              id="th_delete_timeout_message"
+              severity="info"
+              [text]="'ACTIONS.DELETE.MESSAGE_TIMEOUT' | translate"
+            ></p-message>
+          } @else if (useLoadingState() === 'ready' && themeToBeDeleted()) {
+            @if (themeToBeDeleted()?.mandatory) {
               <p-message
                 id="th_delete_reject_mandatory_message"
                 severity="info"
                 [text]="'ACTIONS.DELETE.MESSAGE_REJECT_MANDATORY' | translate"
               ></p-message>
-            } @else if (isUsedByWorkspace) {
+            } @else if (themeUsed()) {
               <p-message
                 id="th_delete_reject_use_message"
                 severity="info"
@@ -34,9 +51,9 @@
                   {{ 'ACTIONS.DELETE.THEME_MESSAGE' | translate }}
                 </div>
                 <div id="th_delete_theme_display_name" class="my-2 font-bold danger-action-text text-center">
-                  {{ theme.displayName }}
+                  {{ themeToBeDeleted()?.displayName }}
                 </div>
-                @if (theme.operator) {
+                @if (themeToBeDeleted()?.operator) {
                   <p-message
                     id="th_delete_operator_hint"
                     severity="info"
@@ -58,7 +75,7 @@
 
     <ng-template pTemplate="footer">
       <div class="flex flex-wrap column-gap-2 row-gap-1 justify-content-end">
-        @if (!theme || theme.mandatory || isUsedByWorkspace) {
+        @if (!themeToBeDeleted() || themeToBeDeleted()?.mandatory || themeUsed()) {
           <p-button
             icon="pi pi-times"
             id="th_delete_action_close"
@@ -68,7 +85,7 @@
             tooltipPosition="top"
             tooltipEvent="hover"
           ></p-button>
-        } @else if (theme && !theme.mandatory && !isUsedByWorkspace) {
+        } @else if (themeToBeDeleted() && !themeToBeDeleted()?.mandatory && !themeUsed()) {
           <p-button
             icon="pi pi-times"
             id="th_delete_action_no"
@@ -81,7 +98,7 @@
           <p-button
             icon="pi pi-check"
             id="th_delete_action_yes"
-            (onClick)="onDeleteTheme(theme)"
+            (onClick)="onDeleteTheme(themeToBeDeleted())"
             [label]="'ACTIONS.CONFIRMATION.YES' | translate"
             [pTooltip]="'ACTIONS.CONFIRMATION.YES.TOOLTIP' | translate"
             tooltipPosition="top"

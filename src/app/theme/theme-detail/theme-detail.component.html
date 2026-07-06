@@ -26,7 +26,7 @@
       }
     </ng-container>
 
-    <p-tabs #tabComponent [(value)]="selectedTabIndex" (valueChange)="onTabChange($event, theme)">
+    <p-tabs #tabComponent [lazy]="false" [(value)]="selectedTabIndex" (valueChange)="onTabChange($event, theme)">
       <p-tablist>
         <p-tab
           value="0"
@@ -154,7 +154,10 @@
         <!-- USE -->
         <p-tabpanel value="3">
           <div class="m-2">
-            <app-theme-use [themeName]="themeForUse?.name" (used)="preparePageActions($event, theme)"></app-theme-use>
+            <app-theme-use
+              [workspaces]="themeUsedByWorkspaces()"
+              [isComponentDefined]="isComponentDefined()"
+            ></app-theme-use>
           </div>
         </p-tabpanel>
 
@@ -168,6 +171,15 @@
     </p-tabs>
   </ocx-content>
 
+  @if (isComponentDefined() === true && themeUsedName() && changeMode === 'VIEW') {
+    <ocx-slot
+      [name]="slotName"
+      [inputs]="{ dataType: 'workspaces', themeName: themeUsedName(), logEnabled: false, logPrefix: 'theme-use' }"
+      [outputs]="{ workspaces: slotEmitter }"
+    >
+    </ocx-slot>
+  }
+
   <!-- CREATE -->
   <app-theme-create
     [(visible)]="themeCreateVisible"
@@ -180,7 +192,8 @@
     [(visible)]="themeDeleteVisible"
     [(deleted)]="themeDeleted"
     (deletedChange)="onThemeDeleted($event)"
-    [themeToBeDeleted]="themeForUse"
-    [isUsedByWorkspace]="isThemeUsedByWorkspace"
+    [themeToBeDeleted]="themeToBeDeleted()"
+    [themeUsed]="themeUsed()"
+    [useLoadingState]="themeUseLoadingState()"
   ></app-theme-delete>
 </ocx-portal-page>

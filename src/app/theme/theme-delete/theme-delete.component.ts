@@ -1,4 +1,4 @@
-import { Component, effect, Input, model } from '@angular/core'
+import { Component, effect, input, model } from '@angular/core'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 
 import { ButtonModule } from 'primeng/button'
@@ -9,6 +9,7 @@ import { TooltipModule } from 'primeng/tooltip'
 import { PortalMessageService } from '@onecx/angular-integration-interface'
 
 import { Theme, ThemesAPIService } from 'src/app/shared/generated'
+import { LoadingState } from '../theme-detail/theme-detail.component'
 
 @Component({
   selector: 'app-theme-delete',
@@ -17,12 +18,15 @@ import { Theme, ThemesAPIService } from 'src/app/shared/generated'
   templateUrl: './theme-delete.component.html'
 })
 export class ThemeDeleteComponent {
-  @Input() isUsedByWorkspace = false
-
+  // signals
   public visible = model.required<boolean>()
   public deleted = model.required<boolean>()
-  public themeToBeDeleted = model<Theme | undefined>()
+  public themeUsed = input.required<boolean>()
+  public useLoadingState = input.required<LoadingState>()
+  // data
+  public themeToBeDeleted = input<Theme | undefined>()
   public theme: Theme | undefined
+  //public themea : Signal<Theme | undefined>
 
   constructor(
     private readonly themeApi: ThemesAPIService,
@@ -31,8 +35,16 @@ export class ThemeDeleteComponent {
   ) {
     this.deleted.set(false)
     effect(() => {
-      this.theme = this.themeToBeDeleted()
+      if (this.theme !== this.themeToBeDeleted()) {
+        this.theme = this.themeToBeDeleted()
+      }
     })
+    /*
+    this.themea = computed(() => {
+      if (this.themea() !== this.themeToBeDeleted()) return this.themeToBeDeleted()
+      else return undefined
+    })
+      */
   }
 
   /**
