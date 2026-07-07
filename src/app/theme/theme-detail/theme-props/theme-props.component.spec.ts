@@ -41,6 +41,8 @@ describe('ThemePropsComponent', () => {
   function initTestComponent(): void {
     fixture = TestBed.createComponent(ThemePropsComponent)
     component = fixture.componentInstance
+    fixture.componentRef.setInput('changeMode', 'VIEW')
+    fixture.componentRef.setInput('theme', undefined)
     fixture.detectChanges()
   }
 
@@ -81,9 +83,13 @@ describe('ThemePropsComponent', () => {
   })
 
   describe('OnChanges', () => {
+    beforeEach(() => {
+      initTestComponent()
+    })
+
     it('call without theme', () => {
-      component.changeMode = 'VIEW'
-      component.theme = undefined
+      fixture.componentRef.setInput('changeMode', 'VIEW')
+      fixture.componentRef.setInput('theme', undefined)
       component.ngOnChanges({ theme: new SimpleChange(undefined, undefined, true) })
 
       expect(component.basicForm.disabled).toBeTrue()
@@ -92,9 +98,13 @@ describe('ThemePropsComponent', () => {
   })
 
   describe('OnSave', () => {
+    beforeEach(() => {
+      initTestComponent()
+    })
+
     it('call without theme', () => {
-      component.changeMode = 'EDIT'
-      component.theme = undefined
+      fixture.componentRef.setInput('changeMode', 'EDIT')
+      component.theme.set(undefined)
       component.ngOnChanges({ theme: new SimpleChange(undefined, undefined, true) })
       component.onUpdateTheme()
 
@@ -102,8 +112,8 @@ describe('ThemePropsComponent', () => {
     })
 
     it('call with theme but invalid basic form', () => {
-      component.changeMode = 'EDIT'
-      component.theme = { ...validTheme, name: '' } // name is required, so form is invalid
+      fixture.componentRef.setInput('changeMode', 'EDIT')
+      component.theme.set({ ...validTheme, name: '' }) // name is required, so form is invalid
       component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme, true) })
 
       component.onUpdateTheme()
@@ -112,8 +122,8 @@ describe('ThemePropsComponent', () => {
     })
 
     it('call with theme but invalid font form', () => {
-      component.changeMode = 'EDIT'
-      component.theme = { ...validTheme }
+      fixture.componentRef.setInput('changeMode', 'EDIT')
+      component.theme.set({ ...validTheme })
       component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme, true) })
       // manually invalidate the font form
       component.fontForm.controls['font-family'].setErrors({ invalid: true })
@@ -124,16 +134,16 @@ describe('ThemePropsComponent', () => {
     })
 
     it('call with valid theme', () => {
-      component.changeMode = 'EDIT'
-      component.theme = validTheme
+      fixture.componentRef.setInput('changeMode', 'EDIT')
+      component.theme.set(validTheme)
       component.ngOnChanges({ theme: new SimpleChange(undefined, validTheme, true) })
       // a change in the form: change   displayName and font-family
       component.basicForm.controls['displayName'].setValue('new display name')
       component.fontForm.controls['font-family'].setValue('newFont')
 
       component.onUpdateTheme()
-      expect(component.theme.displayName).toBe('new display name')
-      //expect(component.fontForm.value['font-family']).toBe(component.theme.properties?.font?.['font-family'])
+      expect(component.theme()!.displayName).toBe('new display name')
+      //expect(component.fontForm.value['font-family']).toBe(component.theme().properties?.font?.['font-family'])
     })
   })
 
@@ -152,11 +162,11 @@ describe('ThemePropsComponent', () => {
 
       it('call without external URLs', () => {
         const theme: Theme = { ...validTheme, logoUrl: undefined, smallLogoUrl: undefined, faviconUrl: undefined }
-        component.changeMode = 'EDIT'
-        component.theme = theme
+        fixture.componentRef.setInput('changeMode', 'EDIT')
+        component.theme.set(theme)
         component.ngOnChanges({ theme: new SimpleChange(undefined, theme, true) })
 
-        expect(component.changeMode).toBe('EDIT')
+        expect(component.changeMode()).toBe('EDIT')
         expect(component.bffUrl[LogoRefType.Logo]).toBe(bffUrl)
       })
     })
@@ -208,8 +218,8 @@ describe('ThemePropsComponent', () => {
       // create a component and initialize with a theme
       beforeEach(() => {
         initTestComponent()
-        component.changeMode = 'EDIT'
-        component.theme = validTheme
+        fixture.componentRef.setInput('changeMode', 'EDIT')
+        component.theme.set(validTheme)
         component.ngOnChanges({ theme: new SimpleChange(undefined, validTheme, true) })
       })
 
@@ -261,14 +271,14 @@ describe('ThemePropsComponent', () => {
     describe('file upload', () => {
       beforeEach(() => {
         initTestComponent()
-        component.changeMode = 'EDIT'
-        component.theme = { ...validTheme }
+        fixture.componentRef.setInput('changeMode', 'VIEW')
+        fixture.componentRef.setInput('theme', { ...validTheme })
         component.ngOnChanges({ theme: new SimpleChange(undefined, validTheme, true) })
       })
 
       describe('checks before', () => {
         it('should not upload a file if theme is not set', () => {
-          component.theme = undefined
+          fixture.componentRef.setInput('theme', undefined)
           const blob = new Blob(['a'.repeat(10)], { type: MimeType.Png })
           const file = new File([blob], 'test.png', { type: MimeType.Png })
           const event = { target: { files: [file] } }

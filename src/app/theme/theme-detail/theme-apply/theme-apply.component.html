@@ -1,4 +1,4 @@
-@if (changeMode === 'EDIT') {
+@if (changeMode() === 'EDIT') {
   <section
     class="mt-2 p-1 sm:p-2 flex flex-wrap justify-content-between align-items-center row-gap-2 column-gap-3 surface-100 border-round"
     [attr.aria-label]="'DIALOG.DETAIL.SPECIAL.SECTION' | translate"
@@ -20,7 +20,7 @@
         {{ 'DIALOG.DETAIL.AUTO_APPLY.LABEL' | translate }}
       </label>
     </div>
-    @if (isCurrentTheme) {
+    @if (isCurrentTheme()) {
       <div
         class="pi pi-bolt text-primary font-medium"
         [attr.aria-label]="'DIALOG.DETAIL.AUTO_APPLY.CURRENT_THEME' | translate"
@@ -29,7 +29,7 @@
     }
     <div class="field mb-0">
       <p-float-label variant="on" class="min-w-rem-dropdown-template max-w-30rem">
-        @if (themes$ | async; as themes) {
+        @if (themes$() | async; as themes) {
           <p-select
             #themeTemplateBox
             inputId="th_detail_apply_theme_template"

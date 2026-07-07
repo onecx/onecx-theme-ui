@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core'
+import { Component, input, model, OnChanges, output, SimpleChanges } from '@angular/core'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { ReplaySubject } from 'rxjs'
@@ -45,10 +45,10 @@ import { ChangeMode } from '../theme-detail.component'
   styleUrls: ['./theme-props.component.scss']
 })
 export class ThemePropsComponent implements OnChanges {
-  @Input() theme: Theme | undefined
-  @Input() changeMode: ChangeMode = 'VIEW'
-  @Output() headerImageUrl = new EventEmitter<string>() // send logo url to detail header
-
+  // signals
+  public readonly theme = model.required<Theme | undefined>()
+  public readonly changeMode = input.required<ChangeMode>()
+  public readonly headerImageUrl = output<string | undefined>()
   // data
   public basicForm: FormGroup
   public fontForm: FormGroup
@@ -108,9 +108,9 @@ export class ThemePropsComponent implements OnChanges {
   public ngOnChanges(changes: SimpleChanges): void {
     this.basicForm.disable()
     this.fontForm.disable()
-    if (this.theme) {
-      if (changes['theme']) this.fillForm(this.theme)
-      if (this.changeMode !== 'VIEW') {
+    if (this.theme() !== undefined) {
+      if (changes['theme']) this.fillForm(this.theme()!)
+      if (this.changeMode() !== 'VIEW') {
         this.basicForm.enable()
         this.fontForm.enable()
       }
@@ -136,16 +136,16 @@ export class ThemePropsComponent implements OnChanges {
 
   // called by theme detail dialog: returns form values to theme detail component for saving
   public onUpdateTheme(): boolean {
-    if (this.theme) {
+    if (this.theme()) {
       if (this.basicForm.valid) {
-        Object.assign(this.theme, this.getFormData(this.basicForm))
+        Object.assign(this.theme()!, this.getFormData(this.basicForm))
       } else {
         this.msgService.error({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
         return false
       }
       if (this.fontForm.valid)
         // add only font properties
-        this.theme.properties = {
+        this.theme()!.properties = {
           font: this.fontForm.value
         }
       else {
@@ -206,7 +206,7 @@ export class ThemePropsComponent implements OnChanges {
       this.msgService.error({ summaryKey: 'IMAGE.CONSTRAINT.FAILED', detailKey: 'IMAGE.CONSTRAINT.SIZE' })
     else if (!regex.exec(file.name))
       this.msgService.error({ summaryKey: 'IMAGE.CONSTRAINT.FAILED', detailKey: 'IMAGE.CONSTRAINT.FILE_TYPE' })
-    else if (this.theme) this.saveImage(this.theme.name!, file, refType) // store image
+    else if (this.theme()) this.saveImage(this.theme()!.name!, file, refType) // store image
   }
 
   // SAVE image

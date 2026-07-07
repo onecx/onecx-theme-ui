@@ -1,20 +1,20 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core'
+import { Component, input, output } from '@angular/core'
 import { AsyncPipe } from '@angular/common'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { firstValueFrom, map, Observable } from 'rxjs'
 
-import { Select, SelectModule } from 'primeng/select'
 import { ButtonModule } from 'primeng/button'
 import { ConfirmDialogModule } from 'primeng/confirmdialog'
+import { ConfirmationService } from 'primeng/api'
 import { ConfirmPopupModule } from 'primeng/confirmpopup'
 import { DialogModule } from 'primeng/dialog'
 import { FloatLabelModule } from 'primeng/floatlabel'
 import { MessageModule } from 'primeng/message'
+import { Select, SelectModule } from 'primeng/select'
 import { ToastModule } from 'primeng/toast'
 import { ToggleSwitchModule } from 'primeng/toggleswitch'
 import { TooltipModule } from 'primeng/tooltip'
-import { ConfirmationService } from 'primeng/api'
 
 import { Theme } from 'src/app/shared/generated'
 import { Utils } from 'src/app/shared/utils'
@@ -44,13 +44,14 @@ import { ChangeMode } from '../theme-detail.component'
   providers: [ConfirmationService]
 })
 export class ThemeApplyComponent {
-  @Input() theme: Theme | undefined
-  @Input() themes$: Observable<Theme[]> | undefined
-  @Input() changeMode: ChangeMode = 'VIEW'
-  @Input() isCurrentTheme = true
-  @Input() autoApply = true
-  @Output() autoApplyChange = new EventEmitter<boolean>() // inform theme detail about change in auto apply to trigger message about it
-  @Output() templatingThemeData = new EventEmitter<Theme>() // the data of the theme to be used as template, emitted when user confirms to use a theme as template
+  // signals
+  public readonly theme = input.required<Theme | undefined>()
+  public readonly themes$ = input.required<Observable<Theme[]> | undefined>()
+  public readonly changeMode = input.required<ChangeMode>()
+  public readonly isCurrentTheme = input.required<boolean>()
+  public readonly autoApply = input.required<boolean>()
+  public readonly autoApplyChange = output<boolean>() // inform theme detail about change in auto apply to trigger message about it
+  public readonly templatingThemeData = output<Theme>() // the data of the theme to be used as template, emitted when user confirms to use a theme as template
 
   constructor(
     private readonly confirmation: ConfirmationService,

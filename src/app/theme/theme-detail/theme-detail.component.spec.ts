@@ -15,8 +15,8 @@ import { SlotService } from '@onecx/angular-remote-components'
 import { ImagesInternalAPIService, Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { Utils, LogoRefType } from 'src/app/shared/utils'
 
-import { slotInitializer, ThemeDetailComponent } from './theme-detail.component'
-import { DestroyRef } from '@angular/core'
+import { slotInitializer, ThemeDetailComponent, ChangeMode } from './theme-detail.component'
+import { DestroyRef, signal } from '@angular/core'
 import { Workspace } from './theme-use/theme-use.component'
 
 const theme: Theme = {
@@ -808,8 +808,10 @@ describe('ThemeDetailComponent', () => {
     beforeEach(() => {
       mockThemePropsComponent = {
         onUpdateTheme: jasmine.createSpy('onUpdateTheme').and.returnValue(true),
-        theme: { ...theme, properties: {} }
+        theme: signal<Theme | undefined>({ ...theme, properties: {} }),
+        changeMode: signal<ChangeMode>('VIEW')
       }
+
       mockThemeColorsComponent = {
         onUpdateTheme: jasmine.createSpy('onUpdateTheme').and.returnValue(true),
         theme: { properties: { primary: '#fff' } }
@@ -824,6 +826,8 @@ describe('ThemeDetailComponent', () => {
       const updatedTheme = { ...theme, id: 'themeId' }
       themesApiSpy.updateTheme.and.returnValue(of({ resource: updatedTheme }) as any)
       themesApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
+      mockThemePropsComponent.theme.set({ ...theme, properties: {} })
+      mockThemePropsComponent.changeMode.set('EDIT')
 
       component['onUpdateTheme']()
 
@@ -848,7 +852,7 @@ describe('ThemeDetailComponent', () => {
     })
 
     it('should not proceed if themeData is undefined', () => {
-      mockThemePropsComponent.theme = undefined
+      mockThemePropsComponent.theme = signal(undefined)
 
       component['onUpdateTheme']()
 
@@ -875,7 +879,7 @@ describe('ThemeDetailComponent', () => {
     })
 
     it('should clear empty URL strings', () => {
-      mockThemePropsComponent.theme = { ...theme, id: 'themeId', logoUrl: '', smallLogoUrl: '', faviconUrl: '' }
+      mockThemePropsComponent.theme = signal({ ...theme, id: 'themeId', logoUrl: '', smallLogoUrl: '', faviconUrl: '' })
       themesApiSpy.updateTheme.and.returnValue(of({ resource: theme }) as any)
       themesApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
 
@@ -896,7 +900,7 @@ describe('ThemeDetailComponent', () => {
     })
 
     it('should initialize properties if undefined', () => {
-      mockThemePropsComponent.theme = { ...theme, id: 'themeId', properties: undefined }
+      mockThemePropsComponent.theme = signal({ ...theme, id: 'themeId', properties: undefined })
       themesApiSpy.updateTheme.and.returnValue(of({ resource: theme }) as any)
       themesApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
 
@@ -964,7 +968,7 @@ describe('ThemeDetailComponent', () => {
       component.changeMode = 'EDIT'
       component.ThemePropsComponent = {
         onUpdateTheme: jasmine.createSpy().and.returnValue(true),
-        theme: { ...theme, properties: {} }
+        theme: signal({ ...theme, properties: {} })
       } as any
       component.ThemeColorsComponent = {
         onUpdateTheme: jasmine.createSpy().and.returnValue(true),

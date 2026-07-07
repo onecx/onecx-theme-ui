@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { AsyncPipe, JsonPipe, Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
-import { catchError, combineLatest, finalize, first, map, of, Observable, Subscription } from 'rxjs'
+import { catchError, combineLatest, finalize, first, map, of, Observable } from 'rxjs'
 import FileSaver from 'file-saver'
 
 import { MessageModule } from 'primeng/message'
@@ -106,7 +106,6 @@ export class ThemeDetailComponent implements OnInit {
   // receive the slot output
   public slotName = 'onecx-workspace-data'
   public slotEmitter = new EventEmitter<Workspace[]>()
-  private slotSubscription: Subscription | undefined
 
   // Partial theme with undefined values for internal use (copying, editing) to prevent issues with form patching and image url handling when required properties are missing
   private readonly undefinedThemeData = {
@@ -143,7 +142,7 @@ export class ThemeDetailComponent implements OnInit {
     // trigger the request to the workspace service via slot to get the workspaces that use the theme
     this.themeUsed.set(false)
     // receive data and stop process
-    this.slotSubscription = this.slotEmitter.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((res) => {
+    this.slotEmitter.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((res) => {
       this.stopGettingThemeUseData(res)
     })
 
@@ -324,7 +323,7 @@ export class ThemeDetailComponent implements OnInit {
     if (!this.ThemePropsComponent.onUpdateTheme()) return undefined
     if (!this.ThemeColorsComponent.onUpdateTheme()) return undefined
 
-    let themeData = this.ThemePropsComponent.theme
+    let themeData = this.ThemePropsComponent.theme()
     if (!themeData) return undefined
     themeData = {
       ...themeData,
@@ -338,7 +337,7 @@ export class ThemeDetailComponent implements OnInit {
     }
     // properties: fonts & colors
     themeData.properties = {
-      ...this.ThemePropsComponent.theme?.properties, // font only
+      ...this.ThemePropsComponent.theme()?.properties, // font only
       ...this.ThemeColorsComponent.theme?.properties // colors only
     }
     return themeData
