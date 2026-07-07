@@ -1,13 +1,11 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
-import { provideHttpClient } from '@angular/common/http'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { provideRouter, Router } from '@angular/router'
+import { provideNoopAnimations } from '@angular/platform-browser/animations'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 import { of, throwError } from 'rxjs'
 
 import { PortalMessageService } from '@onecx/angular-integration-interface'
 
-import { ThemesAPIService } from 'src/app/shared/generated'
+import { Theme, ThemesAPIService } from 'src/app/shared/generated'
 
 import { ThemeDeleteComponent } from './theme-delete.component'
 
@@ -21,7 +19,11 @@ describe('ThemeDeleteComponent', () => {
   function initTestComponent(): void {
     fixture = TestBed.createComponent(ThemeDeleteComponent)
     component = fixture.componentInstance
-    fixture.componentRef.setInput('visible', false)
+    fixture.componentRef.setInput('visible', true)
+    fixture.componentRef.setInput('deleted', false)
+    fixture.componentRef.setInput('useLoadingState', 'loading')
+    fixture.componentRef.setInput('themeUsed', false)
+    fixture.componentRef.setInput('themeToBeDeleted', { id: 'themeId', name: 'themeName' } as Theme)
     fixture.detectChanges()
   }
 
@@ -34,18 +36,14 @@ describe('ThemeDeleteComponent', () => {
           en: require('src/assets/i18n/en.json')
         }).withDefaultLanguage('de')
       ],
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting(),
-        provideRouter([{ path: '', component: ThemeDeleteComponent }]),
-        { provide: PortalMessageService, useValue: msgServiceSpy },
-        { provide: ThemesAPIService, useValue: themesApiSpy }
-      ]
+      providers: [provideNoopAnimations()]
     })
       .overrideComponent(ThemeDeleteComponent, {
-        set: {
-          template: '',
-          imports: []
+        add: {
+          providers: [
+            { provide: ThemesAPIService, useValue: themesApiSpy },
+            { provide: PortalMessageService, useValue: msgServiceSpy }
+          ]
         }
       })
       .compileComponents()
@@ -69,14 +67,13 @@ describe('ThemeDeleteComponent', () => {
   })
 
   describe('Theme deletion', () => {
-    it('should hide dialog, inform and navigate on successfull deletion', () => {
-      const router = TestBed.inject(Router)
-      spyOn(router, 'navigate')
+    it('should hide dialog and inform on successfull deletion', () => {
       themesApiSpy.deleteTheme.and.returnValue(of({}) as any)
 
       component.onDeleteTheme({ id: 'themeId' } as any)
 
       expect(component.visible()).toBeFalse()
+      expect(component.deleted()).toBeTrue()
       expect(msgServiceSpy.success).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.DELETE.THEME_OK' })
     })
 
@@ -87,7 +84,6 @@ describe('ThemeDeleteComponent', () => {
 
       component.onDeleteTheme({ id: 'themeId' } as any)
 
-      expect(component.visible()).toBeFalse()
       expect(console.error).toHaveBeenCalledWith('deleteTheme', errorResponse)
       expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({
         summaryKey: 'ACTIONS.DELETE.THEME_NOK',

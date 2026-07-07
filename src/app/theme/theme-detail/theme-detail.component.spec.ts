@@ -1,18 +1,23 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing'
 import { Location } from '@angular/common'
 import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { ActivatedRoute, Router, provideRouter } from '@angular/router'
+import { ActivatedRoute, provideRouter, Router } from '@angular/router'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 import { BehaviorSubject, of, throwError } from 'rxjs'
 import FileSaver from 'file-saver'
 
 import { PortalMessageService, ThemeService, UserService } from '@onecx/angular-integration-interface'
+import { providePermissionService } from '@onecx/angular-utils'
+import { provideNoopAnimations } from '@angular/platform-browser/animations'
+import { SlotService } from '@onecx/angular-remote-components'
 
 import { ImagesInternalAPIService, Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { Utils, LogoRefType } from 'src/app/shared/utils'
 
-import { ThemeDetailComponent } from './theme-detail.component'
+import { slotInitializer, ThemeDetailComponent } from './theme-detail.component'
+import { DestroyRef } from '@angular/core'
+import { Workspace } from './theme-use/theme-use.component'
 
 const theme: Theme = {
   id: 'themeId',
@@ -31,7 +36,7 @@ describe('ThemeDetailComponent', () => {
   const mockUserService = { lang$: { getValue: jasmine.createSpy('getValue').and.returnValue('en') } }
   const msgServiceSpy = jasmine.createSpyObj<PortalMessageService>('PortalMessageService', ['success', 'error', 'info'])
   const locationSpy = jasmine.createSpyObj<Location>('Location', ['back'])
-  const themeApiSpy = jasmine.createSpyObj<ThemesAPIService>('ThemesAPIService', [
+  const themesApiSpy = jasmine.createSpyObj<ThemesAPIService>('ThemesAPIService', [
     'getThemeByName',
     'getThemeById',
     'deleteTheme',
@@ -43,6 +48,8 @@ describe('ThemeDetailComponent', () => {
   const currentTheme$ = new BehaviorSubject<any>({ name: 'currentTheme' })
   const mockThemeService = { currentTheme$: currentTheme$.asObservable() }
   const imgServiceSpy = { configuration: { basePath: '/basePath' } }
+  let slotServiceMock: any
+  let slotSubject: BehaviorSubject<boolean>
 
   function initTestComponent(): void {
     fixture = TestBed.createComponent(ThemeDetailComponent)
@@ -51,6 +58,14 @@ describe('ThemeDetailComponent', () => {
   }
 
   beforeEach(waitForAsync(() => {
+    slotSubject = new BehaviorSubject<boolean>(false)
+    // Mock für den Service erstellen
+    slotServiceMock = {
+      isSomeComponentDefinedForSlot: jasmine
+        .createSpy('isSomeComponentDefinedForSlot')
+        .and.returnValue(slotSubject.asObservable())
+    }
+
     TestBed.configureTestingModule({
       imports: [
         ThemeDetailComponent,
@@ -62,19 +77,23 @@ describe('ThemeDetailComponent', () => {
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
+        providePermissionService(),
+        provideNoopAnimations(),
         provideRouter([{ path: '', component: ThemeDetailComponent }]),
-        { provide: UserService, useValue: mockUserService },
-        { provide: PortalMessageService, useValue: msgServiceSpy },
         { provide: Location, useValue: locationSpy },
-        { provide: ThemesAPIService, useValue: themeApiSpy },
         { provide: ThemeService, useValue: mockThemeService },
-        { provide: ImagesInternalAPIService, useValue: imgServiceSpy }
+        { provide: ImagesInternalAPIService, useValue: imgServiceSpy },
+        { provide: SlotService, useValue: slotServiceMock },
+        { provide: DestroyRef, useValue: { onDestroy: () => {} } }
       ]
     })
       .overrideComponent(ThemeDetailComponent, {
-        set: {
-          template: '',
-          imports: []
+        add: {
+          providers: [
+            { provide: UserService, useValue: mockUserService },
+            { provide: ThemesAPIService, useValue: themesApiSpy },
+            { provide: PortalMessageService, useValue: msgServiceSpy }
+          ]
         }
       })
       .compileComponents()
@@ -84,19 +103,19 @@ describe('ThemeDetailComponent', () => {
     msgServiceSpy.success.calls.reset()
     msgServiceSpy.error.calls.reset()
     msgServiceSpy.info.calls.reset()
-    themeApiSpy.getThemeByName.calls.reset()
-    themeApiSpy.getThemeById.calls.reset()
-    themeApiSpy.exportThemes.calls.reset()
-    themeApiSpy.searchThemes.calls.reset()
-    themeApiSpy.updateTheme.calls.reset()
-    themeApiSpy.createTheme.calls.reset()
+    themesApiSpy.getThemeByName.calls.reset()
+    themesApiSpy.getThemeById.calls.reset()
+    themesApiSpy.exportThemes.calls.reset()
+    themesApiSpy.searchThemes.calls.reset()
+    themesApiSpy.updateTheme.calls.reset()
+    themesApiSpy.createTheme.calls.reset()
     locationSpy.back.calls.reset()
-    themeApiSpy.getThemeByName.and.returnValue(of({ resource: {} }) as any)
-    themeApiSpy.getThemeById.and.returnValue(of({ resource: {} }) as any)
-    themeApiSpy.exportThemes.and.returnValue(of({}) as any)
-    themeApiSpy.searchThemes.and.returnValue(of({ stream: [] }) as any)
-    themeApiSpy.createTheme.and.returnValue(of({}) as any)
-    themeApiSpy.updateTheme.and.returnValue(of({}) as any)
+    themesApiSpy.getThemeByName.and.returnValue(of({ resource: {} }) as any)
+    themesApiSpy.getThemeById.and.returnValue(of({ resource: {} }) as any)
+    themesApiSpy.exportThemes.and.returnValue(of({}) as any)
+    themesApiSpy.searchThemes.and.returnValue(of({ stream: [] }) as any)
+    themesApiSpy.createTheme.and.returnValue(of({}) as any)
+    themesApiSpy.updateTheme.and.returnValue(of({}) as any)
     mockUserService.lang$.getValue.and.returnValue('en')
     currentTheme$.next({ name: 'currentTheme' })
 
@@ -128,6 +147,21 @@ describe('ThemeDetailComponent', () => {
     })
   })
 
+  describe('slotInitializer', () => {
+    let slotService: jasmine.SpyObj<SlotService>
+
+    beforeEach(() => {
+      slotService = jasmine.createSpyObj('SlotService', ['init'])
+    })
+
+    it('should call SlotService.init', () => {
+      const initializer = slotInitializer(slotService)
+      initializer()
+
+      expect(slotService.init).toHaveBeenCalled()
+    })
+  })
+
   describe('ngOnInit', () => {
     it('should call getTheme on init', () => {
       spyOn(component as any, 'getTheme')
@@ -138,18 +172,18 @@ describe('ThemeDetailComponent', () => {
 
     it('should not load theme if no themeName', () => {
       component['themeName'] = null
-      themeApiSpy.getThemeByName.calls.reset()
+      themesApiSpy.getThemeByName.calls.reset()
 
       component['getTheme']()
 
-      expect(themeApiSpy.getThemeByName).not.toHaveBeenCalled()
+      expect(themesApiSpy.getThemeByName).not.toHaveBeenCalled()
     })
 
     it('should re-initialize when route param changes to a new name', () => {
       const route = TestBed.inject(ActivatedRoute)
       const paramMapSubject = new BehaviorSubject(route.snapshot.paramMap)
       spyOnProperty(route, 'paramMap').and.returnValue(paramMapSubject.asObservable())
-      themeApiSpy.getThemeByName.calls.reset()
+      themesApiSpy.getThemeByName.calls.reset()
 
       component['themeName'] = 'oldName'
       component.ngOnInit()
@@ -158,7 +192,7 @@ describe('ThemeDetailComponent', () => {
       paramMapSubject.next({ get: () => 'newName', has: () => true, getAll: () => [], keys: [] } as any)
 
       expect(component['themeName']).toBe('newName')
-      expect(themeApiSpy.getThemeByName).toHaveBeenCalled()
+      expect(themesApiSpy.getThemeByName).toHaveBeenCalled()
     })
 
     it('should not re-initialize when route param is the same as current themeName', () => {
@@ -168,12 +202,12 @@ describe('ThemeDetailComponent', () => {
       spyOnProperty(route, 'paramMap').and.returnValue(paramMapSubject.asObservable())
 
       component.ngOnInit()
-      themeApiSpy.getThemeByName.calls.reset()
+      themesApiSpy.getThemeByName.calls.reset()
 
       // Emit param with same name
       paramMapSubject.next({ get: () => 'sameName', has: () => true, getAll: () => [], keys: [] } as any)
 
-      expect(themeApiSpy.getThemeByName).not.toHaveBeenCalled()
+      expect(themesApiSpy.getThemeByName).not.toHaveBeenCalled()
     })
 
     it('should not re-initialize when route param name is null', () => {
@@ -183,73 +217,13 @@ describe('ThemeDetailComponent', () => {
       spyOnProperty(route, 'paramMap').and.returnValue(paramMapSubject.asObservable())
 
       component.ngOnInit()
-      themeApiSpy.getThemeByName.calls.reset()
+      themesApiSpy.getThemeByName.calls.reset()
 
       // Emit param with null name
       paramMapSubject.next({ get: () => null, has: () => false, getAll: () => [], keys: [] } as any)
 
       expect(component['themeName']).toBe('existingName')
-      expect(themeApiSpy.getThemeByName).not.toHaveBeenCalled()
-    })
-  })
-
-  describe('getTheme', () => {
-    beforeEach(() => {
-      component['themeName'] = theme.name!
-    })
-
-    it('should get theme - success', () => {
-      themeApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
-
-      component['getTheme']()
-
-      expect(component.theme).toEqual(theme)
-      expect(component.themeForProps).toEqual({ ...theme, id: undefined })
-      expect(component.themeForColors).toEqual({ properties: theme.properties })
-      expect(component.headerImageUrl).toBe(theme.logoUrl)
-      expect(component.loading).toBeFalse()
-    })
-
-    it('should set isCurrentTheme and autoApply when theme matches current theme', () => {
-      currentTheme$.next({ name: theme.name })
-      themeApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
-
-      component['getTheme']()
-
-      expect(component.isCurrentTheme).toBeTrue()
-      expect(component.autoApply).toBeTrue()
-    })
-
-    it('should set isCurrentTheme to false when theme does not match current theme', () => {
-      currentTheme$.next({ name: 'otherTheme' })
-      themeApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
-
-      component['getTheme']()
-
-      expect(component.isCurrentTheme).toBeFalse()
-      expect(component.autoApply).toBeFalse()
-    })
-
-    it('should handle error when getThemeByName fails', () => {
-      const errorResponse = { error: { message: 'No permissions' }, status: 403 }
-      themeApiSpy.getThemeByName.and.returnValue(throwError(() => errorResponse))
-      spyOn(console, 'error')
-
-      component['getTheme']()
-
-      expect(console.error).toHaveBeenCalledWith('getThemeByName', errorResponse)
-      expect(component.exceptionKey).toBe('EXCEPTIONS.HTTP_STATUS_403.THEME')
-      expect(component.loading).toBeFalse()
-    })
-
-    it('should map unknown error status to 0', () => {
-      const errorResponse = { status: 999 }
-      themeApiSpy.getThemeByName.and.returnValue(throwError(() => errorResponse))
-      spyOn(console, 'error')
-
-      component['getTheme']()
-
-      expect(component.exceptionKey).toBe('EXCEPTIONS.HTTP_STATUS_0.THEME')
+      expect(themesApiSpy.getThemeByName).not.toHaveBeenCalled()
     })
   })
 
@@ -272,13 +246,73 @@ describe('ThemeDetailComponent', () => {
     })
   })
 
+  describe('getTheme', () => {
+    beforeEach(() => {
+      component['themeName'] = theme.name!
+    })
+
+    it('should get theme - success', () => {
+      themesApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
+
+      component['getTheme']()
+
+      expect(component.theme).toEqual(theme)
+      expect(component.themeForProps).toEqual({ ...theme, id: undefined })
+      expect(component.themeForColors).toEqual({ properties: theme.properties })
+      expect(component.headerImageUrl).toBe(theme.logoUrl)
+      expect(component.loading).toBeFalse()
+    })
+
+    it('should set isCurrentTheme and autoApply when theme matches current theme', () => {
+      currentTheme$.next({ name: theme.name })
+      themesApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
+
+      component['getTheme']()
+
+      expect(component.isCurrentTheme).toBeTrue()
+      expect(component.autoApply).toBeTrue()
+    })
+
+    it('should set isCurrentTheme to false when theme does not match current theme', () => {
+      currentTheme$.next({ name: 'otherTheme' })
+      themesApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
+
+      component['getTheme']()
+
+      expect(component.isCurrentTheme).toBeFalse()
+      expect(component.autoApply).toBeFalse()
+    })
+
+    it('should handle error when getThemeByName fails', () => {
+      const errorResponse = { error: { message: 'No permissions' }, status: 403 }
+      themesApiSpy.getThemeByName.and.returnValue(throwError(() => errorResponse))
+      spyOn(console, 'error')
+
+      component['getTheme']()
+
+      expect(console.error).toHaveBeenCalledWith('getThemeByName', errorResponse)
+      expect(component.exceptionKey).toBe('EXCEPTIONS.HTTP_STATUS_403.THEME')
+      expect(component.loading).toBeFalse()
+    })
+
+    it('should map unknown error status to 0', () => {
+      const errorResponse = { status: 999 }
+      themesApiSpy.getThemeByName.and.returnValue(throwError(() => errorResponse))
+      spyOn(console, 'error')
+
+      component['getTheme']()
+
+      expect(component.exceptionKey).toBe('EXCEPTIONS.HTTP_STATUS_0.THEME')
+    })
+  })
+
   describe('getThemes', () => {
     it('should load themes successfully', (done: DoneFn) => {
       const themes = [
         { name: 'b', displayName: 'Bravo' },
         { name: 'a', displayName: 'Alpha' }
       ]
-      themeApiSpy.searchThemes.and.returnValue(of({ stream: themes }) as any)
+      themesApiSpy.searchThemes.and.returnValue(of({ stream: themes }) as any)
 
       component['getThemes']()
 
@@ -291,7 +325,7 @@ describe('ThemeDetailComponent', () => {
 
     it('should handle searchThemes error', (done: DoneFn) => {
       const errorResponse = { status: 500 }
-      themeApiSpy.searchThemes.and.returnValue(throwError(() => errorResponse))
+      themesApiSpy.searchThemes.and.returnValue(throwError(() => errorResponse))
       spyOn(console, 'error')
 
       component['getThemes']()
@@ -305,7 +339,7 @@ describe('ThemeDetailComponent', () => {
     })
 
     it('should return empty array when stream is undefined', (done: DoneFn) => {
-      themeApiSpy.searchThemes.and.returnValue(of({ stream: undefined }) as any)
+      themesApiSpy.searchThemes.and.returnValue(of({ stream: undefined }) as any)
 
       component['getThemes']()
 
@@ -344,45 +378,136 @@ describe('ThemeDetailComponent', () => {
     it('should set showOperatorMessage to false and set selectedTabIndex', () => {
       component.showOperatorMessage = true
 
-      component.onTabChange('3', theme)
+      component.onTabChange(2, theme)
 
       expect(component.showOperatorMessage).toBeFalse()
-      expect(component.selectedTabIndex).toBe('3')
-      expect(component.themeForUse).toEqual(theme)
+      expect(component.selectedTabIndex).toBe('2')
     })
 
-    it('should set themeForUse when tabIndex is 3', () => {
+    it('should start getting theme use data when tabIndex is 3', () => {
+      spyOn<any>(component, 'startGettingThemeUseData')
+
       component.onTabChange('3', theme)
 
-      expect(component.themeForUse).toEqual(theme)
+      expect(component.selectedTabIndex).toBe('3')
+      expect(component['startGettingThemeUseData']).toHaveBeenCalledWith(theme.name)
     })
 
-    it('should not set themeForUse when tabIndex is not 3', () => {
-      component.themeForUse = undefined
-
-      component.onTabChange(1, theme)
-
-      expect(component.selectedTabIndex).toBe('1')
-      expect(component.themeForUse).toBeUndefined()
-    })
-
-    it('should do nothing if theme is undefined', () => {
-      component.showOperatorMessage = true
-
+    it('should set selectedTabIndex to 0 if theme is undefined', () => {
       component.onTabChange('1', undefined)
 
-      expect(component.showOperatorMessage).toBeTrue()
+      expect(component.selectedTabIndex).toBe('0')
+    })
+  })
+
+  describe('slot service', () => {
+    it('should test if component is assigned to slot', () => {
+      slotSubject.next(true)
+      fixture = TestBed.createComponent(ThemeDetailComponent)
+      component = fixture.componentInstance
+
+      expect(slotServiceMock.isSomeComponentDefinedForSlot).toHaveBeenCalledWith(component.slotName)
+      expect(component.isComponentDefined()).toBe(true)
+    })
+
+    it('should destroy the stream when the component is destroyed', () => {
+      fixture = TestBed.createComponent(ThemeDetailComponent)
+      component = fixture.componentInstance
+
+      fixture.destroy()
+      slotSubject.next(true) // new value emitted after component destroyed
+
+      // No change of the signal after component destroyed
+      expect(component.isComponentDefined()).toBe(false)
+    })
+  })
+
+  describe('getting theme use data', () => {
+    const workspaces = [{ name: 'Workspace 1' }, { name: 'Workspace 2' }] as Workspace[]
+
+    it('should start first time', () => {
+      component.themeUseLoadingState.set('initial')
+
+      component.onTabChange('3', theme)
+
+      expect(component.selectedTabIndex).toBe('3')
+      expect(component.themeUseLoadingState()).toBe('loading')
+      expect(component.themeUsedName()).toBe(theme.name)
+    })
+
+    describe('timer', () => {
+      it('should get timeout if time is exceeded', fakeAsync(() => {
+        component.themeUseLoadingState.set('initial')
+        component['themeUseTimeoutTimer'] = setTimeout(() => {}, 10)
+
+        component.onTabChange('3', theme)
+        tick(component['MAX_LOADING_TIME'] + 100) // wait for timer to trigger
+
+        expect(component.selectedTabIndex).toBe('3')
+        expect(component.themeUseLoadingState()).toBe('timeout')
+        expect(component.themeUsedName()).toBe(theme.name)
+      }))
+
+      it('should stop getting theme use data process if data received', fakeAsync(() => {
+        component.themeUseLoadingState.set('initial')
+        component['themeUseTimeoutTimer'] = setTimeout(() => {}, 10)
+
+        component.onTabChange('3', theme)
+        tick(component['MAX_LOADING_TIME'] + 100) // wait for timer to trigger
+
+        expect(component.selectedTabIndex).toBe('3')
+        expect(component.themeUseLoadingState()).toBe('timeout')
+        expect(component.themeUsedName()).toBe(theme.name)
+      }))
+    })
+
+    describe('stop', () => {
+      it('should call stopGettingThemeUseData when slotEmitter emits', () => {
+        fixture = TestBed.createComponent(ThemeDetailComponent)
+        component = fixture.componentInstance
+        const stopSpy = spyOn<any>(component, 'stopGettingThemeUseData').and.callThrough()
+
+        component.slotEmitter.emit(workspaces)
+
+        expect(stopSpy).toHaveBeenCalledOnceWith(workspaces)
+      })
+
+      it('should wait until min loading time before stopping theme use data process', fakeAsync(() => {
+        fixture = TestBed.createComponent(ThemeDetailComponent)
+        component = fixture.componentInstance
+        const stopSpy = spyOn<any>(component, 'stopGettingThemeUseData').and.callThrough()
+        component['themeUseTimeoutTimer'] = setTimeout(() => {}, 10) // should exist for cleanup only
+        component['themeUseStartTime'] = Date.now() - 1 // simulate that 1 second has passed
+
+        component.slotEmitter.emit(workspaces)
+        tick(component['MIN_LOADING_TIME'] - 1) // wait until min loading time
+
+        expect(stopSpy).toHaveBeenCalledOnceWith(workspaces)
+      }))
+
+      it('should not call stopGettingThemeUseData when the component is destroyed', () => {
+        fixture = TestBed.createComponent(ThemeDetailComponent)
+        component = fixture.componentInstance
+        const stopSpy = spyOn<any>(component, 'stopGettingThemeUseData').and.callThrough()
+
+        fixture.destroy()
+        component.slotEmitter.emit(workspaces)
+
+        expect(stopSpy).not.toHaveBeenCalled()
+      })
     })
   })
 
   describe('Theme deletion', () => {
     it('should show delete dialog', () => {
       component.themeDeleteVisible.set(false)
+      spyOn<any>(component, 'startGettingThemeUseData')
 
       component.onDeleteTheme(theme)
 
       expect(component.themeDeleteVisible()).toBeTrue()
-      expect(component.themeForUse).toEqual(theme)
+      expect(component.themeToBeDeleted()).toEqual(theme)
+      expect(component['startGettingThemeUseData']).toHaveBeenCalledWith(theme.name)
     })
 
     it('should navigate back on theme deleted', () => {
@@ -416,11 +541,11 @@ describe('ThemeDetailComponent', () => {
           }
         }
       }
-      themeApiSpy.exportThemes.and.returnValue(of(exportResponse) as any)
+      themesApiSpy.exportThemes.and.returnValue(of(exportResponse) as any)
 
       component.onExportTheme(exportTheme)
 
-      expect(themeApiSpy.exportThemes).toHaveBeenCalledOnceWith(
+      expect(themesApiSpy.exportThemes).toHaveBeenCalledOnceWith(
         jasmine.objectContaining({ exportThemeRequest: { names: [exportTheme.name] } })
       )
       expect(JSON.stringify).toHaveBeenCalledOnceWith(jasmine.objectContaining(exportResponse), null, 2)
@@ -432,7 +557,7 @@ describe('ThemeDetailComponent', () => {
 
     it('should display error on theme export fail', () => {
       const errorResponse = { error: 'Error on exporting theme', status: 400 }
-      themeApiSpy.exportThemes.and.returnValue(throwError(() => errorResponse))
+      themesApiSpy.exportThemes.and.returnValue(throwError(() => errorResponse))
       spyOn(console, 'error')
 
       component.onExportTheme(theme)
@@ -444,7 +569,7 @@ describe('ThemeDetailComponent', () => {
     it('should not export if theme has no name', () => {
       component.onExportTheme({})
 
-      expect(themeApiSpy.exportThemes).not.toHaveBeenCalled()
+      expect(themesApiSpy.exportThemes).not.toHaveBeenCalled()
     })
   })
 
@@ -472,7 +597,7 @@ describe('ThemeDetailComponent', () => {
 
   describe('preparePageActions', () => {
     it('should create 8 actions', (done: DoneFn) => {
-      component.preparePageActions(true, theme)
+      component.preparePageActions(theme)
 
       component.actions$.subscribe((actions) => {
         expect(actions.length).toBe(8)
@@ -480,19 +605,11 @@ describe('ThemeDetailComponent', () => {
       })
     })
 
-    it('should set isThemeUsedByWorkspace', () => {
-      component.preparePageActions(true, theme)
-      expect(component.isThemeUsedByWorkspace).toBeTrue()
-
-      component.preparePageActions(false, theme)
-      expect(component.isThemeUsedByWorkspace).toBeFalse()
-    })
-
     it('should show back, export, edit, delete in VIEW mode', (done: DoneFn) => {
       component.changeMode = 'VIEW'
       component.theme = theme // needed for save_as_on_view condition (this.theme !== undefined)
 
-      component.preparePageActions(false, theme)
+      component.preparePageActions(theme)
 
       component.actions$.subscribe((actions) => {
         const back = actions.find((a) => a.id === 'th_detail_page_action_back')
@@ -521,7 +638,7 @@ describe('ThemeDetailComponent', () => {
       component.changeMode = 'EDIT'
       component.theme = theme
 
-      component.preparePageActions(false, theme)
+      component.preparePageActions(theme)
 
       component.actions$.subscribe((actions) => {
         const cancel = actions.find((a) => a.id === 'th_detail_page_action_cancel')
@@ -542,7 +659,7 @@ describe('ThemeDetailComponent', () => {
 
     it('should hide delete when theme is undefined', (done: DoneFn) => {
       component.changeMode = 'VIEW'
-      component.preparePageActions(false, undefined)
+      component.preparePageActions(undefined)
 
       component.actions$.subscribe((actions) => {
         const deleteAction = actions.find((a) => a.id === 'th_detail_page_action_delete')
@@ -552,7 +669,7 @@ describe('ThemeDetailComponent', () => {
     })
 
     it('should trigger onBack callback', (done: DoneFn) => {
-      component.preparePageActions(false, theme)
+      component.preparePageActions(theme)
 
       component.actions$.subscribe((actions) => {
         const back = actions.find((a) => a.id === 'th_detail_page_action_back')
@@ -564,7 +681,7 @@ describe('ThemeDetailComponent', () => {
 
     it('should trigger onExportTheme callback', (done: DoneFn) => {
       spyOn(component, 'onExportTheme')
-      component.preparePageActions(false, theme)
+      component.preparePageActions(theme)
 
       component.actions$.subscribe((actions) => {
         const exportAction = actions.find((a) => a.id === 'th_detail_page_action_export')
@@ -575,7 +692,7 @@ describe('ThemeDetailComponent', () => {
     })
 
     it('should trigger onDeleteTheme callback', (done: DoneFn) => {
-      component.preparePageActions(false, theme)
+      component.preparePageActions(theme)
 
       component.actions$.subscribe((actions) => {
         const deleteAction = actions.find((a) => a.id === 'th_detail_page_action_delete')
@@ -587,9 +704,9 @@ describe('ThemeDetailComponent', () => {
 
     it('should trigger edit action callback', (done: DoneFn) => {
       component['themeName'] = theme.name!
-      themeApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
+      themesApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
       component.changeMode = 'VIEW'
-      component.preparePageActions(false, theme)
+      component.preparePageActions(theme)
 
       component.actions$.subscribe((actions) => {
         const editAction = actions.find((a) => a.id === 'th_detail_page_action_edit')
@@ -601,7 +718,7 @@ describe('ThemeDetailComponent', () => {
 
     it('should trigger cancel action callback', (done: DoneFn) => {
       component.changeMode = 'EDIT'
-      component.preparePageActions(false, theme)
+      component.preparePageActions(theme)
 
       component.actions$.subscribe((actions) => {
         const cancelAction = actions.find((a) => a.id === 'th_detail_page_action_cancel')
@@ -618,7 +735,7 @@ describe('ThemeDetailComponent', () => {
         onUpdateTheme: () => false,
         theme: undefined
       } as any
-      component.preparePageActions(false, theme)
+      component.preparePageActions(theme)
 
       component.actions$.subscribe((actions) => {
         const saveAction = actions.find((a) => a.id === 'th_detail_page_action_save')
@@ -631,7 +748,7 @@ describe('ThemeDetailComponent', () => {
     it('should trigger save_as callback in EDIT/CREATE mode', (done: DoneFn) => {
       spyOn(component, 'onSaveAs')
       component.changeMode = 'EDIT'
-      component.preparePageActions(false, theme)
+      component.preparePageActions(theme)
 
       component.actions$.subscribe((actions) => {
         const saveAsOnEdit = actions.find((a) => a.id === 'th_detail_page_action_save_as_on_edit')
@@ -645,7 +762,7 @@ describe('ThemeDetailComponent', () => {
       spyOn(component, 'onSaveAs')
       component.changeMode = 'VIEW'
       component.theme = theme
-      component.preparePageActions(false, theme)
+      component.preparePageActions(theme)
 
       component.actions$.subscribe((actions) => {
         const saveAsOnView = actions.find((a) => a.id === 'th_detail_page_action_save_as_on_view')
@@ -659,7 +776,7 @@ describe('ThemeDetailComponent', () => {
   describe('onChangeMode', () => {
     beforeEach(() => {
       component['themeName'] = theme.name!
-      themeApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
+      themesApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
     })
 
     it('should switch to VIEW mode when forcedMode is view', () => {
@@ -705,14 +822,14 @@ describe('ThemeDetailComponent', () => {
 
     it('should call updateTheme on save with valid forms', (done: DoneFn) => {
       const updatedTheme = { ...theme, id: 'themeId' }
-      themeApiSpy.updateTheme.and.returnValue(of({ resource: updatedTheme }) as any)
-      themeApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
+      themesApiSpy.updateTheme.and.returnValue(of({ resource: updatedTheme }) as any)
+      themesApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
 
       component['onUpdateTheme']()
 
       expect(mockThemePropsComponent.onUpdateTheme).toHaveBeenCalled()
       expect(mockThemeColorsComponent.onUpdateTheme).toHaveBeenCalled()
-      expect(themeApiSpy.updateTheme).toHaveBeenCalledWith(jasmine.objectContaining({ id: 'themeId' }))
+      expect(themesApiSpy.updateTheme).toHaveBeenCalledWith(jasmine.objectContaining({ id: 'themeId' }))
       expect(msgServiceSpy.success).toHaveBeenCalledWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.OK' })
       // subscribe to theme$ to cover the Observable subscriber
       component.theme$!.subscribe((data) => {
@@ -727,7 +844,7 @@ describe('ThemeDetailComponent', () => {
       component['onUpdateTheme']()
 
       expect(mockThemeColorsComponent.onUpdateTheme).not.toHaveBeenCalled()
-      expect(themeApiSpy.updateTheme).not.toHaveBeenCalled()
+      expect(themesApiSpy.updateTheme).not.toHaveBeenCalled()
     })
 
     it('should not proceed if themeData is undefined', () => {
@@ -735,7 +852,7 @@ describe('ThemeDetailComponent', () => {
 
       component['onUpdateTheme']()
 
-      expect(themeApiSpy.updateTheme).not.toHaveBeenCalled()
+      expect(themesApiSpy.updateTheme).not.toHaveBeenCalled()
     })
 
     it('should not proceed if ThemeColorsComponent.onUpdateTheme returns false', () => {
@@ -743,12 +860,12 @@ describe('ThemeDetailComponent', () => {
 
       component['onUpdateTheme']()
 
-      expect(themeApiSpy.updateTheme).not.toHaveBeenCalled()
+      expect(themesApiSpy.updateTheme).not.toHaveBeenCalled()
     })
 
     it('should handle updateTheme error', () => {
       const errorResponse = { status: 400 }
-      themeApiSpy.updateTheme.and.returnValue(throwError(() => errorResponse))
+      themesApiSpy.updateTheme.and.returnValue(throwError(() => errorResponse))
       spyOn(console, 'error')
 
       component['onUpdateTheme']()
@@ -759,12 +876,12 @@ describe('ThemeDetailComponent', () => {
 
     it('should clear empty URL strings', () => {
       mockThemePropsComponent.theme = { ...theme, id: 'themeId', logoUrl: '', smallLogoUrl: '', faviconUrl: '' }
-      themeApiSpy.updateTheme.and.returnValue(of({ resource: theme }) as any)
-      themeApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
+      themesApiSpy.updateTheme.and.returnValue(of({ resource: theme }) as any)
+      themesApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
 
       component['onUpdateTheme']()
 
-      const callArgs = themeApiSpy.updateTheme.calls.mostRecent().args[0]
+      const callArgs = themesApiSpy.updateTheme.calls.mostRecent().args[0]
       expect(callArgs.updateThemeRequest!.resource.logoUrl).toBeUndefined()
       expect(callArgs.updateThemeRequest!.resource.smallLogoUrl).toBeUndefined()
       expect(callArgs.updateThemeRequest!.resource.faviconUrl).toBeUndefined()
@@ -775,17 +892,17 @@ describe('ThemeDetailComponent', () => {
 
       component['onUpdateTheme']()
 
-      expect(themeApiSpy.updateTheme).not.toHaveBeenCalled()
+      expect(themesApiSpy.updateTheme).not.toHaveBeenCalled()
     })
 
     it('should initialize properties if undefined', () => {
       mockThemePropsComponent.theme = { ...theme, id: 'themeId', properties: undefined }
-      themeApiSpy.updateTheme.and.returnValue(of({ resource: theme }) as any)
-      themeApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
+      themesApiSpy.updateTheme.and.returnValue(of({ resource: theme }) as any)
+      themesApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
 
       component['onUpdateTheme']()
 
-      const callArgs = themeApiSpy.updateTheme.calls.mostRecent().args[0]
+      const callArgs = themesApiSpy.updateTheme.calls.mostRecent().args[0]
       expect(callArgs.updateThemeRequest!.resource.properties).toBeDefined()
     })
   })
@@ -793,19 +910,19 @@ describe('ThemeDetailComponent', () => {
   describe('useThemeAsTemplate', () => {
     it('should load theme by id and set themeForColors', () => {
       const templateTheme = { name: 'template', displayName: 'Template', properties: { color: 'red' } }
-      themeApiSpy.getThemeById.and.returnValue(of({ resource: templateTheme }) as any)
+      themesApiSpy.getThemeById.and.returnValue(of({ resource: templateTheme }) as any)
       spyOn(console, 'log')
 
       component.useThemeAsTemplate({ id: '123' })
 
-      expect(themeApiSpy.getThemeById).toHaveBeenCalledWith({ id: '123' })
+      expect(themesApiSpy.getThemeById).toHaveBeenCalledWith({ id: '123' })
       expect(component.themeForColors).toEqual(templateTheme as any)
       expect(msgServiceSpy.info).toHaveBeenCalledWith({ summaryKey: 'THEME.TEMPLATE.CONFIRMATION.OK' })
     })
 
     it('should use component theme name in EDIT mode', () => {
       const templateTheme = { name: 'template', displayName: 'Template', properties: {} }
-      themeApiSpy.getThemeById.and.returnValue(of({ resource: templateTheme }) as any)
+      themesApiSpy.getThemeById.and.returnValue(of({ resource: templateTheme }) as any)
       component.changeMode = 'EDIT'
       component.theme = { name: 'original' }
       spyOn(console, 'log')

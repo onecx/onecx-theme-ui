@@ -17,14 +17,7 @@ describe('ThemeColorBoxComponent', () => {
         }).withDefaultLanguage('en')
       ],
       providers: []
-    })
-      .overrideComponent(ThemeColorBoxComponent, {
-        set: {
-          template: '',
-          imports: []
-        }
-      })
-      .compileComponents()
+    }).compileComponents()
   }))
 
   beforeEach(() => {

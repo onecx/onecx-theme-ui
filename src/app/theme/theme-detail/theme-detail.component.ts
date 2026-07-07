@@ -28,7 +28,7 @@ import { ThemeCreateComponent } from '../theme-create/theme-create.component'
 import { ThemeDeleteComponent } from '../theme-delete/theme-delete.component'
 
 export type ChangeMode = 'VIEW' | 'EDIT'
-export type LoadingState = 'ready' | 'loading' | 'timeout'
+export type LoadingState = 'initial' | 'ready' | 'loading' | 'timeout'
 export function slotInitializer(slotService: SlotService) {
   return () => slotService.init()
 }
@@ -73,9 +73,12 @@ export class ThemeDetailComponent implements OnInit {
   public readonly themeUsed = signal<boolean>(false)
   public readonly themeUsedName = signal<string | undefined>(undefined)
   public readonly themeUsedByWorkspaces = signal<Workspace[]>([])
-  public readonly themeUseLoadingState = signal<LoadingState>('ready')
+  public readonly themeUseLoadingState = signal<LoadingState>('initial')
+  // private timer to avoid long waits for getting workspace data
   private themeUseTimeoutTimer: ReturnType<typeof setTimeout> | undefined
-
+  private themeUseStartTime: number | undefined
+  private readonly MIN_LOADING_TIME = 1500 // 1.5 seconds
+  private readonly MAX_LOADING_TIME = 4000 // 4 seconds
   // dialog
   public loading = true
   public exceptionKey: string | undefined = undefined
@@ -129,6 +132,7 @@ export class ThemeDetailComponent implements OnInit {
     private readonly imageApi: ImagesInternalAPIService,
     private readonly slotService: SlotService
   ) {
+    // Initialize the slot service for getting workspaces using the theme.
     slotInitializer(slotService)
     this.slotService
       .isSomeComponentDefinedForSlot(this.slotName)
@@ -136,17 +140,23 @@ export class ThemeDetailComponent implements OnInit {
       .subscribe((isDefined) => {
         this.isComponentDefined.set(isDefined)
       })
-    this.getWorkspaceData()
+    // trigger the request to the workspace service via slot to get the workspaces that use the theme
+    this.themeUsed.set(false)
+    // receive data and stop process
+    this.slotSubscription = this.slotEmitter.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((res) => {
+      this.stopGettingThemeUseData(res)
+    })
 
+    // receive the theme created or deleted event from the child dialog and react accordingly
     effect(() => {
-      if (this.themeDeleted()) {
+      if (this.themeDeleted() === true) {
         this.themeDeleted.set(false)
       }
       const theme = this.themeCreated()
       if (theme) {
         this.router.navigate(['../' + theme.name], { relativeTo: this.route })
       }
-      if (!this.themeCreateVisible()) {
+      if (this.themeCreateVisible() === false) {
         this.themeForCreation = undefined
       }
     })
@@ -223,6 +233,49 @@ export class ThemeDetailComponent implements OnInit {
         return of([])
       })
     )
+  }
+
+  /**
+   * GETTING THEME USE IN WORKSPACES
+   * The theme use in workspaces is checked when the user opens the "Use" tab or when the user tries to delete a theme.
+   * The check is done by sending a request to the workspace service via a slot. The response is received via an event emitter.
+   * The loading state is managed by a signal and a timeout timer. The loading indicator is shown for at least 1.5 seconds.
+   * If the data is not received within timeout time, the loading state is set to "timeout".
+   */
+  // Initialize the process of checking if the theme is used in workspaces
+  private startGettingThemeUseData(themeName?: string): void {
+    if (themeName && this.themeUseLoadingState() === 'initial') {
+      this.themeUseLoadingState.set('loading')
+      // best customer experience: show the loading indicator for at least 1.5 seconds, even if the data is received faster
+      this.themeUseStartTime = performance.now() // store the start time for measuring loading duration
+      if (this.themeUseTimeoutTimer) {
+        clearTimeout(this.themeUseTimeoutTimer)
+      }
+      this.themeUseTimeoutTimer = setTimeout(() => {
+        if (this.themeUseLoadingState() === 'loading') this.themeUseLoadingState.set('timeout')
+      }, this.MAX_LOADING_TIME)
+      this.themeUsedName.set(themeName) // force checking use in workspaces
+    }
+  }
+  // Stop the process of checking if the theme is used in workspaces
+  private stopGettingThemeUseData(workspaces: Workspace[]): void {
+    this.themeUsedByWorkspaces.set(workspaces)
+    this.themeUsed.set(workspaces.length > 0)
+    const themeUseLoadingDuration = performance.now() - this.themeUseStartTime!
+    // Switch not to fast to the ready state, to avoid flickering of the loading indicator.
+    const rest = this.MIN_LOADING_TIME - themeUseLoadingDuration
+    if (rest > 0) {
+      setTimeout(() => {
+        this.themeUseLoadingState.set('ready')
+      }, rest)
+    } else {
+      this.themeUseLoadingState.set('ready')
+    }
+    // clear the timeout timer if it is still running, to avoid unnecessary state changes
+    if (this.themeUseTimeoutTimer) {
+      clearTimeout(this.themeUseTimeoutTimer)
+      this.themeUseTimeoutTimer = undefined
+    }
   }
 
   /**
@@ -344,35 +397,6 @@ export class ThemeDetailComponent implements OnInit {
     this.themeToBeDeleted.set(theme)
     this.startGettingThemeUseData(theme?.name)
     this.themeDeleteVisible.set(true)
-  }
-
-  // Initialize the process of checking if the theme is used in workspaces, with a timeout to avoid long waits
-  private startGettingThemeUseData(themeName?: string): void {
-    this.themeUseLoadingState.set('loading')
-    if (this.themeUseTimeoutTimer) clearTimeout(this.themeUseTimeoutTimer)
-    this.themeUseTimeoutTimer = setTimeout(() => {
-      if (this.themeUseLoadingState() === 'loading') this.themeUseLoadingState.set('timeout')
-    }, 4000)
-    if (themeName) this.themeUsedName.set(themeName) // force checking use in workspaces
-  }
-  private stopGettingThemeUseData(workspaces: Workspace[]): void {
-    this.themeUsedByWorkspaces.set(workspaces)
-    this.themeUsed.set(workspaces.length > 0)
-    this.themeUseLoadingState.set('ready')
-    if (this.themeUseTimeoutTimer) {
-      clearTimeout(this.themeUseTimeoutTimer)
-      this.themeUseTimeoutTimer = undefined
-    }
-  }
-
-  private getWorkspaceData() {
-    // receive response from workspace service via slot
-    this.slotSubscription?.unsubscribe()
-    this.themeUsed.set(false)
-    this.slotSubscription = this.slotEmitter.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((res) => {
-      console.log('slot emitter', res)
-      this.stopGettingThemeUseData(res)
-    })
   }
 
   /**

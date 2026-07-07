@@ -7,8 +7,10 @@ import { PortalMessageService } from '@onecx/angular-integration-interface'
 import { ThemePropsComponent } from './theme-props.component'
 import { MimeType, ImagesInternalAPIService, Theme } from 'src/app/shared/generated'
 import { of, throwError } from 'rxjs'
-import { HttpResponse } from '@angular/common/http'
+import { HttpResponse, provideHttpClient } from '@angular/common/http'
 import { Utils, LogoRefType } from 'src/app/shared/utils'
+import { provideNoopAnimations } from '@angular/platform-browser/animations'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 
 const validTheme = {
   id: 'id',
@@ -51,15 +53,14 @@ describe('ThemePropsComponent', () => {
           en: require('src/assets/i18n/en.json')
         }).withDefaultLanguage('de')
       ],
-      providers: [
-        { provide: PortalMessageService, useValue: msgServiceSpy },
-        { provide: ImagesInternalAPIService, useValue: imgServiceSpy }
-      ]
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideNoopAnimations()]
     })
       .overrideComponent(ThemePropsComponent, {
-        set: {
-          template: '',
-          imports: []
+        add: {
+          providers: [
+            { provide: ImagesInternalAPIService, useValue: imgServiceSpy },
+            { provide: PortalMessageService, useValue: msgServiceSpy }
+          ]
         }
       })
       .compileComponents()

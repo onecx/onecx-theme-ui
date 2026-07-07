@@ -13,37 +13,40 @@
       <div class="flex column-gap-3 row-gap-1 justify-content-start align-items-center">
         @let icon =
           useLoadingState() === 'loading'
-            ? 'pi-spinner pi-spin'
+            ? 'pi-spin pi-cog'
             : useLoadingState() === 'timeout'
               ? 'pi-exclamation-triangle'
-              : 'pi-question-circle';
-        <div [class]="'text-2xl danger-action-text pi ' + icon"></div>
+              : useLoadingState() === 'ready' && themeUsed()
+                ? 'pi-ban'
+                : 'pi-question-circle';
+        @let color = useLoadingState() === 'ready' && !themeUsed() ? 'var(--danger-button-bg)' : 'var(--text-color)';
+        <div [class]="'text-3xl pi ' + icon" [style.color]="color"></div>
 
         <div class="w-full mt-1 flex flex-column row-gap-3">
           @if (useLoadingState() === 'loading') {
             <p-message
-              id="th_delete_loading_message"
+              id="th_delete_message_loading"
               severity="info"
-              [text]="'ACTIONS.LOADING' | translate"
+              [text]="'ACTIONS.DELETE.MESSAGE_CHECK_USE' | translate"
             ></p-message>
           } @else if (useLoadingState() === 'timeout') {
             <p-message
-              id="th_delete_timeout_message"
+              id="th_delete_message_timeout"
               severity="info"
               [text]="'ACTIONS.DELETE.MESSAGE_TIMEOUT' | translate"
             ></p-message>
           } @else if (useLoadingState() === 'ready' && themeToBeDeleted()) {
             @if (themeToBeDeleted()?.mandatory) {
               <p-message
-                id="th_delete_reject_mandatory_message"
+                id="th_delete_message_reject_mandatory"
                 severity="info"
                 [text]="'ACTIONS.DELETE.MESSAGE_REJECT_MANDATORY' | translate"
               ></p-message>
             } @else if (themeUsed()) {
               <p-message
-                id="th_delete_reject_use_message"
-                severity="info"
-                [text]="'ACTIONS.DELETE.MESSAGE_REJECT_USE' | translate"
+                id="th_delete_message_reject_used"
+                severity="error"
+                [text]="'ACTIONS.DELETE.MESSAGE_REJECT_DELETION' | translate"
               ></p-message>
             } @else {
               <div>

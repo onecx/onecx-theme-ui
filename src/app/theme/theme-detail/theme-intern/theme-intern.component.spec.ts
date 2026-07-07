@@ -17,14 +17,7 @@ describe('ThemeInternComponent', () => {
         }).withDefaultLanguage('de')
       ],
       providers: []
-    })
-      .overrideComponent(ThemeInternComponent, {
-        set: {
-          template: '',
-          imports: []
-        }
-      })
-      .compileComponents()
+    }).compileComponents()
   }))
 
   beforeEach(() => {

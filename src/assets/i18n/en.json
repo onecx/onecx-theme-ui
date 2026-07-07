@@ -23,7 +23,8 @@
       "MESSAGE_INFO": "This action cannot be undone!",
       "MESSAGE_INFO_OPERATOR": "This Theme was created by automation. It is deletable but it will be recreated by automation.",
       "MESSAGE_REJECT_MANDATORY": "The Theme is marked as required for operation and therefore cannot be deleted.",
-      "MESSAGE_REJECT_USE": "The Theme is used by Workspaces and therefore cannot be deleted.",
+      "MESSAGE_REJECT_DELETION": "The Theme is used by Workspaces and therefore cannot be deleted.",
+      "MESSAGE_CHECK_USE": "Checking the usage of the Theme in Workspaces...",
       "MESSAGE_TIMEOUT": "It took too long to determine the usage of the Theme. The operation was aborted.",
       "THEME_NOK": "Theme could not be deleted",
       "THEME_OK": "Theme deleted successfully"

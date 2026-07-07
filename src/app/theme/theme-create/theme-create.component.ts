@@ -1,5 +1,6 @@
 import { Component, DestroyRef, effect, inject, model } from '@angular/core'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 
 import { ButtonModule } from 'primeng/button'
@@ -15,7 +16,6 @@ import { PortalMessageService } from '@onecx/angular-integration-interface'
 
 import { Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { themeVariables } from '../theme-detail/theme-variables'
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 
 @Component({
   selector: 'app-theme-create',
@@ -39,7 +39,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 export class ThemeCreateComponent {
   public visible = model.required<boolean>()
   public created = model.required<Theme | undefined>()
-  public themeToBeCreated = model<Theme | undefined>()
+  public themeToBeCreated = model.required<Theme | undefined>()
 
   private readonly destroyRef = inject(DestroyRef)
   public formGroup: FormGroup

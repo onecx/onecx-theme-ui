@@ -10,6 +10,7 @@ import { PortalMessageService } from '@onecx/angular-integration-interface'
 
 import { Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeCreateComponent } from './theme-create.component'
+import { provideNoopAnimations } from '@angular/platform-browser/animations'
 
 const theme: Theme = {
   id: 'id',
@@ -22,7 +23,7 @@ describe('ThemeCreateComponent', () => {
   let component: ThemeCreateComponent
   let fixture: ComponentFixture<ThemeCreateComponent>
 
-  const themeApiServiceSpy = { createTheme: jasmine.createSpy('createTheme').and.returnValue(of({})) }
+  const themesApiSpy = { createTheme: jasmine.createSpy('createTheme').and.returnValue(of({})) }
   const msgServiceSpy = jasmine.createSpyObj<PortalMessageService>('PortalMessageService', ['success', 'error'])
 
   beforeEach(waitForAsync(() => {
@@ -34,18 +35,14 @@ describe('ThemeCreateComponent', () => {
           en: require('src/assets/i18n/en.json')
         }).withDefaultLanguage('en')
       ],
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting(),
-        provideRouter([]),
-        { provide: PortalMessageService, useValue: msgServiceSpy },
-        { provide: ThemesAPIService, useValue: themeApiServiceSpy }
-      ]
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideNoopAnimations(), provideRouter([])]
     })
       .overrideComponent(ThemeCreateComponent, {
-        set: {
-          template: '',
-          imports: []
+        add: {
+          providers: [
+            { provide: ThemesAPIService, useValue: themesApiSpy },
+            { provide: PortalMessageService, useValue: msgServiceSpy }
+          ]
         }
       })
       .compileComponents()
@@ -54,6 +51,10 @@ describe('ThemeCreateComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ThemeCreateComponent)
     component = fixture.componentInstance
+    // initialize component state
+    component.visible.set(true)
+    component.created.set(undefined)
+    component.themeToBeCreated.set(undefined)
     component.formGroup = new FormGroup({
       name: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(50)]),
       displayName: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(100)]),
@@ -63,7 +64,7 @@ describe('ThemeCreateComponent', () => {
   })
 
   afterEach(() => {
-    themeApiServiceSpy.createTheme.calls.reset()
+    themesApiSpy.createTheme.calls.reset()
     msgServiceSpy.success.calls.reset()
     msgServiceSpy.error.calls.reset()
   })
@@ -109,7 +110,7 @@ describe('ThemeCreateComponent', () => {
 
   describe('saveTheme', () => {
     it('should create a theme and set created', () => {
-      themeApiServiceSpy.createTheme.and.returnValue(of({ resource: theme }))
+      themesApiSpy.createTheme.and.returnValue(of({ resource: theme }))
 
       component.saveTheme()
 
@@ -119,17 +120,17 @@ describe('ThemeCreateComponent', () => {
 
     it('should use themeToBeCreated properties when set', () => {
       component.themeToBeCreated.set({ ...theme, properties: { general: { 'primary-color': '#000' } } })
-      themeApiServiceSpy.createTheme.and.returnValue(of({ resource: theme }))
+      themesApiSpy.createTheme.and.returnValue(of({ resource: theme }))
 
       component.saveTheme()
 
-      const callArgs = themeApiServiceSpy.createTheme.calls.mostRecent().args[0]
+      const callArgs = themesApiSpy.createTheme.calls.mostRecent().args[0]
       expect(callArgs.createThemeRequest.resource.properties).toEqual({ general: { 'primary-color': '#000' } })
     })
 
     it('should display error when theme creation fails', () => {
       const errorResponse = { status: 400, statusText: 'Error on creating a theme' }
-      themeApiServiceSpy.createTheme.and.returnValue(throwError(() => errorResponse))
+      themesApiSpy.createTheme.and.returnValue(throwError(() => errorResponse))
       spyOn(console, 'error')
 
       component.saveTheme()

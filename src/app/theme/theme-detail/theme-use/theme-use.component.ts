@@ -1,8 +1,9 @@
-import { Component, effect, input } from '@angular/core'
+import { Component, input } from '@angular/core'
 import { AsyncPipe } from '@angular/common'
 import { Router, RouterModule } from '@angular/router'
 import { TranslateModule } from '@ngx-translate/core'
 import { Observable, of } from 'rxjs'
+
 import { TooltipModule } from 'primeng/tooltip'
 
 import { WorkspaceService } from '@onecx/angular-integration-interface'
@@ -36,6 +37,7 @@ export class ThemeUseComponent {
   // signals
   public workspaces = input<Workspace[]>()
   public isComponentDefined = input<boolean>(false)
+  // dialog
   public workspaceEndpointExist = false
 
   constructor(
@@ -49,15 +51,6 @@ export class ThemeUseComponent {
       'onecx-workspace-ui',
       'workspace-detail'
     )
-    effect(() => {
-      if (this.isComponentDefined() === true) {
-        console.log('ThemeUseComponent: component exists: ', this.isComponentDefined(), this.workspaceEndpointExist)
-      }
-      const ws = this.workspaces()
-      if (ws) {
-        console.log('ThemeUseComponent: workspaces: ', ws)
-      }
-    })
   }
 
   public getWorkspaceEndpointUrl$(name?: string): Observable<string | undefined> {

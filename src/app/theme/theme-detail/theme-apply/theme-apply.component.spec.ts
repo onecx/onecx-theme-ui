@@ -24,12 +24,11 @@ describe('ThemeApplyComponent', () => {
           en: require('src/assets/i18n/en.json')
         }).withDefaultLanguage('de')
       ],
-      providers: [{ provide: PortalMessageService, useValue: msgServiceSpy }, ConfirmationService]
+      providers: [ConfirmationService]
     })
       .overrideComponent(ThemeApplyComponent, {
-        set: {
-          template: '',
-          imports: []
+        add: {
+          providers: [{ provide: PortalMessageService, useValue: msgServiceSpy }]
         }
       })
       .compileComponents()
@@ -104,7 +103,7 @@ describe('ThemeApplyComponent', () => {
       expect(confirmSpy).toHaveBeenCalled()
       const confirmArg = confirmSpy.calls.mostRecent().args[0]
       expect(confirmArg.key).toBe('template')
-      expect(confirmArg.icon).toBe('pi pi-question-circle')
+      expect(confirmArg.icon).toBe('pi pi-question-circle danger-action-text')
       expect(confirmArg.defaultFocus).toBe('reject')
       expect(confirmArg.dismissableMask).toBeTrue()
     })

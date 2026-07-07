@@ -1,4 +1,4 @@
-import { Component, effect, input, model } from '@angular/core'
+import { Component, input, model } from '@angular/core'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 
 import { ButtonModule } from 'primeng/button'
@@ -21,12 +21,9 @@ export class ThemeDeleteComponent {
   // signals
   public visible = model.required<boolean>()
   public deleted = model.required<boolean>()
-  public themeUsed = input.required<boolean>()
   public useLoadingState = input.required<LoadingState>()
-  // data
+  public themeUsed = input.required<boolean>()
   public themeToBeDeleted = input<Theme | undefined>()
-  public theme: Theme | undefined
-  //public themea : Signal<Theme | undefined>
 
   constructor(
     private readonly themeApi: ThemesAPIService,
@@ -34,17 +31,6 @@ export class ThemeDeleteComponent {
     private readonly translate: TranslateService
   ) {
     this.deleted.set(false)
-    effect(() => {
-      if (this.theme !== this.themeToBeDeleted()) {
-        this.theme = this.themeToBeDeleted()
-      }
-    })
-    /*
-    this.themea = computed(() => {
-      if (this.themea() !== this.themeToBeDeleted()) return this.themeToBeDeleted()
-      else return undefined
-    })
-      */
   }
 
   /**

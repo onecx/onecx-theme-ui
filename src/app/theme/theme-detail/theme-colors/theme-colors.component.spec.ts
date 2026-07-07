@@ -22,12 +22,11 @@ describe('ThemeColorsComponent', () => {
           en: require('src/assets/i18n/en.json')
         }).withDefaultLanguage('de')
       ],
-      providers: [{ provide: PortalMessageService, useValue: msgServiceSpy }]
+      providers: []
     })
       .overrideComponent(ThemeColorsComponent, {
-        set: {
-          template: '',
-          imports: []
+        add: {
+          providers: [{ provide: PortalMessageService, useValue: msgServiceSpy }]
         }
       })
       .compileComponents()

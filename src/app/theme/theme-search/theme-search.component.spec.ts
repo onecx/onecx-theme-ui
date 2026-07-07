@@ -1,11 +1,13 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { ActivatedRoute, ActivatedRouteSnapshot, provideRouter, Router } from '@angular/router'
+import { provideRouter, Router } from '@angular/router'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 import { of, throwError } from 'rxjs'
 
 import { DataSortDirection, RowListGridData } from '@onecx/angular-accelerator'
+import { provideNoopAnimations } from '@angular/platform-browser/animations'
+import { providePermissionService } from '@onecx/angular-utils'
 
 import { SearchThemeResponse, Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeSearchComponent } from './theme-search.component'
@@ -14,12 +16,13 @@ describe('ThemeSearchComponent', () => {
   let component: ThemeSearchComponent
   let fixture: ComponentFixture<ThemeSearchComponent>
 
-  const mockRouter = { navigate: jasmine.createSpy('navigate') }
-  const mockActivatedRouteSnapshot: Partial<ActivatedRouteSnapshot> = { params: { id: 'mockId' } }
-  const mockActivatedRoute: Partial<ActivatedRoute> = {
-    snapshot: mockActivatedRouteSnapshot as ActivatedRouteSnapshot
+  const themesApiSpy = { searchThemes: jasmine.createSpy('searchThemes').and.returnValue(of({})) }
+
+  function initTestComponent(): void {
+    fixture = TestBed.createComponent(ThemeSearchComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
   }
-  const themeApiSpy = { searchThemes: jasmine.createSpy('searchThemes').and.returnValue(of({})) }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -33,33 +36,24 @@ describe('ThemeSearchComponent', () => {
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
-        provideRouter([{ path: '', component: ThemeSearchComponent }]),
-        { provide: ThemesAPIService, useValue: themeApiSpy },
-        { provide: Router, useValue: mockRouter },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute }
+        providePermissionService(),
+        provideNoopAnimations(),
+        provideRouter([{ path: '', component: ThemeSearchComponent }])
       ]
     })
       .overrideComponent(ThemeSearchComponent, {
-        set: {
-          template: '',
-          imports: []
+        add: {
+          providers: [{ provide: ThemesAPIService, useValue: themesApiSpy }]
         }
       })
       .compileComponents()
-    // to spy data: reset
-    themeApiSpy.searchThemes.calls.reset()
-    // to spy data: refill with neutral data
-    themeApiSpy.searchThemes.and.returnValue(of({}))
   }))
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ThemeSearchComponent)
-    component = fixture.componentInstance
-    themeApiSpy.searchThemes.and.returnValue(of({}) as any)
-  })
-
-  afterEach(() => {
-    themeApiSpy.searchThemes.calls.reset()
+    // reset spy BEFORE creating component so initTestComponent uses neutral value
+    themesApiSpy.searchThemes.calls.reset()
+    themesApiSpy.searchThemes.and.returnValue(of({}))
+    initTestComponent()
   })
 
   describe('initialization', () => {
@@ -75,8 +69,8 @@ describe('ThemeSearchComponent', () => {
           { name: 'theme2', displayName: 'Theme 2' }
         ]
       }
-      themeApiSpy.searchThemes.and.returnValue(of(themesResponse as SearchThemeResponse))
-      fixture.detectChanges()
+      themesApiSpy.searchThemes.and.returnValue(of(themesResponse as SearchThemeResponse))
+      component.loadThemes()
 
       component.data$.subscribe({
         next: (result) => {
@@ -105,8 +99,8 @@ describe('ThemeSearchComponent', () => {
 
   describe('search on init', () => {
     it('should manage no themes exists', (done) => {
-      themeApiSpy.searchThemes.and.returnValue(of({ stream: [] } as SearchThemeResponse))
-      fixture.detectChanges()
+      themesApiSpy.searchThemes.and.returnValue(of({ stream: [] } as SearchThemeResponse))
+      component.loadThemes()
 
       component.data$.subscribe({
         next: (result) => {
@@ -121,9 +115,9 @@ describe('ThemeSearchComponent', () => {
 
     it('should manage known server error', (done) => {
       const errorResponse = { status: 403, statusText: 'No permissions' }
-      themeApiSpy.searchThemes.and.returnValue(throwError(() => errorResponse))
+      themesApiSpy.searchThemes.and.returnValue(throwError(() => errorResponse))
       spyOn(console, 'error')
-      fixture.detectChanges()
+      component.loadThemes()
 
       component.data$.subscribe({
         next: (result) => {
@@ -140,21 +134,21 @@ describe('ThemeSearchComponent', () => {
 
     it('should manage unknown server error', (done) => {
       const errorResponse = { status: 405, statusText: 'something went wrong' }
-      themeApiSpy.searchThemes.and.returnValue(throwError(() => errorResponse))
+      themesApiSpy.searchThemes.and.returnValue(throwError(() => errorResponse))
       spyOn(console, 'error')
-      fixture.detectChanges()
+      component.loadThemes()
 
       component.data$.subscribe({
         next: (result) => {
           if (result) {
             expect(result.length).toBe(0)
-            expect(console.error).toHaveBeenCalledWith('searchThemes', errorResponse)
             expect(component.exceptionKey).toEqual('EXCEPTIONS.HTTP_STATUS_405.THEME')
           }
           done()
         },
         error: done.fail
       })
+      expect(console.error).toHaveBeenCalledWith('searchThemes', errorResponse)
     })
   })
 
@@ -190,6 +184,7 @@ describe('ThemeSearchComponent', () => {
   it('should navigate to created theme on theme creation', () => {
     fixture.detectChanges()
     const router = TestBed.inject(Router)
+    spyOn(router, 'navigate').and.returnValue(Promise.resolve(true))
 
     component.themeCreated.set({ name: 'new-theme' } as Theme)
     fixture.detectChanges()
@@ -266,10 +261,13 @@ describe('ThemeSearchComponent', () => {
 
   describe('navigation', () => {
     it('should navigate to detail page when a tile is clicked', () => {
+      fixture.detectChanges()
+      const router = TestBed.inject(Router)
+      spyOn(router, 'navigate').and.returnValue(Promise.resolve(true))
       const theme: Theme = { name: 'onecx', displayName: 'OneCX', description: 'OneCX theme' }
 
       component.onAppClick(theme as unknown as RowListGridData)
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['./', theme.name], { relativeTo: mockActivatedRoute })
+      expect(router.navigate).toHaveBeenCalledWith(['./', theme.name], { relativeTo: (component as any).route })
     })
 
     it('should prevent navigation if name is missing', () => {

@@ -5,6 +5,8 @@ import { of } from 'rxjs'
 import { AppStateService } from '@onecx/angular-integration-interface'
 
 import { ImageContainerComponent } from './image-container.component'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { provideHttpClient } from '@angular/common/http'
 
 class MockAppStateService {
   currentMfe$ = of({
@@ -34,15 +36,12 @@ describe('ImageContainerComponent', () => {
           en: require('src/assets/i18n/en.json')
         }).withDefaultLanguage('en')
       ],
-      providers: [{ provide: AppStateService, useValue: mockAppStateService }]
-    })
-      .overrideComponent(ImageContainerComponent, {
-        set: {
-          template: '',
-          imports: []
-        }
-      })
-      .compileComponents()
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: AppStateService, useValue: mockAppStateService }
+      ]
+    }).compileComponents()
   }))
 
   beforeEach(() => {
