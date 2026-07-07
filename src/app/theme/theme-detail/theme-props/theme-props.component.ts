@@ -1,7 +1,8 @@
-import { Component, input, model, OnChanges, output, SimpleChanges } from '@angular/core'
+import { Component, computed, input, model, OnChanges, output, Signal, SimpleChanges } from '@angular/core'
+import { toSignal } from '@angular/core/rxjs-interop'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
-import { ReplaySubject } from 'rxjs'
+import { combineLatest, map, ReplaySubject, startWith } from 'rxjs'
 
 import { ButtonModule } from 'primeng/button'
 import { CheckboxModule } from 'primeng/checkbox'
@@ -49,10 +50,11 @@ export class ThemePropsComponent implements OnChanges {
   public readonly theme = model.required<Theme | undefined>()
   public readonly changeMode = input.required<ChangeMode>()
   public readonly headerImageUrl = output<string | undefined>()
-  // data
-  public basicForm: FormGroup
-  public fontForm: FormGroup
-  public themeFormValues$ = new ReplaySubject<{ theme: string }>(1) // async storage of formgroup value to manage change detection
+  // signals for forms, initialized in constructor
+  public isBasicFormValid!: Signal<boolean>
+  public isFontFormValid!: Signal<boolean>
+  public isComponentValid!: Signal<Theme>
+  public combinedFormValues!: Signal<Theme>
   // image
   public bffUrl: Partial<Record<LogoRefType, string | undefined>> = {}
   public imageBasePath = this.imageApi.configuration.basePath
@@ -61,12 +63,66 @@ export class ThemePropsComponent implements OnChanges {
   public Utils = Utils
   public getLocation = getLocation
   public LogoRefType = LogoRefType
+  // data
+  public basicForm: FormGroup = new FormGroup({})
+  public fontForm: FormGroup = new FormGroup({})
+  public themeFormValues$ = new ReplaySubject<{ theme: string }>(1) // async storage of formgroup value to manage change detection
 
   constructor(
     private readonly msgService: PortalMessageService,
     private readonly translate: TranslateService,
     private readonly imageApi: ImagesInternalAPIService
   ) {
+    this.initForms()
+    // build signals for form validation: basic and font form, for internal use in this component only
+    this.isBasicFormValid = toSignal(
+      this.basicForm.statusChanges.pipe(
+        map((status) => status === 'VALID'),
+        startWith(this.basicForm.valid) // initial state on component init
+      ),
+      { requireSync: true }
+    )
+    this.isFontFormValid = toSignal(
+      this.fontForm.statusChanges.pipe(
+        map((status) => status === 'VALID'),
+        startWith(this.fontForm.valid) // initial state on component init
+      ),
+      { requireSync: true }
+    )
+    // build a combined signal for overall form validation: for use in detail component
+    this.isComponentValid = computed(() => {
+      return this.isBasicFormValid() && this.isFontFormValid()
+    })
+    // Combine the form values to a Theme
+    this.combinedFormValues = toSignal<Theme>(
+      combineLatest([
+        this.basicForm.valueChanges.pipe(startWith(this.basicForm.value)),
+        this.fontForm.valueChanges.pipe(startWith(this.fontForm.value))
+      ]).pipe(
+        map(([basicValue, fontValue]) => {
+          return { ...basicValue, properties: { font: fontValue } } as Theme
+        })
+      ),
+      { requireSync: true }
+    )
+  }
+
+  public ngOnChanges(changes: SimpleChanges): void {
+    this.basicForm.disable()
+    this.fontForm.disable()
+    if (this.theme() !== undefined) {
+      if (changes['theme']) this.fillForm(this.theme()!)
+      if (this.changeMode() !== 'VIEW') {
+        this.basicForm.enable()
+        this.fontForm.enable()
+      }
+    } else {
+      this.basicForm.reset()
+      this.fontForm.reset()
+    }
+  }
+
+  private initForms() {
     this.basicForm = new FormGroup({
       name: new FormControl<string | null>(null, [
         Validators.required,
@@ -98,25 +154,9 @@ export class ThemePropsComponent implements OnChanges {
     })
     this.basicForm.valueChanges.subscribe(this.themeFormValues$)
     // font
-    this.fontForm = new FormGroup({})
     for (const v of themeVariables.font) {
       const fc = new FormControl<string | null>(null, [Validators.maxLength(255)])
       this.fontForm.addControl(v, fc)
-    }
-  }
-
-  public ngOnChanges(changes: SimpleChanges): void {
-    this.basicForm.disable()
-    this.fontForm.disable()
-    if (this.theme() !== undefined) {
-      if (changes['theme']) this.fillForm(this.theme()!)
-      if (this.changeMode() !== 'VIEW') {
-        this.basicForm.enable()
-        this.fontForm.enable()
-      }
-    } else {
-      this.basicForm.reset()
-      this.fontForm.reset()
     }
   }
 
@@ -136,22 +176,21 @@ export class ThemePropsComponent implements OnChanges {
 
   // called by theme detail dialog: returns form values to theme detail component for saving
   public onUpdateTheme(): boolean {
-    if (this.theme()) {
-      if (this.basicForm.valid) {
-        Object.assign(this.theme()!, this.getFormData(this.basicForm))
-      } else {
-        this.msgService.error({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
-        return false
+    if (!this.theme()) return false
+    if (this.basicForm.valid) {
+      Object.assign(this.theme()!, this.getFormData(this.basicForm))
+    } else {
+      this.msgService.error({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
+      return false
+    }
+    if (this.fontForm.valid)
+      // add only font properties
+      this.theme()!.properties = {
+        font: this.fontForm.value
       }
-      if (this.fontForm.valid)
-        // add only font properties
-        this.theme()!.properties = {
-          font: this.fontForm.value
-        }
-      else {
-        this.msgService.error({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
-        return false
-      }
+    else {
+      this.msgService.error({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
+      return false
     }
     return true
   }
@@ -161,7 +200,7 @@ export class ThemePropsComponent implements OnChanges {
     const changes: any = {}
     Object.keys(form.controls).forEach((key) => {
       if (form.value[key] !== undefined) {
-        if (form.value[key] !== (this.theme as any)[key]) {
+        if (form.value[key] !== (this.theme() as any)[key]) {
           changes[key] = form.value[key]
         }
       }

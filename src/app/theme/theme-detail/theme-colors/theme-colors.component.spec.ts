@@ -1,5 +1,5 @@
 import { SimpleChange } from '@angular/core'
-import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from '@angular/core/testing'
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 
 import { PortalMessageService } from '@onecx/angular-integration-interface'
@@ -35,6 +35,9 @@ describe('ThemeColorsComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ThemeColorsComponent)
     component = fixture.componentInstance
+    fixture.componentRef.setInput('changeMode', 'VIEW')
+    fixture.componentRef.setInput('autoApply', false)
+    fixture.componentRef.setInput('theme', undefined)
     fixture.detectChanges()
   })
 
@@ -52,19 +55,19 @@ describe('ThemeColorsComponent', () => {
 
     it('should create form controls for all general theme variables', () => {
       for (const v of themeVariables.general) {
-        expect(component.generalForm.contains(v)).toBeTrue()
+        expect(component.generalForm.get(v)).not.toBeNull()
       }
     })
 
     it('should create form controls for all topbar theme variables', () => {
       for (const v of themeVariables.topbar) {
-        expect(component.topbarForm.contains(v)).toBeTrue()
+        expect(component.topbarForm.get(v)).not.toBeNull()
       }
     })
 
     it('should create form controls for all sidebar theme variables', () => {
       for (const v of themeVariables.sidebar) {
-        expect(component.sidebarForm.contains(v)).toBeTrue()
+        expect(component.sidebarForm.get(v)).not.toBeNull()
       }
     })
 
@@ -76,7 +79,53 @@ describe('ThemeColorsComponent', () => {
     })
 
     it('should default autoApply to false', () => {
-      expect(component.autoApply).toBeFalse()
+      expect(component.autoApply()).toBeFalse()
+    })
+  })
+
+  describe('signals', () => {
+    it('isComponentValid should be false when forms are disabled (initial state)', () => {
+      // default from beforeEach: theme=undefined, changeMode=VIEW → all sub-forms disabled
+      expect(component.isComponentValid()).toBeFalse()
+    })
+
+    it('isComponentValid should be true when all forms are enabled and valid', () => {
+      const theme: Theme = { name: 'test', properties: {} }
+      fixture.componentRef.setInput('changeMode', 'EDIT')
+      fixture.componentRef.setInput('theme', theme)
+      component.ngOnChanges({ theme: new SimpleChange(undefined, theme, true) })
+
+      expect(component.isComponentValid()).toBeTrue()
+    })
+
+    it('isComponentValid should be false when general form has errors', () => {
+      const theme: Theme = { name: 'test', properties: {} }
+      fixture.componentRef.setInput('changeMode', 'EDIT')
+      fixture.componentRef.setInput('theme', theme)
+      component.ngOnChanges({ theme: new SimpleChange(undefined, theme, true) })
+      component.generalForm.setErrors({ invalid: true })
+
+      expect(component.isComponentValid()).toBeFalse()
+    })
+
+    it('isComponentValid should be false when topbar form has errors', () => {
+      const theme: Theme = { name: 'test', properties: {} }
+      fixture.componentRef.setInput('changeMode', 'EDIT')
+      fixture.componentRef.setInput('theme', theme)
+      component.ngOnChanges({ theme: new SimpleChange(undefined, theme, true) })
+      component.topbarForm.setErrors({ invalid: true })
+
+      expect(component.isComponentValid()).toBeFalse()
+    })
+
+    it('isComponentValid should be false when sidebar form has errors', () => {
+      const theme: Theme = { name: 'test', properties: {} }
+      fixture.componentRef.setInput('changeMode', 'EDIT')
+      fixture.componentRef.setInput('theme', theme)
+      component.ngOnChanges({ theme: new SimpleChange(undefined, theme, true) })
+      component.sidebarForm.setErrors({ invalid: true })
+
+      expect(component.isComponentValid()).toBeFalse()
     })
   })
 
@@ -90,8 +139,8 @@ describe('ThemeColorsComponent', () => {
           sidebar: { 'menu-text-color': '#0000ff' }
         }
       }
-      component.theme = theme
-      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme, true) })
+      fixture.componentRef.setInput('theme', theme)
+      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme(), true) })
 
       expect(component.generalForm.get('primary-color')?.value).toBe('#ff0000')
       expect(component.topbarForm.get('topbar-bg-color')?.value).toBe('#00ff00')
@@ -99,8 +148,8 @@ describe('ThemeColorsComponent', () => {
     })
 
     it('should not fill form when theme is undefined', () => {
-      component.theme = undefined
-      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme, true) })
+      fixture.componentRef.setInput('theme', undefined)
+      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme(), true) })
 
       expect(component.generalForm.get('primary-color')?.value).toBeNull()
       expect(component.topbarForm.get('topbar-bg-color')?.value).toBeNull()
@@ -109,10 +158,10 @@ describe('ThemeColorsComponent', () => {
 
     it('should default operator to undefined if not set on theme', () => {
       const theme: Theme = { name: 'test-theme' }
-      component.theme = theme
-      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme, true) })
+      fixture.componentRef.setInput('theme', theme)
+      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme(), true) })
 
-      expect(component.theme.operator).toBeUndefined()
+      expect(component.theme()?.operator).toBeUndefined()
     })
 
     it('should reset form before patching new values', () => {
@@ -120,8 +169,8 @@ describe('ThemeColorsComponent', () => {
         name: 'theme1',
         properties: { general: { 'primary-color': '#111111' } }
       }
-      component.theme = theme1
-      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme, true) })
+      fixture.componentRef.setInput('theme', theme1)
+      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme(), true) })
 
       expect(component.generalForm.get('primary-color')?.value).toBe('#111111')
 
@@ -129,8 +178,8 @@ describe('ThemeColorsComponent', () => {
         name: 'theme2',
         properties: { general: { 'secondary-color': '#222222' } }
       }
-      component.theme = theme2
-      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme, true) })
+      fixture.componentRef.setInput('theme', theme2)
+      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme(), true) })
 
       expect(component.generalForm.get('primary-color')?.value).toBeNull()
       expect(component.generalForm.get('secondary-color')?.value).toBe('#222222')
@@ -149,21 +198,21 @@ describe('ThemeColorsComponent', () => {
     }
 
     it('should save form values to theme properties', () => {
-      component.changeMode = 'EDIT'
-      component.theme = theme
+      fixture.componentRef.setInput('changeMode', 'EDIT')
+      fixture.componentRef.setInput('theme', theme)
 
-      component.ngOnChanges({ theme: new SimpleChange(undefined, theme, true) })
+      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme(), true) })
       expect(component.onUpdateTheme()).toBeTrue()
 
-      expect(component.theme.properties).toEqual(component.colorsForm.value)
+      expect(component.theme()?.properties).toEqual(component.colorsForm.value)
     })
 
     it('call with theme but invalid font form', () => {
       const theme: Theme = { name: 'test-theme', properties: {} }
-      component.changeMode = 'EDIT'
-      component.theme = theme
+      fixture.componentRef.setInput('changeMode', 'EDIT')
+      fixture.componentRef.setInput('theme', theme)
 
-      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme, true) })
+      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme(), true) })
       // manually invalidate the font form
       component.colorsForm.markAsDirty()
       component.colorsForm.setErrors({ invalid: true })
@@ -174,7 +223,7 @@ describe('ThemeColorsComponent', () => {
     })
 
     it('should not save if theme is undefined', () => {
-      component.theme = undefined
+      fixture.componentRef.setInput('theme', undefined)
 
       // no error thrown
       expect(component.onUpdateTheme()).toBeFalse()
@@ -182,118 +231,134 @@ describe('ThemeColorsComponent', () => {
   })
 
   describe('autoApply', () => {
-    it('should apply CSS variable when autoApply is true and a color value changes', fakeAsync(() => {
-      component.autoApply = true
+    it('should apply CSS variable when autoApply is true and a color value changes', async () => {
+      fixture.componentRef.setInput('autoApply', true)
+      fixture.detectChanges()
       const spy = spyOn(document.documentElement.style, 'setProperty')
 
       component.generalForm.get('primary-color')?.setValue('#ff5500')
-      tick(300)
+      await fixture.whenStable()
+      fixture.detectChanges()
 
       expect(spy).toHaveBeenCalledWith('--primary-color', '#ff5500')
       expect(spy).toHaveBeenCalledWith('--primary-color-rgb', '255,85,0')
-    }))
+    })
 
-    it('should not apply CSS variable when autoApply is false', fakeAsync(() => {
-      component.autoApply = false
+    it('should not apply CSS variable when autoApply is false', async () => {
+      fixture.componentRef.setInput('autoApply', false)
+      fixture.detectChanges()
       const spy = spyOn(document.documentElement.style, 'setProperty')
 
       component.generalForm.get('primary-color')?.setValue('#ff5500')
-      tick(300)
+      await fixture.whenStable()
+      fixture.detectChanges()
 
       expect(spy).not.toHaveBeenCalled()
-    }))
+    })
 
-    it('should handle invalid hex gracefully (no rgb property set)', fakeAsync(() => {
-      component.autoApply = true
+    it('should handle invalid hex gracefully (no rgb property set)', async () => {
+      fixture.componentRef.setInput('autoApply', true)
+      fixture.detectChanges()
       const spy = spyOn(document.documentElement.style, 'setProperty')
 
       component.generalForm.get('primary-color')?.setValue('not-a-hex')
-      tick(300)
+      await fixture.whenStable()
+      fixture.detectChanges()
 
       expect(spy).toHaveBeenCalledWith('--primary-color', 'not-a-hex')
       expect(spy).not.toHaveBeenCalledWith('--primary-color-rgb', jasmine.anything())
-    }))
+    })
 
-    it('should use empty string when form value is null', fakeAsync(() => {
-      component.autoApply = true
+    it('should use empty string when form value is null', async () => {
+      fixture.componentRef.setInput('autoApply', true)
+      fixture.detectChanges()
       const spy = spyOn(document.documentElement.style, 'setProperty')
 
       component.generalForm.get('primary-color')?.setValue(null)
-      tick(300)
+      await fixture.whenStable()
+      fixture.detectChanges()
 
       expect(spy).toHaveBeenCalledWith('--primary-color', '')
-    }))
+    })
 
-    it('should debounce rapid value changes', fakeAsync(() => {
-      component.autoApply = true
+    it('should debounce rapid value changes', async () => {
+      fixture.componentRef.setInput('autoApply', true)
+      fixture.detectChanges()
       const spy = spyOn(document.documentElement.style, 'setProperty')
 
       component.generalForm.get('primary-color')?.setValue('#111111')
-      tick(100)
       component.generalForm.get('primary-color')?.setValue('#222222')
-      tick(100)
       component.generalForm.get('primary-color')?.setValue('#333333')
-      tick(300)
+      await fixture.whenStable()
+      fixture.detectChanges()
 
       expect(spy).toHaveBeenCalledWith('--primary-color', '#333333')
       expect(spy).not.toHaveBeenCalledWith('--primary-color', '#111111')
-    }))
+    })
 
-    it('should apply CSS variable for topbar form controls', fakeAsync(() => {
-      component.autoApply = true
+    it('should apply CSS variable for topbar form controls', async () => {
+      fixture.componentRef.setInput('autoApply', true)
+      fixture.detectChanges()
       const spy = spyOn(document.documentElement.style, 'setProperty')
 
       component.topbarForm.get('topbar-bg-color')?.setValue('#003366')
-      tick(300)
+      await fixture.whenStable()
+      fixture.detectChanges()
 
       expect(spy).toHaveBeenCalledWith('--topbar-bg-color', '#003366')
       expect(spy).toHaveBeenCalledWith('--topbar-bg-color-rgb', '0,51,102')
-    }))
+    })
 
-    it('should apply CSS variable for sidebar form controls', fakeAsync(() => {
-      component.autoApply = true
+    it('should apply CSS variable for sidebar form controls', async () => {
+      fixture.componentRef.setInput('autoApply', true)
+      fixture.detectChanges()
       const spy = spyOn(document.documentElement.style, 'setProperty')
 
       component.sidebarForm.get('menu-text-color')?.setValue('#99ccff')
-      tick(300)
+      await fixture.whenStable()
+      fixture.detectChanges()
 
       expect(spy).toHaveBeenCalledWith('--menu-text-color', '#99ccff')
       expect(spy).toHaveBeenCalledWith('--menu-text-color-rgb', '153,204,255')
-    }))
+    })
   })
 
   describe('onChangeColorValue', () => {
     it('should do nothing when changeMode is VIEW', () => {
-      component.changeMode = 'VIEW'
+      fixture.componentRef.setInput('changeMode', 'VIEW')
+      fixture.detectChanges()
       component.onChangeColorValue('general', 'primary-color', '#abcdef')
 
       expect(component.generalForm.get('primary-color')?.value).toBeNull()
     })
 
     it('should update the form control value for a general variable', () => {
-      component.changeMode = 'EDIT'
+      fixture.componentRef.setInput('changeMode', 'EDIT')
       component.onChangeColorValue('general', 'primary-color', '#abcdef')
 
       expect(component.generalForm.get('primary-color')?.value).toBe('#abcdef')
     })
 
     it('should update the form control value for a topbar variable', () => {
-      component.changeMode = 'EDIT'
+      fixture.componentRef.setInput('changeMode', 'EDIT')
+      fixture.detectChanges()
       component.onChangeColorValue('topbar', 'topbar-bg-color', '#112233')
 
       expect(component.topbarForm.get('topbar-bg-color')?.value).toBe('#112233')
     })
 
     it('should update the form control value for a sidebar variable', () => {
-      component.changeMode = 'EDIT'
+      fixture.componentRef.setInput('changeMode', 'EDIT')
+      fixture.detectChanges()
       component.onChangeColorValue('sidebar', 'menu-text-color', '#334455')
 
       expect(component.sidebarForm.get('menu-text-color')?.value).toBe('#334455')
     })
 
     it('should apply CSS variable when autoApply is true', () => {
-      component.changeMode = 'EDIT'
-      component.autoApply = true
+      fixture.componentRef.setInput('changeMode', 'EDIT')
+      fixture.componentRef.setInput('autoApply', true)
+      fixture.detectChanges()
       const spy = spyOn(document.documentElement.style, 'setProperty')
 
       component.onChangeColorValue('general', 'primary-color', '#ff0000')
@@ -303,8 +368,9 @@ describe('ThemeColorsComponent', () => {
     })
 
     it('should not apply CSS variable when autoApply is false', () => {
-      component.changeMode = 'EDIT'
-      component.autoApply = false
+      fixture.componentRef.setInput('changeMode', 'EDIT')
+      fixture.componentRef.setInput('autoApply', false)
+      fixture.detectChanges()
       const spy = spyOn(document.documentElement.style, 'setProperty')
 
       component.onChangeColorValue('general', 'primary-color', '#ff0000')
@@ -312,12 +378,17 @@ describe('ThemeColorsComponent', () => {
       expect(spy).not.toHaveBeenCalled()
     })
 
-    it('should do nothing for an unknown group key', () => {
-      component.changeMode = 'EDIT'
+    it('should do nothing for an unknown group key', async () => {
+      fixture.componentRef.setInput('changeMode', 'EDIT')
+      fixture.componentRef.setInput('autoApply', false)
+      await fixture.whenStable()
+      fixture.detectChanges()
       const spy = spyOn(document.documentElement.style, 'setProperty')
 
       // Should not throw; unknown key finds no group
       expect(() => component.onChangeColorValue('unknown', 'primary-color', '#ff0000')).not.toThrow()
+      await fixture.whenStable()
+      fixture.detectChanges()
       expect(component.generalForm.get('primary-color')?.value).toBeNull()
       expect(spy).not.toHaveBeenCalled()
     })

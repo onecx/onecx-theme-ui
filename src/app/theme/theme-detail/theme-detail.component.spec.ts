@@ -15,7 +15,7 @@ import { SlotService } from '@onecx/angular-remote-components'
 import { ImagesInternalAPIService, Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { Utils, LogoRefType } from 'src/app/shared/utils'
 
-import { slotInitializer, ThemeDetailComponent, ChangeMode } from './theme-detail.component'
+import { slotInitializer, ThemeDetailComponent } from './theme-detail.component'
 import { DestroyRef, signal } from '@angular/core'
 import { Workspace } from './theme-use/theme-use.component'
 
@@ -125,6 +125,14 @@ describe('ThemeDetailComponent', () => {
   describe('construction', () => {
     it('should create component', () => {
       expect(component).toBeTruthy()
+    })
+
+    it('should compute themeData from view children without mock', () => {
+      // Reading themeData() without overriding it triggers the lazy computed() callback,
+      // which reads viewChild signals for themePropsComponent and themeColorsComponent.
+      const data = component.themeData()
+      expect(data).toBeDefined()
+      expect(data.theme).toBeDefined()
     })
 
     it('should use German date format', () => {
@@ -731,10 +739,8 @@ describe('ThemeDetailComponent', () => {
 
     it('should trigger save action callback', (done: DoneFn) => {
       component.changeMode = 'EDIT'
-      component.ThemePropsComponent = {
-        onUpdateTheme: () => false,
-        theme: undefined
-      } as any
+      component.themeData = signal({ theme: {}, propsValid: false, colorsValid: true }) as any
+      spyOn(console, 'log')
       component.preparePageActions(theme)
 
       component.actions$.subscribe((actions) => {
@@ -802,37 +808,20 @@ describe('ThemeDetailComponent', () => {
   })
 
   describe('onUpdateTheme', () => {
-    let mockThemePropsComponent: any
-    let mockThemeColorsComponent: any
-
     beforeEach(() => {
-      mockThemePropsComponent = {
-        onUpdateTheme: jasmine.createSpy('onUpdateTheme').and.returnValue(true),
-        theme: signal<Theme | undefined>({ ...theme, properties: {} }),
-        changeMode: signal<ChangeMode>('VIEW')
-      }
-
-      mockThemeColorsComponent = {
-        onUpdateTheme: jasmine.createSpy('onUpdateTheme').and.returnValue(true),
-        theme: { properties: { primary: '#fff' } }
-      }
-      component.ThemePropsComponent = mockThemePropsComponent
-      component.ThemeColorsComponent = mockThemeColorsComponent
+      component.themeData = signal({ theme: { ...theme, properties: {} }, propsValid: true, colorsValid: true }) as any
       component['themeName'] = theme.name!
       component.theme = { ...theme, id: 'themeId', modificationCount: 1 }
+      spyOn(console, 'log')
     })
 
     it('should call updateTheme on save with valid forms', (done: DoneFn) => {
       const updatedTheme = { ...theme, id: 'themeId' }
       themesApiSpy.updateTheme.and.returnValue(of({ resource: updatedTheme }) as any)
       themesApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
-      mockThemePropsComponent.theme.set({ ...theme, properties: {} })
-      mockThemePropsComponent.changeMode.set('EDIT')
 
       component['onUpdateTheme']()
 
-      expect(mockThemePropsComponent.onUpdateTheme).toHaveBeenCalled()
-      expect(mockThemeColorsComponent.onUpdateTheme).toHaveBeenCalled()
       expect(themesApiSpy.updateTheme).toHaveBeenCalledWith(jasmine.objectContaining({ id: 'themeId' }))
       expect(msgServiceSpy.success).toHaveBeenCalledWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.OK' })
       // subscribe to theme$ to cover the Observable subscriber
@@ -842,25 +831,24 @@ describe('ThemeDetailComponent', () => {
       })
     })
 
-    it('should not proceed if ThemePropsComponent.onUpdateTheme returns false', () => {
-      mockThemePropsComponent.onUpdateTheme.and.returnValue(false)
-
-      component['onUpdateTheme']()
-
-      expect(mockThemeColorsComponent.onUpdateTheme).not.toHaveBeenCalled()
-      expect(themesApiSpy.updateTheme).not.toHaveBeenCalled()
-    })
-
-    it('should not proceed if themeData is undefined', () => {
-      mockThemePropsComponent.theme = signal(undefined)
+    it('should not proceed if propsValid is false', () => {
+      component.themeData = signal({ theme: {}, propsValid: false, colorsValid: true }) as any
 
       component['onUpdateTheme']()
 
       expect(themesApiSpy.updateTheme).not.toHaveBeenCalled()
     })
 
-    it('should not proceed if ThemeColorsComponent.onUpdateTheme returns false', () => {
-      mockThemeColorsComponent.onUpdateTheme.and.returnValue(false)
+    it('should not proceed if propsValid is undefined (no child component)', () => {
+      component.themeData = signal({ theme: {}, propsValid: undefined, colorsValid: true }) as any
+
+      component['onUpdateTheme']()
+
+      expect(themesApiSpy.updateTheme).not.toHaveBeenCalled()
+    })
+
+    it('should not proceed if colorsValid is false', () => {
+      component.themeData = signal({ theme: {}, propsValid: true, colorsValid: false }) as any
 
       component['onUpdateTheme']()
 
@@ -879,7 +867,11 @@ describe('ThemeDetailComponent', () => {
     })
 
     it('should clear empty URL strings', () => {
-      mockThemePropsComponent.theme = signal({ ...theme, id: 'themeId', logoUrl: '', smallLogoUrl: '', faviconUrl: '' })
+      component.themeData = signal({
+        theme: { ...theme, logoUrl: '', smallLogoUrl: '', faviconUrl: '' },
+        propsValid: true,
+        colorsValid: true
+      }) as any
       themesApiSpy.updateTheme.and.returnValue(of({ resource: theme }) as any)
       themesApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
 
@@ -897,17 +889,6 @@ describe('ThemeDetailComponent', () => {
       component['onUpdateTheme']()
 
       expect(themesApiSpy.updateTheme).not.toHaveBeenCalled()
-    })
-
-    it('should initialize properties if undefined', () => {
-      mockThemePropsComponent.theme = signal({ ...theme, id: 'themeId', properties: undefined })
-      themesApiSpy.updateTheme.and.returnValue(of({ resource: theme }) as any)
-      themesApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
-
-      component['onUpdateTheme']()
-
-      const callArgs = themesApiSpy.updateTheme.calls.mostRecent().args[0]
-      expect(callArgs.updateThemeRequest!.resource.properties).toBeDefined()
     })
   })
 
@@ -966,15 +947,9 @@ describe('ThemeDetailComponent', () => {
 
     it('should use sub-component data in EDIT mode', () => {
       component.changeMode = 'EDIT'
-      component.ThemePropsComponent = {
-        onUpdateTheme: jasmine.createSpy().and.returnValue(true),
-        theme: signal({ ...theme, properties: {} })
-      } as any
-      component.ThemeColorsComponent = {
-        onUpdateTheme: jasmine.createSpy().and.returnValue(true),
-        theme: { properties: {} }
-      } as any
+      component.themeData = signal({ theme: { ...theme, properties: {} }, propsValid: true, colorsValid: true }) as any
       component.theme = { ...theme, modificationCount: 2 }
+      spyOn(console, 'log')
 
       component.onSaveAs(copyOfPrefix)
 
@@ -984,14 +959,8 @@ describe('ThemeDetailComponent', () => {
 
     it('should not open dialog if sub-component data is invalid in EDIT mode', () => {
       component.changeMode = 'EDIT'
-      component.ThemePropsComponent = {
-        onUpdateTheme: jasmine.createSpy().and.returnValue(false),
-        theme: undefined
-      } as any
-      component.ThemeColorsComponent = {
-        onUpdateTheme: jasmine.createSpy().and.returnValue(true),
-        theme: { properties: {} }
-      } as any
+      component.themeData = signal({ theme: {}, propsValid: false, colorsValid: true }) as any
+      spyOn(console, 'log')
 
       component.onSaveAs(copyOfPrefix)
 

@@ -54,13 +54,13 @@
                   group.formGroup.get(variable)?.value === '#FFFFFF' ? 'var(--p-stone-400)' : 'var(--p-stone-200)'
                 "
                 [style.background-color]="group.formGroup.get(variable)?.value"
-                [disabled]="changeMode === 'VIEW'"
+                [disabled]="changeMode() === 'VIEW'"
                 [attr.aria-label]="'THEME.TOOLTIPS.ITEM_COLOR_PICKER' | translate"
-                [pTooltip]="changeMode !== 'VIEW' ? ('THEME.TOOLTIPS.ITEM_COLOR_PICKER' | translate) : null"
+                [pTooltip]="changeMode() !== 'VIEW' ? ('THEME.TOOLTIPS.ITEM_COLOR_PICKER' | translate) : null"
                 tooltipPosition="top"
                 tooltipEvent="hover"
               >
-                @if (changeMode !== 'VIEW') {
+                @if (changeMode() !== 'VIEW') {
                   <span class="p-button-icon p-button-icon-left pi pi-palette"></span>
                 }
               </button>

@@ -1,4 +1,16 @@
-import { Component, DestroyRef, effect, EventEmitter, inject, OnInit, signal, ViewChild } from '@angular/core'
+import {
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  EventEmitter,
+  inject,
+  OnInit,
+  Signal,
+  signal,
+  viewChild,
+  ViewChild
+} from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { AsyncPipe, JsonPipe, Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -32,6 +44,11 @@ export type LoadingState = 'initial' | 'ready' | 'loading' | 'timeout'
 export function slotInitializer(slotService: SlotService) {
   return () => slotService.init()
 }
+type ThemeData = {
+  theme: Theme
+  propsValid: boolean | undefined
+  colorsValid: boolean | undefined
+}
 
 @Component({
   standalone: true,
@@ -57,12 +74,13 @@ export function slotInitializer(slotService: SlotService) {
   styleUrls: ['./theme-detail.component.scss']
 })
 export class ThemeDetailComponent implements OnInit {
-  @ViewChild(ThemePropsComponent, { static: false }) ThemePropsComponent!: ThemePropsComponent
-  @ViewChild(ThemeColorsComponent, { static: false }) ThemeColorsComponent!: ThemeColorsComponent
   @ViewChild(Tabs, { static: false }) tabComponent!: Tabs
+  public readonly themePropsComponent = viewChild(ThemePropsComponent)
+  public readonly themeColorsComponent = viewChild(ThemeColorsComponent)
 
   private readonly destroyRef = inject(DestroyRef)
   // signals
+  public themeData: Signal<ThemeData> // combined data from sub components
   public readonly themeCreated = signal<Theme | undefined>(undefined)
   public readonly themeDeleted = signal<boolean>(false)
   public readonly themeDeleteVisible = signal<boolean>(false)
@@ -159,6 +177,19 @@ export class ThemeDetailComponent implements OnInit {
         this.themeForCreation = undefined
       }
     })
+
+    // Combine the data from the sub components to a single theme object and check if the forms are valid
+    this.themeData = computed(() => {
+      const themeProps = this.themePropsComponent()?.combinedFormValues()
+      const themeColors = this.themeColorsComponent()?.combinedFormValues()
+      const propsValid = this.themePropsComponent()?.isComponentValid()
+      const colorsValid = this.themeColorsComponent()?.isComponentValid()
+      return {
+        theme: { ...themeProps, ...themeColors },
+        propsValid: propsValid,
+        colorsValid: colorsValid
+      } as ThemeData
+    })
   }
 
   ngOnInit(): void {
@@ -241,6 +272,7 @@ export class ThemeDetailComponent implements OnInit {
    * The loading state is managed by a signal and a timeout timer. The loading indicator is shown for at least 1.5 seconds.
    * If the data is not received within timeout time, the loading state is set to "timeout".
    */
+
   // Initialize the process of checking if the theme is used in workspaces
   private startGettingThemeUseData(themeName?: string): void {
     if (themeName && this.themeUseLoadingState() === 'initial') {
@@ -256,6 +288,7 @@ export class ThemeDetailComponent implements OnInit {
       this.themeUsedName.set(themeName) // force checking use in workspaces
     }
   }
+
   // Stop the process of checking if the theme is used in workspaces
   private stopGettingThemeUseData(workspaces: Workspace[]): void {
     this.themeUsedByWorkspaces.set(workspaces)
@@ -318,33 +351,29 @@ export class ThemeDetailComponent implements OnInit {
   /**
    * SAVE
    */
-  private getThemeDataFromSubComponents(): Theme | undefined {
-    // Trigger save on sub components (return false on validation error to prevent saving)
-    if (!this.ThemePropsComponent.onUpdateTheme()) return undefined
-    if (!this.ThemeColorsComponent.onUpdateTheme()) return undefined
+  private prepareThemeData(): Theme | undefined {
+    // check form state in sub components before saving: must be valid!
+    if (!this.themeData().propsValid) return undefined
+    if (!this.themeData().colorsValid) return undefined
 
-    let themeData = this.ThemePropsComponent.theme()
-    if (!themeData) return undefined
-    themeData = {
-      ...themeData,
+    let data = this.themeData().theme // combined data from sub components
+    // combine with the original theme data to preserve properties (modificationCount!)
+    data = {
+      ...data,
       id: undefined,
       operator: undefined,
       modificationCount: this.theme?.modificationCount,
       // prevent empty strings for urls, as it causes issues for the image service
-      logoUrl: themeData.logoUrl === '' ? undefined : themeData.logoUrl,
-      smallLogoUrl: themeData.smallLogoUrl === '' ? undefined : themeData.smallLogoUrl,
-      faviconUrl: themeData.faviconUrl === '' ? undefined : themeData.faviconUrl
+      logoUrl: data.logoUrl === '' ? undefined : data.logoUrl,
+      smallLogoUrl: data.smallLogoUrl === '' ? undefined : data.smallLogoUrl,
+      faviconUrl: data.faviconUrl === '' ? undefined : data.faviconUrl
     }
-    // properties: fonts & colors
-    themeData.properties = {
-      ...this.ThemePropsComponent.theme()?.properties, // font only
-      ...this.ThemeColorsComponent.theme?.properties // colors only
-    }
-    return themeData
+    return data
   }
 
   private onUpdateTheme(): void {
-    const themeData = this.getThemeDataFromSubComponents()
+    const themeData = this.prepareThemeData()
+    console.log('onUpdateTheme', themeData)
     if (!themeData) return
     // save
     if (this.theme?.id)
@@ -374,7 +403,7 @@ export class ThemeDetailComponent implements OnInit {
   public onSaveAs(copyOfPrefix: string): void {
     let themeData: Theme | undefined
     if (this.changeMode === 'EDIT') {
-      themeData = this.getThemeDataFromSubComponents()
+      themeData = this.prepareThemeData()
       if (!themeData) return
     } else {
       themeData = this.theme
@@ -548,13 +577,13 @@ export class ThemeDetailComponent implements OnInit {
   /**
    * TEMPLATING: allow using properties from an existing theme => no creation of a new theme!
    */
-  public useThemeAsTemplate(data: any): any {
-    this.themeApi.getThemeById({ id: data.id }).subscribe((response) => {
+  public useThemeAsTemplate(selectedTheme: any): any {
+    this.themeApi.getThemeById({ id: selectedTheme.id }).subscribe((response) => {
       this.themeForProps = {
         ...response.resource,
         ...this.undefinedThemeData,
         name: this.theme?.name,
-        displayName: data['ACTIONS.COPY_OF'] + response.resource.displayName,
+        displayName: selectedTheme['ACTIONS.COPY_OF'] + response.resource.displayName,
         modificationCount: this.theme?.modificationCount
       }
       this.themeForColors = response.resource
