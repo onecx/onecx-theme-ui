@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ChangeDetectorRef, Input, ViewChild, OnChanges, model } from '@angular/core'
+import { AfterViewInit, Component, ChangeDetectorRef, ViewChild, OnChanges, model, input } from '@angular/core'
 import { HttpHeaders } from '@angular/common/http'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -39,13 +39,12 @@ import { ThemeColorBoxComponent } from 'src/app/shared/theme-color-box/theme-col
   styleUrls: ['./theme-import.component.scss']
 })
 export class ThemeImportComponent implements OnChanges, AfterViewInit {
-  @Input() public themes: Theme[] = []
-
-  @ViewChild('themeNameInput') themeNameInput!: HTMLInputElement
-
+  // signals
+  public readonly themes = input.required<Theme[]>()
   public visible = model.required<boolean>()
   public uploaded = model.required<boolean>()
-
+  // dialog
+  @ViewChild('themeNameInput') themeNameInput!: HTMLInputElement
   public themeNameExists = false
   public displayNameExists = false
   public themeImportError = false
@@ -107,9 +106,9 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
   }
 
   public onThemeNameChange() {
-    if (this.themes.length === 0 || !this.formGroup.valid) return
-    this.themeNameExists = this.themes.some((theme) => theme.name === this.formGroup.controls['themeName'].value)
-    this.displayNameExists = this.themes.some(
+    if (this.themes().length === 0 || !this.formGroup.valid) return
+    this.themeNameExists = this.themes().some((theme) => theme.name === this.formGroup.controls['themeName'].value)
+    this.displayNameExists = this.themes().some(
       (theme) => theme.displayName === this.formGroup.controls['displayName'].value
     )
   }

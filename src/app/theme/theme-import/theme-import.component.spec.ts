@@ -62,7 +62,7 @@ describe('ThemeImportComponent', () => {
     fixture = TestBed.createComponent(ThemeImportComponent)
     component = fixture.componentInstance
     component.visible.set(true)
-    component.themes = themes
+    fixture.componentRef.setInput('themes', themes)
     component.formGroup = formGroup
     fixture.detectChanges()
   })
