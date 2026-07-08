@@ -8,8 +8,7 @@ import {
   OnInit,
   Signal,
   signal,
-  viewChild,
-  ViewChild
+  viewChild
 } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { AsyncPipe, JsonPipe, Location } from '@angular/common'
@@ -74,10 +73,6 @@ type ThemeData = {
   styleUrls: ['./theme-detail.component.scss']
 })
 export class ThemeDetailComponent implements OnInit {
-  @ViewChild(Tabs, { static: false }) tabComponent!: Tabs
-  public readonly themePropsComponent = viewChild(ThemePropsComponent)
-  public readonly themeColorsComponent = viewChild(ThemeColorsComponent)
-
   private readonly destroyRef = inject(DestroyRef)
   // signals
   public themeData: Signal<ThemeData> // combined data from sub components
@@ -92,6 +87,10 @@ export class ThemeDetailComponent implements OnInit {
   public readonly themeUsedName = signal<string | undefined>(undefined)
   public readonly themeUsedByWorkspaces = signal<Workspace[]>([])
   public readonly themeUseLoadingState = signal<LoadingState>('initial')
+  // signals: components
+  public readonly tabComponent = viewChild(Tabs)
+  public readonly themePropsComponent = viewChild(ThemePropsComponent)
+  public readonly themeColorsComponent = viewChild(ThemeColorsComponent)
   // private timer to avoid long waits for getting workspace data
   private themeUseTimeoutTimer: ReturnType<typeof setTimeout> | undefined
   private themeUseStartTime: number | undefined
@@ -104,7 +103,7 @@ export class ThemeDetailComponent implements OnInit {
   public autoApply = false
   public showOperatorMessage = true // display initially only
   public selectedTabIndex = '0'
-  public dateFormat = 'medium'
+  public dateFormat = 'M/d/yy, hh:mm:ss a'
   public isThemeUsedByWorkspace = false
   public isCurrentTheme = false
   public Utils = Utils
@@ -164,7 +163,7 @@ export class ThemeDetailComponent implements OnInit {
       this.stopGettingThemeUseData(res)
     })
 
-    // receive the theme created or deleted event from the child dialog and react accordingly
+    // manage signal responses from the child dialog and react accordingly
     effect(() => {
       if (this.themeDeleted() === true) {
         this.themeDeleted.set(false)
@@ -193,7 +192,7 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.dateFormat = this.user.lang$.getValue() === 'de' ? 'dd.MM.yyyy HH:mm:ss' : 'medium'
+    this.dateFormat = this.user.lang$.getValue() === 'de' ? 'dd.MM.yyyy HH:mm:ss' : this.dateFormat
     this.themeName = this.route.snapshot.paramMap.get('name')
     // Common start
     this.theme = undefined
@@ -233,7 +232,7 @@ export class ThemeDetailComponent implements OnInit {
         }),
         finalize(() => {
           this.loading = false
-          this.tabComponent.value.set(this.selectedTabIndex) // Forces tab change
+          this.tabComponent()?.value.set(this.selectedTabIndex) // Forces tab change
         })
       )
       .subscribe((theme) => {
@@ -427,6 +426,12 @@ export class ThemeDetailComponent implements OnInit {
     this.themeDeleteVisible.set(true)
   }
 
+  public onThemeDeleted(deleted: boolean): void {
+    if (deleted) {
+      this.router.navigate(['..'], { relativeTo: this.route })
+    }
+  }
+
   /**
    * EXPORT
    */
@@ -589,11 +594,5 @@ export class ThemeDetailComponent implements OnInit {
       this.themeForColors = response.resource
       this.msgService.info({ summaryKey: 'THEME.TEMPLATE.CONFIRMATION.OK' })
     })
-  }
-
-  public onThemeDeleted(deleted: boolean): void {
-    if (deleted) {
-      this.router.navigate(['..'], { relativeTo: this.route })
-    }
   }
 }

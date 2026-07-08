@@ -144,7 +144,7 @@ describe('ThemeDetailComponent', () => {
     it('should use English date format', () => {
       mockUserService.lang$.getValue.and.returnValue('en')
       initTestComponent()
-      expect(component.dateFormat).toEqual('medium')
+      expect(component.dateFormat).toEqual('M/d/yy, hh:mm:ss a')
     })
 
     it('should set changeMode to VIEW when name is in route', () => {

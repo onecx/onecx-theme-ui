@@ -213,8 +213,12 @@
       "THEME_COLOR_PRIMARY": "Primary color",
       "THEME_COLOR_SECONDARY": "Secondary color",
       "THEME_COLOR_TEXT": "Text color",
-      "THEME_COLOR_TOP_MENU": "Topbar Menu color",
-      "THEME_COLOR_TOP_LEFT": "Topbar Link color"
+      "THEME_COLOR_BG": "Background color",
+      "THEME_COLOR_CONTENT_BG": "Content Background color",
+      "THEME_COLOR_TOPBAR_TEXT": "Topbar Text color",
+      "THEME_COLOR_TOPBAR_BG": "Topbar Background color",
+      "THEME_COLOR_MENU_TEXT": "Menu Text color",
+      "THEME_COLOR_MENU_BG": "Menu Background color"
     },
     "TEMPLATE": {
       "SELECTOR": "Select Theme template",

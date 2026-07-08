@@ -213,8 +213,12 @@
       "THEME_COLOR_PRIMARY": "Primärfarbe",
       "THEME_COLOR_SECONDARY": "Sekundärfarbe",
       "THEME_COLOR_TEXT": "Textfarbe",
-      "THEME_COLOR_TOP_MENU": "Menüfarbe",
-      "THEME_COLOR_TOP_LEFT": "Linkfarbe"
+      "THEME_COLOR_BG": "Hintergrundfarbe",
+      "THEME_COLOR_CONTENT_BG": "Inhaltshintergrundfarbe",
+      "THEME_COLOR_TOPBAR_TEXT": "Topbar Textfarbe",
+      "THEME_COLOR_TOPBAR_BG": "Topbar Hintergrundfarbe",
+      "THEME_COLOR_MENU_TEXT": "Menü Textfarbe",
+      "THEME_COLOR_MENU_BG": "Menü Hintergrundfarbe"
     },
     "TEMPLATE": {
       "SELECTOR": "Theme-Vorlage wählen",
