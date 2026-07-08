@@ -1,4 +1,3 @@
-import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 import { of } from 'rxjs'
@@ -6,6 +5,8 @@ import { of } from 'rxjs'
 import { AppStateService } from '@onecx/angular-integration-interface'
 
 import { ImageContainerComponent } from './image-container.component'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { provideHttpClient } from '@angular/common/http'
 
 class MockAppStateService {
   currentMfe$ = of({
@@ -28,15 +29,18 @@ describe('ImageContainerComponent', () => {
     mockAppStateService = new MockAppStateService()
 
     TestBed.configureTestingModule({
-      declarations: [ImageContainerComponent],
       imports: [
+        ImageContainerComponent,
         TranslateTestingModule.withTranslations({
           de: require('src/assets/i18n/de.json'),
           en: require('src/assets/i18n/en.json')
         }).withDefaultLanguage('en')
       ],
-      schemas: [NO_ERRORS_SCHEMA],
-      providers: [{ provide: AppStateService, useValue: mockAppStateService }]
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: AppStateService, useValue: mockAppStateService }
+      ]
     }).compileComponents()
   }))
 
@@ -51,15 +55,15 @@ describe('ImageContainerComponent', () => {
 
   describe('on changes', () => {
     it('should use imageUrl as URL if was set', () => {
-      component.imageUrl = 'https://host/path-to-image'
+      fixture.componentRef.setInput('imageUrl', 'https://host/path-to-image')
 
       component.ngOnChanges()
 
-      expect(component.url).toBe(component.imageUrl)
+      expect(component.url).toBe(component.imageUrl())
     })
 
     it('should use default URL if image URL is invalid', () => {
-      component.imageUrl = 'https://host'
+      fixture.componentRef.setInput('imageUrl', 'https://host')
 
       component.ngOnChanges()
 
@@ -67,16 +71,16 @@ describe('ImageContainerComponent', () => {
     })
 
     it('should use imageUrl as URL if was set', () => {
-      component.bffUrl = '/basePath/path-to-logo'
+      fixture.componentRef.setInput('bffUrl', '/basePath/path-to-logo')
 
       component.ngOnChanges()
 
-      expect(component.url).toBe(component.bffUrl)
+      expect(component.url).toBe(component.bffUrl())
     })
 
     it('should use default URL if no URL is provided', () => {
-      component.imageUrl = undefined
-      component.bffUrl = undefined
+      fixture.componentRef.setInput('imageUrl', undefined)
+      fixture.componentRef.setInput('bffUrl', undefined)
 
       component.ngOnChanges()
 
@@ -99,11 +103,11 @@ describe('ImageContainerComponent', () => {
 
       component.url = '/external/url'
       component['urlType'] === 'ext-url'
-      component.bffUrl = '/bff/url'
+      fixture.componentRef.setInput('bffUrl', '/bff/url')
 
       component.onImageLoadError()
 
-      expect(component.url).toBe(component.bffUrl)
+      expect(component.url).toBe(component.bffUrl()!)
       expect(component['urlType']).toBe('bff-url')
       expect(component.imageLoadResult.emit).toHaveBeenCalledWith(false)
     })
@@ -114,7 +118,7 @@ describe('ImageContainerComponent', () => {
       component['defaultImageUrl'] = 'default-url'
       component.url = '/external/url'
       component['urlType'] === 'ext-url'
-      component.bffUrl = undefined
+      fixture.componentRef.setInput('bffUrl', undefined)
 
       component.onImageLoadError()
 

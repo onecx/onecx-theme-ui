@@ -1,5 +1,5 @@
-@import 'src/app/_th-mixins.scss';
+@use 'src/app/th-mixins.scss' as *;
 
 @include correct-file-upload;
 @include dialog-footer-buttons;
-@include displaying-text-responsive;
+@include ocx-text-responsive;

@@ -1,10 +1,12 @@
-<img
-  *ngIf="imageUrl$ | async as url"
-  [id]="imageId ?? 'th_logo_' + themeName"
-  [class]="'border-round-sm ' + (imageStyleClass ?? '')"
-  alt="Theme Logo"
-  [ocxSrc]="url"
-  aria-label="Theme Logo"
-  (error)="onImageLoadError(url)"
-  (load)="onImageLoad()"
-/>
+@if (imageUrl$ | async; as url) {
+  <img
+    [id]="imageId ?? 'th_logo_' + themeName"
+    [class]="'border-round-sm ' + (imageStyleClass ?? '')"
+    style="border-radius: 0.25rem !important; max-height: 2rem !important; max-width: 5rem !important"
+    alt="Theme Logo"
+    [ocxSrc]="url"
+    aria-label="Theme Logo"
+    (error)="onImageLoadError(url)"
+    (load)="onImageLoad()"
+  />
+}

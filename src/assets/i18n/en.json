@@ -23,7 +23,9 @@
       "MESSAGE_INFO": "This action cannot be undone!",
       "MESSAGE_INFO_OPERATOR": "This Theme was created by automation. It is deletable but it will be recreated by automation.",
       "MESSAGE_REJECT_MANDATORY": "The Theme is marked as required for operation and therefore cannot be deleted.",
-      "MESSAGE_REJECT_USE": "The Theme is used by Workspaces and therefore cannot be deleted.",
+      "MESSAGE_REJECT_DELETION": "The Theme is used by Workspaces and therefore cannot be deleted.",
+      "MESSAGE_CHECK_USE": "Checking the usage of the Theme in Workspaces...",
+      "MESSAGE_TIMEOUT": "It took too long to determine the usage of the Theme. The operation was aborted.",
       "THEME_NOK": "Theme could not be deleted",
       "THEME_OK": "Theme deleted successfully"
     },
@@ -105,8 +107,6 @@
   },
   "DIALOG": {
     "HEADER": {
-      "SEARCH": "Theme Management",
-      "SEARCH.SUBHEADER": "Creation and editing of Theme",
       "DETAIL": "Display and editing of the Theme properties",
       "DETAIL.SUBHEADER": "Theme Details",
       "CREATE": "Create Theme",
@@ -118,12 +118,15 @@
       "SPECIAL.SECTION": "Theme applying and template selection",
       "AUTO_APPLY": {
         "LABEL": "Auto apply changes",
+        "MESSAGE": "All changes (font, colors) are automatically applied to the current page.",
         "TOOLTIP": "If this option is switched on, then all changes (font, colors) are automatically applied to the current page.",
         "CURRENT_THEME": "Changes are applied immediately upon saving, as this is the currently used theme."
       },
       "THEME_SELECTOR": "Select Theme as Template"
     },
     "SEARCH": {
+      "HEADER": "Theme Management",
+      "SUBHEADER": "Creation and editing of Theme",
       "CRITERIA": "Search Criteria",
       "RESULTS": "Search Results"
     },
@@ -147,11 +150,12 @@
       "UNUSED": "The Theme is not used by any Workspace."
     },
     "DATAVIEW": {
-      "FILTER": "Filter",
-      "PRODUCT_FILTER_TOOLTIP": "Filter by Application and Classification",
-      "FILTER_OF": "Filter of ",
-      "FILTER_CLEAR": "Clear Filter",
-      "FILTER_PLACEHOLDER": "Filter",
+      "FILTER": {
+        "LABEL": "Filter",
+        "OF": "Filter of ",
+        "CLEAR": "Clear Filter",
+        "PLACEHOLDER": "Filter"
+      },
       "SORT_BY": "Sort By",
       "SORT_DIRECTION_ASC": "ascending",
       "SORT_DIRECTION_DESC": "descending",
@@ -209,8 +213,12 @@
       "THEME_COLOR_PRIMARY": "Primary color",
       "THEME_COLOR_SECONDARY": "Secondary color",
       "THEME_COLOR_TEXT": "Text color",
-      "THEME_COLOR_TOP_MENU": "Topbar Menu color",
-      "THEME_COLOR_TOP_LEFT": "Topbar Link color"
+      "THEME_COLOR_BG": "Background color",
+      "THEME_COLOR_CONTENT_BG": "Content Background color",
+      "THEME_COLOR_TOPBAR_TEXT": "Topbar Text color",
+      "THEME_COLOR_TOPBAR_BG": "Topbar Background color",
+      "THEME_COLOR_MENU_TEXT": "Menu Text color",
+      "THEME_COLOR_MENU_BG": "Menu Background color"
     },
     "TEMPLATE": {
       "SELECTOR": "Select Theme template",

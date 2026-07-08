@@ -1,92 +1,129 @@
-import { Component, OnInit, ViewChild } from '@angular/core'
-import { ActivatedRoute, Router } from '@angular/router'
-import { TranslateService } from '@ngx-translate/core'
-import { catchError, finalize, map, Observable, of } from 'rxjs'
-import { DataView } from 'primeng/dataview'
+import { Component, DestroyRef, effect, inject, OnInit, signal } from '@angular/core'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
+import { AsyncPipe } from '@angular/common'
+import { ActivatedRoute, Router, RouterModule } from '@angular/router'
+import { TranslateModule, TranslateService } from '@ngx-translate/core'
+import { BehaviorSubject, catchError, finalize, map, Observable, of, Subscription } from 'rxjs'
 
-import { Action, DataViewControlTranslations } from '@onecx/portal-integration-angular'
+import { ButtonModule } from 'primeng/button'
+import { CardModule } from 'primeng/card'
+import { FloatLabelModule } from 'primeng/floatlabel'
+import { InputGroupModule } from 'primeng/inputgroup'
+import { InputGroupAddonModule } from 'primeng/inputgroupaddon'
+import { MessageModule } from 'primeng/message'
+import { ToastModule } from 'primeng/toast'
+import { TooltipModule } from 'primeng/tooltip'
 
-import { ImagesInternalAPIService, Theme, ThemesAPIService } from 'src/app/shared/generated'
+import { Action, AngularAcceleratorModule, RowListGridData, DataSortDirection } from '@onecx/angular-accelerator'
+import { PortalPageComponent } from '@onecx/angular-utils'
+
 import { Utils, LogoRefType } from 'src/app/shared/utils'
+import { ImagesInternalAPIService, Theme, ThemesAPIService } from 'src/app/shared/generated'
+import { ThemeColorBoxComponent } from 'src/app/shared/theme-color-box/theme-color-box.component'
+import { ImageContainerComponent } from 'src/app/shared/image-container/image-container.component'
+
+import { ThemeCreateComponent } from '../theme-create/theme-create.component'
+import { ThemeImportComponent } from '../theme-import/theme-import.component'
 
 @Component({
+  standalone: true,
+  imports: [
+    AngularAcceleratorModule,
+    AsyncPipe,
+    ButtonModule,
+    CardModule,
+    FloatLabelModule,
+    InputGroupModule,
+    InputGroupAddonModule,
+    MessageModule,
+    RouterModule,
+    ToastModule,
+    TooltipModule,
+    TranslateModule,
+    PortalPageComponent,
+    ThemeCreateComponent,
+    ThemeImportComponent,
+    ThemeColorBoxComponent,
+    ImageContainerComponent
+  ],
   templateUrl: './theme-search.component.html',
   styleUrls: ['./theme-search.component.scss']
 })
 export class ThemeSearchComponent implements OnInit {
+  // signals
+  public themeImportVisible = signal(false)
+  public themeCreateVisible = signal(false)
+  public themeCreated = signal<Theme | undefined>(undefined)
+  public themeImported = signal(false)
+  // data
+  private readonly destroyRef = inject(DestroyRef)
+  private readonly dataSubject$ = new BehaviorSubject<RowListGridData[]>([])
+  public data$: Observable<RowListGridData[] | null> = this.dataSubject$.asObservable()
+  private searchSubscription?: Subscription // to cancel ongoing search if new search is triggered
+  public filteredData: RowListGridData[] | undefined = undefined
   // dialog
   public loading = false
   public exceptionKey: string | undefined = undefined
-  public viewMode: 'list' | 'grid' = 'grid'
-  public filter: string | undefined
-  public sortField = 'displayName'
-  public sortOrder = 1
   public actions$: Observable<Action[]> | undefined
-  public themeImportVisible = false
-  public themeCreateVisible = false
+  public textFilterValue$ = new BehaviorSubject<string | undefined>(undefined)
+  public globalFilterValue = ''
+  public sortDirection: DataSortDirection = DataSortDirection.ASCENDING
+  public sortField = 'displayName'
   public Utils = Utils
   // image
   public imageBasePath = this.imageApi.configuration.basePath
   public LogoRefType = LogoRefType
-  // data
-  public themes$!: Observable<Theme[]>
-  @ViewChild(DataView) dv: DataView | undefined
-  public dataViewControlsTranslations$: Observable<DataViewControlTranslations> | undefined
 
   constructor(
-    private readonly route: ActivatedRoute,
-    private readonly router: Router,
+    public readonly route: ActivatedRoute,
+    public readonly router: Router,
     private readonly themeApi: ThemesAPIService,
     private readonly translate: TranslateService,
     private readonly imageApi: ImagesInternalAPIService
-  ) {}
+  ) {
+    effect(() => {
+      const theme = this.themeCreated()
+      if (theme) {
+        this.router.navigate(['./' + theme.name], { relativeTo: this.route })
+      }
+      if (this.themeImported()) {
+        this.loadThemes()
+      }
+    })
+  }
 
   ngOnInit(): void {
-    this.prepareTranslations()
     this.prepareActionButtons()
     this.loadThemes()
   }
 
   public loadThemes(): void {
     this.loading = true
-    this.themes$ = this.themeApi.searchThemes({ searchThemeRequest: {} }).pipe(
-      map((data) => {
-        const themes = data?.stream ?? []
-        themes.sort(this.sortThemesByName)
-        return themes
-      }),
-      catchError((err) => {
-        this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + Utils.mapping_error_status(err.status) + '.THEME'
-        console.error('searchThemes', err)
-        return of([] as Theme[])
-      }),
-      finalize(() => (this.loading = false))
-    )
+    this.exceptionKey = undefined
+    this.searchSubscription?.unsubscribe()
+    this.searchSubscription = this.themeApi
+      .searchThemes({ searchThemeRequest: {} })
+      .pipe(
+        map((data) => {
+          const themes = data?.stream ?? []
+          themes.sort(this.sortThemesByName)
+          return themes as unknown[] as RowListGridData[]
+        }),
+        catchError((err) => {
+          this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + err.status + '.THEME'
+          console.error('searchThemes', err)
+          return of([] as RowListGridData[])
+        }),
+        finalize(() => (this.loading = false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((data) => this.dataSubject$.next(data))
   }
   private sortThemesByName(a: Theme, b: Theme): number {
     return a.displayName!.toUpperCase().localeCompare(b.displayName!.toUpperCase())
   }
-
-  private prepareTranslations() {
-    this.dataViewControlsTranslations$ = this.translate
-      .get([
-        'THEME.NAME',
-        'THEME.DISPLAY_NAME',
-        'DIALOG.DATAVIEW.FILTER',
-        'DIALOG.DATAVIEW.FILTER_OF',
-        'DIALOG.DATAVIEW.SORT_BY'
-      ])
-      .pipe(
-        map((data) => {
-          return {
-            filterInputPlaceholder: data['DIALOG.DATAVIEW.FILTER'],
-            filterInputTooltip:
-              data['DIALOG.DATAVIEW.FILTER_OF'] + data['THEME.NAME'] + ', ' + data['THEME.DISPLAY_NAME'],
-            sortDropdownTooltip: data['DIALOG.DATAVIEW.SORT_BY'],
-            sortDropdownPlaceholder: data['DIALOG.DATAVIEW.SORT_BY']
-          } as DataViewControlTranslations
-        })
-      )
+  public convertToThemes(data: RowListGridData[]): Theme[] {
+    return data as unknown[] as Theme[]
   }
 
   private prepareActionButtons(): void {
@@ -98,7 +135,7 @@ export class ThemeSearchComponent implements OnInit {
             {
               label: data['ACTIONS.CREATE.THEME'],
               title: data['ACTIONS.CREATE.THEME.TOOLTIP'],
-              actionCallback: () => (this.themeCreateVisible = true),
+              actionCallback: () => this.themeCreateVisible.set(true),
               permission: 'THEME#CREATE',
               icon: 'pi pi-plus',
               show: 'always'
@@ -116,30 +153,40 @@ export class ThemeSearchComponent implements OnInit {
       )
   }
 
-  public onThemeCreateClosed(visible: boolean): void {
-    this.themeCreateVisible = visible
+  /**
+   * FILTER & SORT Events
+   */
+  public onGlobalFilter(value?: string, data?: RowListGridData[]): void {
+    if (!data) return
+    this.globalFilterValue = value ?? ''
+    if (this.globalFilterValue === '') this.filteredData = undefined
+    else {
+      this.filteredData = data?.filter(
+        (row) =>
+          row['name']?.toString().toLowerCase().includes(this.globalFilterValue.toLowerCase()) ||
+          row['displayName']?.toString().toLowerCase().includes(this.globalFilterValue.toLowerCase())
+      )
+    }
   }
-  public onThemeCreated(theme: Theme): void {
-    this.router.navigate(['./' + theme.name], { relativeTo: this.route })
+
+  public onClearGlobalFilter(input?: HTMLInputElement): void {
+    this.globalFilterValue = ''
+    this.filteredData = undefined
+    if (input) input.value = ''
   }
-  public onLayoutChange(viewMode: 'list' | 'grid'): void {
-    this.viewMode = viewMode
+
+  public onSortChange(event: { sortColumn: string; sortDirection: DataSortDirection }): void {
+    this.sortField = event.sortColumn
+    this.sortDirection = event.sortDirection
   }
-  public onFilterChange(filter: string): void {
-    this.filter = filter
-    this.dv?.filter(filter)
+
+  public onAppClick(item: RowListGridData): void {
+    const theme = item as unknown as Theme
+    if (!theme?.name) return
+    this.router.navigate(['./', theme.name], { relativeTo: this.route })
   }
-  public onSortChange(field: string): void {
-    this.sortField = field
-  }
-  public onSortDirChange(asc: boolean): void {
-    this.sortOrder = asc ? -1 : 1
-  }
+
   public onImportThemeClick(): void {
-    this.themeImportVisible = true
-  }
-  public onThemeUpload(uploaded: boolean) {
-    this.themeImportVisible = false
-    if (uploaded) this.loadThemes()
+    this.themeImportVisible.set(true)
   }
 }

@@ -1,6 +1,5 @@
-import { NO_ERRORS_SCHEMA } from '@angular/core'
+import { DatePipe } from '@angular/common'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
-import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 
 import { ThemeInternComponent } from './theme-intern.component'
@@ -11,22 +10,22 @@ describe('ThemeInternComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ThemeInternComponent],
       imports: [
-        TranslateModule.forRoot(),
+        ThemeInternComponent,
         TranslateTestingModule.withTranslations({
           de: require('src/assets/i18n/de.json'),
           en: require('src/assets/i18n/en.json')
         }).withDefaultLanguage('de')
       ],
-      providers: [TranslateService],
-      schemas: [NO_ERRORS_SCHEMA]
+      providers: []
     }).compileComponents()
   }))
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ThemeInternComponent)
     component = fixture.componentInstance
+    fixture.componentRef.setInput('dateFormat', 'medium')
+    fixture.componentRef.setInput('theme', undefined)
     fixture.detectChanges()
   })
 
@@ -34,20 +33,88 @@ describe('ThemeInternComponent', () => {
     expect(component).toBeTruthy()
   })
 
-  it('should set operator to false if theme is not provided', () => {
-    component.ngOnChanges()
-    expect(component.operator).toBeFalse()
+  describe('ngOnChanges', () => {
+    it('should set operator and mandatory to false if theme is not provided', () => {
+      component.ngOnChanges()
+      expect(component.operator).toBeFalse()
+      expect(component.mandatory).toBeFalse()
+    })
+
+    it('should set operator to true if theme.operator is true', () => {
+      fixture.componentRef.setInput('theme', { operator: true })
+      component.ngOnChanges()
+      expect(component.operator).toBeTrue()
+    })
+
+    it('should set operator to false if theme.operator is undefined', () => {
+      fixture.componentRef.setInput('theme', { operator: undefined })
+      component.ngOnChanges()
+      expect(component.operator).toBeFalse()
+    })
+
+    it('should set mandatory to true if theme.mandatory is true', () => {
+      fixture.componentRef.setInput('theme', { mandatory: true })
+      component.ngOnChanges()
+      expect(component.mandatory).toBeTrue()
+    })
+
+    it('should set mandatory to false if theme.mandatory is undefined', () => {
+      fixture.componentRef.setInput('theme', { mandatory: undefined })
+      component.ngOnChanges()
+      expect(component.mandatory).toBeFalse()
+    })
   })
 
-  it('should set operator to theme.operator if theme is provided', () => {
-    component.theme = { operator: true }
-    component.ngOnChanges()
-    expect(component.operator).toBeTrue()
+  describe('creationDate', () => {
+    it('should return empty string if theme has no creationDate', () => {
+      fixture.componentRef.setInput('theme', {})
+      fixture.detectChanges()
+      expect(component.creationDate()).toBe('')
+    })
+
+    it('should return formatted date if theme has a creationDate', () => {
+      fixture.componentRef.setInput('theme', { creationDate: '2024-01-15T10:00:00.000Z' })
+      fixture.detectChanges()
+      expect(component.creationDate()).toBeTruthy()
+    })
+
+    it('should return empty string if datePipe returns null for creationDate', () => {
+      spyOn(DatePipe.prototype, 'transform').and.returnValue(null)
+      fixture.componentRef.setInput('theme', { creationDate: '2024-01-15T10:00:00.000Z' })
+      fixture.detectChanges()
+      expect(component.creationDate()).toBe('')
+    })
   })
 
-  it('should set operator to false if theme is provided', () => {
-    component.theme = { operator: undefined }
-    component.ngOnChanges()
-    expect(component.operator).toBeFalse()
+  describe('modificationDate', () => {
+    it('should return empty string if theme has no modificationDate', () => {
+      fixture.componentRef.setInput('theme', {})
+      fixture.detectChanges()
+      expect(component.modificationDate()).toBe('')
+    })
+
+    it('should return formatted date if theme has a modificationDate', () => {
+      fixture.componentRef.setInput('theme', { modificationDate: '2024-01-15T10:00:00.000Z' })
+      fixture.detectChanges()
+      expect(component.modificationDate()).toBeTruthy()
+    })
+
+    it('should return empty string if datePipe returns null for modificationDate', () => {
+      spyOn(DatePipe.prototype, 'transform').and.returnValue(null)
+      fixture.componentRef.setInput('theme', { modificationDate: '2024-01-15T10:00:00.000Z' })
+      fixture.detectChanges()
+      expect(component.modificationDate()).toBe('')
+    })
+
+    it('should use default format', () => {
+      fixture.componentRef.setInput('theme', {
+        modificationDate: '2024-01-15T00:00:00.000Z',
+        creationDate: '2024-01-15T00:00:00.000Z'
+      })
+      fixture.componentRef.setInput('dateFormat', undefined)
+      fixture.detectChanges()
+      expect(component.modificationDate()).toBeTruthy()
+      expect(component.creationDate()).toBeTruthy()
+    })
   })
 })

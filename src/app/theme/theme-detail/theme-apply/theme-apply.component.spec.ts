@@ -1,41 +1,46 @@
-import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
-import { ReactiveFormsModule } from '@angular/forms'
-import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 
 import { PortalMessageService } from '@onecx/angular-integration-interface'
 
 import { ThemeApplyComponent } from './theme-apply.component'
 import { ConfirmationService } from 'primeng/api'
-import { Dropdown } from 'primeng/dropdown'
+import { Select } from 'primeng/select'
 import { Theme } from 'src/app/shared/generated'
 
 describe('ThemeApplyComponent', () => {
   let component: ThemeApplyComponent
   let fixture: ComponentFixture<ThemeApplyComponent>
+
   let confirmationService: ConfirmationService
   const msgServiceSpy = jasmine.createSpyObj<PortalMessageService>('PortalMessageService', ['success', 'error'])
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ThemeApplyComponent],
       imports: [
-        ReactiveFormsModule,
-        TranslateModule.forRoot(),
+        ThemeApplyComponent,
         TranslateTestingModule.withTranslations({
           de: require('src/assets/i18n/de.json'),
           en: require('src/assets/i18n/en.json')
         }).withDefaultLanguage('de')
       ],
-      providers: [TranslateService, { provide: PortalMessageService, useValue: msgServiceSpy }, ConfirmationService],
-      schemas: [NO_ERRORS_SCHEMA]
-    }).compileComponents()
+      providers: [ConfirmationService]
+    })
+      .overrideComponent(ThemeApplyComponent, {
+        add: {
+          providers: [{ provide: PortalMessageService, useValue: msgServiceSpy }]
+        }
+      })
+      .compileComponents()
   }))
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ThemeApplyComponent)
     component = fixture.componentInstance
+    fixture.componentRef.setInput('changeMode', 'VIEW')
+    fixture.componentRef.setInput('isCurrentTheme', true)
+    fixture.componentRef.setInput('autoApply', true)
+    fixture.componentRef.setInput('theme', undefined)
     confirmationService = fixture.debugElement.injector.get(ConfirmationService)
     fixture.detectChanges()
   })
@@ -45,24 +50,18 @@ describe('ThemeApplyComponent', () => {
   })
 
   describe('default inputs', () => {
-    it('should have default changeMode as VIEW', () => {
-      expect(component.changeMode).toBe('VIEW')
-    })
-
-    it('should have default isCurrentTheme as true', () => {
-      expect(component.isCurrentTheme).toBeTrue()
-    })
-
-    it('should have default autoApply as true', () => {
-      expect(component.autoApply).toBeTrue()
+    it('should have default inputs', () => {
+      expect(component.changeMode()).toBe('VIEW')
+      expect(component.isCurrentTheme()).toBeTrue()
+      expect(component.autoApply()).toBeTrue()
     })
   })
 
   describe('onSelectThemeTemplate', () => {
-    let dropdownMock: jasmine.SpyObj<Dropdown>
+    let dropdownMock: jasmine.SpyObj<Select>
 
     beforeEach(() => {
-      dropdownMock = jasmine.createSpyObj<Dropdown>('Dropdown', ['clear'])
+      dropdownMock = jasmine.createSpyObj<Select>('Select', ['clear'])
     })
 
     it('should not trigger confirmation if no theme matches the event value', () => {
@@ -102,7 +101,7 @@ describe('ThemeApplyComponent', () => {
       expect(confirmSpy).toHaveBeenCalled()
       const confirmArg = confirmSpy.calls.mostRecent().args[0]
       expect(confirmArg.key).toBe('template')
-      expect(confirmArg.icon).toBe('pi pi-question-circle')
+      expect(confirmArg.icon).toBe('pi pi-question-circle danger-action-text')
       expect(confirmArg.defaultFocus).toBe('reject')
       expect(confirmArg.dismissableMask).toBeTrue()
     })

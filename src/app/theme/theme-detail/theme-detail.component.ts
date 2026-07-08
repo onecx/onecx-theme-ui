@@ -1,45 +1,112 @@
-import { Component, OnInit, ViewChild } from '@angular/core'
-import { Location } from '@angular/common'
+import {
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  EventEmitter,
+  inject,
+  OnInit,
+  Signal,
+  signal,
+  viewChild
+} from '@angular/core'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
+import { AsyncPipe, JsonPipe, Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
-import { TranslateService } from '@ngx-translate/core'
-import { Observable, catchError, combineLatest, finalize, first, map, of } from 'rxjs'
-import { Message } from 'primeng/api'
+import { TranslateModule, TranslateService } from '@ngx-translate/core'
+import { catchError, combineLatest, finalize, first, map, of, Observable } from 'rxjs'
 import FileSaver from 'file-saver'
 
+import { MessageModule } from 'primeng/message'
+import { Tabs, TabsModule } from 'primeng/tabs'
+import { TooltipModule } from 'primeng/tooltip'
+
 import { PortalMessageService, ThemeService, UserService } from '@onecx/angular-integration-interface'
-import { Action } from '@onecx/angular-accelerator'
 
-import { ExportThemeRequest, ImagesInternalAPIService, Theme, ThemesAPIService } from 'src/app/shared/generated'
+import { Action, AngularAcceleratorModule } from '@onecx/angular-accelerator'
+import { PortalPageComponent } from '@onecx/angular-utils'
+import { SlotService } from '@onecx/angular-remote-components'
+
 import { Utils, LogoRefType } from 'src/app/shared/utils'
+import { ExportThemeRequest, ImagesInternalAPIService, Theme, ThemesAPIService } from 'src/app/shared/generated'
 
+import { ThemeApplyComponent } from './theme-apply/theme-apply.component'
 import { ThemeColorsComponent } from './theme-colors/theme-colors.component'
 import { ThemePropsComponent } from './theme-props/theme-props.component'
+import { ThemeUseComponent, Workspace } from './theme-use/theme-use.component'
+import { ThemeInternComponent } from './theme-intern/theme-intern.component'
+import { ThemeCreateComponent } from '../theme-create/theme-create.component'
+import { ThemeDeleteComponent } from '../theme-delete/theme-delete.component'
 
 export type ChangeMode = 'VIEW' | 'EDIT'
+export type LoadingState = 'initial' | 'ready' | 'loading' | 'timeout'
+export function slotInitializer(slotService: SlotService) {
+  return () => slotService.init()
+}
+type ThemeData = {
+  theme: Theme
+  propsValid: boolean | undefined
+  colorsValid: boolean | undefined
+}
 
 @Component({
+  standalone: true,
+  imports: [
+    AngularAcceleratorModule,
+    AsyncPipe,
+    JsonPipe,
+    MessageModule,
+    TabsModule,
+    TooltipModule,
+    TranslateModule,
+    // components
+    PortalPageComponent,
+    ThemeCreateComponent,
+    ThemeDeleteComponent,
+    ThemeInternComponent,
+    ThemeUseComponent,
+    ThemeApplyComponent,
+    ThemePropsComponent,
+    ThemeColorsComponent
+  ],
   templateUrl: './theme-detail.component.html',
   styleUrls: ['./theme-detail.component.scss']
 })
 export class ThemeDetailComponent implements OnInit {
-  @ViewChild(ThemePropsComponent, { static: false }) ThemePropsComponent!: ThemePropsComponent
-  @ViewChild(ThemeColorsComponent, { static: false }) ThemeColorsComponent!: ThemeColorsComponent
-
+  private readonly destroyRef = inject(DestroyRef)
+  // signals
+  public themeData: Signal<ThemeData> // combined data from sub components
+  public readonly themeCreated = signal<Theme | undefined>(undefined)
+  public readonly themeDeleted = signal<boolean>(false)
+  public readonly themeDeleteVisible = signal<boolean>(false)
+  public readonly themeCreateVisible = signal<boolean>(false)
+  public readonly themeToBeDeleted = signal<Theme | undefined>(undefined)
+  public readonly checkThemeUse = signal<boolean>(false)
+  public readonly isComponentDefined = signal<boolean>(false)
+  public readonly themeUsed = signal<boolean>(false)
+  public readonly themeUsedName = signal<string | undefined>(undefined)
+  public readonly themeUsedByWorkspaces = signal<Workspace[]>([])
+  public readonly themeUseLoadingState = signal<LoadingState>('initial')
+  // signals: components
+  public readonly tabComponent = viewChild(Tabs)
+  public readonly themePropsComponent = viewChild(ThemePropsComponent)
+  public readonly themeColorsComponent = viewChild(ThemeColorsComponent)
+  // private timer to avoid long waits for getting workspace data
+  private themeUseTimeoutTimer: ReturnType<typeof setTimeout> | undefined
+  private themeUseStartTime: number | undefined
+  private readonly MIN_LOADING_TIME = 1500 // 1.5 seconds
+  private readonly MAX_LOADING_TIME = 4000 // 4 seconds
   // dialog
   public loading = true
   public exceptionKey: string | undefined = undefined
   public changeMode: ChangeMode = 'VIEW'
   public autoApply = false
-  public themeDeleteVisible = false
-  public themeCreateVisible = false
   public showOperatorMessage = true // display initially only
-  public selectedTabIndex = 0
-  public dateFormat = 'medium'
-  public messages: Message[] = []
+  public selectedTabIndex = '0'
+  public dateFormat = 'M/d/yy, hh:mm:ss a'
   public isThemeUsedByWorkspace = false
   public isCurrentTheme = false
   public Utils = Utils
-  private translations$: Observable<Message[]> | undefined
   // page header
   public actions$: Observable<Action[]> = of([])
   public headerImageUrl?: string
@@ -48,12 +115,14 @@ export class ThemeDetailComponent implements OnInit {
   public theme$!: Observable<Theme | undefined>
   public themes$!: Observable<Theme[]>
   public theme: Theme | undefined
-  public themeForUse: Theme | undefined
   public themeForProps: Theme | undefined
   public themeForColors: Theme | undefined
   public themeForCreation: Theme | undefined
   // image
   public imageBasePath = this.imageApi.configuration.basePath
+  // receive the slot output
+  public slotName = 'onecx-workspace-data'
+  public slotEmitter = new EventEmitter<Workspace[]>()
 
   // Partial theme with undefined values for internal use (copying, editing) to prevent issues with form patching and image url handling when required properties are missing
   private readonly undefinedThemeData = {
@@ -76,19 +145,60 @@ export class ThemeDetailComponent implements OnInit {
     private readonly themeService: ThemeService,
     private readonly msgService: PortalMessageService,
     private readonly translate: TranslateService,
-    private readonly imageApi: ImagesInternalAPIService
+    private readonly imageApi: ImagesInternalAPIService,
+    private readonly slotService: SlotService
   ) {
-    this.dateFormat = this.user.lang$.getValue() === 'de' ? 'dd.MM.yyyy HH:mm:ss' : 'medium'
-    this.themeName = route.snapshot.paramMap.get('name')
+    // Initialize the slot service for getting workspaces using the theme.
+    slotInitializer(slotService)
+    this.slotService
+      .isSomeComponentDefinedForSlot(this.slotName)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((isDefined) => {
+        this.isComponentDefined.set(isDefined)
+      })
+    // trigger the request to the workspace service via slot to get the workspaces that use the theme
+    this.themeUsed.set(false)
+    // receive data and stop process
+    this.slotEmitter.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((res) => {
+      this.stopGettingThemeUseData(res)
+    })
+
+    // manage signal responses from the child dialog and react accordingly
+    effect(() => {
+      if (this.themeDeleted() === true) {
+        this.themeDeleted.set(false)
+      }
+      const theme = this.themeCreated()
+      if (theme) {
+        this.router.navigate(['../' + theme.name], { relativeTo: this.route })
+      }
+      if (this.themeCreateVisible() === false) {
+        this.themeForCreation = undefined
+      }
+    })
+
+    // Combine the data from the sub components to a single theme object and check if the forms are valid
+    this.themeData = computed(() => {
+      const themeProps = this.themePropsComponent()?.combinedFormValues()
+      const themeColors = this.themeColorsComponent()?.combinedFormValues()
+      const propsValid = this.themePropsComponent()?.isComponentValid()
+      const colorsValid = this.themeColorsComponent()?.isComponentValid()
+      return {
+        theme: { ...themeProps, ...themeColors },
+        propsValid: propsValid,
+        colorsValid: colorsValid
+      } as ThemeData
+    })
   }
 
   ngOnInit(): void {
+    this.dateFormat = this.user.lang$.getValue() === 'de' ? 'dd.MM.yyyy HH:mm:ss' : this.dateFormat
+    this.themeName = this.route.snapshot.paramMap.get('name')
     // Common start
     this.theme = undefined
-    this.prepareDialogTranslations()
     this.getTheme()
     // Re-initialize the component when the route parameter changes (e.g. after creating a new theme)
-    this.route.paramMap.subscribe((params) => {
+    this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const newThemeName = params.get('name')
       if (newThemeName && newThemeName !== this.themeName) {
         this.themeName = newThemeName
@@ -98,7 +208,7 @@ export class ThemeDetailComponent implements OnInit {
     })
   }
 
-  private getTheme(switchToEdit?: boolean) {
+  private getTheme(): void {
     if (!this.themeName) return
     this.loading = true
     combineLatest([
@@ -110,19 +220,19 @@ export class ThemeDetailComponent implements OnInit {
           this.isCurrentTheme = ct.name === response.resource.name
           this.autoApply = this.isCurrentTheme
           this.prepareHeaderUrl(response.resource)
-          this.preparePageActions(true, response.resource)
+          this.preparePageActions(response.resource)
           return response.resource
         }),
         catchError((err) => {
           this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + Utils.mapping_error_status(err.status) + '.THEME'
           console.error('getThemeByName', err)
           this.prepareHeaderUrl()
-          this.preparePageActions(true)
+          this.preparePageActions()
           return of(undefined)
         }),
         finalize(() => {
           this.loading = false
-          if (switchToEdit === true) this.changeMode = 'EDIT'
+          this.tabComponent()?.value.set(this.selectedTabIndex) // Forces tab change
         })
       )
       .subscribe((theme) => {
@@ -155,36 +265,84 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   /**
+   * GETTING THEME USE IN WORKSPACES
+   * The theme use in workspaces is checked when the user opens the "Use" tab or when the user tries to delete a theme.
+   * The check is done by sending a request to the workspace service via a slot. The response is received via an event emitter.
+   * The loading state is managed by a signal and a timeout timer. The loading indicator is shown for at least 1.5 seconds.
+   * If the data is not received within timeout time, the loading state is set to "timeout".
+   */
+
+  // Initialize the process of checking if the theme is used in workspaces
+  private startGettingThemeUseData(themeName?: string): void {
+    if (themeName && this.themeUseLoadingState() === 'initial') {
+      this.themeUseLoadingState.set('loading')
+      // best customer experience: show the loading indicator for at least 1.5 seconds, even if the data is received faster
+      this.themeUseStartTime = performance.now() // store the start time for measuring loading duration
+      if (this.themeUseTimeoutTimer) {
+        clearTimeout(this.themeUseTimeoutTimer)
+      }
+      this.themeUseTimeoutTimer = setTimeout(() => {
+        if (this.themeUseLoadingState() === 'loading') this.themeUseLoadingState.set('timeout')
+      }, this.MAX_LOADING_TIME)
+      this.themeUsedName.set(themeName) // force checking use in workspaces
+    }
+  }
+
+  // Stop the process of checking if the theme is used in workspaces
+  private stopGettingThemeUseData(workspaces: Workspace[]): void {
+    this.themeUsedByWorkspaces.set(workspaces)
+    this.themeUsed.set(workspaces.length > 0)
+    const themeUseLoadingDuration = performance.now() - this.themeUseStartTime!
+    // Switch not to fast to the ready state, to avoid flickering of the loading indicator.
+    const rest = this.MIN_LOADING_TIME - themeUseLoadingDuration
+    if (rest > 0) {
+      setTimeout(() => {
+        this.themeUseLoadingState.set('ready')
+      }, rest)
+    } else {
+      this.themeUseLoadingState.set('ready')
+    }
+    // clear the timeout timer if it is still running, to avoid unnecessary state changes
+    if (this.themeUseTimeoutTimer) {
+      clearTimeout(this.themeUseTimeoutTimer)
+      this.themeUseTimeoutTimer = undefined
+    }
+  }
+
+  /**
    * OTHER UI EVENTS
    */
   public onBack(): void {
     this.location.back()
   }
 
-  public onTabChange($event: any, theme?: Theme): void {
+  public onTabChange(tabValue: string | number, theme?: Theme): void {
     if (theme) {
       this.showOperatorMessage = false
-      this.selectedTabIndex = $event.index
-      if (this.selectedTabIndex === 3) this.themeForUse = theme
-    }
+      this.selectedTabIndex = typeof tabValue === 'number' ? tabValue.toString() : tabValue
+      if (this.selectedTabIndex === '3') {
+        this.startGettingThemeUseData(theme?.name)
+      }
+    } else this.selectedTabIndex = '0'
   }
 
   public onChangeAutoApply(value: boolean): void {
     this.autoApply = value
     if (this.autoApply) {
-      this.msgService.info({ summaryKey: 'INTERNAL.AUTO_APPLY_MESSAGE' })
+      this.msgService.info({ summaryKey: 'DIALOG.DETAIL.AUTO_APPLY.MESSAGE' })
     }
   }
 
   // Change the mode to operate with the theme
-  private onChangeMode(requestedMode: 'edit' | 'view', theme?: Theme): void {
-    if (requestedMode === 'view') {
-      this.changeMode = 'VIEW'
+  private onChangeMode(requestedMode: ChangeMode, theme?: Theme): void {
+    this.changeMode = requestedMode
+    if (requestedMode === 'VIEW') {
       this.initSubComponentData(theme) // use originally loaded theme data
-      this.preparePageActions(this.isThemeUsedByWorkspace, theme)
+      this.preparePageActions(theme)
     }
-    if (requestedMode === 'edit') {
-      this.getTheme(true)
+    if (requestedMode === 'EDIT') {
+      if (Number(this.selectedTabIndex) > 1) this.selectedTabIndex = '0'
+      this.getTheme()
       this.getThemes()
     }
   }
@@ -192,33 +350,29 @@ export class ThemeDetailComponent implements OnInit {
   /**
    * SAVE
    */
-  private getThemeDataFromSubComponents(): Theme | undefined {
-    // Trigger save on sub components (return false on validation error to prevent saving)
-    if (!this.ThemePropsComponent.onUpdateTheme()) return undefined
-    if (!this.ThemeColorsComponent.onUpdateTheme()) return undefined
+  private prepareThemeData(): Theme | undefined {
+    // check form state in sub components before saving: must be valid!
+    if (!this.themeData().propsValid) return undefined
+    if (!this.themeData().colorsValid) return undefined
 
-    let themeData = this.ThemePropsComponent.theme
-    if (!themeData) return undefined
-    themeData = {
-      ...themeData,
+    let data = this.themeData().theme // combined data from sub components
+    // combine with the original theme data to preserve properties (modificationCount!)
+    data = {
+      ...data,
       id: undefined,
       operator: undefined,
       modificationCount: this.theme?.modificationCount,
       // prevent empty strings for urls, as it causes issues for the image service
-      logoUrl: themeData.logoUrl === '' ? undefined : themeData.logoUrl,
-      smallLogoUrl: themeData.smallLogoUrl === '' ? undefined : themeData.smallLogoUrl,
-      faviconUrl: themeData.faviconUrl === '' ? undefined : themeData.faviconUrl
+      logoUrl: data.logoUrl === '' ? undefined : data.logoUrl,
+      smallLogoUrl: data.smallLogoUrl === '' ? undefined : data.smallLogoUrl,
+      faviconUrl: data.faviconUrl === '' ? undefined : data.faviconUrl
     }
-    // properties: fonts & colors
-    themeData.properties = {
-      ...this.ThemePropsComponent.theme?.properties, // font only
-      ...this.ThemeColorsComponent.theme?.properties // colors only
-    }
-    return themeData
+    return data
   }
 
   private onUpdateTheme(): void {
-    const themeData = this.getThemeDataFromSubComponents()
+    const themeData = this.prepareThemeData()
+    console.log('onUpdateTheme', themeData)
     if (!themeData) return
     // save
     if (this.theme?.id)
@@ -230,7 +384,7 @@ export class ThemeDetailComponent implements OnInit {
         .subscribe({
           next: (data) => {
             this.msgService.success({ summaryKey: 'ACTIONS.EDIT.MESSAGE.OK' })
-            this.onChangeMode('view', data.resource)
+            this.onChangeMode('VIEW', data.resource)
             // update observable with response data
             this.theme$ = new Observable((sub) => sub.next(data.resource))
           },
@@ -241,11 +395,14 @@ export class ThemeDetailComponent implements OnInit {
         })
   }
 
-  // SAVE AS => collect current theme data and pass it to the creation dialog
+  /**
+   * CREATE
+   */
+  // SAVE AS => prepare theme data and pass it to the creation dialog
   public onSaveAs(copyOfPrefix: string): void {
     let themeData: Theme | undefined
     if (this.changeMode === 'EDIT') {
-      themeData = this.getThemeDataFromSubComponents()
+      themeData = this.prepareThemeData()
       if (!themeData) return
     } else {
       themeData = this.theme
@@ -257,35 +414,22 @@ export class ThemeDetailComponent implements OnInit {
       name: copyOfPrefix + themeData.name,
       displayName: copyOfPrefix + themeData.displayName
     }
-    this.themeCreateVisible = true
-  }
-
-  /**
-   * CREATE
-   */
-  public onThemeCreated(createdTheme: Theme): void {
-    this.themeCreateVisible = false
-    this.themeForCreation = undefined
-    this.router.navigate(['../' + createdTheme.name], { relativeTo: this.route })
-  }
-  public onThemeCreateClosed(visible: boolean): void {
-    if (!visible) {
-      this.themeCreateVisible = false
-      this.themeForCreation = undefined
-    }
+    this.themeCreateVisible.set(true)
   }
 
   /**
    * DELETE
    */
   public onDeleteTheme(theme: Theme): void {
-    this.themeForUse = theme // force checking use in workspaces
-    this.themeDeleteVisible = true
+    this.themeToBeDeleted.set(theme)
+    this.startGettingThemeUseData(theme?.name)
+    this.themeDeleteVisible.set(true)
   }
 
-  public onThemeDeleteClosed(deleted: boolean): void {
-    this.themeDeleteVisible = false
-    if (deleted) this.router.navigate(['..'], { relativeTo: this.route })
+  public onThemeDeleted(deleted: boolean): void {
+    if (deleted) {
+      this.router.navigate(['..'], { relativeTo: this.route })
+    }
   }
 
   /**
@@ -319,28 +463,8 @@ export class ThemeDetailComponent implements OnInit {
     else this.headerImageUrl = Utils.bffImageUrl(this.imageBasePath, theme.name, LogoRefType.Logo)
   }
 
-  private prepareDialogTranslations(): void {
-    this.translations$ = this.translate.get(['INTERNAL.OPERATOR_MESSAGE', 'INTERNAL.OPERATOR_HINT']).pipe(
-      first(),
-      map((data) => {
-        return [
-          {
-            id: 'ws_detail_operator_message',
-            severity: 'warn',
-            life: 5000,
-            closable: true,
-            summary: data['INTERNAL.OPERATOR_HINT'],
-            detail: data['INTERNAL.OPERATOR_MESSAGE']
-          }
-        ]
-      })
-    )
-    this.translations$.subscribe((data) => (this.messages = data))
-  }
-
   // default: we guess the Theme is in use so that deletion is not offered
-  public preparePageActions(inUse: boolean, theme?: Theme): void {
-    this.isThemeUsedByWorkspace = inUse
+  public preparePageActions(theme?: Theme): void {
     this.actions$ = this.translate
       .get([
         'ACTIONS.NAVIGATION.BACK',
@@ -388,7 +512,7 @@ export class ThemeDetailComponent implements OnInit {
               id: 'th_detail_page_action_edit',
               label: data['ACTIONS.EDIT.LABEL'],
               title: data['ACTIONS.EDIT.TOOLTIP'],
-              actionCallback: () => this.onChangeMode('edit', theme!),
+              actionCallback: () => this.onChangeMode('EDIT', theme!),
               permission: 'THEME#EDIT',
               icon: 'pi pi-pencil',
               show: 'always',
@@ -399,7 +523,7 @@ export class ThemeDetailComponent implements OnInit {
               id: 'th_detail_page_action_cancel',
               label: data['ACTIONS.CANCEL'],
               title: data['ACTIONS.TOOLTIPS.CANCEL'],
-              actionCallback: () => this.onChangeMode('view', theme!),
+              actionCallback: () => this.onChangeMode('VIEW', theme!),
               permission: 'THEME#VIEW',
               icon: 'pi pi-times',
               show: 'always',
@@ -458,13 +582,13 @@ export class ThemeDetailComponent implements OnInit {
   /**
    * TEMPLATING: allow using properties from an existing theme => no creation of a new theme!
    */
-  public useThemeAsTemplate(data: any): any {
-    this.themeApi.getThemeById({ id: data.id }).subscribe((response) => {
+  public useThemeAsTemplate(selectedTheme: any): any {
+    this.themeApi.getThemeById({ id: selectedTheme.id }).subscribe((response) => {
       this.themeForProps = {
         ...response.resource,
         ...this.undefinedThemeData,
         name: this.theme?.name,
-        displayName: data['ACTIONS.COPY_OF'] + response.resource.displayName,
+        displayName: selectedTheme['ACTIONS.COPY_OF'] + response.resource.displayName,
         modificationCount: this.theme?.modificationCount
       }
       this.themeForColors = response.resource

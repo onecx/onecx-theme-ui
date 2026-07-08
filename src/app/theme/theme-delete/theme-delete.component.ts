@@ -1,25 +1,37 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core'
-import { TranslateService } from '@ngx-translate/core'
+import { Component, input, model } from '@angular/core'
+import { TranslateModule, TranslateService } from '@ngx-translate/core'
+
+import { ButtonModule } from 'primeng/button'
+import { DialogModule } from 'primeng/dialog'
+import { MessageModule } from 'primeng/message'
+import { TooltipModule } from 'primeng/tooltip'
 
 import { PortalMessageService } from '@onecx/angular-integration-interface'
 
 import { Theme, ThemesAPIService } from 'src/app/shared/generated'
+import { LoadingState } from '../theme-detail/theme-detail.component'
 
 @Component({
   selector: 'app-theme-delete',
+  standalone: true,
+  imports: [ButtonModule, DialogModule, MessageModule, TranslateModule, TooltipModule],
   templateUrl: './theme-delete.component.html'
 })
 export class ThemeDeleteComponent {
-  @Input() theme: Theme | undefined
-  @Input() isUsedByWorkspace = false
-  @Input() visible = false
-  @Output() visibleChange = new EventEmitter<boolean>()
+  // signals
+  public visible = model.required<boolean>()
+  public deleted = model.required<boolean>()
+  public useLoadingState = input.required<LoadingState>()
+  public themeUsed = input.required<boolean>()
+  public themeToBeDeleted = input<Theme | undefined>()
 
   constructor(
     private readonly themeApi: ThemesAPIService,
     private readonly msgService: PortalMessageService,
     private readonly translate: TranslateService
-  ) {}
+  ) {
+    this.deleted.set(false)
+  }
 
   /**
    * DELETE
@@ -28,7 +40,8 @@ export class ThemeDeleteComponent {
     if (theme?.id)
       this.themeApi.deleteTheme({ id: theme.id }).subscribe({
         next: () => {
-          this.visibleChange.emit(true)
+          this.deleted.set(true)
+          this.visible.set(false)
           this.msgService.success({ summaryKey: 'ACTIONS.DELETE.THEME_OK' })
         },
         error: (err) => {

@@ -1,4 +1,3 @@
-import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 
@@ -10,15 +9,14 @@ describe('ThemeColorBoxComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ThemeColorBoxComponent],
       imports: [
+        ThemeColorBoxComponent,
         TranslateTestingModule.withTranslations({
           de: require('src/assets/i18n/de.json'),
           en: require('src/assets/i18n/en.json')
         }).withDefaultLanguage('en')
       ],
-      providers: [],
-      schemas: [NO_ERRORS_SCHEMA]
+      providers: []
     }).compileComponents()
   }))
 
@@ -29,6 +27,15 @@ describe('ThemeColorBoxComponent', () => {
   })
 
   it('should create', () => {
+    expect(component).toBeTruthy()
+  })
+
+  it('should create', () => {
+    fixture.componentRef.setInput(
+      'properties',
+      '{"general": {"primary-color": "lightgray"}, "topbar": {"topbar-text-color": "darkgray"}, "sidebar": {"menu-text-color": "black"}}'
+    )
+    fixture.detectChanges()
     expect(component).toBeTruthy()
   })
 })

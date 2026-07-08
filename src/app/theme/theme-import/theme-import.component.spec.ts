@@ -1,4 +1,3 @@
-import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { HttpResponse, provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
@@ -11,6 +10,7 @@ import { PortalMessageService } from '@onecx/angular-integration-interface'
 
 import { Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeImportComponent } from './theme-import.component'
+import { provideNoopAnimations } from '@angular/platform-browser/animations'
 
 describe('ThemeImportComponent', () => {
   let component: ThemeImportComponent
@@ -25,35 +25,44 @@ describe('ThemeImportComponent', () => {
   })
 
   const msgServiceSpy = jasmine.createSpyObj<PortalMessageService>('PortalMessageService', ['success', 'error'])
-  const themeApiSpy = jasmine.createSpyObj<ThemesAPIService>('ThemesAPIService', ['importThemes'])
+  const themesApiSpy = jasmine.createSpyObj<ThemesAPIService>('ThemesAPIService', ['importThemes'])
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ThemeImportComponent],
       imports: [
+        ThemeImportComponent,
         TranslateTestingModule.withTranslations({
           de: require('src/assets/i18n/de.json'),
           en: require('src/assets/i18n/en.json')
         }).withDefaultLanguage('en')
       ],
       providers: [
-        provideHttpClientTesting(),
         provideHttpClient(),
-        provideRouter([{ path: '', component: ThemeImportComponent }]),
-        { provide: PortalMessageService, useValue: msgServiceSpy },
-        { provide: ThemesAPIService, useValue: themeApiSpy }
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
-    }).compileComponents()
+        provideHttpClientTesting(),
+        provideNoopAnimations(),
+        provideRouter([{ path: '', component: ThemeImportComponent }])
+      ]
+    })
+      .overrideComponent(ThemeImportComponent, {
+        add: {
+          providers: [
+            { provide: ThemesAPIService, useValue: themesApiSpy },
+            { provide: PortalMessageService, useValue: msgServiceSpy }
+          ]
+        }
+      })
+      .compileComponents()
+
     msgServiceSpy.success.calls.reset()
     msgServiceSpy.error.calls.reset()
+    themesApiSpy.importThemes.calls.reset()
   }))
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ThemeImportComponent)
     component = fixture.componentInstance
-    component.visible = true
-    component.themes = themes
+    component.visible.set(true)
+    fixture.componentRef.setInput('themes', themes)
     component.formGroup = formGroup
     fixture.detectChanges()
   })
@@ -133,14 +142,6 @@ describe('ThemeImportComponent', () => {
     expect(component.displayNameExists).toBe(true)
   })
 
-  it('should emit uploadEmitter false on closing import dialog', () => {
-    spyOn(component.uploadEmitter, 'emit')
-
-    component.onImportThemeHide()
-
-    expect(component.uploadEmitter.emit).toHaveBeenCalledOnceWith(false)
-  })
-
   it('should clear error and import data on import clear', () => {
     component.themeSnapshot = {
       themes: {
@@ -160,14 +161,13 @@ describe('ThemeImportComponent', () => {
   it('should inform and navigate to new theme on import success', () => {
     const router = TestBed.inject(Router)
     spyOn(router, 'navigate')
-    themeApiSpy.importThemes.and.returnValue(
+    themesApiSpy.importThemes.and.returnValue(
       of(
         new HttpResponse({
           body: { id: 'id', name: 'themeName', displayName: 'themeDisplayName' }
         })
       )
     )
-    spyOn(component.uploadEmitter, 'emit')
     component.themeSnapshot = {
       id: 'id',
       created: 'created',
@@ -180,12 +180,11 @@ describe('ThemeImportComponent', () => {
     component.onThemeUpload()
 
     expect(msgServiceSpy.success).toHaveBeenCalledOnceWith({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_SUCCESS' })
-    expect(component.uploadEmitter.emit).toHaveBeenCalledOnceWith(true)
+    expect(component.uploaded()).toBeTrue()
   })
 
   it('should return if no themes available', () => {
-    themeApiSpy.importThemes.and.returnValue(of(new HttpResponse({ body: { id: 'id' } })))
-    spyOn(component.uploadEmitter, 'emit')
+    themesApiSpy.importThemes.and.returnValue(of(new HttpResponse({ body: { id: 'id' } })))
 
     component.formGroup.controls['themeName'].setValue('themeName')
     component.formGroup.controls['displayName'].setValue('themeDisplayName')
@@ -194,21 +193,20 @@ describe('ThemeImportComponent', () => {
 
     expect(component.themeNameExists).toBe(false)
     expect(component.displayNameExists).toBe(false)
-    expect(component.uploadEmitter.emit).not.toHaveBeenCalled()
+    expect(component.uploaded()).toBeFalse()
   })
 
   it('should prevent upload if form is not ready', () => {
-    themeApiSpy.importThemes.and.returnValue(of(new HttpResponse({ body: { id: 'id' } })))
-    spyOn(component.uploadEmitter, 'emit')
+    themesApiSpy.importThemes.and.returnValue(of(new HttpResponse({ body: { id: 'id' } })))
 
     component.formGroup.controls['themeName'].setValue('themeName')
     component.onThemeUpload()
 
-    expect(component.uploadEmitter.emit).not.toHaveBeenCalled()
+    expect(component.uploaded()).toBeFalse()
   })
 
   it('should display error on api call fail during upload', () => {
-    themeApiSpy.importThemes.and.returnValue(throwError(() => new Error()))
+    themesApiSpy.importThemes.and.returnValue(throwError(() => new Error()))
     component.themeSnapshot = {
       id: 'id',
       created: 'created',
@@ -221,6 +219,7 @@ describe('ThemeImportComponent', () => {
     component.onThemeUpload()
 
     expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_FAIL' })
+    expect(component.uploaded()).toBeFalse()
   })
 
   it('should not check existence if form is not ready', () => {

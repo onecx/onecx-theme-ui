@@ -1,14 +1,17 @@
-import { TestBed } from '@angular/core/testing'
-import { CommonModule } from '@angular/common'
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
+import { Location } from '@angular/common'
 import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { NoopAnimationsModule } from '@angular/platform-browser/animations'
+import { provideNoopAnimations } from '@angular/platform-browser/animations'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 import { of, ReplaySubject, throwError } from 'rxjs'
 
-import { BASE_URL, RemoteComponentConfig } from '@onecx/angular-remote-components'
+import { SlotService } from '@onecx/angular-remote-components'
+import { AppConfigService } from '@onecx/angular-integration-interface'
+import { REMOTE_COMPONENT_CONFIG, RemoteComponentConfig } from '@onecx/angular-utils'
 
 import { Theme, SearchThemeResponse, ThemesAPIService } from 'src/app/shared/generated'
+import { environment } from 'src/environments/environment'
 import { OneCXThemeDataComponent } from './theme-data.component'
 
 const theme1: Theme = {
@@ -24,61 +27,64 @@ const theme2: Theme = {
 const themes: Theme[] = [theme1, theme2]
 
 describe('OneCXThemeDataComponent', () => {
+  let component: OneCXThemeDataComponent
+  let fixture: ComponentFixture<OneCXThemeDataComponent>
+  let baseUrlSubject: ReplaySubject<any>
+
   const themeApiSpy = {
     searchThemes: jasmine.createSpy('searchThemes').and.returnValue(of({})),
     getThemeByName: jasmine.createSpy('getThemeByName').and.returnValue(of({}))
   }
-
-  function setUp() {
-    const fixture = TestBed.createComponent(OneCXThemeDataComponent)
-    const component = fixture.componentInstance
-    fixture.detectChanges()
-    return { fixture, component }
+  const slotServiceSpy = {
+    init: jasmine.createSpy('init'),
+    isSomeComponentDefinedForSlot: jasmine.createSpy('isSomeComponentDefinedForSlot').and.returnValue(of(false))
   }
 
-  let baseUrlSubject: ReplaySubject<any>
-  beforeEach(() => {
+  function initializeComponent() {
+    fixture = TestBed.createComponent(OneCXThemeDataComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+  }
+
+  beforeEach(waitForAsync(() => {
     baseUrlSubject = new ReplaySubject<any>(1)
+
     TestBed.configureTestingModule({
       declarations: [],
       imports: [
         TranslateTestingModule.withTranslations({
           de: require('src/assets/i18n/de.json'),
           en: require('src/assets/i18n/en.json')
-        }).withDefaultLanguage('en'),
-        NoopAnimationsModule
+        }).withDefaultLanguage('en')
       ],
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
-        {
-          provide: BASE_URL,
-          useValue: baseUrlSubject
-        }
+        provideNoopAnimations(),
+        { provide: REMOTE_COMPONENT_CONFIG, useValue: baseUrlSubject },
+        { provide: SlotService, useValue: slotServiceSpy }
       ]
     })
       .overrideComponent(OneCXThemeDataComponent, {
         set: {
-          imports: [TranslateTestingModule, CommonModule],
-          providers: [{ provide: ThemesAPIService, useValue: themeApiSpy }]
+          providers: [{ provide: ThemesAPIService, useValue: themeApiSpy }, { provide: AppConfigService }]
         }
       })
       .compileComponents()
 
-    baseUrlSubject.next('base_url_mock')
+    slotServiceSpy.isSomeComponentDefinedForSlot.calls.reset()
     themeApiSpy.searchThemes.calls.reset()
     themeApiSpy.getThemeByName.calls.reset()
-  })
+  }))
 
-  describe('initialize', () => {
+  describe('initialization', () => {
     it('should create', () => {
-      const { component } = setUp()
-
+      initializeComponent()
       expect(component).toBeTruthy()
     })
 
     it('should call ocxInitRemoteComponent with the correct config', () => {
-      const { component } = setUp()
+      initializeComponent()
       const mockConfig: RemoteComponentConfig = {
         appId: 'appId',
         productName: 'prodName',
@@ -92,21 +98,24 @@ describe('OneCXThemeDataComponent', () => {
       expect(component.ocxInitRemoteComponent).toHaveBeenCalledWith(mockConfig)
     })
 
-    it('should init remote component', (done: DoneFn) => {
-      const { component } = setUp()
+    it('should initialize remote component', (done: DoneFn) => {
+      const config = { baseUrl: 'base_url' } as RemoteComponentConfig
+      initializeComponent()
 
-      component.ocxInitRemoteComponent({ baseUrl: 'base_url' } as RemoteComponentConfig)
+      component.ocxInitRemoteComponent(config)
 
       baseUrlSubject.asObservable().subscribe((item) => {
-        expect(item).toEqual('base_url')
+        expect(item).toEqual(config)
         done()
       })
+      const expectedBasePath = Location.joinWithSlash('base_url', environment.apiPrefix)
+      expect((themeApiSpy as any).configuration.basePath).toEqual(expectedBasePath)
     })
   })
 
   describe('getting themes', () => {
     it('should get themes - successful with data', (done) => {
-      const { component } = setUp()
+      initializeComponent()
       const mockResponse: SearchThemeResponse = { stream: themes }
       themeApiSpy.searchThemes.and.returnValue(of(mockResponse))
       component.dataType = 'themes'
@@ -125,7 +134,7 @@ describe('OneCXThemeDataComponent', () => {
     })
 
     it('should get themes - successful without data', (done) => {
-      const { component } = setUp()
+      initializeComponent()
       const mockResponse: SearchThemeResponse = { stream: [] }
       themeApiSpy.searchThemes.and.returnValue(of(mockResponse))
       component.dataType = 'themes'
@@ -144,7 +153,7 @@ describe('OneCXThemeDataComponent', () => {
     })
 
     it('should get themes - successful without stream', (done) => {
-      const { component } = setUp()
+      initializeComponent()
       const mockResponse: SearchThemeResponse = { stream: undefined }
       themeApiSpy.searchThemes.and.returnValue(of(mockResponse))
       component.dataType = 'themes'
@@ -163,7 +172,7 @@ describe('OneCXThemeDataComponent', () => {
     })
 
     it('should get themes - failed', (done) => {
-      const { component } = setUp()
+      initializeComponent()
       const errorResponse = { status: 400, statusText: 'Error on getting themes' }
       themeApiSpy.searchThemes.and.returnValue(throwError(() => errorResponse))
       component.dataType = 'themes'
@@ -184,7 +193,7 @@ describe('OneCXThemeDataComponent', () => {
 
   describe('getting theme', () => {
     it('should get theme - successful with data', () => {
-      const { component } = setUp()
+      initializeComponent()
       component.dataType = 'theme'
       themeApiSpy.getThemeByName.and.returnValue(of(theme1))
 
@@ -194,7 +203,7 @@ describe('OneCXThemeDataComponent', () => {
     })
 
     it('should get theme - successful with data', (done) => {
-      const { component } = setUp()
+      initializeComponent()
       themeApiSpy.getThemeByName.and.returnValue(of(theme1))
       component.dataType = 'theme'
       component.themeName = theme1.name
@@ -213,7 +222,7 @@ describe('OneCXThemeDataComponent', () => {
     })
 
     it('should get theme - failed', (done) => {
-      const { component } = setUp()
+      initializeComponent()
       const errorResponse = { status: 400, statusText: 'Error on getting themes' }
       themeApiSpy.getThemeByName.and.returnValue(throwError(() => errorResponse))
       component.dataType = 'theme'
@@ -236,7 +245,7 @@ describe('OneCXThemeDataComponent', () => {
 
   describe('provide logo', () => {
     it('should load - initially', (done) => {
-      const { component } = setUp()
+      initializeComponent()
       component.logEnabled = true
       component.logPrefix = 'get image url'
       component.themeName = theme1.name
@@ -258,7 +267,7 @@ describe('OneCXThemeDataComponent', () => {
 
     describe('provide logo - on error', () => {
       it('should load - failed - used: url', () => {
-        const { component } = setUp()
+        initializeComponent()
         component.logEnabled = true // log without prefix !
         component.themeName = theme1.name
         component.imageUrl = 'http://image/url'
@@ -268,7 +277,7 @@ describe('OneCXThemeDataComponent', () => {
       })
 
       it('should use image - failed - use default', () => {
-        const { component } = setUp()
+        initializeComponent()
         component.logEnabled = false
         component.logPrefix = 'default logo'
         component.themeName = theme1.name
@@ -280,7 +289,7 @@ describe('OneCXThemeDataComponent', () => {
 
     describe('provide logo - get url', () => {
       it('should get image url - data type undefined', () => {
-        const { component } = setUp()
+        initializeComponent()
         component.dataType = undefined
         component.themeName = theme1.name
 
@@ -290,7 +299,7 @@ describe('OneCXThemeDataComponent', () => {
       })
 
       it('should get image url - use input image url', () => {
-        const { component } = setUp()
+        initializeComponent()
         component.dataType = 'logo'
         component.logEnabled = false
         component.logPrefix = 'url'
@@ -303,7 +312,7 @@ describe('OneCXThemeDataComponent', () => {
       })
 
       it('should get url - use default image url', () => {
-        const { component } = setUp()
+        initializeComponent()
         component.dataType = 'logo'
         component.logEnabled = false
         component.logPrefix = 'default url'

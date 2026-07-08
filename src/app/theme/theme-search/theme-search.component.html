@@ -1,202 +1,223 @@
 <ocx-portal-page permission="THEME#SEARCH" helpArticleId="PAGE_THEME_SEARCH">
   <ocx-page-header
-    [header]="'DIALOG.HEADER.SEARCH' | translate"
-    [subheader]="'DIALOG.HEADER.SEARCH.SUBHEADER' | translate"
+    [header]="'DIALOG.SEARCH.HEADER' | translate"
+    [subheader]="'DIALOG.SEARCH.SUBHEADER' | translate"
+    [manualBreadcrumbs]="false"
     [actions]="(actions$ | async) ?? []"
   >
   </ocx-page-header>
-
-  <ocx-page-content *ngIf="themes$ | async as themes">
-    <p-message
-      *ngIf="loading && !exceptionKey"
-      id="th_search_message_loading"
-      severity="info"
-      styleClass="m-3"
-      [text]="'ACTIONS.LOADING' | translate"
-    ></p-message>
-    <p-message
-      *ngIf="exceptionKey"
-      id="th_search_message_error"
-      severity="error"
-      styleClass="m-3"
-      [text]="exceptionKey | translate"
-    ></p-message>
-    <p-dataView
-      id="th_search_dataview"
-      [value]="themes"
-      [paginator]="true"
-      [alwaysShowPaginator]="true"
-      [rowsPerPageOptions]="viewMode === 'grid' ? [100, 200] : [50, 200]"
-      [rows]="viewMode === 'grid' ? 100 : 50"
-      [layout]="viewMode"
-      [emptyMessage]="'ACTIONS.SEARCH.NO_DATA' | translate"
-      filterBy="displayName,name"
-      [sortField]="sortField"
-      [sortOrder]="sortOrder"
-      [showCurrentPageReport]="true"
-      currentPageReportTemplate="{first} - {last} {{ 'ACTIONS.SEARCH.OF' | translate }} {totalRecords}"
-    >
-      <ng-template pTemplate="header">
-        <ocx-data-view-controls
-          [enableSorting]="true"
-          [enableFiltering]="true"
-          [supportedViews]="['grid', 'list']"
-          [initialViewMode]="viewMode"
-          [sortingOptions]="[
-            { label: 'THEME.DISPLAY_NAME' | translate, value: 'displayName' },
-            { label: 'THEME.NAME' | translate, value: 'name' }
-          ]"
-          [defaultSortOption]="sortField"
-          [defaultSortDirection]="false"
-          (dataViewChange)="onLayoutChange($event)"
-          (filterChange)="onFilterChange($event)"
-          [filterColumns]="['THEME.DISPLAY_NAME' | translate, 'THEME.NAME' | translate]"
-          (sortChange)="onSortChange($event)"
-          (sortDirectionChange)="onSortDirChange($event)"
-          [translations]="(dataViewControlsTranslations$ | async) ?? {}"
+  @let data = (data$ | async) ?? [];
+  <ocx-content class="ocx-content">
+    @if (exceptionKey) {
+      <p-message
+        id="th_search_message_error"
+        severity="error"
+        styleClass="m-3"
+        [text]="exceptionKey | translate"
+      ></p-message>
+    } @else if (loading) {
+      <p-message
+        id="th_search_message_loading"
+        severity="info"
+        styleClass="m-3"
+        [text]="'ACTIONS.LOADING' | translate"
+      ></p-message>
+    } @else {
+      <section [attr.aria-label]="'DIALOG.SEARCH.RESULTS' | translate">
+        <ocx-interactive-data-view
+          id="th_search_dataview"
+          styleClass="p-0"
+          [data]="filteredData ?? data"
+          [listGridPaginator]="true"
+          [pageSizes]="[20, 40, 100]"
+          [pageSize]="20"
+          [supportedViewLayouts]="['list', 'grid']"
+          [layout]="'grid'"
+          [clientSideSorting]="true"
+          [clientSideFiltering]="true"
+          [emptyResultsMessage]="'ACTIONS.SEARCH.NO_DATA' | translate"
+          [sortDirection]="sortDirection"
+          [sortField]="sortField"
+          (sorted)="onSortChange($event)"
         >
-        </ocx-data-view-controls>
-      </ng-template>
+          <ng-template #topCenter>
+            <div class="flex flex-wrap flex-row justify-content-between align-items-center gap-2">
+              <!-- GLOBAL Filter -->
+              <p-inputgroup class="w-auto">
+                <p-inputgroup-addon>
+                  <i class="pi pi-filter" aria-hidden="true"></i>
+                </p-inputgroup-addon>
+                <p-floatlabel variant="on">
+                  <input
+                    #globalFilterInput
+                    id="th_search_filter"
+                    type="text"
+                    pInputText
+                    [value]="globalFilterValue"
+                    (input)="onGlobalFilter(globalFilterInput.value, data)"
+                    [ariaLabel]="'DIALOG.DATAVIEW.FILTER.LABEL' | translate"
+                    [pTooltip]="('DIALOG.DATAVIEW.FILTER.OF' | translate) + ('THEME.THEME_NAME' | translate)"
+                    tooltipPosition="top"
+                    tooltipEvent="hover"
+                  />
+                  <label for="th_search_filter" aria-hidden="true">
+                    {{ 'DIALOG.DATAVIEW.FILTER.LABEL' | translate }}
+                  </label>
+                </p-floatlabel>
+                <p-inputgroup-addon>
+                  <p-button
+                    icon="pi pi-filter-slash"
+                    (onClick)="globalFilterInput.value = ''; onClearGlobalFilter()"
+                    [severity]="globalFilterInput.value !== '' ? 'primary' : 'secondary'"
+                    [disabled]="globalFilterInput.value === ''"
+                    [ariaLabel]="'DIALOG.DATAVIEW.FILTER.CLEAR' | translate"
+                    [pTooltip]="'DIALOG.DATAVIEW.FILTER.CLEAR' | translate"
+                    tooltipPosition="top"
+                    tooltipEvent="hover"
+                  />
+                </p-inputgroup-addon>
+              </p-inputgroup>
 
-      <!-- LIST -->
-      <ng-template let-themes pTemplate="listItem">
-        <section [attr.aria-label]="('DIALOG.SEARCH.RESULTS' | translate) + ': Themes'">
-          <article
-            *ngFor="let theme of themes; index as i"
-            [id]="'th_search_data_list_row_' + i"
-            class="py-1 px-3 flex flex-row flex-nowrap justify-content-start align-items-center column-gap-3 hover:bg-gray-200 cursor-pointer"
-            [attr.aria-label]="theme.displayName"
-            [routerLink]="['./', theme.name]"
-          >
-            <div
-              class="p-0 h-3rem sm:h-4rem col-4 sm:col-3 md:col-2 flex justify-content-around align-items-center"
-              aria-hidden="true"
-            >
-              <app-image-container
-                [id]="'th_search_data_list_row_' + i + '_logo'"
-                styleClass="max-h-3rem max-w-4rem sm:max-w-6rem border-round-sm"
-                [bffUrl]="Utils.bffImageUrl(imageBasePath, theme.name, LogoRefType.Logo)"
-                [imageUrl]="theme.logoUrl"
-              ></app-image-container>
+              <!-- ALIGNMENT Helper -->
+              <div>&nbsp;</div>
             </div>
-            <div class="p-0 col-5 sm:col-6 xl:col-6">
-              <div class="flex flex-column row-gap-1 justify-content-center">
-                <div
-                  class="sm:font-bold word-break-all"
-                  [id]="'th_search_data_list_row_' + i + '_display_name'"
-                  [attr.aria-label]="theme.displayName"
-                  [pTooltip]="theme.displayName?.length < 40 ? '' : theme.displayName"
-                  tooltipPosition="top"
-                  tooltipEvent="hover"
-                  role="note"
-                >
-                  {{ Utils.limitText(theme.displayName, 40) }}
-                </div>
-                <div
-                  class="hidden md:block"
-                  [id]="'th_search_data_list_row_' + i + '_description'"
-                  [attr.aria-label]="theme.description"
-                  [pTooltip]="theme.description?.length < 75 ? '' : theme.description"
-                  tooltipPosition="top"
-                  tooltipEvent="hover"
-                  role="note"
-                >
-                  {{ Utils.limitText(theme.description, 75) }}
-                </div>
-              </div>
-            </div>
-            <div class="p-0 sm:col-3 md:col-4 lg:col-4 xl:col-4">
-              <div class="flex flex-column justify-content-center align-items-center h-full">
-                <app-theme-color-box
-                  [id]="'th_search_data_list_row_' + i + '_properties'"
-                  [properties]="theme.properties"
-                  styleClass="h-1rem md:h-1rem w-6rem sm:w-10rem md:w-14rem"
-                  aria-hidden="true"
-                />
-              </div>
-            </div>
-          </article>
-        </section>
-      </ng-template>
+          </ng-template>
 
-      <!-- GRID -->
-      <ng-template let-themes pTemplate="gridItem">
-        <section class="grid grid-nogutter" [attr.aria-label]="('DIALOG.SEARCH.RESULTS' | translate) + ': Themes'">
-          <div *ngFor="let theme of themes; index as i" class="col-6 md:col-4 xl:col-3 p-2 md:p-3">
+          <ng-template pTemplate="listItem" let-item>
             <article
-              [id]="'th_search_data_grid_row_' + i"
-              class="card p-2 sm:px-3 flex flex-column gap-2 justify-content-between text-center hover:bg-gray-200 cursor-pointer"
-              [routerLink]="['./', theme.name]"
-              [attr.aria-label]="'Theme: ' + theme.displayName"
+              [id]="'th_search_data_list_row_' + item.name"
+              class="py-1 px-3 w-full flex flex-row flex-nowrap justify-content-start align-items-center column-gap-3 hover:bg-gray-200 cursor-pointer"
+              [attr.aria-label]="item.displayName"
+              [routerLink]="['./', item.name]"
             >
               <div
-                [id]="'th_search_data_grid_row_' + i + '_display_name'"
-                class="font-bold text-base sm:text-lg md:text-xl lg:text-2xl text-responsive"
-                [pTooltip]="theme.displayName?.length < 20 ? undefined : theme.displayName"
-                tooltipPosition="top"
-                tooltipEvent="hover"
+                class="p-0 h-3rem sm:h-4rem col-4 sm:col-3 md:col-2 flex justify-content-around align-items-center"
                 aria-hidden="true"
               >
-                {{ theme.displayName }}
-              </div>
-              <!-- IMAGE & BADGE -->
-              <div class="relative w-full h-5rem sm:h-10rem px-4 flex justify-content-center align-items-center">
                 <app-image-container
-                  [id]="'th_search_data_grid_row_' + i + '_logo'"
-                  styleClass="max-h-5rem sm:max-h-10rem p-2 border-round-sm"
-                  [bffUrl]="Utils.bffImageUrl(imageBasePath, theme.name, LogoRefType.Logo)"
-                  [imageUrl]="theme.logoUrl"
-                  aria-hidden="true"
+                  [id]="'th_search_data_list_row_' + item.name + '_logo'"
+                  styleClass="max-h-3rem max-w-4rem sm:max-w-6rem border-round-sm"
+                  [bffUrl]="Utils.bffImageUrl(imageBasePath, item.name, LogoRefType.Logo)"
+                  [imageUrl]="item.logoUrl"
                 ></app-image-container>
-                <!-- BADGES -->
+              </div>
+              <div class="p-0 col-5 sm:col-6 xl:col-6">
+                <div class="flex flex-column row-gap-1 justify-content-center">
+                  <div
+                    class="sm:font-bold word-break-all"
+                    [id]="'th_search_data_list_row_' + item.name + '_display_name'"
+                    [attr.aria-label]="item.displayName"
+                    [pTooltip]="item.displayName?.length < 40 ? '' : item.displayName"
+                    tooltipPosition="top"
+                    tooltipEvent="hover"
+                    role="note"
+                  >
+                    {{ Utils.limitText(item.displayName, 40) }}
+                  </div>
+                  <div
+                    class="hidden md:block"
+                    [id]="'th_search_data_list_row_' + item.name + '_description'"
+                    [attr.aria-label]="item.description"
+                    [pTooltip]="item.description?.length < 75 ? '' : item.description"
+                    tooltipPosition="top"
+                    tooltipEvent="hover"
+                    role="note"
+                  >
+                    {{ Utils.limitText(item.description, 75) }}
+                  </div>
+                </div>
+              </div>
+              <div class="p-0 sm:col-3 md:col-4 lg:col-4 xl:col-4">
+                <div class="flex flex-column justify-content-center align-items-center h-full">
+                  <app-theme-color-box
+                    [id]="'th_search_data_list_row_' + item.name + '_properties'"
+                    [properties]="item.properties"
+                    styleClass="h-1rem md:h-1rem w-6rem sm:w-10rem md:w-14rem"
+                    aria-hidden="true"
+                  />
+                </div>
+              </div>
+            </article>
+          </ng-template>
+
+          <ng-template pTemplate="gridItem" let-item>
+            <div class="col-6 md:col-4 lg:col-4 xl:col-3 p-2">
+              <p-card
+                [style]="{ margin: '0rem;' }"
+                styleClass="cursor-pointer hover:bg-gray-200 text-center m-2 p-1"
+                [attr.aria-label]="item.name"
+                (click)="onAppClick(item)"
+                (keydown.enter)="onAppClick(item)"
+                role="button"
+                tabindex="0"
+              >
                 <div
-                  *ngIf="theme.mandatory"
-                  [id]="'th_search_data_grid_row_' + i + '_mandatory'"
-                  class="card-badge-left badge-1 font-bold text-lg md:text-xl pi pi-shield"
-                  [attr.aria-label]="'INTERNAL.MANDATORY_TRUE' | translate"
-                  [pTooltip]="'THEME.TOOLTIPS.MANDATORY' | translate"
+                  [id]="'th_search_data_grid_row_' + item.name + '_display_name'"
+                  class="py-1 font-bold text-base sm:text-lg md:text-xl lg:text-2xl text-responsive"
+                  [pTooltip]="item.displayName?.length < 20 ? undefined : item.displayName"
                   tooltipPosition="top"
                   tooltipEvent="hover"
-                  role="note"
-                ></div>
-              </div>
-              <div class="flex flex-column justify-content-between gap-1 text-center">
+                  aria-hidden="true"
+                >
+                  {{ item.displayName }}
+                </div>
+                <!-- IMAGE & BADGE -->
+                <div class="relative w-full h-5rem sm:h-10rem px-4 flex justify-content-center align-items-center">
+                  <app-image-container
+                    [id]="'th_search_data_grid_row_' + item.name + '_logo'"
+                    styleClass="max-h-5rem sm:max-h-10rem p-2 border-round-sm"
+                    [bffUrl]="Utils.bffImageUrl(imageBasePath, item.name, LogoRefType.Logo)"
+                    [imageUrl]="item.logoUrl"
+                    aria-hidden="true"
+                  ></app-image-container>
+                  <!-- BADGES -->
+                  @if (item.mandatory) {
+                    <div
+                      [id]="'th_search_data_grid_row_' + item.name + '_mandatory'"
+                      class="card-badge-left badge-1 font-bold text-lg md:text-xl pi pi-shield"
+                      [attr.aria-label]="'INTERNAL.MANDATORY_TRUE' | translate"
+                      [pTooltip]="'THEME.TOOLTIPS.MANDATORY' | translate"
+                      tooltipPosition="top"
+                      tooltipEvent="hover"
+                      role="note"
+                    ></div>
+                  }
+                </div>
                 <div
-                  [id]="'th_search_data_grid_row_' + i + '_name'"
-                  class="text-xs sm:text-sm text-responsive"
+                  [id]="'th_search_data_grid_row_' + item.name + '_name'"
+                  class="py-1 text-xs sm:text-sm text-responsive"
                   [attr.aria-label]="'Name'"
-                  [pTooltip]="theme.name.length < 30 ? '' : theme.displayName"
+                  [pTooltip]="item.name.length < 30 ? '' : item.displayName"
                   tooltipPosition="top"
                   tooltipEvent="hover"
                   role="note"
                 >
-                  {{ theme.name }}
+                  {{ item.name }}
                 </div>
-              </div>
-              <app-theme-color-box
-                [properties]="theme.properties"
-                styleClass="h-05rem md:h-1rem mb-2 m-auto"
-                aria-hidden="true"
-              />
-            </article>
-          </div>
-        </section>
-      </ng-template>
-    </p-dataView>
+                <app-theme-color-box
+                  [properties]="item.properties"
+                  styleClass="h-05rem md:h-1rem my-1"
+                  aria-hidden="true"
+                />
+              </p-card>
+            </div>
+          </ng-template>
+        </ocx-interactive-data-view>
+      </section>
+    }
 
     <!-- CREATE -->
     <app-theme-create
-      [visible]="themeCreateVisible"
-      (visibleChange)="themeCreateVisible = $event"
-      (themeCreated)="onThemeCreated($event)"
+      [(visible)]="themeCreateVisible"
+      [(created)]="themeCreated"
+      [themeToBeCreated]="undefined"
     ></app-theme-create>
 
     <!-- IMPORT -->
     <app-theme-import
-      [themes]="themes"
-      [visible]="themeImportVisible"
-      (visibleChange)="themeImportVisible = $event"
-      (uploadEmitter)="onThemeUpload($event)"
+      [(visible)]="themeImportVisible"
+      [(uploaded)]="themeImported"
+      [themes]="convertToThemes(data)"
     ></app-theme-import>
-  </ocx-page-content>
+  </ocx-content>
 </ocx-portal-page>

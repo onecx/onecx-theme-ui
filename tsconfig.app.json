@@ -6,7 +6,13 @@
     "declarationMap": false,
     "inlineSources": true
   },
-  "files": ["src/main.ts", "src/polyfills.ts", "src/app/onecx-theme-remote.module.ts"],
+  "files": [
+    "src/main.ts",
+    "src/polyfills.ts",
+    "src/app/onecx-theme-remote.module.ts",
+    "src/app/remotes/theme-data/theme-data.component.main.ts",
+    "src/app/remotes/current-theme-logo/current-theme-logo.component.main.ts"
+  ],
   "include": ["src/**/*.ts"],
   "exclude": ["src/test.ts", "src/**/*.spec.ts", "src/**/*.harness.ts", "src/app/shared/mocks/**"]
 }

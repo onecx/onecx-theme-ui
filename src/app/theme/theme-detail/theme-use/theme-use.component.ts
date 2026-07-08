@@ -1,7 +1,11 @@
-import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core'
-import { BehaviorSubject, Observable, of } from 'rxjs'
+import { Component, input } from '@angular/core'
+import { AsyncPipe } from '@angular/common'
+import { Router, RouterModule } from '@angular/router'
+import { TranslateModule } from '@ngx-translate/core'
+import { Observable, of } from 'rxjs'
 
-import { SlotService } from '@onecx/angular-remote-components'
+import { TooltipModule } from 'primeng/tooltip'
+
 import { WorkspaceService } from '@onecx/angular-integration-interface'
 
 import { Utils } from 'src/app/shared/utils'
@@ -25,42 +29,28 @@ export type Workspace = {
 
 @Component({
   selector: 'app-theme-use',
+  standalone: true,
+  imports: [AsyncPipe, RouterModule, TooltipModule, TranslateModule],
   templateUrl: './theme-use.component.html'
 })
-export class ThemeUseComponent implements OnChanges {
-  @Input() themeName: string | undefined
-  @Output() used = new EventEmitter<boolean>()
-
-  // receive the slot output
-  public slotName = 'onecx-workspace-data'
-  public slotEmitter = new EventEmitter<Workspace[]>()
-  public workspaceData$ = new BehaviorSubject<Workspace[] | undefined>(undefined)
-  public isComponentDefined$: Observable<boolean> | undefined
+export class ThemeUseComponent {
+  // signals
+  public workspaces = input<Workspace[]>()
+  public isComponentDefined = input<boolean>(false)
+  // dialog
   public workspaceEndpointExist = false
 
   constructor(
-    private readonly slotService: SlotService,
+    private readonly router: Router,
     private readonly workspaceService: WorkspaceService
   ) {
-    this.isComponentDefined$ = this.slotService.isSomeComponentDefinedForSlot(this.slotName)
-  }
-
-  public ngOnChanges(): void {
-    if (this.themeName) {
-      // receive response from workspace
-      this.slotEmitter.subscribe((res) => {
-        this.workspaceData$.next(res)
-        if (res.length > 0) this.used.emit(true)
-        else this.used.emit(false)
-      })
-      // check endpoint exists
-      this.workspaceEndpointExist = Utils.doesEndpointExist(
-        this.workspaceService,
-        'onecx-workspace',
-        'onecx-workspace-ui',
-        'workspace-detail'
-      )
-    }
+    // check endpoint exists
+    this.workspaceEndpointExist = Utils.doesEndpointExist(
+      this.workspaceService,
+      'onecx-workspace',
+      'onecx-workspace-ui',
+      'workspace-detail'
+    )
   }
 
   public getWorkspaceEndpointUrl$(name?: string): Observable<string | undefined> {

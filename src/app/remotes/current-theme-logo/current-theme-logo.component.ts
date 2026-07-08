@@ -1,17 +1,16 @@
-import { Component, EventEmitter, Inject, Input, NO_ERRORS_SCHEMA } from '@angular/core'
-import { CommonModule, Location } from '@angular/common'
+import { Component, EventEmitter, Inject, Input } from '@angular/core'
+import { AsyncPipe, Location } from '@angular/common'
 import { UntilDestroy } from '@ngneat/until-destroy'
 import { BehaviorSubject, first, Observable, ReplaySubject } from 'rxjs'
 
 import {
   AngularRemoteComponentsModule,
-  BASE_URL,
-  RemoteComponentConfig,
   ocxRemoteComponent,
   ocxRemoteWebcomponent
 } from '@onecx/angular-remote-components'
-import { Theme, ThemeService } from '@onecx/angular-integration-interface'
-import { PortalCoreModule } from '@onecx/portal-integration-angular'
+import { AngularAcceleratorModule } from '@onecx/angular-accelerator'
+import { REMOTE_COMPONENT_CONFIG, RemoteComponentConfig } from '@onecx/angular-utils'
+import { AppConfigService, Theme, ThemeService } from '@onecx/angular-integration-interface'
 
 import { Configuration, ThemesAPIService } from 'src/app/shared/generated'
 import { Utils, LogoRefType } from 'src/app/shared/utils'
@@ -19,16 +18,9 @@ import { environment } from 'src/environments/environment'
 
 @Component({
   selector: 'app-current-theme-logo',
-  templateUrl: './current-theme-logo.component.html',
   standalone: true,
-  imports: [AngularRemoteComponentsModule, CommonModule, PortalCoreModule],
-  providers: [
-    {
-      provide: BASE_URL,
-      useValue: new ReplaySubject<string>(1)
-    }
-  ],
-  schemas: [NO_ERRORS_SCHEMA]
+  imports: [AngularAcceleratorModule, AngularRemoteComponentsModule, AsyncPipe],
+  templateUrl: './current-theme-logo.component.html'
 })
 @UntilDestroy()
 export class OneCXCurrentThemeLogoComponent implements ocxRemoteComponent, ocxRemoteWebcomponent {
@@ -52,9 +44,11 @@ export class OneCXCurrentThemeLogoComponent implements ocxRemoteComponent, ocxRe
   public defaultImageUrl: string | undefined = undefined
 
   constructor(
-    @Inject(BASE_URL) private readonly baseUrl: ReplaySubject<string>,
-    private readonly themeApi: ThemesAPIService,
-    private readonly themeService: ThemeService
+    @Inject(REMOTE_COMPONENT_CONFIG)
+    private readonly remoteComponentConfig: ReplaySubject<RemoteComponentConfig>,
+    private readonly appConfigService: AppConfigService,
+    private readonly themeService: ThemeService,
+    private readonly themeApi: ThemesAPIService
   ) {
     this.currentTheme$ = this.themeService.currentTheme$.asObservable()
     this.currentTheme$.pipe(first()).subscribe((theme) => {
@@ -63,13 +57,15 @@ export class OneCXCurrentThemeLogoComponent implements ocxRemoteComponent, ocxRe
     })
   }
 
-  ocxInitRemoteComponent(remoteComponentConfig: RemoteComponentConfig) {
-    this.baseUrl.next(remoteComponentConfig.baseUrl)
+  // initialize this component as remote
+  public ocxInitRemoteComponent(config: RemoteComponentConfig): void {
+    this.appConfigService.init(config.baseUrl)
+    this.remoteComponentConfig.next(config)
     this.themeApi.configuration = new Configuration({
-      basePath: Location.joinWithSlash(remoteComponentConfig.baseUrl, environment.apiPrefix)
+      basePath: Location.joinWithSlash(config.baseUrl, environment.apiPrefix)
     })
     if (environment.DEFAULT_LOGO_PATH)
-      this.defaultImageUrl = Utils.prepareUrlPath(remoteComponentConfig.baseUrl, environment.DEFAULT_LOGO_PATH)
+      this.defaultImageUrl = Utils.prepareUrlPath(config.baseUrl, environment.DEFAULT_LOGO_PATH)
   }
 
   /**

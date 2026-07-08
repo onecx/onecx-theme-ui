@@ -9,11 +9,9 @@
     "composite": false,
     "declaration": false,
     "declarationMap": false,
-    "downlevelIteration": true,
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "importHelpers": true,
-    "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
@@ -24,8 +22,9 @@
     "target": "ES2022",
     "module": "ES2022",
     "lib": ["ES2022", "DOM"],
+    "skipLibCheck": true,
     "inlineSources": true,
-    "types": []
+    "types": ["node"]
   },
   "files": [],
   "include": [],

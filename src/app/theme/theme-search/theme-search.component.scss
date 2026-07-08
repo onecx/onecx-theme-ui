@@ -1,15 +1,23 @@
-@import 'src/app/_th-mixins.scss';
+@use 'src/app/th-mixins.scss' as *;
 
 @include card-badges;
 @include danger-action;
-@include displaying-text-responsive;
+@include ocx-text-responsive;
+@include ocx-interactive-data-view-fixes;
 @include dataview-list-flex-zebra-rows;
-@include correct-select-button;
-@include correct-dataview-header;
-@include correct-data-view-control;
 @include media-queries;
 
 :host ::ng-deep {
+  .ocx-content > div {
+    margin-bottom: 0 !important;
+    padding: 0.75rem 0.5rem !important;
+  }
+
+  /* fixes for p-card */
+  --onecx-theme-onecx-theme-ui-card-body-padding: 0.5rem;
+  --onecx-theme-onecx-theme-ui-card-border-radius: 4px;
+  --onecx-theme-onecx-theme-ui-card-shadow: 0 2px 1px -1px #0003, 0 1px 1px #00000024, 0 1px 3px #0000001f;
+
   .h-05rem {
     height: 0.5rem;
   }

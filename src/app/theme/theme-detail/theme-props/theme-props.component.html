@@ -1,13 +1,11 @@
-<form [formGroup]="basicForm" class="mt-4 mx-0 sm:mx-2 flex flex-column row-gap-4" errorTailor>
+<form [formGroup]="basicForm" class="mt-4 mx-0 sm:mx-2 flex flex-column row-gap-4">
   <!-- THEME BASICs -->
   <div
     class="flex flex-row flex-wrap justify-content-start align-items-center column-gap-4 sm:column-gap-5 md:column-gap-6 row-gap-2"
   >
-    <span class="flex-grow-1 p-float-label" controlErrorAnchor>
+    <p-floatlabel variant="on" class="flex-grow-1">
       <input
         pInputText
-        minlength="2"
-        maxlength="255"
         type="text"
         id="th_detail_basic_field_display_name"
         class="w-full pt-3 pb-2 text-responsive"
@@ -20,7 +18,7 @@
       <label class="ocx-required-label" for="th_detail_basic_field_display_name" aria-hidden="true">
         {{ 'THEME.DISPLAY_NAME' | translate }}
       </label>
-    </span>
+    </p-floatlabel>
     <div class="md:w-10rem">
       <p-checkbox
         ngDefaultControl
@@ -29,15 +27,15 @@
         styleClass="cursor-auto shadow-none"
         formControlName="mandatory"
         [binary]="true"
-        [label]="'INTERNAL.MANDATORY' | translate"
         [ariaLabel]="'INTERNAL.MANDATORY' | translate"
         [pTooltip]="'INTERNAL.TOOLTIPS.MANDATORY' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
       ></p-checkbox>
+      <label for="th_detail_basic_field_mandatory" class="ml-2">{{ 'INTERNAL.MANDATORY' | translate }}</label>
     </div>
   </div>
-  <div class="flex-grow-1 p-float-label">
+  <p-floatlabel variant="on" class="flex-grow-1">
     <input
       pInputText
       type="text"
@@ -52,7 +50,7 @@
     <label for="th_detail_basic_field_description" aria-hidden="true">
       {{ 'THEME.DESCRIPTION' | translate }}
     </label>
-  </div>
+  </p-floatlabel>
 
   <!-- LOGO -->
   <div class="flex-grow-1 sm:h-3-5rem mt-2">
@@ -104,8 +102,8 @@
         tooltipEvent="hover"
       ></button>
       <div class="flex flex-column row-gap-1 flex-grow-1">
-        <div class="p-inputgroup">
-          <span class="p-float-label w-full">
+        <p-inputgroup class="w-auto">
+          <p-floatlabel variant="on">
             <input
               #LogoUrlInput
               pInputText
@@ -122,20 +120,20 @@
             <label for="th_detail_basic_field_logo_url" aria-hidden="true">
               {{ 'IMAGE.LOGO_URL' | translate }}
             </label>
-          </span>
-          <button
-            id="ws_detail_props_item_logo_url_remove"
-            class="p-inputgroup-addon bg-primary pseudo-button"
-            [ngClass]="changeMode === 'EDIT' && LogoUrlInput.value ? 'cursor-pointer' : 'p-disabled'"
-            (click)="onRemoveImageUrl(LogoRefType.Logo)"
-            [attr.aria-label]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
-            [pTooltip]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
-            tooltipPosition="right"
-            tooltipEvent="hover"
-          >
-            <span class="pi pi-trash" aria-hidden="true"></span>
-          </button>
-        </div>
+          </p-floatlabel>
+          <p-inputgroup-addon>
+            <p-button
+              id="ws_detail_props_item_logo_url_remove"
+              icon="pi pi-trash"
+              (onClick)="onRemoveImageUrl(LogoRefType.Logo)"
+              [disabled]="changeMode() !== 'EDIT' && LogoUrlInput.value !== ''"
+              [ariaLabel]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
+              [pTooltip]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
+              tooltipPosition="top"
+              tooltipEvent="hover"
+            />
+          </p-inputgroup-addon>
+        </p-inputgroup>
       </div>
     </div>
   </div>
@@ -196,8 +194,8 @@
         tooltipEvent="hover"
       ></button>
       <div class="flex flex-column row-gap-1 flex-grow-1">
-        <div class="p-inputgroup">
-          <span class="p-float-label w-full">
+        <p-inputgroup class="w-auto">
+          <p-floatlabel variant="on">
             <input
               #SmallLogoUrlInput
               pInputText
@@ -214,22 +212,20 @@
             <label for="th_detail_basic_field_logo_small_url" aria-hidden="true">
               {{ 'IMAGE.LOGO_URL' | translate }}
             </label>
-          </span>
-          <button
-            id="ws_detail_props_item_logo_small_url_remove"
-            class="p-inputgroup-addon bg-primary pseudo-button"
-            [ngClass]="
-              changeMode === 'EDIT' && basicForm.controls['smallLogoUrl'].value ? 'cursor-pointer' : 'p-disabled'
-            "
-            (click)="onRemoveImageUrl(LogoRefType.LogoSmall)"
-            [attr.aria-label]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
-            [pTooltip]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
-            tooltipPosition="right"
-            tooltipEvent="hover"
-          >
-            <span class="pi pi-trash" aria-hidden="true"></span>
-          </button>
-        </div>
+          </p-floatlabel>
+          <p-inputgroup-addon>
+            <p-button
+              id="ws_detail_props_item_logo_small_url_remove"
+              icon="pi pi-trash"
+              (onClick)="onRemoveImageUrl(LogoRefType.LogoSmall)"
+              [disabled]="changeMode() !== 'EDIT' && basicForm.controls['smallLogoUrl'].value !== ''"
+              [ariaLabel]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
+              [pTooltip]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
+              tooltipPosition="top"
+              tooltipEvent="hover"
+            />
+          </p-inputgroup-addon>
+        </p-inputgroup>
       </div>
     </div>
   </div>
@@ -290,8 +286,8 @@
         tooltipEvent="hover"
       ></button>
       <div class="flex flex-column row-gap-1 flex-grow-1">
-        <div class="p-inputgroup">
-          <span class="p-float-label w-full">
+        <p-inputgroup class="w-auto">
+          <p-floatlabel variant="on">
             <input
               #FaviconUrlInput
               pInputText
@@ -308,20 +304,20 @@
             <label for="th_detail_basic_field_favicon_url" aria-hidden="true">
               {{ 'IMAGE.FAVICON_URL' | translate }}
             </label>
-          </span>
-          <button
-            id="ws_detail_props_item_favicon_url_remove"
-            class="p-inputgroup-addon bg-primary pseudo-button"
-            [ngClass]="changeMode === 'EDIT' && FaviconUrlInput.value ? 'cursor-pointer' : 'p-disabled'"
-            (click)="onRemoveImageUrl(LogoRefType.Favicon)"
-            [attr.aria-label]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
-            [pTooltip]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
-            tooltipPosition="right"
-            tooltipEvent="hover"
-          >
-            <span class="pi pi-trash" aria-hidden="true"></span>
-          </button>
-        </div>
+          </p-floatlabel>
+          <p-inputgroup-addon>
+            <p-button
+              id="ws_detail_props_item_favicon_url_remove"
+              icon="pi pi-trash"
+              (onClick)="onRemoveImageUrl(LogoRefType.Favicon)"
+              [disabled]="changeMode() !== 'EDIT' && basicForm.controls['faviconUrl'].value !== ''"
+              [ariaLabel]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
+              [pTooltip]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
+              tooltipPosition="top"
+              tooltipEvent="hover"
+            />
+          </p-inputgroup-addon>
+        </p-inputgroup>
       </div>
     </div>
   </div>
@@ -333,7 +329,7 @@
 
 <form [formGroup]="fontForm" class="mx-0 sm:mx-2 flex flex-column sm:flex-row gap-4">
   <div class="flex-grow-1">
-    <span class="p-float-label">
+    <p-floatlabel variant="on">
       <input
         pInputText
         type="text"
@@ -346,10 +342,10 @@
         tooltipEvent="hover"
       />
       <label for="th_detail_font_font_family" aria-hidden="true">{{ 'THEME.FONT_FAMILY' | translate }}</label>
-    </span>
+    </p-floatlabel>
   </div>
   <div class="flex-grow-1">
-    <span class="p-float-label">
+    <p-floatlabel variant="on">
       <input
         pInputText
         type="text"
@@ -362,6 +358,6 @@
         tooltipEvent="hover"
       />
       <label for="th_detail_font_font_size" aria-hidden="true">{{ 'THEME.FONT_SIZE' | translate }}</label>
-    </span>
+    </p-floatlabel>
   </div>
 </form>

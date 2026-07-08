@@ -1,12 +1,11 @@
-import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
-import { TranslateModule, TranslateService } from '@ngx-translate/core'
+import { provideRouter } from '@angular/router'
 import { TranslateTestingModule } from 'ngx-translate-testing'
-import { of, throwError } from 'rxjs'
+import { of } from 'rxjs'
 
 import { WorkspaceService } from '@onecx/angular-integration-interface'
 
-import { ThemeUseComponent, Workspace } from './theme-use.component'
+import { ThemeUseComponent } from './theme-use.component'
 
 describe('ThemeUseComponent', () => {
   let component: ThemeUseComponent
@@ -16,20 +15,21 @@ describe('ThemeUseComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ThemeUseComponent],
       imports: [
-        TranslateModule.forRoot(),
+        ThemeUseComponent,
         TranslateTestingModule.withTranslations({
           de: require('src/assets/i18n/de.json'),
           en: require('src/assets/i18n/en.json')
         }).withDefaultLanguage('de')
       ],
-      providers: [TranslateService, { provide: WorkspaceService, useValue: workspaceServiceSpy }],
-      schemas: [NO_ERRORS_SCHEMA]
+      providers: [provideRouter([]), { provide: WorkspaceService, useValue: workspaceServiceSpy }]
     }).compileComponents()
   }))
 
   beforeEach(() => {
+    spyOn(console, 'error')
+    workspaceServiceSpy.doesUrlExistFor.and.returnValue(of(false))
+
     fixture = TestBed.createComponent(ThemeUseComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
@@ -39,27 +39,7 @@ describe('ThemeUseComponent', () => {
     expect(component).toBeTruthy()
   })
 
-  describe('on changes', () => {
-    beforeEach(() => {
-      component.themeName = 'theme'
-      workspaceServiceSpy.doesUrlExistFor.and.returnValue(of(true))
-      component.ngOnChanges()
-    })
-
-    it('should emit true', () => {
-      component.slotEmitter.emit([{ name: 'name' } as Workspace])
-    })
-
-    it('should emit false', () => {
-      component.slotEmitter.emit([])
-    })
-  })
-
   describe('getWorkspaceEndpointUrl', () => {
-    beforeEach(() => {
-      component.themeName = 'theme'
-    })
-
     it('should workspaceEndpointExist - exist', (done) => {
       component.workspaceEndpointExist = true
       workspaceServiceSpy.getUrl.and.returnValue(of('/url'))
@@ -79,16 +59,12 @@ describe('ThemeUseComponent', () => {
 
     it('should workspaceEndpointExist - not exist', (done) => {
       component.workspaceEndpointExist = false
-      const errorResponse = { status: 400, statusText: 'Error on check endpoint' }
-      workspaceServiceSpy.getUrl.and.returnValue(throwError(() => errorResponse))
 
       const eu$ = component.getWorkspaceEndpointUrl$('name')
 
       eu$.subscribe({
         next: (data) => {
-          if (data) {
-            expect(data).toBeFalse()
-          }
+          expect(data).toBeUndefined()
           done()
         },
         error: done.fail

@@ -216,17 +216,13 @@ describe('util functions', () => {
     it('should endpoint exist', () => {
       workspaceServiceMock.doesUrlExistFor.and.returnValue(of(true))
 
-      const exist = Utils.doesEndpointExist(workspaceServiceMock, productName, appId, endpointName)
-
-      expect(exist).toBeTrue()
+      expect(Utils.doesEndpointExist(workspaceServiceMock, productName, appId, endpointName)).toBeTrue()
     })
 
     it('should endpoint NOT exist', () => {
       workspaceServiceMock.doesUrlExistFor.and.returnValue(of(false))
 
-      const exist = Utils.doesEndpointExist(workspaceServiceMock, productName, appId, endpointName)
-
-      expect(exist).toBeFalse()
+      expect(Utils.doesEndpointExist(workspaceServiceMock, productName, appId, endpointName)).toBeFalse()
       expect(console.error).toHaveBeenCalled()
     })
 
@@ -234,9 +230,7 @@ describe('util functions', () => {
       const errorResponse = { status: 403, statusText: 'No permissions' }
       workspaceServiceMock.doesUrlExistFor.and.returnValue(throwError(() => errorResponse))
 
-      const exist = Utils.doesEndpointExist(workspaceServiceMock, productName, appId, endpointName)
-
-      expect(exist).toBeFalse()
+      expect(Utils.doesEndpointExist(workspaceServiceMock, productName, appId, endpointName)).toBeFalse()
       expect(console.error).toHaveBeenCalledWith('doesUrlExistFor', errorResponse)
     })
   })

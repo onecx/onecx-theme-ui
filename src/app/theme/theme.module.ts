@@ -1,22 +1,12 @@
 import { NgModule } from '@angular/core'
 import { RouterModule, Routes } from '@angular/router'
 
-import { PortalCoreModule } from '@onecx/portal-integration-angular'
-import { addInitializeModuleGuard, InitializeModuleGuard } from '@onecx/angular-integration-interface'
+import { providePermissionService } from '@onecx/angular-utils'
 
-import { LabelResolver } from 'src/app/shared/label.resolver'
-import { SharedModule } from 'src/app/shared/shared.module'
+import { labelResolver } from 'src/app/shared/label.resolver'
 
 import { ThemeSearchComponent } from './theme-search/theme-search.component'
-import { ThemeImportComponent } from './theme-import/theme-import.component'
-import { ThemeCreateComponent } from './theme-create/theme-create.component'
-import { ThemeDeleteComponent } from './theme-delete/theme-delete.component'
 import { ThemeDetailComponent } from './theme-detail/theme-detail.component'
-import { ThemeUseComponent } from './theme-detail/theme-use/theme-use.component'
-import { ThemeApplyComponent } from './theme-detail/theme-apply/theme-apply.component'
-import { ThemePropsComponent } from './theme-detail/theme-props/theme-props.component'
-import { ThemeInternComponent } from './theme-detail/theme-intern/theme-intern.component'
-import { ThemeColorsComponent } from './theme-detail/theme-colors/theme-colors.component'
 
 const routes: Routes = [
   {
@@ -30,30 +20,16 @@ const routes: Routes = [
     runGuardsAndResolvers: 'paramsChange',
     data: {
       breadcrumb: 'BREADCRUMBS.DETAIL',
-      breadcrumbFn: (data: any) => `${data.labeli18n}`
+      breadcrumbFn: (data: { labeli18n: string }) => `${data.labeli18n}`
     },
-    resolve: { labeli18n: LabelResolver }
+    resolve: {
+      labeli18n: labelResolver
+    }
   }
 ]
 @NgModule({
-  declarations: [
-    ThemeSearchComponent,
-    ThemeCreateComponent,
-    ThemeDeleteComponent,
-    ThemeDetailComponent,
-    ThemeImportComponent,
-    ThemeApplyComponent,
-    ThemePropsComponent,
-    ThemeColorsComponent,
-    ThemeInternComponent,
-    ThemeUseComponent
-  ],
-  imports: [
-    PortalCoreModule.forMicroFrontend(),
-    [RouterModule.forChild(addInitializeModuleGuard(routes))],
-    SharedModule
-  ],
-  providers: [InitializeModuleGuard]
+  imports: [ThemeSearchComponent, ThemeDetailComponent, RouterModule.forChild(routes)],
+  providers: [...providePermissionService()]
 })
 export class ThemeModule {
   constructor() {

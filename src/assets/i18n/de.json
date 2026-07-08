@@ -23,7 +23,9 @@
       "MESSAGE_INFO": "Diese Aktion kann nicht rückgängig gemacht werden!",
       "MESSAGE_INFO_OPERATOR": "Dieses Theme wurde automatisiert erstellt. Es ist löschbar wird aber automatisiert wiederhergestellt.",
       "MESSAGE_REJECT_MANDATORY": "Das Theme ist gekennzeichnet als erforderlich für den Betrieb und kann deshalb nicht gelöscht werden.",
-      "MESSAGE_REJECT_USE": "Das Theme wird von Workspaces benutzt und kann deshalb nicht gelöscht werden.",
+      "MESSAGE_REJECT_DELETION": "Das Theme wird von Workspaces benutzt und kann deshalb nicht gelöscht werden.",
+      "MESSAGE_CHECK_USE": "Prüfe die Verwendung des Themes in Workspaces...",
+      "MESSAGE_TIMEOUT": "Es hat zu lange gedauert um die Benutzung des Themes zu ermitteln. Der Vorgang wurde abgebrochen.",
       "THEME_NOK": "Theme konnte nicht gelöscht werden",
       "THEME_OK": "Theme erfolgreich gelöscht"
     },
@@ -105,25 +107,26 @@
   },
   "DIALOG": {
     "HEADER": {
-      "SEARCH": "Theme Verwaltung",
-      "SEARCH.SUBHEADER": "Erstellung und Bearbeitung von Themes",
       "DETAIL": "Anzeige und Bearbeitung der Theme-Eigenschaften",
       "DETAIL.SUBHEADER": "Theme Details",
       "CREATE": "Theme erstellen",
       "DELETE": "Theme löschen",
       "EXPORT": "Theme exportieren",
-      "SAVE_AS": "Theme speichern unter"
+      "SAVE_AS": "Theme speichern unter..."
     },
     "DETAIL": {
       "SPECIAL.SECTION": "Theme anwenden und Vorlage wählen",
       "AUTO_APPLY": {
         "LABEL": "Änderungen automatisch anwenden",
+        "MESSAGE": "Alle Änderungen (Schriftart, Farben) werden automatisch auf die aktuelle Seite angewendet.",
         "TOOLTIP": "Wenn diese Option eingeschaltet ist, dann werden alle Änderungen (Schriftart, Farben) automatisch auf die aktuelle Seite angewendet.",
         "CURRENT_THEME": "Änderungen werden beim Speichern sofort angewendet, da es das aktuell benutzte Theme ist"
       },
       "THEME_SELECTOR": "Ein Theme als Vorlage wählen"
     },
     "SEARCH": {
+      "HEADER": "Theme Verwaltung",
+      "SUBHEADER": "Erstellung und Bearbeitung von Themes",
       "CRITERIA": "Suchfelder",
       "RESULTS": "Suchergebnisse"
     },
@@ -147,11 +150,12 @@
       "UNUSED": "Das Theme wird von keinem Workspace verwendet."
     },
     "DATAVIEW": {
-      "FILTER": "Filter",
-      "PRODUCT_FILTER_TOOLTIP": "Filtern nach Applikation und Klassifikation",
-      "FILTER_OF": "Filter für ",
-      "FILTER_CLEAR": "Filter entfernen",
-      "FILTER_PLACEHOLDER": "Filter",
+      "FILTER": {
+        "LABEL": "Filter",
+        "OF": "Filter für ",
+        "CLEAR": "Filter entfernen",
+        "PLACEHOLDER": "Filter"
+      },
       "SORT_BY": "Sortiert nach",
       "SORT_DIRECTION_ASC": "aufsteigend",
       "SORT_DIRECTION_DESC": "absteigend",
@@ -209,8 +213,12 @@
       "THEME_COLOR_PRIMARY": "Primärfarbe",
       "THEME_COLOR_SECONDARY": "Sekundärfarbe",
       "THEME_COLOR_TEXT": "Textfarbe",
-      "THEME_COLOR_TOP_MENU": "Menüfarbe",
-      "THEME_COLOR_TOP_LEFT": "Linkfarbe"
+      "THEME_COLOR_BG": "Hintergrundfarbe",
+      "THEME_COLOR_CONTENT_BG": "Inhaltshintergrundfarbe",
+      "THEME_COLOR_TOPBAR_TEXT": "Topbar Textfarbe",
+      "THEME_COLOR_TOPBAR_BG": "Topbar Hintergrundfarbe",
+      "THEME_COLOR_MENU_TEXT": "Menü Textfarbe",
+      "THEME_COLOR_MENU_BG": "Menü Hintergrundfarbe"
     },
     "TEMPLATE": {
       "SELECTOR": "Theme-Vorlage wählen",
