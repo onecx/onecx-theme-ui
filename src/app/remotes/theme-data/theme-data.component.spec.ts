@@ -266,24 +266,48 @@ describe('OneCXThemeDataComponent', () => {
     })
 
     describe('provide logo - on error', () => {
-      it('should load - failed - used: url', () => {
+      it('should load - failed - used: url', (done) => {
         initializeComponent()
         component.logEnabled = true // log without prefix !
         component.themeName = theme1.name
         component.imageUrl = 'http://image/url'
         component.dataType = 'logo'
+        spyOn(component, 'getImageUrl').and.callThrough()
 
         component.onImageLoadError(component.imageUrl)
+
+        component.imageUrl$?.subscribe({
+          next: (data) => {
+            if (data) {
+              expect(data).toBe('base_url/bff/images/' + theme1.name + '/logo')
+              expect(component.getImageUrl).toHaveBeenCalledOnceWith(theme1.name, 'image')
+            }
+            done()
+          },
+          error: done.fail
+        })
       })
 
-      it('should use image - failed - use default', () => {
+      it('should use image - failed - use default', (done) => {
         initializeComponent()
         component.logEnabled = false
         component.logPrefix = 'default logo'
         component.themeName = theme1.name
         component.dataType = 'logo'
+        spyOn(component, 'getImageUrl').and.callThrough()
 
         component.onImageLoadError('base_url/bff/images/theme1/logo')
+
+        component.imageUrl$?.subscribe({
+          next: (data) => {
+            if (data) {
+              expect(data).toBe('base_url/bff/images/' + theme1.name + '/logo')
+              expect(component.getImageUrl).toHaveBeenCalledOnceWith(theme1.name, 'image')
+            }
+            done()
+          },
+          error: done.fail
+        })
       })
     })
 

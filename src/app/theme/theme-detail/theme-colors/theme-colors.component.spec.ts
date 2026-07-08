@@ -72,7 +72,7 @@ describe('ThemeColorsComponent', () => {
     })
 
     it('should have three groups defined', () => {
-      expect(component.groups.length).toBe(3)
+      expect(component.groups).toHaveSize(3)
       expect(component.groups[0].key).toBe('general')
       expect(component.groups[1].key).toBe('topbar')
       expect(component.groups[2].key).toBe('sidebar')

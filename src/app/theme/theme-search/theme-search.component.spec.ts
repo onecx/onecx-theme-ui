@@ -75,7 +75,7 @@ describe('ThemeSearchComponent', () => {
       component.data$.subscribe({
         next: (result) => {
           if (result) {
-            expect(result.length).toBe(2)
+            expect(result).toHaveSize(2)
             expect(result[0]['name']).toEqual('theme1')
             expect(result[1]['name']).toEqual('theme2')
           }
@@ -105,7 +105,7 @@ describe('ThemeSearchComponent', () => {
       component.data$.subscribe({
         next: (result) => {
           if (result) {
-            expect(result.length).toBe(0)
+            expect(result).toHaveSize(0)
           }
           done()
         },
@@ -122,7 +122,7 @@ describe('ThemeSearchComponent', () => {
       component.data$.subscribe({
         next: (result) => {
           if (result) {
-            expect(result.length).toBe(0)
+            expect(result).toHaveSize(0)
             expect(console.error).toHaveBeenCalledWith('searchThemes', errorResponse)
             expect(component.exceptionKey).toEqual('EXCEPTIONS.HTTP_STATUS_' + errorResponse.status + '.THEME')
           }
@@ -141,7 +141,7 @@ describe('ThemeSearchComponent', () => {
       component.data$.subscribe({
         next: (result) => {
           if (result) {
-            expect(result.length).toBe(0)
+            expect(result).toHaveSize(0)
             expect(component.exceptionKey).toEqual('EXCEPTIONS.HTTP_STATUS_405.THEME')
           }
           done()

@@ -123,22 +123,47 @@ describe('OneCXCurrentThemeLogoComponent', () => {
     })
 
     describe('provide logo - on error', () => {
-      it('should load - failed - used: url', () => {
+      it('should load - failed - used: url', (done) => {
         initializeComponent()
         component.logEnabled = true // log without prefix !
         component.themeName = theme1.name
         component.imageUrl = 'http://image/url'
+        spyOn(component, 'getImageUrl').and.callThrough()
 
-        component.onImageLoadError(component.imageUrl)
+        component.onImageLoadError(component.imageUrl) // on error using url use the image as next
+
+        component.imageUrl$?.subscribe({
+          next: (data) => {
+            if (data) {
+              expect(data).toBe('http://onecx-theme-bff:8080/images/' + theme1.name + '/logo')
+              expect(component.getImageUrl).toHaveBeenCalledOnceWith(theme1.name, 'image')
+            }
+            done()
+          },
+          error: done.fail
+        })
       })
 
-      it('should use image - failed - use default', () => {
+      it('should use image - failed - use default', (done) => {
         initializeComponent()
         component.logEnabled = false
         component.logPrefix = 'default logo'
         component.themeName = theme1.name
+        component.imageUrl = '/image-url'
+        spyOn(component, 'getImageUrl').and.callThrough()
 
         component.onImageLoadError('http://onecx-theme-bff:8080/images/' + theme1.name + '/logo')
+
+        component.imageUrl$?.subscribe({
+          next: (data) => {
+            if (data) {
+              expect(data).toBe('http://onecx-theme-bff:8080/images/' + theme1.name + '/logo')
+              expect(component.getImageUrl).toHaveBeenCalledOnceWith(theme1.name, 'default')
+            }
+            done()
+          },
+          error: done.fail
+        })
       })
     })
 
