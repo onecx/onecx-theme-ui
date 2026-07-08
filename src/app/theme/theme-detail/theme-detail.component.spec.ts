@@ -325,7 +325,7 @@ describe('ThemeDetailComponent', () => {
       component['getThemes']()
 
       component.themes$.subscribe((result) => {
-        expect(result.length).toBe(2)
+        expect(result).toHaveSize(2)
         expect(result[0].displayName).toBe('Alpha')
         done()
       })
@@ -608,7 +608,7 @@ describe('ThemeDetailComponent', () => {
       component.preparePageActions(theme)
 
       component.actions$.subscribe((actions) => {
-        expect(actions.length).toBe(8)
+        expect(actions).toHaveSize(8)
         done()
       })
     })

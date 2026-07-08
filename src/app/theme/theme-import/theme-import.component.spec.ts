@@ -105,7 +105,7 @@ describe('ThemeImportComponent', () => {
     await component.onImportThemeSelect(event)
 
     expect(component.themeImportError).toBe(true)
-    expect(component.themeSnapshot).toBe(null)
+    expect(component.themeSnapshot).toBeNull()
     expect(console.error).toHaveBeenCalledOnceWith('Theme Import Error: not valid data ')
   })
 
@@ -118,7 +118,7 @@ describe('ThemeImportComponent', () => {
     await component.onImportThemeSelect(event)
 
     expect(console.error).toHaveBeenCalledOnceWith('Theme Import Parse Error', jasmine.any(Object))
-    expect(component.themeSnapshot).toBe(null)
+    expect(component.themeSnapshot).toBeNull()
   })
 
   it('should indicate theme name existance if already present', async () => {

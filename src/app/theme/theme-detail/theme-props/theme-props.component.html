@@ -55,7 +55,17 @@
   <!-- LOGO -->
   <div class="flex-grow-1 sm:h-3-5rem mt-2">
     <!-- helper inputs because p-fileupload does not work inside inputgroup -->
-    <input #fileUploadLogo hidden type="file" accept="image/*" (change)="onFileUpload($event, LogoRefType.Logo)" />
+    <input
+      #fileUploadLogo
+      id="th_detail_basic_upload_logo_input"
+      hidden
+      type="file"
+      accept="image/*"
+      (change)="onFileUpload($event, LogoRefType.Logo)"
+    />
+    <label class="hidden" for="th_detail_basic_upload_logo_input" aria-hidden="true">
+      exists only for Sonar report
+    </label>
     <div class="flex flex-wrap sm:flex-nowrap align-items-center row-gap-3 column-gap-4">
       <section
         class="w-4rem pl-2"
@@ -143,6 +153,7 @@
     <!-- helper inputs because p-fileupload does not work inside inputgroup -->
     <input
       #fileUploadLogoSmall
+      id="th_detail_basic_upload_logo_small_input"
       hidden
       type="file"
       accept="image/*"
@@ -235,6 +246,7 @@
     <!-- helper inputs because p-fileupload does not work inside inputgroup -->
     <input
       #fileUploadFavicon
+      id="th_detail_basic_upload_favicon_input"
       hidden
       type="file"
       accept="image/*"
