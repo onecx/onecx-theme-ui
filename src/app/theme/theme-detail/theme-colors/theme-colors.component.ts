@@ -107,7 +107,6 @@ export class ThemeColorsComponent implements OnChanges {
       { requireSync: true }
     )
     this.isComponentValid = computed(() => {
-      // Sobald sich eines der Formulare ändert, berechnet sich das hier blitzschnell neu
       return this.isGeneralFormValid() && this.isTopbarFormValid() && this.isSidebarFormValid()
     })
     // Combine the form values to a Theme
@@ -184,7 +183,6 @@ export class ThemeColorsComponent implements OnChanges {
   public onUpdateTheme(): boolean {
     if (!this.theme()) return false
     if (this.colorsForm.valid) {
-      //this.theme()!.properties = this.colorsForm.value
       this.theme.set({ properties: this.colorsForm.value })
     } else {
       this.msgService.error({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
