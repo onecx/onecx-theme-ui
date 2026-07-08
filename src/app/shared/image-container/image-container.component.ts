@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core'
+import { Component, input, OnChanges, output } from '@angular/core'
 import { TranslateModule } from '@ngx-translate/core'
 import { TooltipModule } from 'primeng/tooltip'
 import { map } from 'rxjs'
@@ -22,15 +22,16 @@ import { Utils } from 'src/app/shared/utils'
   templateUrl: './image-container.component.html'
 })
 export class ImageContainerComponent implements OnChanges {
-  // HTML properties
-  @Input() public id = 'th_image_container'
-  @Input() public title: string | undefined
-  @Input() public styleClass: string | undefined
-  // image data + behavior
-  @Input() public bffUrl: string | undefined // uploaded image
-  @Input() public imageUrl: string | undefined // external URL
-  @Input() public cascadeUse: boolean = true // if false then only the default logo is used if loading failed
-  @Output() public imageLoadResult = new EventEmitter<boolean>() // inform caller
+  // signals: HTML properties
+  public readonly id = input<string>('th_image_container')
+  public readonly title = input<string | undefined>()
+  public readonly styleClass = input<string | undefined>('')
+  // signals: image data + behavior
+  public readonly bffUrl = input<string | undefined>() // uploaded image
+  public readonly imageUrl = input<string | undefined>() // external URL
+  public readonly cascadeUse = input<boolean>(true) // if false then only the default logo is used if loading failed
+
+  public readonly imageLoadResult = output<boolean>() // inform caller
 
   public url: string | undefined = undefined
   private urlType: 'ext-url' | 'bff-url' | 'def-url' = 'ext-url'
@@ -43,16 +44,16 @@ export class ImageContainerComponent implements OnChanges {
   }
 
   public ngOnChanges(): void {
-    if (this.imageUrl) {
-      if (/^(http|https):\/\/.{6,245}$/.exec(this.imageUrl)) {
-        this.url = this.imageUrl
+    if (this.imageUrl()) {
+      if (/^(http|https):\/\/.{6,245}$/.exec(this.imageUrl()!)) {
+        this.url = this.imageUrl()
         this.urlType = 'ext-url'
       } else {
         this.url = this.defaultImageUrl
         this.urlType = 'def-url'
       }
-    } else if (this.bffUrl) {
-      this.url = this.bffUrl
+    } else if (this.bffUrl()) {
+      this.url = this.bffUrl()
       this.urlType = 'bff-url'
     } else {
       this.url = this.defaultImageUrl
@@ -72,9 +73,9 @@ export class ImageContainerComponent implements OnChanges {
     if (this.url !== undefined) this.imageLoadResult.emit(false)
 
     // using ext-url not possible, use bff URL
-    if (this.urlType === 'ext-url' && this.cascadeUse) {
-      if (this.bffUrl) {
-        this.url = this.bffUrl
+    if (this.urlType === 'ext-url' && this.cascadeUse()) {
+      if (this.bffUrl()) {
+        this.url = this.bffUrl()
         this.urlType = 'bff-url'
       } else {
         this.url = this.defaultImageUrl

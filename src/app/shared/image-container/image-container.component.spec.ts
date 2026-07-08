@@ -55,15 +55,15 @@ describe('ImageContainerComponent', () => {
 
   describe('on changes', () => {
     it('should use imageUrl as URL if was set', () => {
-      component.imageUrl = 'https://host/path-to-image'
+      fixture.componentRef.setInput('imageUrl', 'https://host/path-to-image')
 
       component.ngOnChanges()
 
-      expect(component.url).toBe(component.imageUrl)
+      expect(component.url).toBe(component.imageUrl())
     })
 
     it('should use default URL if image URL is invalid', () => {
-      component.imageUrl = 'https://host'
+      fixture.componentRef.setInput('imageUrl', 'https://host')
 
       component.ngOnChanges()
 
@@ -71,16 +71,16 @@ describe('ImageContainerComponent', () => {
     })
 
     it('should use imageUrl as URL if was set', () => {
-      component.bffUrl = '/basePath/path-to-logo'
+      fixture.componentRef.setInput('bffUrl', '/basePath/path-to-logo')
 
       component.ngOnChanges()
 
-      expect(component.url).toBe(component.bffUrl)
+      expect(component.url).toBe(component.bffUrl())
     })
 
     it('should use default URL if no URL is provided', () => {
-      component.imageUrl = undefined
-      component.bffUrl = undefined
+      fixture.componentRef.setInput('imageUrl', undefined)
+      fixture.componentRef.setInput('bffUrl', undefined)
 
       component.ngOnChanges()
 
@@ -103,11 +103,11 @@ describe('ImageContainerComponent', () => {
 
       component.url = '/external/url'
       component['urlType'] === 'ext-url'
-      component.bffUrl = '/bff/url'
+      fixture.componentRef.setInput('bffUrl', '/bff/url')
 
       component.onImageLoadError()
 
-      expect(component.url).toBe(component.bffUrl)
+      expect(component.url).toBe(component.bffUrl()!)
       expect(component['urlType']).toBe('bff-url')
       expect(component.imageLoadResult.emit).toHaveBeenCalledWith(false)
     })
@@ -118,7 +118,7 @@ describe('ImageContainerComponent', () => {
       component['defaultImageUrl'] = 'default-url'
       component.url = '/external/url'
       component['urlType'] === 'ext-url'
-      component.bffUrl = undefined
+      fixture.componentRef.setInput('bffUrl', undefined)
 
       component.onImageLoadError()
 

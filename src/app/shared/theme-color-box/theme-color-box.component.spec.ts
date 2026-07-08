@@ -33,7 +33,7 @@ describe('ThemeColorBoxComponent', () => {
   it('should create', () => {
     fixture.componentRef.setInput(
       'properties',
-      '{"general": {"primary-color": "lightgray", "secondary-color": "silver", "text-color": "black"}, "topbar": {"topbar-text-color": "darkgray", "topbar-bg-color": "lightgray", "topbar-menu-button-text-color": "black", "topbar-menu-button-bg-color": "silver", "topbar-left-bg-color": " lightgray"}}'
+      '{"general": {"primary-color": "lightgray"}, "topbar": {"topbar-text-color": "darkgray"}, "sidebar": {"menu-text-color": "black"}}'
     )
     fixture.detectChanges()
     expect(component).toBeTruthy()
