@@ -104,7 +104,6 @@ export class ThemeDetailComponent implements OnInit {
   public showOperatorMessage = true // display initially only
   public selectedTabIndex = '0'
   public dateFormat = 'M/d/yy, hh:mm:ss a'
-  public isThemeUsedByWorkspace = false
   public isCurrentTheme = false
   public Utils = Utils
   // page header
@@ -372,7 +371,6 @@ export class ThemeDetailComponent implements OnInit {
 
   private onUpdateTheme(): void {
     const themeData = this.prepareThemeData()
-    console.log('onUpdateTheme', themeData)
     if (!themeData) return
     // save
     if (this.theme?.id)

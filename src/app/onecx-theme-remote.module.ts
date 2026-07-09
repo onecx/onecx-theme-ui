@@ -65,9 +65,7 @@ const routes: Routes = [
   ]
 })
 export class OneCXThemeModule implements DoBootstrap {
-  constructor(private readonly injector: Injector) {
-    console.info('OneCX Theme Module constructor')
-  }
+  constructor(private readonly injector: Injector) {}
 
   ngDoBootstrap(): void {
     createAppEntrypoint(AppEntrypointComponent, 'ocx-theme-component', this.injector)
