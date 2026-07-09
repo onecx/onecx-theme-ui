@@ -1,12 +1,12 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { provideNoopAnimations } from '@angular/platform-browser/animations'
 import { provideRouter, Router } from '@angular/router'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 import { of, throwError } from 'rxjs'
 
 import { DataSortDirection, RowListGridData } from '@onecx/angular-accelerator'
-import { provideNoopAnimations } from '@angular/platform-browser/animations'
 import { providePermissionService } from '@onecx/angular-utils'
 
 import { SearchThemeResponse, Theme, ThemesAPIService } from 'src/app/shared/generated'
@@ -86,7 +86,7 @@ describe('ThemeSearchComponent', () => {
 
       let actions: any = []
       component.actions$!.subscribe((act) => (actions = act))
-      expect(actions.length).toBe(2)
+      expect(actions).toHaveSize(2)
 
       actions[0].actionCallback()
       expect(component.themeCreateVisible()).toBeTrue()

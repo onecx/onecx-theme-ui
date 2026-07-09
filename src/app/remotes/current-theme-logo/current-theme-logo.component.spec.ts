@@ -57,13 +57,7 @@ describe('OneCXCurrentThemeLogoComponent', () => {
         { provide: SlotService, useValue: slotServiceSpy },
         { provide: ThemeService, useValue: mockThemeService }
       ]
-    })
-      .overrideComponent(OneCXCurrentThemeLogoComponent, {
-        set: {
-          providers: [{ provide: ThemeService, useValue: mockThemeService }]
-        }
-      })
-      .compileComponents()
+    }).compileComponents()
 
     slotServiceSpy.isSomeComponentDefinedForSlot.calls.reset()
   })
