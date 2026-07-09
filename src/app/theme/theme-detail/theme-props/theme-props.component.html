@@ -87,30 +87,28 @@
           (imageLoadResult)="onImageLoadResult($event, LogoRefType.Logo, basicForm.controls['logoUrl'].value)"
         ></app-image-container>
       </div>
-      <button
-        pButton
+      <p-button
         id="th_detail_basic_action_remove_logo"
         icon="pi pi-trash"
         class="action-button p-button-icon-only"
-        [disabled]="!(bffUrl[LogoRefType.Logo] && !basicForm.controls['logoUrl'].value)"
         (click)="onRemoveImage(LogoRefType.Logo)"
+        [disabled]="!(bffUrl[LogoRefType.Logo] && !basicForm.controls['logoUrl'].value)"
         [ariaLabel]="'IMAGE.TOOLTIPS.REMOVE' | translate"
         [pTooltip]="'IMAGE.TOOLTIPS.REMOVE' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
-      ></button>
-      <button
-        pButton
+      ></p-button>
+      <p-button
         id="th_detail_basic_action_upload_logo"
         icon="pi pi-upload"
         class="action-button p-button-icon-only"
-        [disabled]="LogoUrlInput.value"
-        (click)="fileUploadLogo.click()"
+        (onClick)="fileUploadLogo.click()"
+        [disabled]="basicForm.controls['logoUrl'].value"
         [ariaLabel]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
         [pTooltip]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
-      ></button>
+      ></p-button>
       <div class="flex flex-column row-gap-1 flex-grow-1">
         <p-inputgroup class="w-auto">
           <p-floatlabel variant="on">
@@ -136,7 +134,7 @@
               id="ws_detail_props_item_logo_url_remove"
               icon="pi pi-trash"
               (onClick)="onRemoveImageUrl(LogoRefType.Logo)"
-              [disabled]="changeMode() !== 'EDIT' && LogoUrlInput.value !== ''"
+              [disabled]="changeMode() !== 'EDIT' && basicForm.controls['logoUrl'].value !== ''"
               [ariaLabel]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
               [pTooltip]="'IMAGE.TOOLTIPS.REMOVE.URL' | translate"
               tooltipPosition="top"
@@ -183,30 +181,28 @@
           (imageLoadResult)="onImageLoadResult($event, LogoRefType.LogoSmall, basicForm.controls['smallLogoUrl'].value)"
         ></app-image-container>
       </div>
-      <button
-        pButton
+      <p-button
         id="th_detail_basic_action_remove_logo_small"
         icon="pi pi-trash"
         class="action-button p-button-icon-only"
+        (onClick)="onRemoveImage(LogoRefType.LogoSmall)"
         [disabled]="!(bffUrl[LogoRefType.LogoSmall] && !basicForm.controls['smallLogoUrl'].value)"
-        (click)="onRemoveImage(LogoRefType.LogoSmall)"
         [ariaLabel]="'IMAGE.TOOLTIPS.REMOVE' | translate"
         [pTooltip]="'IMAGE.TOOLTIPS.REMOVE' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
-      ></button>
-      <button
-        pButton
+      ></p-button>
+      <p-button
         id="th_detail_basic_action_upload_logo_small"
         icon="pi pi-upload"
         class="action-button p-button-icon-only"
         [disabled]="basicForm.controls['smallLogoUrl'].value"
-        (click)="fileUploadLogoSmall.click()"
+        (onClick)="fileUploadLogoSmall.click()"
         [ariaLabel]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
         [pTooltip]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
-      ></button>
+      ></p-button>
       <div class="flex flex-column row-gap-1 flex-grow-1">
         <p-inputgroup class="w-auto">
           <p-floatlabel variant="on">
@@ -279,30 +275,28 @@
           (imageLoadResult)="onImageLoadResult($event, LogoRefType.Favicon, basicForm.controls['faviconUrl'].value)"
         ></app-image-container>
       </div>
-      <button
-        pButton
+      <p-button
         id="th_detail_basic_action_remove_favicon"
         icon="pi pi-trash"
         class="action-button p-button-icon-only"
-        [disabled]="!(bffUrl[LogoRefType.Favicon] && !basicForm.controls['faviconUrl'].value)"
         (click)="onRemoveImage(LogoRefType.Favicon)"
+        [disabled]="!(bffUrl[LogoRefType.Favicon] && !basicForm.controls['faviconUrl'].value)"
         [ariaLabel]="'IMAGE.TOOLTIPS.REMOVE' | translate"
         [pTooltip]="'IMAGE.TOOLTIPS.REMOVE' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
-      ></button>
-      <button
-        pButton
+      ></p-button>
+      <p-button
         id="th_detail_basic_action_upload_favicon"
         icon="pi pi-upload"
         class="action-button p-button-icon-only"
+        (onClick)="fileUploadFavicon.click()"
         [disabled]="basicForm.controls['faviconUrl'].value"
-        (click)="fileUploadFavicon.click()"
         [ariaLabel]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
         [pTooltip]="'IMAGE.TOOLTIPS.UPLOAD' | translate"
         tooltipPosition="top"
         tooltipEvent="hover"
-      ></button>
+      ></p-button>
       <div class="flex flex-column row-gap-1 flex-grow-1">
         <p-inputgroup class="w-auto">
           <p-floatlabel variant="on">
