@@ -1,4 +1,4 @@
-import { Component, DestroyRef, effect, inject, model } from '@angular/core'
+import { ChangeDetectionStrategy, Component, DestroyRef, effect, inject, model } from '@angular/core'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
@@ -33,6 +33,7 @@ import { themeVariables } from '../theme-detail/theme-variables'
     TooltipModule,
     ToastModule
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-create.component.html',
   styleUrls: ['./theme-create.component.scss']
 })

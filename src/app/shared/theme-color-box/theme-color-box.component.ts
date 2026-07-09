@@ -1,4 +1,4 @@
-import { Component, computed, input, Signal } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, input, Signal } from '@angular/core'
 import { TranslateModule } from '@ngx-translate/core'
 import { TooltipModule } from 'primeng/tooltip'
 
@@ -28,8 +28,9 @@ interface ThemeColorBoxProperties {
   selector: 'app-theme-color-box',
   standalone: true,
   imports: [TooltipModule, TranslateModule],
-  styleUrls: ['./theme-color-box.component.scss'],
-  templateUrl: './theme-color-box.component.html'
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  templateUrl: './theme-color-box.component.html',
+  styleUrl: './theme-color-box.component.scss'
 })
 export class ThemeColorBoxComponent {
   public readonly styleClass = input<string>('h-1rem w-14rem ')

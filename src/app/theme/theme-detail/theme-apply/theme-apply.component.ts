@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core'
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core'
 import { AsyncPipe } from '@angular/common'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
@@ -39,9 +39,10 @@ import { ChangeMode } from '../theme-detail.component'
     TooltipModule,
     ToastModule
   ],
+  providers: [ConfirmationService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-apply.component.html',
-  styleUrls: ['./theme-apply.component.scss'],
-  providers: [ConfirmationService]
+  styleUrls: ['./theme-apply.component.scss']
 })
 export class ThemeApplyComponent {
   // signals

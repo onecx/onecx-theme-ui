@@ -1,4 +1,4 @@
-import { Component, input, model } from '@angular/core'
+import { ChangeDetectionStrategy, Component, input, model } from '@angular/core'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 
 import { ButtonModule } from 'primeng/button'
@@ -15,6 +15,7 @@ import { LoadingState } from '../theme-detail/theme-detail.component'
   selector: 'app-theme-delete',
   standalone: true,
   imports: [ButtonModule, DialogModule, MessageModule, TranslateModule, TooltipModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-delete.component.html'
 })
 export class ThemeDeleteComponent {

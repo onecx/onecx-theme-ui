@@ -30,14 +30,13 @@
       <form [formGroup]="formGroup" class="flex flex-wrap justify-content-start align-items-center gap-3 mt-4">
         <p-floatlabel variant="on" class="w-full md:w-15rem">
           <input
-            #themeNameInput
             pInputText
             type="text"
             id="th_import_theme_name"
             class="w-full pt-3 pb-2 text-responsive"
             formControlName="themeName"
             (keyup)="onThemeNameChange()"
-            [attr.aria-label]="'THEME.THEME_NAME' | translate"
+            [ariaLabel]="'THEME.THEME_NAME' | translate"
             [pTooltip]="'THEME.THEME_NAME' | translate"
             tooltipPosition="top"
             tooltipEvent="hover"
@@ -54,7 +53,7 @@
             class="w-full pt-3 pb-2 text-responsive"
             formControlName="displayName"
             (keyup)="onThemeNameChange()"
-            [attr.aria-label]="'THEME.DISPLAY_NAME' | translate"
+            [ariaLabel]="'THEME.DISPLAY_NAME' | translate"
             [pTooltip]="'THEME.DISPLAY_NAME' | translate"
             tooltipPosition="top"
             tooltipEvent="hover"

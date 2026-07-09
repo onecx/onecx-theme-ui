@@ -1,4 +1,12 @@
-import { AfterViewInit, Component, ChangeDetectorRef, ViewChild, OnChanges, model, input } from '@angular/core'
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnChanges,
+  model,
+  input
+} from '@angular/core'
 import { HttpHeaders } from '@angular/common/http'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -35,6 +43,7 @@ import { ThemeColorBoxComponent } from 'src/app/shared/theme-color-box/theme-col
     ToastModule,
     ThemeColorBoxComponent
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-import.component.html',
   styleUrls: ['./theme-import.component.scss']
 })
@@ -44,7 +53,6 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
   public visible = model.required<boolean>()
   public uploaded = model.required<boolean>()
   // dialog
-  @ViewChild('themeNameInput') themeNameInput!: HTMLInputElement
   public themeNameExists = false
   public displayNameExists = false
   public themeImportError = false

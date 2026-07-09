@@ -1,4 +1,14 @@
-import { ChangeDetectorRef, Component, computed, input, model, OnChanges, Signal, SimpleChanges } from '@angular/core'
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  computed,
+  input,
+  model,
+  OnChanges,
+  Signal,
+  SimpleChanges
+} from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, FormBuilder } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
@@ -45,6 +55,7 @@ import { ChangeMode } from '../theme-detail.component'
     TooltipModule,
     TranslateModule
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-colors.component.html',
   styleUrls: ['./theme-colors.component.scss']
 })

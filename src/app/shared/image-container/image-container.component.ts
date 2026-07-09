@@ -1,4 +1,4 @@
-import { Component, input, OnChanges, output } from '@angular/core'
+import { ChangeDetectionStrategy, Component, input, OnChanges, output } from '@angular/core'
 import { TranslateModule } from '@ngx-translate/core'
 import { TooltipModule } from 'primeng/tooltip'
 import { map } from 'rxjs'
@@ -19,6 +19,7 @@ import { Utils } from 'src/app/shared/utils'
   selector: 'app-image-container',
   standalone: true,
   imports: [AngularAcceleratorModule, TooltipModule, TranslateModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './image-container.component.html'
 })
 export class ImageContainerComponent implements OnChanges {

@@ -1,4 +1,4 @@
-import { Component, DestroyRef, effect, inject, OnInit, signal } from '@angular/core'
+import { ChangeDetectionStrategy, Component, DestroyRef, effect, inject, OnInit, signal } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { AsyncPipe } from '@angular/common'
 import { ActivatedRoute, Router, RouterModule } from '@angular/router'
@@ -46,6 +46,7 @@ import { ThemeImportComponent } from '../theme-import/theme-import.component'
     ThemeColorBoxComponent,
     ImageContainerComponent
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-search.component.html',
   styleUrls: ['./theme-search.component.scss']
 })

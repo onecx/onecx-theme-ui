@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core'
+import { ChangeDetectionStrategy, Component, input } from '@angular/core'
 import { AsyncPipe } from '@angular/common'
 import { Router, RouterModule } from '@angular/router'
 import { TranslateModule } from '@ngx-translate/core'
@@ -31,6 +31,7 @@ export type Workspace = {
   selector: 'app-theme-use',
   standalone: true,
   imports: [AsyncPipe, RouterModule, TooltipModule, TranslateModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-use.component.html'
 })
 export class ThemeUseComponent {

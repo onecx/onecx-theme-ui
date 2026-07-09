@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
@@ -69,6 +70,7 @@ type ThemeData = {
     ThemePropsComponent,
     ThemeColorsComponent
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-detail.component.html',
   styleUrls: ['./theme-detail.component.scss']
 })
@@ -383,8 +385,7 @@ export class ThemeDetailComponent implements OnInit {
           next: (data) => {
             this.msgService.success({ summaryKey: 'ACTIONS.EDIT.MESSAGE.OK' })
             this.onChangeMode('VIEW', data.resource)
-            // update observable with response data
-            this.theme$ = new Observable((sub) => sub.next(data.resource))
+            this.theme$ = of(data.resource) // update observable with response data
           },
           error: (err) => {
             console.error('updateTheme', err)

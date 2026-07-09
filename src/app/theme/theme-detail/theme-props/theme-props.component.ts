@@ -1,4 +1,14 @@
-import { Component, computed, input, model, OnChanges, output, Signal, SimpleChanges } from '@angular/core'
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+  model,
+  OnChanges,
+  output,
+  Signal,
+  SimpleChanges
+} from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
@@ -42,6 +52,7 @@ import { ChangeMode } from '../theme-detail.component'
     TranslateModule,
     ImageContainerComponent
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-props.component.html',
   styleUrls: ['./theme-props.component.scss']
 })
