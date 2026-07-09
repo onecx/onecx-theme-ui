@@ -7,7 +7,6 @@ import { TranslateTestingModule } from 'ngx-translate-testing'
 import { of, ReplaySubject, throwError } from 'rxjs'
 
 import { SlotService } from '@onecx/angular-remote-components'
-import { AppConfigService } from '@onecx/angular-integration-interface'
 import { REMOTE_COMPONENT_CONFIG, RemoteComponentConfig } from '@onecx/angular-utils'
 
 import { Theme, SearchThemeResponse, ThemesAPIService } from 'src/app/shared/generated'
@@ -66,8 +65,8 @@ describe('OneCXThemeDataComponent', () => {
       ]
     })
       .overrideComponent(OneCXThemeDataComponent, {
-        set: {
-          providers: [{ provide: ThemesAPIService, useValue: themeApiSpy }, { provide: AppConfigService }]
+        add: {
+          providers: [{ provide: ThemesAPIService, useValue: themeApiSpy }]
         }
       })
       .compileComponents()
