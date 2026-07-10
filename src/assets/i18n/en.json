@@ -102,7 +102,7 @@
       "MODIFICATION_DATE": "Timestamp of the last change",
       "MODIFICATION_USER": "Name of the user of the last change",
       "MANDATORY": "If set then this Theme is required for operation and therefore the Theme cannot be deleted.",
-      "OPERATOR": "If set, the Theme cannot be deleted and all changes will be lost during the next deployment."
+      "OPERATOR": "If set, the Theme can be deleted or changed, but it will be restored during the next deployment."
     }
   },
   "DIALOG": {

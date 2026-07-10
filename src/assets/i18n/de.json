@@ -92,7 +92,7 @@
     "MODIFICATION_DATE": "Geändert am",
     "MODIFICATION_USER": "Geändert von",
     "MANDATORY": "Notwendig",
-    "MANDATORY_TRUE": "Dieses Theme ist notwendig für den Betrieb. Das Theme kann somit nicht gelöscht werden.",
+    "MANDATORY_TRUE": "Dieses Theme ist notwendig für den Betrieb. Das Theme kann deshalb nicht gelöscht werden.",
     "OPERATOR": "Automatisiert erstellt",
     "OPERATOR_HINT": "Hinweis",
     "OPERATOR_MESSAGE": "Dieses Theme wurde automatisiert erstellt. Alle Änderungen gehen beim nächsten Deployment verloren.",
@@ -102,7 +102,7 @@
       "MODIFICATION_DATE": "Zeitpunkt der letzten Änderung",
       "MODIFICATION_USER": "Name des Benutzers der letzten Änderung",
       "MANDATORY": "Wenn gesetzt, dann ist dieses Theme notwendig für den Betrieb. Das Theme kann somit nicht gelöscht werden.",
-      "OPERATOR": "Wenn gesetzt, dann kann das Theme nicht gelöscht werden und alle Änderungen gehen beim beim nächsten Deployment verloren."
+      "OPERATOR": "Wenn gesetzt, dann kann das Theme zwar gelöscht oder geändert werden, wird aber beim nächsten Deployment wiederhergestellt."
     }
   },
   "DIALOG": {
