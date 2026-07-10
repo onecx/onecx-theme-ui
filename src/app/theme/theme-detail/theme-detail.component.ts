@@ -59,7 +59,7 @@ type ThemeData = {
     ThemeColorsComponent
   ],
   templateUrl: './theme-detail.component.html',
-  styleUrls: ['./theme-detail.component.scss']
+  styleUrl: './theme-detail.component.scss'
 })
 export class ThemeDetailComponent implements OnInit {
   private readonly user = inject(UserService)
@@ -386,7 +386,6 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   public onThemeCreation(theme: Theme | undefined): void {
-    console.log('onThemeCreation', theme)
     this.themeForCreation.set(undefined)
     this.themeCreateVisible.set(false)
     if (theme) {

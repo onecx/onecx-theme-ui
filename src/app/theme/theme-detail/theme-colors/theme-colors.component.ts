@@ -58,7 +58,7 @@ import { ChangeMode } from '../theme-detail.component'
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-colors.component.html',
-  styleUrls: ['./theme-colors.component.scss']
+  styleUrl: './theme-colors.component.scss'
 })
 export class ThemeColorsComponent implements OnChanges {
   private readonly fb = inject(FormBuilder)

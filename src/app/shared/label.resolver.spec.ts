@@ -1,9 +1,9 @@
-import { TestBed } from '@angular/core/testing'
-import { TranslateService } from '@ngx-translate/core'
 import { Observable, of } from 'rxjs'
-import { labelResolver } from './label.resolver'
+import { LabelResolver } from './label.resolver'
 
-describe('labelResolver', () => {
+let labelResolver: LabelResolver
+
+describe('LabelResolver', () => {
   const translateServiceSpy = jasmine.createSpyObj('TranslateService', ['get'])
 
   const activatedRouteSpy = jasmine.createSpyObj('ActivatedRouteSnapshot', [], {
@@ -16,9 +16,7 @@ describe('labelResolver', () => {
   const routerStateSpy = jasmine.createSpyObj('RouterStateSnapshot', [''])
 
   beforeEach(async () => {
-    TestBed.configureTestingModule({
-      providers: [{ provide: TranslateService, useValue: translateServiceSpy }]
-    })
+    labelResolver = new LabelResolver(translateServiceSpy)
     translateServiceSpy.get.calls.reset()
     const dataSpy = Object.getOwnPropertyDescriptor(activatedRouteSpy, 'data')?.get as jasmine.Spy<() => {}>
     dataSpy.and.returnValue({})
@@ -31,9 +29,7 @@ describe('labelResolver', () => {
     })
     translateServiceSpy.get.and.returnValue(of('translation'))
 
-    const obsResult = TestBed.runInInjectionContext(() =>
-      labelResolver(activatedRouteSpy, routerStateSpy)
-    ) as Observable<string>
+    const obsResult = labelResolver.resolve(activatedRouteSpy, routerStateSpy) as Observable<string>
     obsResult.subscribe((result) => {
       expect(result).toBe('translation')
       expect(translateServiceSpy.get).toHaveBeenCalledOnceWith('defined')
@@ -43,7 +39,7 @@ describe('labelResolver', () => {
   })
 
   it('should use route path if breadcrumb is not present', () => {
-    const result = TestBed.runInInjectionContext(() => labelResolver(activatedRouteSpy, routerStateSpy))
+    const result = labelResolver.resolve(activatedRouteSpy, routerStateSpy)
 
     expect(result).toBe('path')
     expect(translateServiceSpy.get).toHaveBeenCalledTimes(0)
@@ -54,7 +50,7 @@ describe('labelResolver', () => {
       () => {}
     >
     routeConfigSpy.and.returnValue({})
-    const result = TestBed.runInInjectionContext(() => labelResolver(activatedRouteSpy, routerStateSpy))
+    const result = labelResolver.resolve(activatedRouteSpy, routerStateSpy)
 
     expect(result).toBe('')
     expect(translateServiceSpy.get).toHaveBeenCalledTimes(0)

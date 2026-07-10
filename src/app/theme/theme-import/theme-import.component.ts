@@ -46,7 +46,7 @@ import { ThemeColorBoxComponent } from 'src/app/shared/theme-color-box/theme-col
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-import.component.html',
-  styleUrls: ['./theme-import.component.scss']
+  styleUrl: './theme-import.component.scss'
 })
 export class ThemeImportComponent implements OnChanges, AfterViewInit {
   private readonly route = inject(ActivatedRoute)

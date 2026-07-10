@@ -42,7 +42,7 @@ import { ChangeMode } from '../theme-detail.component'
   providers: [ConfirmationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-apply.component.html',
-  styleUrls: ['./theme-apply.component.scss']
+  styleUrl: './theme-apply.component.scss'
 })
 export class ThemeApplyComponent {
   // signals

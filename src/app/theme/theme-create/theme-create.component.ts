@@ -35,7 +35,7 @@ import { themeVariables } from '../theme-detail/theme-variables'
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-create.component.html',
-  styleUrls: ['./theme-create.component.scss']
+  styleUrl: './theme-create.component.scss'
 })
 export class ThemeCreateComponent {
   public visible = model.required<boolean>()

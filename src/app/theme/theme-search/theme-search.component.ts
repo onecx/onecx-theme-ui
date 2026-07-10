@@ -48,7 +48,7 @@ import { ThemeImportComponent } from '../theme-import/theme-import.component'
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-search.component.html',
-  styleUrls: ['./theme-search.component.scss']
+  styleUrl: './theme-search.component.scss'
 })
 export class ThemeSearchComponent implements OnInit {
   public readonly route = inject(ActivatedRoute)

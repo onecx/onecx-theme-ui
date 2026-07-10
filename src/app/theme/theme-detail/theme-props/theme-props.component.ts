@@ -55,7 +55,7 @@ import { ChangeMode } from '../theme-detail.component'
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-props.component.html',
-  styleUrls: ['./theme-props.component.scss']
+  styleUrl: './theme-props.component.scss'
 })
 export class ThemePropsComponent implements OnChanges {
   private readonly msgService = inject(PortalMessageService)
