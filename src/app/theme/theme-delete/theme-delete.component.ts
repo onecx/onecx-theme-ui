@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, model } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject, input, model, output } from '@angular/core'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 
 import { ButtonModule } from 'primeng/button'
@@ -21,18 +21,14 @@ import { LoadingState } from '../theme-detail/theme-detail.component'
 export class ThemeDeleteComponent {
   // signals
   public visible = model.required<boolean>()
-  public deleted = model.required<boolean>()
   public useLoadingState = input.required<LoadingState>()
   public themeUsed = input.required<boolean>()
   public themeToBeDeleted = input<Theme | undefined>()
-
-  constructor(
-    private readonly themeApi: ThemesAPIService,
-    private readonly msgService: PortalMessageService,
-    private readonly translate: TranslateService
-  ) {
-    this.deleted.set(false)
-  }
+  public deleted = output<boolean>()
+  // services
+  private readonly themeApi = inject(ThemesAPIService)
+  private readonly msgService = inject(PortalMessageService)
+  private readonly translate = inject(TranslateService)
 
   /**
    * DELETE
@@ -41,7 +37,7 @@ export class ThemeDeleteComponent {
     if (theme?.id)
       this.themeApi.deleteTheme({ id: theme.id }).subscribe({
         next: () => {
-          this.deleted.set(true)
+          this.deleted.emit(true)
           this.visible.set(false)
           this.msgService.success({ summaryKey: 'ACTIONS.DELETE.THEME_OK' })
         },

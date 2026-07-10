@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core'
 import { AsyncPipe } from '@angular/common'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
@@ -54,10 +54,8 @@ export class ThemeApplyComponent {
   public readonly autoApplyChange = output<boolean>() // inform theme detail about change in auto apply to trigger message about it
   public readonly templatingThemeData = output<Theme>() // the data of the theme to be used as template, emitted when user confirms to use a theme as template
 
-  constructor(
-    private readonly confirmation: ConfirmationService,
-    private readonly translate: TranslateService
-  ) {}
+  private readonly confirmation = inject(ConfirmationService)
+  private readonly translate = inject(TranslateService)
 
   /***************************************************************************
    * TEMPLATING WITH EXISTING THEME

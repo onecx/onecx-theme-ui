@@ -3,6 +3,7 @@ import {
   ChangeDetectorRef,
   Component,
   computed,
+  inject,
   input,
   model,
   OnChanges,
@@ -60,6 +61,10 @@ import { ChangeMode } from '../theme-detail.component'
   styleUrls: ['./theme-colors.component.scss']
 })
 export class ThemeColorsComponent implements OnChanges {
+  private readonly fb = inject(FormBuilder)
+  private readonly translate = inject(TranslateService)
+  private readonly msgService = inject(PortalMessageService)
+  private readonly cd = inject(ChangeDetectorRef)
   // signals
   public readonly theme = model.required<Theme | undefined>()
   public readonly changeMode = input.required<ChangeMode>()
@@ -90,12 +95,7 @@ export class ThemeColorsComponent implements OnChanges {
   ]
   public themeVars = themeVariables // make it available in HTML
 
-  constructor(
-    private readonly fb: FormBuilder,
-    private readonly translate: TranslateService,
-    private readonly msgService: PortalMessageService,
-    private readonly cd: ChangeDetectorRef
-  ) {
+  constructor() {
     this.isGeneralFormValid = toSignal(
       this.generalForm.statusChanges.pipe(
         map((status) => status === 'VALID'),

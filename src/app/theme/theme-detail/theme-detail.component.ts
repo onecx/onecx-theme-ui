@@ -1,16 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  DestroyRef,
-  effect,
-  EventEmitter,
-  inject,
-  OnInit,
-  Signal,
-  signal,
-  viewChild
-} from '@angular/core'
+import { Component, computed, DestroyRef, EventEmitter, inject, OnInit, signal, viewChild } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { AsyncPipe, JsonPipe, Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -70,25 +58,34 @@ type ThemeData = {
     ThemePropsComponent,
     ThemeColorsComponent
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-detail.component.html',
   styleUrls: ['./theme-detail.component.scss']
 })
 export class ThemeDetailComponent implements OnInit {
+  private readonly user = inject(UserService)
+  private readonly route = inject(ActivatedRoute)
+  private readonly router = inject(Router)
+  private readonly location = inject(Location)
+  private readonly themeApi = inject(ThemesAPIService)
+  private readonly themeService = inject(ThemeService)
+  private readonly msgService = inject(PortalMessageService)
+  private readonly translate = inject(TranslateService)
+  private readonly imageApi = inject(ImagesInternalAPIService)
+  private readonly slotService = inject(SlotService)
   private readonly destroyRef = inject(DestroyRef)
   // signals
-  public themeData: Signal<ThemeData> // combined data from sub components
-  public readonly themeCreated = signal<Theme | undefined>(undefined)
-  public readonly themeDeleted = signal<boolean>(false)
   public readonly themeDeleteVisible = signal<boolean>(false)
   public readonly themeCreateVisible = signal<boolean>(false)
   public readonly themeToBeDeleted = signal<Theme | undefined>(undefined)
+  public readonly themeForCreation = signal<Theme | undefined>(undefined)
   public readonly checkThemeUse = signal<boolean>(false)
   public readonly isComponentDefined = signal<boolean>(false)
   public readonly themeUsed = signal<boolean>(false)
   public readonly themeUsedName = signal<string | undefined>(undefined)
   public readonly themeUsedByWorkspaces = signal<Workspace[]>([])
   public readonly themeUseLoadingState = signal<LoadingState>('initial')
+  // signals: Combine the data from the sub components to a single theme object and check if the forms are valid
+  public themeData = computed(() => this.computeThemeData())
   // signals: components
   public readonly tabComponent = viewChild(Tabs)
   public readonly themePropsComponent = viewChild(ThemePropsComponent)
@@ -118,7 +115,6 @@ export class ThemeDetailComponent implements OnInit {
   public theme: Theme | undefined
   public themeForProps: Theme | undefined
   public themeForColors: Theme | undefined
-  public themeForCreation: Theme | undefined
   // image
   public imageBasePath = this.imageApi.configuration.basePath
   // receive the slot output
@@ -137,20 +133,10 @@ export class ThemeDetailComponent implements OnInit {
     creationUser: undefined
   } as Theme
 
-  constructor(
-    private readonly user: UserService,
-    private readonly route: ActivatedRoute,
-    private readonly router: Router,
-    private readonly location: Location,
-    private readonly themeApi: ThemesAPIService,
-    private readonly themeService: ThemeService,
-    private readonly msgService: PortalMessageService,
-    private readonly translate: TranslateService,
-    private readonly imageApi: ImagesInternalAPIService,
-    private readonly slotService: SlotService
-  ) {
+  ngOnInit(): void {
+    // old constructor starts here
     // Initialize the slot service for getting workspaces using the theme.
-    slotInitializer(slotService)
+    slotInitializer(this.slotService)
     this.slotService
       .isSomeComponentDefinedForSlot(this.slotName)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -164,35 +150,7 @@ export class ThemeDetailComponent implements OnInit {
       this.stopGettingThemeUseData(res)
     })
 
-    // manage signal responses from the child dialog and react accordingly
-    effect(() => {
-      if (this.themeDeleted() === true) {
-        this.themeDeleted.set(false)
-      }
-      const theme = this.themeCreated()
-      if (theme) {
-        this.router.navigate(['../' + theme.name], { relativeTo: this.route })
-      }
-      if (this.themeCreateVisible() === false) {
-        this.themeForCreation = undefined
-      }
-    })
-
-    // Combine the data from the sub components to a single theme object and check if the forms are valid
-    this.themeData = computed(() => {
-      const themeProps = this.themePropsComponent()?.combinedFormValues()
-      const themeColors = this.themeColorsComponent()?.combinedFormValues()
-      const propsValid = this.themePropsComponent()?.isComponentValid()
-      const colorsValid = this.themeColorsComponent()?.isComponentValid()
-      return {
-        theme: { ...themeProps, ...themeColors },
-        propsValid: propsValid,
-        colorsValid: colorsValid
-      } as ThemeData
-    })
-  }
-
-  ngOnInit(): void {
+    // old constructor ends here
     this.dateFormat = this.user.lang$.getValue() === 'de' ? 'dd.MM.yyyy HH:mm:ss' : this.dateFormat
     this.themeName = this.route.snapshot.paramMap.get('name')
     // Common start
@@ -272,6 +230,17 @@ export class ThemeDetailComponent implements OnInit {
    * The loading state is managed by a signal and a timeout timer. The loading indicator is shown for at least 1.5 seconds.
    * If the data is not received within timeout time, the loading state is set to "timeout".
    */
+  private computeThemeData(): ThemeData {
+    const themeProps = this.themePropsComponent()?.combinedFormValues()
+    const themeColors = this.themeColorsComponent()?.combinedFormValues()
+    const propsValid = this.themePropsComponent()?.isComponentValid()
+    const colorsValid = this.themeColorsComponent()?.isComponentValid()
+    return {
+      theme: { ...themeProps, ...themeColors },
+      propsValid: propsValid,
+      colorsValid: colorsValid
+    } as ThemeData
+  }
 
   // Initialize the process of checking if the theme is used in workspaces
   private startGettingThemeUseData(themeName?: string): void {
@@ -407,13 +376,22 @@ export class ThemeDetailComponent implements OnInit {
       themeData = this.theme
     }
     if (!themeData) return
-    this.themeForCreation = {
+    this.themeForCreation.set({
       ...themeData,
       ...this.undefinedThemeData,
       name: copyOfPrefix + themeData.name,
       displayName: copyOfPrefix + themeData.displayName
-    }
+    })
     this.themeCreateVisible.set(true)
+  }
+
+  public onThemeCreation(theme: Theme | undefined): void {
+    console.log('onThemeCreation', theme)
+    this.themeForCreation.set(undefined)
+    this.themeCreateVisible.set(false)
+    if (theme) {
+      this.router.navigate(['../' + theme.name], { relativeTo: this.route })
+    }
   }
 
   /**
@@ -425,10 +403,8 @@ export class ThemeDetailComponent implements OnInit {
     this.themeDeleteVisible.set(true)
   }
 
-  public onThemeDeleted(deleted: boolean): void {
-    if (deleted) {
-      this.router.navigate(['..'], { relativeTo: this.route })
-    }
+  public onThemeDeletion(): void {
+    this.router.navigate(['..'], { relativeTo: this.route })
   }
 
   /**

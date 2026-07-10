@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, OnChanges, output } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject, input, OnChanges, output } from '@angular/core'
 import { TranslateModule } from '@ngx-translate/core'
 import { TooltipModule } from 'primeng/tooltip'
 import { map } from 'rxjs'
@@ -38,9 +38,9 @@ export class ImageContainerComponent implements OnChanges {
   private urlType: 'ext-url' | 'bff-url' | 'def-url' = 'ext-url'
   private defaultImageUrl: string | undefined = undefined
 
-  constructor(appState: AppStateService) {
-    appState.currentMfe$
-      .pipe(map((mfe) => Utils.prepareUrlPath(mfe.remoteBaseUrl, environment.DEFAULT_LOGO_PATH)))
+  constructor() {
+    inject(AppStateService)
+      .currentMfe$.pipe(map((mfe) => Utils.prepareUrlPath(mfe.remoteBaseUrl, environment.DEFAULT_LOGO_PATH)))
       .subscribe((data) => (this.defaultImageUrl = data))
   }
 

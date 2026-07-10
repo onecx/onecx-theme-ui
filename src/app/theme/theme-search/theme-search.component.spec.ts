@@ -186,7 +186,7 @@ describe('ThemeSearchComponent', () => {
     const router = TestBed.inject(Router)
     spyOn(router, 'navigate').and.returnValue(Promise.resolve(true))
 
-    component.themeCreated.set({ name: 'new-theme' } as Theme)
+    component.onThemeCreation({ name: 'new-theme' } as Theme)
     fixture.detectChanges()
     TestBed.flushEffects()
 

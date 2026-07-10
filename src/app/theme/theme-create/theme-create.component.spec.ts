@@ -1,16 +1,17 @@
+import { outputToObservable } from '@angular/core/rxjs-interop'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
+import { provideNoopAnimations } from '@angular/platform-browser/animations'
 import { provideRouter } from '@angular/router'
 import { TranslateTestingModule } from 'ngx-translate-testing'
-import { of, throwError } from 'rxjs'
+import { firstValueFrom, of, throwError } from 'rxjs'
 
 import { PortalMessageService } from '@onecx/angular-integration-interface'
 
 import { Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeCreateComponent } from './theme-create.component'
-import { provideNoopAnimations } from '@angular/platform-browser/animations'
 
 const theme: Theme = {
   id: 'id',
@@ -53,7 +54,6 @@ describe('ThemeCreateComponent', () => {
     component = fixture.componentInstance
     // initialize component state
     component.visible.set(true)
-    component.created.set(undefined)
     component.themeToBeCreated.set(undefined)
     component.formGroup = new FormGroup({
       name: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(50)]),
@@ -109,13 +109,14 @@ describe('ThemeCreateComponent', () => {
   })
 
   describe('saveTheme', () => {
-    it('should create a theme and set created', () => {
+    it('should create a theme and set created', async () => {
       themesApiSpy.createTheme.and.returnValue(of({ resource: theme }))
+      const createdPromise = firstValueFrom(outputToObservable(component.created))
 
       component.saveTheme()
 
       expect(msgServiceSpy.success).toHaveBeenCalledWith({ summaryKey: 'ACTIONS.CREATE.MESSAGE.OK' })
-      expect(component.created()).toEqual(theme)
+      await expectAsync(createdPromise).toBeResolved()
     })
 
     it('should use themeToBeCreated properties when set', () => {

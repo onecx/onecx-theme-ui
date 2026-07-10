@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  inject,
   input,
   model,
   OnChanges,
@@ -57,6 +58,9 @@ import { ChangeMode } from '../theme-detail.component'
   styleUrls: ['./theme-props.component.scss']
 })
 export class ThemePropsComponent implements OnChanges {
+  private readonly msgService = inject(PortalMessageService)
+  private readonly translate = inject(TranslateService)
+  private readonly imageApi = inject(ImagesInternalAPIService)
   // signals
   public readonly theme = model.required<Theme | undefined>()
   public readonly changeMode = input.required<ChangeMode>()
@@ -79,11 +83,7 @@ export class ThemePropsComponent implements OnChanges {
   public fontForm: FormGroup = new FormGroup({})
   public themeFormValues$ = new ReplaySubject<{ theme: string }>(1) // async storage of formgroup value to manage change detection
 
-  constructor(
-    private readonly msgService: PortalMessageService,
-    private readonly translate: TranslateService,
-    private readonly imageApi: ImagesInternalAPIService
-  ) {
+  constructor() {
     this.initForms()
     // build signals for form validation: basic and font form, for internal use in this component only
     this.isBasicFormValid = toSignal(

@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  inject,
   OnChanges,
   model,
   input
@@ -48,6 +49,12 @@ import { ThemeColorBoxComponent } from 'src/app/shared/theme-color-box/theme-col
   styleUrls: ['./theme-import.component.scss']
 })
 export class ThemeImportComponent implements OnChanges, AfterViewInit {
+  private readonly route = inject(ActivatedRoute)
+  private readonly router = inject(Router)
+  private readonly themeApi = inject(ThemesAPIService)
+  public readonly translate = inject(TranslateService)
+  private readonly msgService = inject(PortalMessageService)
+  private readonly cd = inject(ChangeDetectorRef)
   // signals
   public readonly themes = input.required<Theme[]>()
   public visible = model.required<boolean>()
@@ -61,14 +68,7 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
   public properties: any = null
   public formGroup: FormGroup
 
-  constructor(
-    private readonly route: ActivatedRoute,
-    private readonly router: Router,
-    private readonly themeApi: ThemesAPIService,
-    public readonly translate: TranslateService,
-    private readonly msgService: PortalMessageService,
-    private readonly cd: ChangeDetectorRef
-  ) {
+  constructor() {
     this.uploaded.set(false)
     this.formGroup = new FormGroup({
       themeName: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(100)]),
