@@ -28,6 +28,7 @@
           id="th_search_dataview"
           styleClass="p-0"
           [data]="filteredData ?? data"
+          [emptyResultsMessage]="'ACTIONS.SEARCH.NO_DATA' | translate"
           [listGridPaginator]="true"
           [pageSizes]="[20, 40, 100]"
           [pageSize]="20"
@@ -35,7 +36,8 @@
           [layout]="'grid'"
           [clientSideSorting]="true"
           [clientSideFiltering]="true"
-          [emptyResultsMessage]="'ACTIONS.SEARCH.NO_DATA' | translate"
+          [columns]="sortColumns"
+          [displayedColumnKeys]="sortColumnKeys"
           [sortDirection]="sortDirection"
           [sortField]="sortField"
           (sorted)="onSortChange($event)"
@@ -56,7 +58,12 @@
                     [value]="globalFilterValue"
                     (input)="onGlobalFilter(globalFilterInput.value, data)"
                     [ariaLabel]="'DIALOG.DATAVIEW.FILTER.LABEL' | translate"
-                    [pTooltip]="('DIALOG.DATAVIEW.FILTER.OF' | translate) + ('THEME.THEME_NAME' | translate)"
+                    [pTooltip]="
+                      ('DIALOG.DATAVIEW.FILTER.OF' | translate) +
+                      ('THEME.THEME_NAME' | translate) +
+                      ', ' +
+                      ('THEME.DISPLAY_NAME' | translate)
+                    "
                     tooltipPosition="top"
                     tooltipEvent="hover"
                   />
