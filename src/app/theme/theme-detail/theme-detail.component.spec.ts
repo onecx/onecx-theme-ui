@@ -1,3 +1,4 @@
+import { DestroyRef, signal } from '@angular/core'
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing'
 import { Location } from '@angular/common'
 import { provideHttpClient } from '@angular/common/http'
@@ -16,7 +17,6 @@ import { ImagesInternalAPIService, Theme, ThemesAPIService } from 'src/app/share
 import { Utils, LogoRefType } from 'src/app/shared/utils'
 
 import { slotInitializer, ThemeDetailComponent } from './theme-detail.component'
-import { DestroyRef, signal } from '@angular/core'
 import { Workspace } from './theme-use/theme-use.component'
 
 const theme: Theme = {
@@ -413,9 +413,10 @@ describe('ThemeDetailComponent', () => {
       slotSubject.next(true)
       fixture = TestBed.createComponent(ThemeDetailComponent)
       component = fixture.componentInstance
+      fixture.detectChanges() // trigger ngOnInit
 
       expect(slotServiceMock.isSomeComponentDefinedForSlot).toHaveBeenCalledWith(component.slotName)
-      expect(component.isComponentDefined()).toBe(true)
+      expect(component.isComponentDefined()).toBeTrue()
     })
 
     it('should destroy the stream when the component is destroyed', () => {
@@ -426,7 +427,7 @@ describe('ThemeDetailComponent', () => {
       slotSubject.next(true) // new value emitted after component destroyed
 
       // No change of the signal after component destroyed
-      expect(component.isComponentDefined()).toBe(false)
+      expect(component.isComponentDefined()).toBeFalse()
     })
   })
 
@@ -473,6 +474,7 @@ describe('ThemeDetailComponent', () => {
       it('should call stopGettingThemeUseData when slotEmitter emits', () => {
         fixture = TestBed.createComponent(ThemeDetailComponent)
         component = fixture.componentInstance
+        fixture.detectChanges() // trigger ngOnInit
         const stopSpy = spyOn<any>(component, 'stopGettingThemeUseData').and.callThrough()
 
         component.slotEmitter.emit(workspaces)
@@ -483,6 +485,7 @@ describe('ThemeDetailComponent', () => {
       it('should wait until min loading time before stopping theme use data process', fakeAsync(() => {
         fixture = TestBed.createComponent(ThemeDetailComponent)
         component = fixture.componentInstance
+        fixture.detectChanges() // trigger ngOnInit
         const stopSpy = spyOn<any>(component, 'stopGettingThemeUseData').and.callThrough()
         component['themeUseTimeoutTimer'] = setTimeout(() => {}, 10) // should exist for cleanup only
         component['themeUseStartTime'] = Date.now() - 1 // simulate that 1 second has passed
@@ -522,10 +525,7 @@ describe('ThemeDetailComponent', () => {
       const router = TestBed.inject(Router)
       spyOn(router, 'navigate')
 
-      component.themeDeleted.set(true) // signal that theme was deleted
-      fixture.detectChanges()
-      TestBed.flushEffects()
-      component.onThemeDeleted(true) // signal that theme was deleted
+      component.onThemeDeletion() // signal that theme was deleted
 
       expect(router.navigate).toHaveBeenCalledOnceWith(['..'], jasmine.any(Object))
     })
@@ -928,12 +928,12 @@ describe('ThemeDetailComponent', () => {
       component.onSaveAs(copyOfPrefix)
 
       expect(component.themeCreateVisible()).toBeTrue()
-      expect(component.themeForCreation).toBeDefined()
-      expect(component.themeForCreation!.name).toBe(copyOfPrefix + theme.name)
-      expect(component.themeForCreation!.displayName).toBe(copyOfPrefix + theme.displayName)
-      expect(component.themeForCreation!.id).toBeUndefined()
-      expect(component.themeForCreation!.operator).toBeUndefined()
-      expect(component.themeForCreation!.modificationCount).toBeUndefined()
+      expect(component.themeForCreation()).toBeDefined()
+      expect(component.themeForCreation()!.name).toBe(copyOfPrefix + theme.name)
+      expect(component.themeForCreation()!.displayName).toBe(copyOfPrefix + theme.displayName)
+      expect(component.themeForCreation()!.id).toBeUndefined()
+      expect(component.themeForCreation()!.operator).toBeUndefined()
+      expect(component.themeForCreation()!.modificationCount).toBeUndefined()
     })
 
     it('should not open dialog if theme is undefined in VIEW mode', () => {
@@ -954,7 +954,7 @@ describe('ThemeDetailComponent', () => {
       component.onSaveAs(copyOfPrefix)
 
       expect(component.themeCreateVisible()).toBeTrue()
-      expect(component.themeForCreation!.name).toBe(copyOfPrefix + theme.name)
+      expect(component.themeForCreation()!.name).toBe(copyOfPrefix + theme.name)
     })
 
     it('should not open dialog if sub-component data is invalid in EDIT mode', () => {
@@ -972,27 +972,12 @@ describe('ThemeDetailComponent', () => {
     it('should clear theme for creation and navigate on theme creation', () => {
       const router = TestBed.inject(Router)
       spyOn(router, 'navigate')
-      component.themeForCreation = theme
+      component.themeForCreation.set(theme)
 
-      component.themeCreated.set({ name: 'newTheme' })
-      fixture.detectChanges()
-      TestBed.flushEffects()
+      component.onThemeCreation({ name: 'newTheme' })
 
-      expect(component.themeForCreation).toBeUndefined()
+      expect(component.themeForCreation()).toBeUndefined()
       expect(router.navigate).toHaveBeenCalledWith(['../newTheme'], jasmine.any(Object))
-    })
-
-    it('should clear theme for creation when dialog was closed', () => {
-      component.themeForCreation = theme
-      component.themeCreateVisible.set(true)
-      fixture.detectChanges()
-      TestBed.flushEffects()
-
-      component.themeCreateVisible.set(false)
-      fixture.detectChanges()
-      TestBed.flushEffects()
-
-      expect(component.themeForCreation).toBeUndefined()
     })
   })
 })

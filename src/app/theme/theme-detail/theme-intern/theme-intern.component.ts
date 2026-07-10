@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnChanges } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, inject, input, OnChanges } from '@angular/core'
 import { DatePipe } from '@angular/common'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { TranslateModule } from '@ngx-translate/core'
@@ -23,6 +23,7 @@ import { Theme } from 'src/app/shared/generated'
     TranslateModule
   ],
   providers: [DatePipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-intern.component.html'
 })
 export class ThemeInternComponent implements OnChanges {

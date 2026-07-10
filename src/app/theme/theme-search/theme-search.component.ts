@@ -1,4 +1,4 @@
-import { Component, DestroyRef, effect, inject, OnInit, signal } from '@angular/core'
+import { ChangeDetectionStrategy, Component, DestroyRef, effect, inject, OnInit, signal } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { AsyncPipe } from '@angular/common'
 import { ActivatedRoute, Router, RouterModule } from '@angular/router'
@@ -46,17 +46,22 @@ import { ThemeImportComponent } from '../theme-import/theme-import.component'
     ThemeColorBoxComponent,
     ImageContainerComponent
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-search.component.html',
   styleUrls: ['./theme-search.component.scss']
 })
 export class ThemeSearchComponent implements OnInit {
+  public readonly route = inject(ActivatedRoute)
+  public readonly router = inject(Router)
+  private readonly themeApi = inject(ThemesAPIService)
+  private readonly translate = inject(TranslateService)
+  private readonly imageApi = inject(ImagesInternalAPIService)
+  private readonly destroyRef = inject(DestroyRef)
   // signals
   public themeImportVisible = signal(false)
   public themeCreateVisible = signal(false)
-  public themeCreated = signal<Theme | undefined>(undefined)
   public themeImported = signal(false)
   // data
-  private readonly destroyRef = inject(DestroyRef)
   private readonly dataSubject$ = new BehaviorSubject<RowListGridData[]>([])
   public data$: Observable<RowListGridData[] | null> = this.dataSubject$.asObservable()
   private searchSubscription?: Subscription // to cancel ongoing search if new search is triggered
@@ -74,18 +79,8 @@ export class ThemeSearchComponent implements OnInit {
   public imageBasePath = this.imageApi.configuration.basePath
   public LogoRefType = LogoRefType
 
-  constructor(
-    public readonly route: ActivatedRoute,
-    public readonly router: Router,
-    private readonly themeApi: ThemesAPIService,
-    private readonly translate: TranslateService,
-    private readonly imageApi: ImagesInternalAPIService
-  ) {
+  constructor() {
     effect(() => {
-      const theme = this.themeCreated()
-      if (theme) {
-        this.router.navigate(['./' + theme.name], { relativeTo: this.route })
-      }
       if (this.themeImported()) {
         this.loadThemes()
       }
@@ -188,5 +183,11 @@ export class ThemeSearchComponent implements OnInit {
 
   public onImportThemeClick(): void {
     this.themeImportVisible.set(true)
+  }
+
+  public onThemeCreation(theme: Theme | undefined): void {
+    if (theme) {
+      this.router.navigate(['./' + theme.name], { relativeTo: this.route })
+    }
   }
 }

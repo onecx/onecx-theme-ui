@@ -1,4 +1,4 @@
-import { Component, DestroyRef, effect, inject, model } from '@angular/core'
+import { ChangeDetectionStrategy, Component, DestroyRef, effect, inject, model, output } from '@angular/core'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
@@ -33,23 +33,22 @@ import { themeVariables } from '../theme-detail/theme-variables'
     TooltipModule,
     ToastModule
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-create.component.html',
   styleUrls: ['./theme-create.component.scss']
 })
 export class ThemeCreateComponent {
   public visible = model.required<boolean>()
-  public created = model.required<Theme | undefined>()
+  public created = output<Theme | undefined>()
   public themeToBeCreated = model.required<Theme | undefined>()
 
   private readonly destroyRef = inject(DestroyRef)
+  private readonly themesApi = inject(ThemesAPIService)
+  private readonly message = inject(PortalMessageService)
+  private readonly translate = inject(TranslateService)
   public formGroup: FormGroup
 
-  constructor(
-    private readonly themesApi: ThemesAPIService,
-    private readonly message: PortalMessageService,
-    private readonly translate: TranslateService
-  ) {
-    this.created.set(undefined)
+  constructor() {
     this.formGroup = new FormGroup({
       name: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(50)]),
       displayName: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(100)]),
@@ -91,7 +90,7 @@ export class ThemeCreateComponent {
       .subscribe({
         next: (response) => {
           this.message.success({ summaryKey: 'ACTIONS.CREATE.MESSAGE.OK' })
-          this.created.set(response.resource as Theme)
+          this.created.emit(response.resource as Theme)
           this.visible.set(false)
         },
         error: (err) => {

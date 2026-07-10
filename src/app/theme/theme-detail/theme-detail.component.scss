@@ -29,4 +29,26 @@
   .animation-delay-3000 {
     animation-delay: 1000ms !important;
   }
+
+  .p-select-option,
+  .p-listbox-option {
+    padding: 0.5rem 1rem !important;
+  }
+
+  /* ZEBRA rows on select lists */
+  .p-select-overlay .p-select-list *:nth-child(even) .p-select-option {
+    background-color: var(
+      --onecx-theme-onecx-theme-ui-datatable-row-even-background,
+      var(--table-body-row-even-bg, rgba(0, 0, 0, 0.02))
+    );
+  }
+  /* ZEBRA rows on listbox */
+  .p-listbox:not(.p-disabled) .p-listbox-option:not(.p-listbox-option-selected):not(.p-disabled) {
+    &:nth-child(even) {
+      background-color: var(
+        --onecx-theme-onecx-theme-ui-datatable-row-even-background,
+        var(--table-body-row-even-bg, rgba(0, 0, 0, 0.02))
+      );
+    }
+  }
 }

@@ -1,4 +1,4 @@
-import { Component, DestroyRef, EventEmitter, Inject, Input, OnChanges } from '@angular/core'
+import { ChangeDetectionStrategy, Component, DestroyRef, EventEmitter, Inject, Input, OnChanges } from '@angular/core'
 import { AsyncPipe, Location } from '@angular/common'
 import { UntilDestroy } from '@ngneat/until-destroy'
 import { TranslateModule } from '@ngx-translate/core'
@@ -29,10 +29,11 @@ type DataType = 'logo' | 'favicon' | 'themes' | 'theme'
 
 @Component({
   selector: 'app-theme-data',
-  templateUrl: './theme-data.component.html',
   standalone: true,
   imports: [AngularAcceleratorModule, AngularRemoteComponentsModule, AsyncPipe, TranslateModule],
-  providers: [{ provide: SLOT_SERVICE, useExisting: SlotService }]
+  providers: [{ provide: SLOT_SERVICE, useExisting: SlotService }],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  templateUrl: './theme-data.component.html'
 })
 @UntilDestroy()
 export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWebcomponent, OnChanges {

@@ -31,8 +31,4 @@ const routes: Routes = [
   imports: [ThemeSearchComponent, ThemeDetailComponent, RouterModule.forChild(routes)],
   providers: [...providePermissionService()]
 })
-export class ThemeModule {
-  constructor() {
-    console.info('Theme Module constructor')
-  }
-}
+export class ThemeModule {}

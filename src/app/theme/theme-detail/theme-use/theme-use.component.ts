@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core'
 import { AsyncPipe } from '@angular/common'
 import { Router, RouterModule } from '@angular/router'
 import { TranslateModule } from '@ngx-translate/core'
@@ -31,19 +31,19 @@ export type Workspace = {
   selector: 'app-theme-use',
   standalone: true,
   imports: [AsyncPipe, RouterModule, TooltipModule, TranslateModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-use.component.html'
 })
 export class ThemeUseComponent {
+  private readonly router = inject(Router)
+  private readonly workspaceService = inject(WorkspaceService)
   // signals
   public workspaces = input<Workspace[]>()
   public isComponentDefined = input<boolean>(false)
   // dialog
   public workspaceEndpointExist = false
 
-  constructor(
-    private readonly router: Router,
-    private readonly workspaceService: WorkspaceService
-  ) {
+  constructor() {
     // check endpoint exists
     this.workspaceEndpointExist = Utils.doesEndpointExist(
       this.workspaceService,

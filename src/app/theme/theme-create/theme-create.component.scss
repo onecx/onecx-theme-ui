@@ -2,6 +2,7 @@
 
 @include dropdown-zebra-rows;
 @include ocx-text-responsive;
+@include ocx-required-label;
 @include dialog-footer-buttons;
 @include dialog-modal-disable-full-height;
 @include flex-width-media-queries;

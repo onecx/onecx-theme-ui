@@ -183,15 +183,15 @@
   <!-- CREATE -->
   <app-theme-create
     [(visible)]="themeCreateVisible"
-    [(created)]="themeCreated"
-    [themeToBeCreated]="themeForCreation"
+    (visibleChange)="$event === false ? themeForCreation.set(undefined) : null"
+    (created)="onThemeCreation($event)"
+    [themeToBeCreated]="themeForCreation()"
   ></app-theme-create>
 
   <!-- DELETE -->
   <app-theme-delete
     [(visible)]="themeDeleteVisible"
-    [(deleted)]="themeDeleted"
-    (deletedChange)="onThemeDeleted($event)"
+    (deleted)="onThemeDeletion()"
     [themeToBeDeleted]="themeToBeDeleted()"
     [themeUsed]="themeUsed()"
     [useLoadingState]="themeUseLoadingState()"

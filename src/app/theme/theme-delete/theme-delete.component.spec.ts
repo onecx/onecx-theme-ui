@@ -1,7 +1,8 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
+import { outputToObservable } from '@angular/core/rxjs-interop'
 import { provideNoopAnimations } from '@angular/platform-browser/animations'
 import { TranslateTestingModule } from 'ngx-translate-testing'
-import { of, throwError } from 'rxjs'
+import { firstValueFrom, of, throwError } from 'rxjs'
 
 import { PortalMessageService } from '@onecx/angular-integration-interface'
 
@@ -20,7 +21,6 @@ describe('ThemeDeleteComponent', () => {
     fixture = TestBed.createComponent(ThemeDeleteComponent)
     component = fixture.componentInstance
     fixture.componentRef.setInput('visible', true)
-    fixture.componentRef.setInput('deleted', false)
     fixture.componentRef.setInput('useLoadingState', 'loading')
     fixture.componentRef.setInput('themeUsed', false)
     fixture.componentRef.setInput('themeToBeDeleted', { id: 'themeId', name: 'themeName' } as Theme)
@@ -67,13 +67,15 @@ describe('ThemeDeleteComponent', () => {
   })
 
   describe('Theme deletion', () => {
-    it('should hide dialog and inform on successfull deletion', () => {
+    it('should hide dialog and inform on successfull deletion', async () => {
       themesApiSpy.deleteTheme.and.returnValue(of({}) as any)
+      const deletedPromise = firstValueFrom(outputToObservable(component.deleted))
 
       component.onDeleteTheme({ id: 'themeId' } as any)
 
+      await expectAsync(deletedPromise).toBeResolved()
+
       expect(component.visible()).toBeFalse()
-      expect(component.deleted()).toBeTrue()
       expect(msgServiceSpy.success).toHaveBeenCalledOnceWith({ summaryKey: 'ACTIONS.DELETE.THEME_OK' })
     })
 

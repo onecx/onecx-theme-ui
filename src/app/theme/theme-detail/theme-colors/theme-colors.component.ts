@@ -1,4 +1,15 @@
-import { ChangeDetectorRef, Component, computed, input, model, OnChanges, Signal, SimpleChanges } from '@angular/core'
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  computed,
+  inject,
+  input,
+  model,
+  OnChanges,
+  Signal,
+  SimpleChanges
+} from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, FormBuilder } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
@@ -45,10 +56,15 @@ import { ChangeMode } from '../theme-detail.component'
     TooltipModule,
     TranslateModule
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-colors.component.html',
   styleUrls: ['./theme-colors.component.scss']
 })
 export class ThemeColorsComponent implements OnChanges {
+  private readonly fb = inject(FormBuilder)
+  private readonly translate = inject(TranslateService)
+  private readonly msgService = inject(PortalMessageService)
+  private readonly cd = inject(ChangeDetectorRef)
   // signals
   public readonly theme = model.required<Theme | undefined>()
   public readonly changeMode = input.required<ChangeMode>()
@@ -79,12 +95,7 @@ export class ThemeColorsComponent implements OnChanges {
   ]
   public themeVars = themeVariables // make it available in HTML
 
-  constructor(
-    private readonly fb: FormBuilder,
-    private readonly translate: TranslateService,
-    private readonly msgService: PortalMessageService,
-    private readonly cd: ChangeDetectorRef
-  ) {
+  constructor() {
     this.isGeneralFormValid = toSignal(
       this.generalForm.statusChanges.pipe(
         map((status) => status === 'VALID'),

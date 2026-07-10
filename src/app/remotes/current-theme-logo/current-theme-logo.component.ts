@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Inject, Input } from '@angular/core'
+import { ChangeDetectionStrategy, Component, EventEmitter, Inject, Input } from '@angular/core'
 import { AsyncPipe, Location } from '@angular/common'
 import { UntilDestroy } from '@ngneat/until-destroy'
 import { BehaviorSubject, first, Observable, ReplaySubject } from 'rxjs'
@@ -20,6 +20,7 @@ import { environment } from 'src/environments/environment'
   selector: 'app-current-theme-logo',
   standalone: true,
   imports: [AngularAcceleratorModule, AngularRemoteComponentsModule, AsyncPipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './current-theme-logo.component.html'
 })
 @UntilDestroy()

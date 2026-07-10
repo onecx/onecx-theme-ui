@@ -78,7 +78,13 @@
 
     <ng-template pTemplate="footer">
       <div class="flex flex-wrap column-gap-2 row-gap-1 justify-content-end">
-        @if (!themeToBeDeleted() || themeToBeDeleted()?.mandatory || themeUsed()) {
+        @if (
+          !themeToBeDeleted() ||
+          themeToBeDeleted()?.mandatory ||
+          themeUsed() ||
+          useLoadingState() === 'loading' ||
+          useLoadingState() === 'timeout'
+        ) {
           <p-button
             icon="pi pi-times"
             id="th_delete_action_close"
