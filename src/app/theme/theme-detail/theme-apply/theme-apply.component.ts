@@ -70,10 +70,10 @@ export class ThemeApplyComponent {
       this.translate
         .get([
           'ACTIONS.COPY_OF',
-          'THEME.TEMPLATE.CONFIRMATION.HEADER',
-          'THEME.TEMPLATE.CONFIRMATION.MESSAGE',
           'ACTIONS.CONFIRMATION.YES',
-          'ACTIONS.CONFIRMATION.NO'
+          'ACTIONS.CONFIRMATION.NO',
+          'THEME.TEMPLATE.CONFIRMATION.HEADER',
+          'THEME.TEMPLATE.CONFIRMATION.MESSAGE'
         ])
         .pipe(map((data) => this.displayConfirmationForUsingTemplate(id, dn, data, box)))
     )
@@ -92,7 +92,7 @@ export class ThemeApplyComponent {
 
       accept: () => {
         box.clear()
-        this.templatingThemeData.emit({ id: themeId, ...data })
+        this.templatingThemeData.emit({ id: themeId, displayName: data['ACTIONS.COPY_OF'] })
       },
       reject: () => box.clear()
     })

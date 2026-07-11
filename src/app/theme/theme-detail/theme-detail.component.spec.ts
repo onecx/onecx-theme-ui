@@ -898,7 +898,7 @@ describe('ThemeDetailComponent', () => {
       themesApiSpy.getThemeById.and.returnValue(of({ resource: templateTheme }) as any)
       spyOn(console, 'log')
 
-      component.useThemeAsTemplate({ id: '123' })
+      component.useThemeAsTemplate({ id: '123', displayName: 'Copy of' })
 
       expect(themesApiSpy.getThemeById).toHaveBeenCalledWith({ id: '123' })
       expect(component.themeForColors).toEqual(templateTheme as any)
@@ -912,7 +912,7 @@ describe('ThemeDetailComponent', () => {
       component.theme = { name: 'original' }
       spyOn(console, 'log')
 
-      component.useThemeAsTemplate({ id: '123', 'ACTIONS.COPY_OF': 'Copy of ' })
+      component.useThemeAsTemplate({ id: '123' })
 
       expect(component.themeForProps!.name).toBe('original')
     })

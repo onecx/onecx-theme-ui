@@ -556,17 +556,19 @@ export class ThemeDetailComponent implements OnInit {
   /**
    * TEMPLATING: allow using properties from an existing theme => no creation of a new theme!
    */
-  public useThemeAsTemplate(selectedTheme: any): any {
-    this.themeApi.getThemeById({ id: selectedTheme.id }).subscribe((response) => {
-      this.themeForProps = {
-        ...response.resource,
-        ...this.undefinedThemeData,
-        name: this.theme?.name,
-        displayName: selectedTheme['ACTIONS.COPY_OF'] + response.resource.displayName,
-        modificationCount: this.theme?.modificationCount
-      }
-      this.themeForColors = response.resource
-      this.msgService.info({ summaryKey: 'THEME.TEMPLATE.CONFIRMATION.OK' })
-    })
+  public useThemeAsTemplate(selectedTheme: Theme): any {
+    console.log('useThemeAsTemplate', selectedTheme)
+    if (selectedTheme.id)
+      this.themeApi.getThemeById({ id: selectedTheme.id }).subscribe((response) => {
+        this.themeForProps = {
+          ...response.resource,
+          ...this.undefinedThemeData,
+          name: this.theme?.name,
+          displayName: (selectedTheme.displayName ?? 'copy of ') + response.resource.displayName,
+          modificationCount: this.theme?.modificationCount
+        }
+        this.themeForColors = response.resource
+        this.msgService.info({ summaryKey: 'THEME.TEMPLATE.CONFIRMATION.OK' })
+      })
   }
 }
