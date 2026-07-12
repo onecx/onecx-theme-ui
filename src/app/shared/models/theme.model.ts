@@ -1,20 +1,20 @@
 /**
- * Generic interface for theme properties
+ * Generic interface for any hierarchical properties
  */
 export type DictionaryObject = Record<string, string | Record<string, string>>
 
 export interface ThemeProperties {
   font?: DictionaryObject
-  topbar?: DictionaryObject
   general?: DictionaryObject
+  topbar?: DictionaryObject
   sidebar?: DictionaryObject
 }
 
 // plain interface for theme variables
 export interface ThemeVariables {
   font: string[]
-  topbar: string[]
   general: string[]
+  topbar: string[]
   sidebar: string[]
 }
 

@@ -34,6 +34,7 @@ import { ImageContainerComponent } from 'src/app/shared/image-container/image-co
 
 import { themeVariables } from '../theme-variables'
 import { ChangeMode } from '../theme-detail.component'
+import { DictionaryObject } from 'src/app/shared/models/theme.model'
 
 @Component({
   selector: 'app-theme-props',
@@ -207,13 +208,13 @@ export class ThemePropsComponent implements OnChanges {
   }
 
   // return the values that are different
-  private getFormData(form: FormGroup): any {
-    const changes: any = {}
+  private getFormData(form: FormGroup): DictionaryObject {
+    const changes: DictionaryObject = {}
+    if (!this.theme()) return changes
+    const themeObj = this.theme() as Record<string, unknown>
     Object.keys(form.controls).forEach((key) => {
-      if (form.value[key] !== undefined) {
-        if (form.value[key] !== (this.theme() as any)[key]) {
-          changes[key] = form.value[key]
-        }
+      if (form.value[key] !== undefined && form.value[key] !== themeObj[key]) {
+        changes[key] = form.value[key]
       }
     })
     return changes

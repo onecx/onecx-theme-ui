@@ -31,13 +31,7 @@ export class ThemeColorBoxComponent {
       'menu-bg-color': 'silver'
     }
   })
-  public generalProperties: Signal<GeneralProps>
-  public topbarProperties: Signal<TopbarProps>
-  public sidebarProperties: Signal<SidebarProps>
-
-  constructor() {
-    this.generalProperties = computed(() => this.properties()?.general ?? {})
-    this.topbarProperties = computed(() => this.properties()?.topbar ?? {})
-    this.sidebarProperties = computed(() => this.properties()?.sidebar ?? {})
-  }
+  public generalProperties = computed(() => this.properties()?.general)
+  public topbarProperties = computed(() => this.properties()?.topbar)
+  public sidebarProperties = computed(() => this.properties()?.sidebar)
 }
