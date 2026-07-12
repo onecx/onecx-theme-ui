@@ -19,6 +19,7 @@ import { TooltipModule } from 'primeng/tooltip'
 import { Theme } from 'src/app/shared/generated'
 import { Utils } from 'src/app/shared/utils'
 import { ChangeMode } from '../theme-detail.component'
+import { DictionaryObject, DictionaryObjectString } from 'src/app/shared/models/theme.model'
 
 @Component({
   selector: 'app-theme-apply',
@@ -60,7 +61,7 @@ export class ThemeApplyComponent {
   /***************************************************************************
    * TEMPLATING WITH EXISTING THEME
    */
-  public onSelectThemeTemplate(ev: any, themes: Theme[], box: Select): void {
+  public onSelectThemeTemplate(ev: { value: string }, themes: Theme[], box: Select): void {
     const theme = themes.find((t) => t.name === ev.value)
     if (theme?.id && theme?.displayName) this.confirmUseThemeTemplate(theme.id, theme.displayName, box)
   }
@@ -75,10 +76,15 @@ export class ThemeApplyComponent {
           'THEME.TEMPLATE.CONFIRMATION.HEADER',
           'THEME.TEMPLATE.CONFIRMATION.MESSAGE'
         ])
-        .pipe(map((data) => this.displayConfirmationForUsingTemplate(id, dn, data, box)))
+        .pipe(map((data: DictionaryObjectString) => this.displayConfirmationForUsingTemplate(id, dn, data, box)))
     )
   }
-  private displayConfirmationForUsingTemplate(themeId: string, themeName: string, data: any, box: Select): void {
+  private displayConfirmationForUsingTemplate(
+    themeId: string,
+    themeName: string,
+    data: DictionaryObjectString,
+    box: Select
+  ): void {
     this.confirmation.confirm({
       key: 'template',
       icon: 'pi pi-question-circle danger-action-text',

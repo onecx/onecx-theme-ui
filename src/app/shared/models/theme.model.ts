@@ -1,7 +1,8 @@
 /**
- * Generic interface for any hierarchical properties
+ * Generic interface for hierarchical properties
  */
 export type DictionaryObject = Record<string, string | Record<string, string>>
+export type DictionaryObjectString<T = string> = Record<string, T>
 
 export interface ThemeProperties {
   font?: DictionaryObject

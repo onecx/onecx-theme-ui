@@ -556,8 +556,7 @@ export class ThemeDetailComponent implements OnInit {
   /**
    * TEMPLATING: allow using properties from an existing theme => no creation of a new theme!
    */
-  public useThemeAsTemplate(selectedTheme: Theme): any {
-    console.log('useThemeAsTemplate', selectedTheme)
+  public onUseThemeAsTemplate(selectedTheme: Theme): void {
     if (selectedTheme.id)
       this.themeApi.getThemeById({ id: selectedTheme.id }).subscribe((response) => {
         this.themeForProps = {

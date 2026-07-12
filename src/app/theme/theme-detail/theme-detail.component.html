@@ -102,7 +102,7 @@
               [isCurrentTheme]="isCurrentTheme"
               [autoApply]="autoApply"
               (autoApplyChange)="onChangeAutoApply($event)"
-              (templatingThemeData)="useThemeAsTemplate($event)"
+              (templatingThemeData)="onUseThemeAsTemplate($event)"
             ></app-theme-apply>
             <app-theme-props [theme]="themeForProps" [changeMode]="changeMode"></app-theme-props>
           }
@@ -134,7 +134,7 @@
               [isCurrentTheme]="isCurrentTheme"
               [autoApply]="autoApply"
               (autoApplyChange)="onChangeAutoApply($event)"
-              (templatingThemeData)="useThemeAsTemplate($event)"
+              (templatingThemeData)="onUseThemeAsTemplate($event)"
             ></app-theme-apply>
             <app-theme-colors
               [theme]="themeForColors"

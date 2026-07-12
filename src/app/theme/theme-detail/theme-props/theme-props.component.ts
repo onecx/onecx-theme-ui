@@ -226,7 +226,7 @@ export class ThemePropsComponent implements OnChanges {
 
   // LOAD AND DISPLAYING
   // Image component informs about loading result for image
-  public onImageLoadResult(loaded: any, refType: LogoRefType, extUrl?: string): void {
+  public onImageLoadResult(loaded: boolean, refType: LogoRefType, extUrl?: string): void {
     if (loaded && refType === LogoRefType.Logo) {
       this.headerImageUrl.emit(!extUrl || extUrl === '' ? this.bffUrl[refType] : extUrl)
     }
@@ -293,7 +293,7 @@ export class ThemePropsComponent implements OnChanges {
     })
   }
 
-  private saveImageResponse(name: string, refType: LogoRefType, err?: any): void {
+  private saveImageResponse(name: string, refType: LogoRefType, err?: unknown): void {
     if (err) {
       console.error('uploadImage', err)
       this.msgService.error({ summaryKey: 'IMAGE.UPLOAD.NOK' })
