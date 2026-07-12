@@ -2,28 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, input, Signal } from '@an
 import { TranslateModule } from '@ngx-translate/core'
 import { TooltipModule } from 'primeng/tooltip'
 
-interface GeneralProps {
-  'primary-color': string
-  'secondary-color': string
-  'text-color': string
-  'body-bg-color': string
-  'content-bg-color': string
-}
+import { GeneralProps, SidebarProps, TopbarProps, ThemeColorBoxProperties } from 'src/app/shared/models/theme.model'
 
-interface TopbarProps {
-  'topbar-text-color': string
-  'topbar-bg-color': string
-}
-interface SidebarProps {
-  'menu-item-text-color': string
-  'menu-bg-color': string
-}
-
-interface ThemeColorBoxProperties {
-  general: GeneralProps
-  topbar: TopbarProps
-  sidebar: SidebarProps
-}
 @Component({
   selector: 'app-theme-color-box',
   standalone: true,

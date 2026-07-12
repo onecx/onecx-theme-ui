@@ -1,11 +1,6 @@
-export interface ThemeVariablesType {
-  font: string[]
-  topbar: string[]
-  general: string[]
-  sidebar: string[]
-}
+import { ThemeVariables } from 'src/app/shared/models/theme.model'
 
-export const themeVariables: ThemeVariablesType = {
+export const themeVariables: ThemeVariables = {
   font: ['font-family', 'font-size'],
   topbar: [
     'topbar-bg-color',

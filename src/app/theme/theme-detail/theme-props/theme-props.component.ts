@@ -176,8 +176,8 @@ export class ThemePropsComponent implements OnChanges {
     this.basicForm.get('name')?.disable()
     this.fontForm.reset()
     if (theme.properties) {
-      const font = Utils.getPropertyValue(theme.properties, 'font')
-      this.fontForm.patchValue(font)
+      const font = Utils.getThemePropertyValue(theme.properties, 'font')
+      if (font) this.fontForm.patchValue(font)
     }
     // initialize image variables: used URLs and if logo URLs exist
     this.setBffImageUrl(theme, LogoRefType.Logo)
