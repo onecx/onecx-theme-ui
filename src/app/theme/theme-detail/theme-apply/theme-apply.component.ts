@@ -18,8 +18,9 @@ import { TooltipModule } from 'primeng/tooltip'
 
 import { Theme } from 'src/app/shared/generated'
 import { Utils } from 'src/app/shared/utils'
+import { DictionaryObjectString } from 'src/app/shared/models/theme.model'
+
 import { ChangeMode } from '../theme-detail.component'
-import { DictionaryObject, DictionaryObjectString } from 'src/app/shared/models/theme.model'
 
 @Component({
   selector: 'app-theme-apply',
