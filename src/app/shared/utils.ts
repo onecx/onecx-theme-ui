@@ -2,7 +2,7 @@ import { Location } from '@angular/common'
 import { catchError, first, of, tap } from 'rxjs'
 
 import { WorkspaceService } from '@onecx/angular-integration-interface'
-import { DictionaryObject, GeneralProps, ThemeProperties } from './models/theme.model'
+import { DictionaryObject, ThemeProperties } from './models/theme.model'
 
 export enum LogoRefType {
   Logo = 'logo',

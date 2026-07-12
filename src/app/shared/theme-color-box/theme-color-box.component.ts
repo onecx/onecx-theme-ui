@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, input, Signal } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core'
 import { TranslateModule } from '@ngx-translate/core'
 import { TooltipModule } from 'primeng/tooltip'
 
-import { GeneralProps, SidebarProps, TopbarProps, ThemeColorBoxProperties } from 'src/app/shared/models/theme.model'
+import { ThemeColorBoxProperties } from 'src/app/shared/models/theme.model'
 
 @Component({
   selector: 'app-theme-color-box',
