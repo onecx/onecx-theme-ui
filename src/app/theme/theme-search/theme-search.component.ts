@@ -14,7 +14,14 @@ import { MessageModule } from 'primeng/message'
 import { ToastModule } from 'primeng/toast'
 import { TooltipModule } from 'primeng/tooltip'
 
-import { Action, AngularAcceleratorModule, RowListGridData, DataSortDirection } from '@onecx/angular-accelerator'
+import {
+  Action,
+  AngularAcceleratorModule,
+  RowListGridData,
+  DataSortDirection,
+  DataTableColumn,
+  ColumnType
+} from '@onecx/angular-accelerator'
 import { PortalPageComponent } from '@onecx/angular-utils'
 
 import { Utils, LogoRefType } from 'src/app/shared/utils'
@@ -48,7 +55,7 @@ import { ThemeImportComponent } from '../theme-import/theme-import.component'
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-search.component.html',
-  styleUrls: ['./theme-search.component.scss']
+  styleUrl: './theme-search.component.scss'
 })
 export class ThemeSearchComponent implements OnInit {
   public readonly route = inject(ActivatedRoute)
@@ -72,6 +79,8 @@ export class ThemeSearchComponent implements OnInit {
   public actions$: Observable<Action[]> | undefined
   public textFilterValue$ = new BehaviorSubject<string | undefined>(undefined)
   public globalFilterValue = ''
+  public sortColumns = this.prepareSortColumns()
+  public sortColumnKeys = this.sortColumns.map((c) => c.id)
   public sortDirection: DataSortDirection = DataSortDirection.ASCENDING
   public sortField = 'displayName'
   public Utils = Utils
@@ -146,6 +155,28 @@ export class ThemeSearchComponent implements OnInit {
           ]
         })
       )
+  }
+  private prepareSortColumns(): DataTableColumn[] {
+    return [
+      {
+        columnType: ColumnType.STRING,
+        nameKey: 'THEME.NAME',
+        id: 'name',
+        sortable: true
+      },
+      {
+        columnType: ColumnType.STRING,
+        nameKey: 'THEME.DISPLAY_NAME',
+        id: 'displayName',
+        sortable: true
+      },
+      {
+        columnType: ColumnType.STRING,
+        nameKey: 'INTERNAL.CREATION_DATE',
+        id: 'creationDate',
+        sortable: true
+      }
+    ]
   }
 
   /**

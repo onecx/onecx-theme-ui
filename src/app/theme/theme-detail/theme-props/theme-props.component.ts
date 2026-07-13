@@ -34,6 +34,7 @@ import { ImageContainerComponent } from 'src/app/shared/image-container/image-co
 
 import { themeVariables } from '../theme-variables'
 import { ChangeMode } from '../theme-detail.component'
+import { DictionaryObject } from 'src/app/shared/models/theme.model'
 
 @Component({
   selector: 'app-theme-props',
@@ -55,7 +56,7 @@ import { ChangeMode } from '../theme-detail.component'
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-props.component.html',
-  styleUrls: ['./theme-props.component.scss']
+  styleUrl: './theme-props.component.scss'
 })
 export class ThemePropsComponent implements OnChanges {
   private readonly msgService = inject(PortalMessageService)
@@ -176,47 +177,13 @@ export class ThemePropsComponent implements OnChanges {
     this.basicForm.get('name')?.disable()
     this.fontForm.reset()
     if (theme.properties) {
-      const font = Utils.getPropertyValue(theme.properties, 'font')
-      this.fontForm.patchValue(font)
+      const font = Utils.getThemePropertyValue<DictionaryObject>(theme.properties, 'font')
+      if (font) this.fontForm.patchValue(font)
     }
     // initialize image variables: used URLs and if logo URLs exist
     this.setBffImageUrl(theme, LogoRefType.Logo)
     this.setBffImageUrl(theme, LogoRefType.LogoSmall)
     this.setBffImageUrl(theme, LogoRefType.Favicon)
-  }
-
-  // called by theme detail dialog: returns form values to theme detail component for saving
-  public onUpdateTheme(): boolean {
-    if (!this.theme()) return false
-    if (this.basicForm.valid) {
-      Object.assign(this.theme()!, this.getFormData(this.basicForm))
-    } else {
-      this.msgService.error({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
-      return false
-    }
-    if (this.fontForm.valid)
-      // add only font properties
-      this.theme()!.properties = {
-        font: this.fontForm.value
-      }
-    else {
-      this.msgService.error({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
-      return false
-    }
-    return true
-  }
-
-  // return the values that are different
-  private getFormData(form: FormGroup): any {
-    const changes: any = {}
-    Object.keys(form.controls).forEach((key) => {
-      if (form.value[key] !== undefined) {
-        if (form.value[key] !== (this.theme() as any)[key]) {
-          changes[key] = form.value[key]
-        }
-      }
-    })
-    return changes
   }
 
   /***************************************************************************
@@ -225,7 +192,7 @@ export class ThemePropsComponent implements OnChanges {
 
   // LOAD AND DISPLAYING
   // Image component informs about loading result for image
-  public onImageLoadResult(loaded: any, refType: LogoRefType, extUrl?: string): void {
+  public onImageLoadResult(loaded: boolean, refType: LogoRefType, extUrl?: string): void {
     if (loaded && refType === LogoRefType.Logo) {
       this.headerImageUrl.emit(!extUrl || extUrl === '' ? this.bffUrl[refType] : extUrl)
     }
@@ -292,7 +259,7 @@ export class ThemePropsComponent implements OnChanges {
     })
   }
 
-  private saveImageResponse(name: string, refType: LogoRefType, err?: any): void {
+  private saveImageResponse(name: string, refType: LogoRefType, err?: unknown): void {
     if (err) {
       console.error('uploadImage', err)
       this.msgService.error({ summaryKey: 'IMAGE.UPLOAD.NOK' })

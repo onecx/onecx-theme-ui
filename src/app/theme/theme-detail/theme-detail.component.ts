@@ -59,7 +59,7 @@ type ThemeData = {
     ThemeColorsComponent
   ],
   templateUrl: './theme-detail.component.html',
-  styleUrls: ['./theme-detail.component.scss']
+  styleUrl: './theme-detail.component.scss'
 })
 export class ThemeDetailComponent implements OnInit {
   private readonly user = inject(UserService)
@@ -236,7 +236,7 @@ export class ThemeDetailComponent implements OnInit {
     const propsValid = this.themePropsComponent()?.isComponentValid()
     const colorsValid = this.themeColorsComponent()?.isComponentValid()
     return {
-      theme: { ...themeProps, ...themeColors },
+      theme: { ...themeProps, properties: { ...themeColors?.properties, ...themeProps?.properties } },
       propsValid: propsValid,
       colorsValid: colorsValid
     } as ThemeData
@@ -322,8 +322,14 @@ export class ThemeDetailComponent implements OnInit {
    */
   private prepareThemeData(): Theme | undefined {
     // check form state in sub components before saving: must be valid!
-    if (!this.themeData().propsValid) return undefined
-    if (!this.themeData().colorsValid) return undefined
+    if (!this.themeData().propsValid) {
+      this.msgService.error({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
+      return undefined
+    }
+    if (!this.themeData().colorsValid) {
+      this.msgService.error({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
+      return undefined
+    }
 
     let data = this.themeData().theme // combined data from sub components
     // combine with the original theme data to preserve properties (modificationCount!)
@@ -386,7 +392,6 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   public onThemeCreation(theme: Theme | undefined): void {
-    console.log('onThemeCreation', theme)
     this.themeForCreation.set(undefined)
     this.themeCreateVisible.set(false)
     if (theme) {
@@ -557,17 +562,18 @@ export class ThemeDetailComponent implements OnInit {
   /**
    * TEMPLATING: allow using properties from an existing theme => no creation of a new theme!
    */
-  public useThemeAsTemplate(selectedTheme: any): any {
-    this.themeApi.getThemeById({ id: selectedTheme.id }).subscribe((response) => {
-      this.themeForProps = {
-        ...response.resource,
-        ...this.undefinedThemeData,
-        name: this.theme?.name,
-        displayName: selectedTheme['ACTIONS.COPY_OF'] + response.resource.displayName,
-        modificationCount: this.theme?.modificationCount
-      }
-      this.themeForColors = response.resource
-      this.msgService.info({ summaryKey: 'THEME.TEMPLATE.CONFIRMATION.OK' })
-    })
+  public onUseThemeAsTemplate(selectedTheme: Theme): void {
+    if (selectedTheme.id)
+      this.themeApi.getThemeById({ id: selectedTheme.id }).subscribe((response) => {
+        this.themeForProps = {
+          ...response.resource,
+          ...this.undefinedThemeData,
+          name: this.theme?.name,
+          displayName: (selectedTheme.displayName ?? 'copy of ') + response.resource.displayName,
+          modificationCount: this.theme?.modificationCount
+        }
+        this.themeForColors = response.resource
+        this.msgService.info({ summaryKey: 'THEME.TEMPLATE.CONFIRMATION.OK' })
+      })
   }
 }

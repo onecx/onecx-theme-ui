@@ -58,7 +58,7 @@ import { ChangeMode } from '../theme-detail.component'
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-colors.component.html',
-  styleUrls: ['./theme-colors.component.scss']
+  styleUrl: './theme-colors.component.scss'
 })
 export class ThemeColorsComponent implements OnChanges {
   private readonly fb = inject(FormBuilder)
@@ -189,17 +189,6 @@ export class ThemeColorsComponent implements OnChanges {
     if (this.autoApply()) {
       this.updateCssVar(name, val)
     }
-  }
-
-  public onUpdateTheme(): boolean {
-    if (!this.theme()) return false
-    if (this.colorsForm.valid) {
-      this.theme.set({ properties: this.colorsForm.value })
-    } else {
-      this.msgService.error({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
-      return false
-    }
-    return true
   }
 
   // Applying Styles

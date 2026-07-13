@@ -892,13 +892,13 @@ describe('ThemeDetailComponent', () => {
     })
   })
 
-  describe('useThemeAsTemplate', () => {
+  describe('onUseThemeAsTemplate', () => {
     it('should load theme by id and set themeForColors', () => {
       const templateTheme = { name: 'template', displayName: 'Template', properties: { color: 'red' } }
       themesApiSpy.getThemeById.and.returnValue(of({ resource: templateTheme }) as any)
       spyOn(console, 'log')
 
-      component.useThemeAsTemplate({ id: '123' })
+      component.onUseThemeAsTemplate({ id: '123', displayName: 'Copy of' })
 
       expect(themesApiSpy.getThemeById).toHaveBeenCalledWith({ id: '123' })
       expect(component.themeForColors).toEqual(templateTheme as any)
@@ -912,7 +912,7 @@ describe('ThemeDetailComponent', () => {
       component.theme = { name: 'original' }
       spyOn(console, 'log')
 
-      component.useThemeAsTemplate({ id: '123', 'ACTIONS.COPY_OF': 'Copy of ' })
+      component.onUseThemeAsTemplate({ id: '123' })
 
       expect(component.themeForProps!.name).toBe('original')
     })

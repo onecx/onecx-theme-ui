@@ -9,7 +9,7 @@
     "CREATE": {
       "THEME": "Erstellen",
       "THEME.TOOLTIP": "Ein neues Theme erstellen.",
-      "THEME.HINT": "Die Farbwerte werden vom aktuellen Theme übernommen.",
+      "THEME.HINT": "Die anderen Eigenschaften wie Farben und Schriftarten werden vom aktuellen Theme übernommen.",
       "MESSAGE": {
         "THEME_ALREADY_EXISTS": "Ein Theme mit diesem Namen existert schon",
         "OK": "Das Theme wurde erfolgreich erstellt",
@@ -92,7 +92,7 @@
     "MODIFICATION_DATE": "Geändert am",
     "MODIFICATION_USER": "Geändert von",
     "MANDATORY": "Notwendig",
-    "MANDATORY_TRUE": "Dieses Theme ist notwendig für den Betrieb. Das Theme kann somit nicht gelöscht werden.",
+    "MANDATORY_TRUE": "Dieses Theme ist notwendig für den Betrieb. Das Theme kann deshalb nicht gelöscht werden.",
     "OPERATOR": "Automatisiert erstellt",
     "OPERATOR_HINT": "Hinweis",
     "OPERATOR_MESSAGE": "Dieses Theme wurde automatisiert erstellt. Alle Änderungen gehen beim nächsten Deployment verloren.",
@@ -102,7 +102,7 @@
       "MODIFICATION_DATE": "Zeitpunkt der letzten Änderung",
       "MODIFICATION_USER": "Name des Benutzers der letzten Änderung",
       "MANDATORY": "Wenn gesetzt, dann ist dieses Theme notwendig für den Betrieb. Das Theme kann somit nicht gelöscht werden.",
-      "OPERATOR": "Wenn gesetzt, dann kann das Theme nicht gelöscht werden und alle Änderungen gehen beim beim nächsten Deployment verloren."
+      "OPERATOR": "Wenn gesetzt, dann kann das Theme zwar gelöscht oder geändert werden, wird aber beim nächsten Deployment wiederhergestellt."
     }
   },
   "DIALOG": {
@@ -208,6 +208,7 @@
       "HEADER": "Import Theme",
       "IMPORT_THEME_SUCCESS": "Theme wurde erfolgreich importiert.",
       "IMPORT_THEME_FAIL": "Ein Fehler ist aufgetreten. Das Theme wurde nicht importiert.",
+      "NAME_HINT_MESSAGE": "Wählen Sie zunächst eine Datei aus. Sie können die Namen anpassen und bei Fehlerfreiheit die Datei hochladen.",
       "NAME_EXISTS_MESSAGE": "Ein Theme mit diesem Namen existiert bereits. Dessen Definition wird überschrieben.",
       "DISPLAY_NAME_EXISTS_MESSAGE": "Ein Theme mit diesem Anzeigenamen existiert bereits. Importieren ist möglich, führt jedoch zu Themes mit demselben Anzeigenamen.",
       "THEME_COLOR_PRIMARY": "Primärfarbe",

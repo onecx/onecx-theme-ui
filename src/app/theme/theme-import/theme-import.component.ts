@@ -26,6 +26,7 @@ import { PortalMessageService } from '@onecx/angular-integration-interface'
 
 import { Theme, ThemesAPIService, ThemeSnapshot } from 'src/app/shared/generated'
 import { ThemeColorBoxComponent } from 'src/app/shared/theme-color-box/theme-color-box.component'
+import { ThemeProperties } from 'src/app/shared/models/theme.model'
 
 @Component({
   selector: 'app-theme-import',
@@ -46,7 +47,7 @@ import { ThemeColorBoxComponent } from 'src/app/shared/theme-color-box/theme-col
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-import.component.html',
-  styleUrls: ['./theme-import.component.scss']
+  styleUrl: './theme-import.component.scss'
 })
 export class ThemeImportComponent implements OnChanges, AfterViewInit {
   private readonly route = inject(ActivatedRoute)
@@ -65,7 +66,7 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
   public themeImportError = false
   public themeSnapshot: ThemeSnapshot | null = null
   public httpHeaders!: HttpHeaders
-  public properties: any = null
+  public properties: ThemeProperties | null = null
   public formGroup: FormGroup
 
   constructor() {
@@ -80,7 +81,7 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
     if (this.visible()) {
       this.httpHeaders = new HttpHeaders()
       this.httpHeaders = this.httpHeaders.set('Content-Type', 'application/json')
-    }
+    } else this.themeSnapshot = null
   }
 
   ngAfterViewInit() {
@@ -98,10 +99,11 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
           this.themeImportError = false
           if (themeSnapshot.themes) {
             const key: string[] = Object.keys(themeSnapshot.themes)
-            this.properties = themeSnapshot.themes[key[0]].properties
+            this.properties = themeSnapshot.themes[key[0]].properties as ThemeProperties
             this.formGroup.controls['themeName'].setValue(key[0])
             this.formGroup.controls['displayName'].setValue(themeSnapshot.themes[key[0]].displayName)
           }
+          this.cd.markForCheck() // force change detection to update the view with the new properties
           this.onThemeNameChange()
         } else {
           console.error('Theme Import Error: not valid data ')

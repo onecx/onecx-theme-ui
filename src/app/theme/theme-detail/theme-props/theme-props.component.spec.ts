@@ -121,56 +121,6 @@ describe('ThemePropsComponent', () => {
     })
   })
 
-  describe('OnSave', () => {
-    beforeEach(() => {
-      initTestComponent()
-    })
-
-    it('call without theme', () => {
-      fixture.componentRef.setInput('changeMode', 'EDIT')
-      component.theme.set(undefined)
-      component.ngOnChanges({ theme: new SimpleChange(undefined, undefined, true) })
-      component.onUpdateTheme()
-
-      expect().nothing()
-    })
-
-    it('call with theme but invalid basic form', () => {
-      fixture.componentRef.setInput('changeMode', 'EDIT')
-      component.theme.set({ ...validTheme, name: '' }) // name is required, so form is invalid
-      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme, true) })
-
-      component.onUpdateTheme()
-
-      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
-    })
-
-    it('call with theme but invalid font form', () => {
-      fixture.componentRef.setInput('changeMode', 'EDIT')
-      component.theme.set({ ...validTheme })
-      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme, true) })
-      // manually invalidate the font form
-      component.fontForm.controls['font-family'].setErrors({ invalid: true })
-
-      component.onUpdateTheme()
-
-      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
-    })
-
-    it('call with valid theme', () => {
-      fixture.componentRef.setInput('changeMode', 'EDIT')
-      component.theme.set(validTheme)
-      component.ngOnChanges({ theme: new SimpleChange(undefined, validTheme, true) })
-      // a change in the form: change   displayName and font-family
-      component.basicForm.controls['displayName'].setValue('new display name')
-      component.fontForm.controls['font-family'].setValue('newFont')
-
-      component.onUpdateTheme()
-      expect(component.theme()!.displayName).toBe('new display name')
-      //expect(component.fontForm.value['font-family']).toBe(component.theme().properties?.font?.['font-family'])
-    })
-  })
-
   describe('image', () => {
     describe('setBffImageUrl', () => {
       let bffUrl: string | undefined = '/base-path-to-logo'

@@ -1,6 +1,5 @@
 import { DoBootstrap, Injector, NgModule, inject, provideAppInitializer } from '@angular/core'
 import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
-import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { RouterModule, Routes, Router } from '@angular/router'
 import { TranslateLoader, TranslateModule, MissingTranslationHandler } from '@ngx-translate/core'
@@ -17,8 +16,9 @@ import { createAppEntrypoint, initializeRouter, startsWith } from '@onecx/angula
 import { AppStateService, ConfigurationService } from '@onecx/angular-integration-interface'
 import { AngularAcceleratorModule } from '@onecx/angular-accelerator'
 
-import { Configuration } from './shared/generated'
 import { environment } from 'src/environments/environment'
+import { Configuration } from './shared/generated'
+import { LabelResolver } from './shared/label.resolver'
 import { AppEntrypointComponent } from './app-entrypoint.component'
 
 function apiConfigProvider() {
@@ -31,12 +31,12 @@ const routes: Routes = [
     loadChildren: () => import('./theme/theme.module').then((m) => m.ThemeModule)
   }
 ]
+
 @NgModule({
   imports: [
     AppEntrypointComponent,
     AngularAcceleratorModule,
     AngularAuthModule,
-    BrowserModule,
     BrowserAnimationsModule,
     RouterModule.forRoot(routes),
     TranslateModule.forRoot({
@@ -54,6 +54,7 @@ const routes: Routes = [
   ],
   providers: [
     ConfigurationService,
+    LabelResolver,
     { provide: Configuration, useFactory: apiConfigProvider },
     provideAppInitializer(() => {
       const initializerFn = initializeRouter(inject(Router), inject(AppStateService))

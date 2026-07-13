@@ -91,6 +91,13 @@
           [text]="'VALIDATION.ERRORS.PARSE_ERROR' | translate"
         ></p-message>
       }
+    } @else {
+      <p-message
+        severity="info"
+        styleClass="mt-3"
+        id="th_import_name_hint_message"
+        [text]="'THEME.IMPORT.NAME_HINT_MESSAGE' | translate"
+      ></p-message>
     }
 
     <ng-template pTemplate="footer">

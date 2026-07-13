@@ -18,6 +18,8 @@ import { TooltipModule } from 'primeng/tooltip'
 
 import { Theme } from 'src/app/shared/generated'
 import { Utils } from 'src/app/shared/utils'
+import { DictionaryObjectString } from 'src/app/shared/models/theme.model'
+
 import { ChangeMode } from '../theme-detail.component'
 
 @Component({
@@ -42,7 +44,7 @@ import { ChangeMode } from '../theme-detail.component'
   providers: [ConfirmationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-apply.component.html',
-  styleUrls: ['./theme-apply.component.scss']
+  styleUrl: './theme-apply.component.scss'
 })
 export class ThemeApplyComponent {
   // signals
@@ -60,7 +62,7 @@ export class ThemeApplyComponent {
   /***************************************************************************
    * TEMPLATING WITH EXISTING THEME
    */
-  public onSelectThemeTemplate(ev: any, themes: Theme[], box: Select): void {
+  public onSelectThemeTemplate(ev: { value: string }, themes: Theme[], box: Select): void {
     const theme = themes.find((t) => t.name === ev.value)
     if (theme?.id && theme?.displayName) this.confirmUseThemeTemplate(theme.id, theme.displayName, box)
   }
@@ -70,15 +72,20 @@ export class ThemeApplyComponent {
       this.translate
         .get([
           'ACTIONS.COPY_OF',
-          'THEME.TEMPLATE.CONFIRMATION.HEADER',
-          'THEME.TEMPLATE.CONFIRMATION.MESSAGE',
           'ACTIONS.CONFIRMATION.YES',
-          'ACTIONS.CONFIRMATION.NO'
+          'ACTIONS.CONFIRMATION.NO',
+          'THEME.TEMPLATE.CONFIRMATION.HEADER',
+          'THEME.TEMPLATE.CONFIRMATION.MESSAGE'
         ])
-        .pipe(map((data) => this.displayConfirmationForUsingTemplate(id, dn, data, box)))
+        .pipe(map((data: DictionaryObjectString) => this.displayConfirmationForUsingTemplate(id, dn, data, box)))
     )
   }
-  private displayConfirmationForUsingTemplate(themeId: string, themeName: string, data: any, box: Select): void {
+  private displayConfirmationForUsingTemplate(
+    themeId: string,
+    themeName: string,
+    data: DictionaryObjectString,
+    box: Select
+  ): void {
     this.confirmation.confirm({
       key: 'template',
       icon: 'pi pi-question-circle danger-action-text',
@@ -92,7 +99,7 @@ export class ThemeApplyComponent {
 
       accept: () => {
         box.clear()
-        this.templatingThemeData.emit({ id: themeId, ...data })
+        this.templatingThemeData.emit({ id: themeId, displayName: data['ACTIONS.COPY_OF'] })
       },
       reject: () => box.clear()
     })

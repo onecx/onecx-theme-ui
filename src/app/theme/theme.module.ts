@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router'
 
 import { providePermissionService } from '@onecx/angular-utils'
 
-import { labelResolver } from 'src/app/shared/label.resolver'
+import { LabelResolver } from 'src/app/shared/label.resolver'
 
 import { ThemeSearchComponent } from './theme-search/theme-search.component'
 import { ThemeDetailComponent } from './theme-detail/theme-detail.component'
@@ -23,7 +23,7 @@ const routes: Routes = [
       breadcrumbFn: (data: { labeli18n: string }) => `${data.labeli18n}`
     },
     resolve: {
-      labeli18n: labelResolver
+      labeli18n: LabelResolver
     }
   }
 ]

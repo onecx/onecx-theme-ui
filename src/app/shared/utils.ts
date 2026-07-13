@@ -2,6 +2,7 @@ import { Location } from '@angular/common'
 import { catchError, first, of, tap } from 'rxjs'
 
 import { WorkspaceService } from '@onecx/angular-integration-interface'
+import { DictionaryObject, ThemeProperties, ThemePropertyPath } from './models/theme.model'
 
 export enum LogoRefType {
   Logo = 'logo',
@@ -24,10 +25,10 @@ export const Utils = {
     }
   },
 
-  sortByLocale(a: any, b: any): number {
+  sortByLocale(a: string, b: string): number {
     return a.toUpperCase().localeCompare(b.toUpperCase())
   },
-  sortByDisplayName(a: any, b: any): number {
+  sortByDisplayName(a: { displayName?: string }, b: { displayName?: string }): number {
     return (a.displayName ? a.displayName.toUpperCase() : '').localeCompare(
       b.displayName ? b.displayName.toUpperCase() : ''
     )
@@ -36,8 +37,8 @@ export const Utils = {
   /**
    * Filter objects => exclude given properties
    */
-  filterObject(obj: any, exProps: string[]): any {
-    const pickedObj: any = {}
+  filterObject(obj: Record<string, unknown>, exProps: string[]): Record<string, unknown> {
+    const pickedObj: Record<string, unknown> = {}
     for (const prop in obj) {
       if (!exProps.includes(prop)) {
         pickedObj[prop] = obj[prop]
@@ -102,10 +103,28 @@ export const Utils = {
   },
 
   /**
-   * Endpoints
+   * Getting a property value from a ThemeProperties object using a dot-separated path.
+   * @param obj The ThemeProperties object to retrieve the value from.
+   * @param path The dot-separated path to the desired property (e.g., "general.text-color").
+   * @returns The value of the property at the specified path, or undefined if not found.
    */
-  getPropertyValue<T = any>(obj: Record<string, T> | undefined, prop: string): T | undefined {
+  getThemePropertyValue<T = string | DictionaryObject>(
+    obj: ThemeProperties | undefined,
+    path: ThemePropertyPath
+  ): T | undefined {
     if (!obj) return undefined
-    return obj[prop]
+
+    const parts = path.split('.')
+    let current: unknown = obj
+
+    for (const part of parts) {
+      if (current && typeof current === 'object' && part in current) {
+        current = (current as Record<string, unknown>)[part]
+      } else {
+        return undefined
+      }
+    }
+
+    return current as T
   }
 }
