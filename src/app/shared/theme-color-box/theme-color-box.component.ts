@@ -2,7 +2,13 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 import { TranslateModule } from '@ngx-translate/core'
 import { TooltipModule } from 'primeng/tooltip'
 
-import { ThemeColorBoxProperties } from 'src/app/shared/models/theme.model'
+import {
+  GeneralProps,
+  SidebarProps,
+  ThemeColorBoxProperties,
+  ThemeProperties,
+  TopbarProps
+} from 'src/app/shared/models/theme.model'
 
 @Component({
   selector: 'app-theme-color-box',
@@ -13,8 +19,10 @@ import { ThemeColorBoxProperties } from 'src/app/shared/models/theme.model'
   styleUrl: './theme-color-box.component.scss'
 })
 export class ThemeColorBoxComponent {
+  // signals
   public readonly styleClass = input<string>('h-1rem w-14rem ')
-  public readonly properties = input<ThemeColorBoxProperties>({
+  // get theme properties from input and cast to ThemeColorBoxProperties (to be displayed in the color box)
+  public readonly properties = input<ThemeProperties>({
     general: {
       'primary-color': 'gray',
       'secondary-color': 'silver',
@@ -31,7 +39,7 @@ export class ThemeColorBoxComponent {
       'menu-bg-color': 'silver'
     }
   })
-  public generalProperties = computed(() => this.properties()?.general)
-  public topbarProperties = computed(() => this.properties()?.topbar)
-  public sidebarProperties = computed(() => this.properties()?.sidebar)
+  public generalProperties = computed(() => this.properties()?.general as unknown as GeneralProps)
+  public topbarProperties = computed(() => this.properties()?.topbar as unknown as TopbarProps)
+  public sidebarProperties = computed(() => this.properties()?.sidebar as unknown as SidebarProps)
 }

@@ -1,13 +1,4 @@
-import {
-  AfterViewInit,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  inject,
-  OnChanges,
-  model,
-  input
-} from '@angular/core'
+import { AfterViewInit, ChangeDetectorRef, Component, inject, OnChanges, model, input } from '@angular/core'
 import { HttpHeaders } from '@angular/common/http'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -26,6 +17,7 @@ import { PortalMessageService } from '@onecx/angular-integration-interface'
 
 import { Theme, ThemesAPIService, ThemeSnapshot } from 'src/app/shared/generated'
 import { ThemeColorBoxComponent } from 'src/app/shared/theme-color-box/theme-color-box.component'
+import { ThemeColorBoxProperties, ThemeProperties } from 'src/app/shared/models/theme.model'
 
 @Component({
   selector: 'app-theme-import',
@@ -44,7 +36,6 @@ import { ThemeColorBoxComponent } from 'src/app/shared/theme-color-box/theme-col
     ToastModule,
     ThemeColorBoxComponent
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-import.component.html',
   styleUrl: './theme-import.component.scss'
 })
@@ -65,7 +56,7 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
   public themeImportError = false
   public themeSnapshot: ThemeSnapshot | null = null
   public httpHeaders!: HttpHeaders
-  public properties: any = null
+  public properties: ThemeProperties | null = null
   public formGroup: FormGroup
 
   constructor() {
@@ -98,10 +89,11 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
           this.themeImportError = false
           if (themeSnapshot.themes) {
             const key: string[] = Object.keys(themeSnapshot.themes)
-            this.properties = themeSnapshot.themes[key[0]].properties
+            this.properties = themeSnapshot.themes[key[0]].properties as ThemeProperties
             this.formGroup.controls['themeName'].setValue(key[0])
             this.formGroup.controls['displayName'].setValue(themeSnapshot.themes[key[0]].displayName)
           }
+          this.cd.markForCheck() // force change detection to update the view with the new properties
           this.onThemeNameChange()
         } else {
           console.error('Theme Import Error: not valid data ')

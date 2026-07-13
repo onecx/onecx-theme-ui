@@ -11,6 +11,25 @@ export interface ThemeProperties {
   sidebar?: DictionaryObject
 }
 
+// This type generates all paths recursively (e.g., "general.text-color")
+type LeavePaths<T, D extends number = 2> = [D] extends [never]
+  ? never
+  : T extends object
+    ? {
+        [K in keyof T]-?: K extends string | number
+          ? | `${K}`
+            | (LeavePaths<T[K], [1, 2, 3, 4][D]> extends infer P
+                ? P extends string | number
+                  ? `${K}.${P}`
+                  : never
+                : never)
+          : never
+      }[keyof T]
+    : never
+
+// This is now the list of all exactly allowed paths for your theme
+export type ThemePropertyPath = LeavePaths<ThemeProperties>
+
 // plain interface for theme variables
 export interface ThemeVariables {
   font: string[]

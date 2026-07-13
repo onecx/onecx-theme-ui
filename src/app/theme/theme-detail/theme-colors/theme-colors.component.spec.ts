@@ -186,50 +186,6 @@ describe('ThemeColorsComponent', () => {
     })
   })
 
-  describe('onSave', () => {
-    const theme: Theme = {
-      name: 'test-theme',
-      displayName: 'Test Theme',
-      properties: {
-        general: { 'primary-color': '#ff0000' },
-        topbar: { 'topbar-bg-color': '#00ff00' },
-        sidebar: { 'menu-text-color': '#0000ff' }
-      }
-    }
-
-    it('should save form values to theme properties', () => {
-      fixture.componentRef.setInput('changeMode', 'EDIT')
-      fixture.componentRef.setInput('theme', theme)
-
-      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme(), true) })
-      expect(component.onUpdateTheme()).toBeTrue()
-
-      expect(component.theme()?.properties).toEqual(component.colorsForm.value)
-    })
-
-    it('call with theme but invalid font form', () => {
-      const theme: Theme = { name: 'test-theme', properties: {} }
-      fixture.componentRef.setInput('changeMode', 'EDIT')
-      fixture.componentRef.setInput('theme', theme)
-
-      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme(), true) })
-      // manually invalidate the font form
-      component.colorsForm.markAsDirty()
-      component.colorsForm.setErrors({ invalid: true })
-
-      component.onUpdateTheme()
-
-      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
-    })
-
-    it('should not save if theme is undefined', () => {
-      fixture.componentRef.setInput('theme', undefined)
-
-      // no error thrown
-      expect(component.onUpdateTheme()).toBeFalse()
-    })
-  })
-
   describe('autoApply', () => {
     it('should apply CSS variable when autoApply is true and a color value changes', async () => {
       fixture.componentRef.setInput('autoApply', true)

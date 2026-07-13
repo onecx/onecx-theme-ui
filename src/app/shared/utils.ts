@@ -2,7 +2,7 @@ import { Location } from '@angular/common'
 import { catchError, first, of, tap } from 'rxjs'
 
 import { WorkspaceService } from '@onecx/angular-integration-interface'
-import { DictionaryObject, ThemeProperties } from './models/theme.model'
+import { DictionaryObject, ThemeProperties, ThemePropertyPath } from './models/theme.model'
 
 export enum LogoRefType {
   Logo = 'logo',
@@ -102,8 +102,29 @@ export const Utils = {
     return exist
   },
 
-  getThemePropertyValue(obj: ThemeProperties, part: string): DictionaryObject | undefined {
+  /**
+   * Getting a property value from a ThemeProperties object using a dot-separated path.
+   * @param obj The ThemeProperties object to retrieve the value from.
+   * @param path The dot-separated path to the desired property (e.g., "general.text-color").
+   * @returns The value of the property at the specified path, or undefined if not found.
+   */
+  getThemePropertyValue<T = string | DictionaryObject>(
+    obj: ThemeProperties | undefined,
+    path: ThemePropertyPath
+  ): T | undefined {
     if (!obj) return undefined
-    return obj[part as keyof ThemeProperties]
+
+    const parts = path.split('.')
+    let current: unknown = obj
+
+    for (const part of parts) {
+      if (current && typeof current === 'object' && part in current) {
+        current = (current as Record<string, unknown>)[part]
+      } else {
+        return undefined
+      }
+    }
+
+    return current as T
   }
 }

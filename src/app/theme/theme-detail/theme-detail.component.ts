@@ -26,6 +26,7 @@ import { ThemeUseComponent, Workspace } from './theme-use/theme-use.component'
 import { ThemeInternComponent } from './theme-intern/theme-intern.component'
 import { ThemeCreateComponent } from '../theme-create/theme-create.component'
 import { ThemeDeleteComponent } from '../theme-delete/theme-delete.component'
+import { DictionaryObject } from 'src/app/shared/models/theme.model'
 
 export type ChangeMode = 'VIEW' | 'EDIT'
 export type LoadingState = 'initial' | 'ready' | 'loading' | 'timeout'
@@ -236,7 +237,7 @@ export class ThemeDetailComponent implements OnInit {
     const propsValid = this.themePropsComponent()?.isComponentValid()
     const colorsValid = this.themeColorsComponent()?.isComponentValid()
     return {
-      theme: { ...themeProps, ...themeColors },
+      theme: { ...themeProps, properties: { ...themeColors?.properties, ...themeProps?.properties } },
       propsValid: propsValid,
       colorsValid: colorsValid
     } as ThemeData
@@ -322,8 +323,14 @@ export class ThemeDetailComponent implements OnInit {
    */
   private prepareThemeData(): Theme | undefined {
     // check form state in sub components before saving: must be valid!
-    if (!this.themeData().propsValid) return undefined
-    if (!this.themeData().colorsValid) return undefined
+    if (!this.themeData().propsValid) {
+      this.msgService.error({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
+      return undefined
+    }
+    if (!this.themeData().colorsValid) {
+      this.msgService.error({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
+      return undefined
+    }
 
     let data = this.themeData().theme // combined data from sub components
     // combine with the original theme data to preserve properties (modificationCount!)

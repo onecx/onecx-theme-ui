@@ -191,17 +191,6 @@ export class ThemeColorsComponent implements OnChanges {
     }
   }
 
-  public onUpdateTheme(): boolean {
-    if (!this.theme()) return false
-    if (this.colorsForm.valid) {
-      this.theme.set({ properties: this.colorsForm.value })
-    } else {
-      this.msgService.error({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
-      return false
-    }
-    return true
-  }
-
   // Applying Styles
   private updateCssVar(varName: string, value: string | null): void {
     document.documentElement.style.setProperty(`--${varName}`, value || '')

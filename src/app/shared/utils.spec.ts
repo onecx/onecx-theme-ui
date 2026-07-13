@@ -1,5 +1,6 @@
 import { of, throwError } from 'rxjs'
 import { Utils, LogoRefType } from './utils'
+import { DictionaryObject, ThemeProperties } from './models/theme.model'
 
 describe('util functions', () => {
   describe('http error status', () => {
@@ -29,8 +30,7 @@ describe('util functions', () => {
     })
 
     it('should return an empty string for undefined input', () => {
-      const str: any = undefined
-      const result = Utils.limitText(str, 5)
+      const result = Utils.limitText(undefined, 5)
 
       expect(result).toEqual('')
     })
@@ -235,21 +235,27 @@ describe('util functions', () => {
     })
   })
 
-  describe('getPropertyValue', () => {
+  describe('getThemePropertyValue', () => {
     it('should return the value for an existing property', () => {
-      const obj = { 'font-family': 'Arial', 'font-size': '14px' }
+      const obj = { font: { 'font-family': 'Arial', 'font-size': '14px' } } as ThemeProperties
 
-      expect(Utils.getPropertyValue(obj, 'font-family')).toEqual('Arial')
+      expect(Utils.getThemePropertyValue(obj, 'font')).toEqual({ 'font-family': 'Arial', 'font-size': '14px' })
     })
 
     it('should return undefined for a non-existing property', () => {
-      const obj = { 'font-family': 'Arial' }
+      const obj = { general: { 'primary-color': 'blue' } } as ThemeProperties
 
-      expect(Utils.getPropertyValue(obj, 'color')).toBeUndefined()
+      expect(Utils.getThemePropertyValue<DictionaryObject>(obj, 'general')).toEqual({ 'primary-color': 'blue' })
+    })
+
+    it('should return undefined for a non-existing property value', () => {
+      const obj = { general: { 'primary-color': 'blue' } } as ThemeProperties
+
+      expect(Utils.getThemePropertyValue<DictionaryObject>(obj, 'general.secondary-color')).toBeUndefined()
     })
 
     it('should return undefined if obj is undefined', () => {
-      expect(Utils.getPropertyValue(undefined, 'font-family')).toBeUndefined()
+      expect(Utils.getThemePropertyValue(undefined, 'font.font-family')).toBeUndefined()
     })
   })
 })

@@ -208,6 +208,7 @@
       "HEADER": "Import Theme",
       "IMPORT_THEME_SUCCESS": "The Theme was successfully imported.",
       "IMPORT_THEME_FAIL": "An error occurred, the Theme was not imported.",
+      "NAME_HINT_MESSAGE": "First select a file. You can adjust the names and upload the file if there are no errors.",
       "NAME_EXISTS_MESSAGE": "A Theme with this name already exists. Its definition is overwritten.",
       "DISPLAY_NAME_EXISTS_MESSAGE": "A Theme with this display name already exists. Importing is possible, but it will result in Themes with the same display name.",
       "THEME_COLOR_PRIMARY": "Primary color",
