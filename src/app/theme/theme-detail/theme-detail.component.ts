@@ -26,7 +26,6 @@ import { ThemeUseComponent, Workspace } from './theme-use/theme-use.component'
 import { ThemeInternComponent } from './theme-intern/theme-intern.component'
 import { ThemeCreateComponent } from '../theme-create/theme-create.component'
 import { ThemeDeleteComponent } from '../theme-delete/theme-delete.component'
-import { DictionaryObject } from 'src/app/shared/models/theme.model'
 
 export type ChangeMode = 'VIEW' | 'EDIT'
 export type LoadingState = 'initial' | 'ready' | 'loading' | 'timeout'

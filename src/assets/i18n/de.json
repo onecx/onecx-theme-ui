@@ -9,7 +9,7 @@
     "CREATE": {
       "THEME": "Erstellen",
       "THEME.TOOLTIP": "Ein neues Theme erstellen.",
-      "THEME.HINT": "Die Farbwerte werden vom aktuellen Theme übernommen.",
+      "THEME.HINT": "Die anderen Eigenschaften wie Farben und Schriftarten werden vom aktuellen Theme übernommen.",
       "MESSAGE": {
         "THEME_ALREADY_EXISTS": "Ein Theme mit diesem Namen existert schon",
         "OK": "Das Theme wurde erfolgreich erstellt",

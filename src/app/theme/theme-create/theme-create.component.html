@@ -65,9 +65,7 @@
       </p-float-label>
 
       @if (!themeToBeCreated()) {
-        <div class="text-center">
-          <p-message id="th_create_hint" severity="info" [text]="'ACTIONS.CREATE.THEME.HINT' | translate"></p-message>
-        </div>
+        <p-message id="th_create_hint" severity="info" [text]="'ACTIONS.CREATE.THEME.HINT' | translate"></p-message>
       }
     </form>
     <ng-template pTemplate="footer">

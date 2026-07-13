@@ -1,4 +1,13 @@
-import { AfterViewInit, ChangeDetectorRef, Component, inject, OnChanges, model, input } from '@angular/core'
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  inject,
+  OnChanges,
+  model,
+  input
+} from '@angular/core'
 import { HttpHeaders } from '@angular/common/http'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -17,7 +26,7 @@ import { PortalMessageService } from '@onecx/angular-integration-interface'
 
 import { Theme, ThemesAPIService, ThemeSnapshot } from 'src/app/shared/generated'
 import { ThemeColorBoxComponent } from 'src/app/shared/theme-color-box/theme-color-box.component'
-import { ThemeColorBoxProperties, ThemeProperties } from 'src/app/shared/models/theme.model'
+import { ThemeProperties } from 'src/app/shared/models/theme.model'
 
 @Component({
   selector: 'app-theme-import',
@@ -36,6 +45,7 @@ import { ThemeColorBoxProperties, ThemeProperties } from 'src/app/shared/models/
     ToastModule,
     ThemeColorBoxComponent
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-import.component.html',
   styleUrl: './theme-import.component.scss'
 })
@@ -71,7 +81,7 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
     if (this.visible()) {
       this.httpHeaders = new HttpHeaders()
       this.httpHeaders = this.httpHeaders.set('Content-Type', 'application/json')
-    }
+    } else this.themeSnapshot = null
   }
 
   ngAfterViewInit() {
