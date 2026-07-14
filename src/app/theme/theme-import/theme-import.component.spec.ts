@@ -73,13 +73,14 @@ describe('ThemeImportComponent', () => {
   })
 
   it('should clear form on hide', () => {
-    component.importError = true
+    component.importError.set('GENERAL')
     component.themeSnapshot = { themes: { theme: {} } }
+
     component.visible.set(false)
     component.ngOnChanges()
 
     expect(component.themeSnapshot).toBeNull()
-    expect(component.importError).toBeFalse()
+    expect(component.importError()).toBe('NONE')
   })
 
   describe('upload', () => {
@@ -100,7 +101,7 @@ describe('ThemeImportComponent', () => {
 
       await component.onImportSelectFile(event)
 
-      expect(component.importError).toBe(false)
+      expect(component.importError()).toBe('NONE')
       expect(component.themeSnapshot).toBeDefined()
       expect(component.properties).toEqual({ general: { 'primary-color': '#000000' } })
       expect(component.formGroup.controls['themeName'].value).toEqual('themeName')
@@ -121,7 +122,7 @@ describe('ThemeImportComponent', () => {
 
       await component.onImportSelectFile(event)
 
-      expect(component.importError).toBe(false)
+      expect(component.importError()).toBe('NONE')
       expect(component.themeSnapshot).toBeDefined()
       expect(component.formGroup.controls['themeName'].value).toEqual('themeName')
       expect(component.formGroup.controls['displayName'].value).toBeNull()
@@ -135,8 +136,8 @@ describe('ThemeImportComponent', () => {
 
       await component.onImportSelectFile(event)
 
-      expect(component.importError).toBe(true)
-      expect(component.themeSnapshot).toBeNull()
+      expect(component.importError()).toBe('CONTENT')
+      expect(component.themeSnapshot).toBeDefined()
       expect(console.error).toHaveBeenCalledOnceWith('Theme Import Error: not valid data ')
     })
 
@@ -167,7 +168,7 @@ describe('ThemeImportComponent', () => {
 
       await component.onImportSelectFile(event)
 
-      expect(component.importError).toBe(false)
+      expect(component.importError()).toBe('NONE')
       expect(component.themeSnapshot).toBeDefined()
       expect(component.themeNameExists).toBe(true)
       expect(component.displayNameExists).toBe(true)
@@ -181,12 +182,12 @@ describe('ThemeImportComponent', () => {
           }
         }
       }
-      component.importError = true
+      component.importError.set('GENERAL')
 
       component.onImportClear()
 
       expect(component.themeSnapshot).toBeNull()
-      expect(component.importError).toBeFalse()
+      expect(component.importError()).toBe('NONE')
     })
   })
 

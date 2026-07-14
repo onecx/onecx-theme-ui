@@ -26,48 +26,65 @@
       [cancelLabel]="'ACTIONS.CANCEL' | translate"
       [chooseLabel]="'ACTIONS.CHOOSE' | translate"
     ></p-fileUpload>
-    @if (themeSnapshot) {
-      <form [formGroup]="formGroup" class="flex flex-wrap justify-content-start align-items-center gap-3 mt-4">
-        <p-floatlabel variant="on" class="w-full md:w-15rem">
-          <input
-            pInputText
-            type="text"
-            id="th_import_theme_name"
-            class="w-full pt-3 pb-2 text-responsive"
-            formControlName="themeName"
-            (keyup)="onThemeNameChange()"
-            [ariaLabel]="'THEME.THEME_NAME' | translate"
-            [pTooltip]="'THEME.THEME_NAME' | translate"
-            tooltipPosition="top"
-            tooltipEvent="hover"
-          />
-          <label class="ocx-required-label" for="th_import_theme_name" aria-hidden="true">
-            {{ 'THEME.THEME_NAME' | translate }}
-          </label>
-        </p-floatlabel>
-        <p-floatlabel variant="on" class="w-full md:w-15rem">
-          <input
-            pInputText
-            type="text"
-            id="th_import_theme_display_name"
-            class="w-full pt-3 pb-2 text-responsive"
-            formControlName="displayName"
-            (keyup)="onThemeNameChange()"
-            [ariaLabel]="'THEME.DISPLAY_NAME' | translate"
-            [pTooltip]="'THEME.DISPLAY_NAME' | translate"
-            tooltipPosition="top"
-            tooltipEvent="hover"
-          />
-          <label class="ocx-required-label" for="th_import_theme_display_name" aria-hidden="true">
-            {{ 'THEME.DISPLAY_NAME' | translate }}
-          </label>
-        </p-floatlabel>
-        @if (properties) {
-          <app-theme-color-box [properties]="properties" styleClass="h-inputtext w-15rem" aria-hidden="true" />
-        } @else {
-          <div role="note">{{ 'THEME.NO_PROPERTIES' | translate }}</div>
-        }
-      </form>
+
+    @if (importError() === 'GENERAL') {
+      <p-message
+        severity="error"
+        styleClass="mt-3"
+        id="th_import_parse_error"
+        [text]="'VALIDATION.ERRORS.IMPORT_PARSE_ERROR' | translate"
+      ></p-message>
+    } @else if (themeSnapshot) {
+      @if (importError() === 'CONTENT') {
+        <p-message
+          severity="error"
+          styleClass="mt-3"
+          id="th_import_parse_error"
+          [text]="'VALIDATION.ERRORS.IMPORT_CONTENT_ERROR' | translate"
+        ></p-message>
+      } @else {
+        <form [formGroup]="formGroup" class="flex flex-wrap justify-content-start align-items-center gap-3 mt-4">
+          <p-floatlabel variant="on" class="w-full md:w-15rem">
+            <input
+              pInputText
+              type="text"
+              id="th_import_theme_name"
+              class="w-full pt-3 pb-2 text-responsive"
+              formControlName="themeName"
+              (keyup)="onThemeNameChange()"
+              [ariaLabel]="'THEME.THEME_NAME' | translate"
+              [pTooltip]="'THEME.THEME_NAME' | translate"
+              tooltipPosition="top"
+              tooltipEvent="hover"
+            />
+            <label class="ocx-required-label" for="th_import_theme_name" aria-hidden="true">
+              {{ 'THEME.THEME_NAME' | translate }}
+            </label>
+          </p-floatlabel>
+          <p-floatlabel variant="on" class="w-full md:w-15rem">
+            <input
+              pInputText
+              type="text"
+              id="th_import_theme_display_name"
+              class="w-full pt-3 pb-2 text-responsive"
+              formControlName="displayName"
+              (keyup)="onThemeNameChange()"
+              [ariaLabel]="'THEME.DISPLAY_NAME' | translate"
+              [pTooltip]="'THEME.DISPLAY_NAME' | translate"
+              tooltipPosition="top"
+              tooltipEvent="hover"
+            />
+            <label class="ocx-required-label" for="th_import_theme_display_name" aria-hidden="true">
+              {{ 'THEME.DISPLAY_NAME' | translate }}
+            </label>
+          </p-floatlabel>
+          @if (properties) {
+            <app-theme-color-box [properties]="properties" styleClass="h-inputtext w-15rem" aria-hidden="true" />
+          } @else {
+            <div role="note">{{ 'THEME.NO_PROPERTIES' | translate }}</div>
+          }
+        </form>
+      }
 
       @if (themeNameExists) {
         <p-message
@@ -82,13 +99,6 @@
           styleClass="mt-3"
           id="th_import_display_name_exists_message"
           [text]="'THEME.IMPORT.DISPLAY_NAME_EXISTS_MESSAGE' | translate"
-        ></p-message>
-      } @else if (importError) {
-        <p-message
-          severity="error"
-          styleClass="mt-3"
-          id="th_import_parse_error"
-          [text]="'VALIDATION.ERRORS.IMPORT_PARSE_ERROR' | translate"
         ></p-message>
       }
     } @else {

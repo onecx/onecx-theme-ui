@@ -63,10 +63,11 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
   public readonly themes = input.required<Theme[]>()
   public visible = model.required<boolean>()
   public uploaded = model.required<boolean>()
+  public importError = model<'GENERAL' | 'CONTENT' | 'NONE'>()
   // dialog
   public themeNameExists = false
   public displayNameExists = false
-  public importError = false
+  //public importError = false
   public themeSnapshot: ThemeSnapshot | null = null
   public httpHeaders!: HttpHeaders
   public properties: ThemeProperties | null = null
@@ -107,14 +108,14 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
     return event.files[0].text().then((text) => {
       this.themeSnapshot = null
       try {
-        const themeSnapshot = JSON.parse(text)
-        if (this.isThemeImportRequestDTO(themeSnapshot)) {
-          this.themeSnapshot = themeSnapshot
-          if (themeSnapshot.themes) {
-            const key: string[] = Object.keys(themeSnapshot.themes)
-            this.properties = themeSnapshot.themes[key[0]].properties as ThemeProperties
+        this.themeSnapshot = JSON.parse(text)
+        if (this.isThemeImportRequestDTO(this.themeSnapshot)) {
+          if (this.themeSnapshot.themes) {
+            // the theme export does not include more than one theme, so we can safely take the first key
+            const key: string[] = Object.keys(this.themeSnapshot.themes)
+            this.properties = this.themeSnapshot.themes[key[0]].properties as ThemeProperties
             this.formGroup.controls['themeName'].setValue(key[0])
-            this.formGroup.controls['displayName'].setValue(themeSnapshot.themes[key[0]].displayName ?? null)
+            this.formGroup.controls['displayName'].setValue(this.themeSnapshot.themes[key[0]].displayName ?? null)
             if (this.formGroup.controls['displayName'].value === null) {
               this.formGroup.controls['displayName'].setErrors({ required: true })
               this.formGroup.controls['displayName'].markAsDirty()
@@ -123,11 +124,12 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
           this.onThemeNameChange()
         } else {
           console.error('Theme Import Error: not valid data ')
-          this.importError = true
+          this.importError.set('CONTENT')
         }
         this.cd.markForCheck() // force change detection to update the view with the new properties
       } catch (err) {
         console.error('Theme Import Parse Error', err)
+        this.importError.set('GENERAL')
       }
     })
   }
@@ -143,7 +145,7 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
   public onImportClear(): void {
     this.formGroup.reset()
     this.themeSnapshot = null
-    this.importError = false
+    this.importError.set('NONE')
     this.themeNameExists = false
     this.displayNameExists = false
   }
