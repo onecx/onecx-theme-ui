@@ -17,11 +17,11 @@
       [maxFileSize]="1000000"
       [headers]="httpHeaders"
       [customUpload]="true"
-      (onClear)="onImportThemeClear()"
-      (onRemove)="onImportThemeClear()"
-      (onSelect)="onImportThemeSelect($event)"
+      (onClear)="onImportClear()"
+      (onRemove)="onImportClear()"
+      (onSelect)="onImportSelectFile($event)"
       (uploadHandler)="onThemeUpload()"
-      [showUploadButton]="formGroup.valid && !themeImportError"
+      [showUploadButton]="!importError && isFormValid()"
       [uploadLabel]="'ACTIONS.UPLOAD' | translate"
       [cancelLabel]="'ACTIONS.CANCEL' | translate"
       [chooseLabel]="'ACTIONS.CHOOSE' | translate"
@@ -83,12 +83,12 @@
           id="th_import_display_name_exists_message"
           [text]="'THEME.IMPORT.DISPLAY_NAME_EXISTS_MESSAGE' | translate"
         ></p-message>
-      } @else if (themeImportError) {
+      } @else if (importError) {
         <p-message
           severity="error"
           styleClass="mt-3"
           id="th_import_parse_error"
-          [text]="'VALIDATION.ERRORS.PARSE_ERROR' | translate"
+          [text]="'VALIDATION.ERRORS.IMPORT_PARSE_ERROR' | translate"
         ></p-message>
       }
     } @else {
