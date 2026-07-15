@@ -39,7 +39,7 @@
     },
     "EXPORT": {
       "LABEL": "Export",
-      "TOOLTIP": "Export definition in JSON format",
+      "TOOLTIP": "Download definition in JSON format",
       "THEME": "Export Theme",
       "EXPORT_THEME_FAIL": "An error occurred, the Theme was not exported."
     },
@@ -260,7 +260,8 @@
   "VALIDATION": {
     "ERRORS": {
       "FORM_INVALID": "The form data are not ready to save the Theme.",
-      "PARSE_ERROR": "Parse error: The contained structure does not match the expected format.",
+      "IMPORT_GENERAL_ERROR": "Parse error: The file content seems not in JSON format. Please check the file and try again.",
+      "IMPORT_CONTENT_ERROR": "Parse error: The contained structure does not match the expected format. Please check the file and try again.",
       "INTERNAL_ERROR": "Internal error",
       "EMPTY_REQUIRED_FIELD": "This field is required.",
       "MAXIMUM_LENGTH": "Only {{chars}} characters are allowed.",

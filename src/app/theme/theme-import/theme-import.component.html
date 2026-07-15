@@ -9,96 +9,103 @@
     [modal]="true"
     [style]="{ 'max-width': '700px' }"
   >
-    <p-fileUpload
-      inputId="th_import_upload"
-      mode="advanced"
-      name="file"
-      accept=".json"
-      [maxFileSize]="1000000"
-      [headers]="httpHeaders"
-      [customUpload]="true"
-      (onClear)="onImportThemeClear()"
-      (onRemove)="onImportThemeClear()"
-      (onSelect)="onImportThemeSelect($event)"
-      (uploadHandler)="onThemeUpload()"
-      [showUploadButton]="formGroup.valid && !themeImportError"
-      [uploadLabel]="'ACTIONS.UPLOAD' | translate"
-      [cancelLabel]="'ACTIONS.CANCEL' | translate"
-      [chooseLabel]="'ACTIONS.CHOOSE' | translate"
-    ></p-fileUpload>
-    @if (themeSnapshot) {
-      <form [formGroup]="formGroup" class="flex flex-wrap justify-content-start align-items-center gap-3 mt-4">
-        <p-floatlabel variant="on" class="w-full md:w-15rem">
-          <input
-            pInputText
-            type="text"
-            id="th_import_theme_name"
-            class="w-full pt-3 pb-2 text-responsive"
-            formControlName="themeName"
-            (keyup)="onThemeNameChange()"
-            [ariaLabel]="'THEME.THEME_NAME' | translate"
-            [pTooltip]="'THEME.THEME_NAME' | translate"
-            tooltipPosition="top"
-            tooltipEvent="hover"
-          />
-          <label class="ocx-required-label" for="th_import_theme_name" aria-hidden="true">
-            {{ 'THEME.THEME_NAME' | translate }}
-          </label>
-        </p-floatlabel>
-        <p-floatlabel variant="on" class="w-full md:w-15rem">
-          <input
-            pInputText
-            type="text"
-            id="th_import_theme_display_name"
-            class="w-full pt-3 pb-2 text-responsive"
-            formControlName="displayName"
-            (keyup)="onThemeNameChange()"
-            [ariaLabel]="'THEME.DISPLAY_NAME' | translate"
-            [pTooltip]="'THEME.DISPLAY_NAME' | translate"
-            tooltipPosition="top"
-            tooltipEvent="hover"
-          />
-          <label class="ocx-required-label" for="th_import_theme_display_name" aria-hidden="true">
-            {{ 'THEME.DISPLAY_NAME' | translate }}
-          </label>
-        </p-floatlabel>
-        @if (properties) {
-          <app-theme-color-box [properties]="properties" styleClass="h-inputtext w-15rem" aria-hidden="true" />
-        } @else {
-          <div role="note">{{ 'THEME.NO_PROPERTIES' | translate }}</div>
-        }
-      </form>
+    <div class="flex flex-wrap flex-column row-gap-3">
+      <p-fileUpload
+        inputId="th_import_upload"
+        mode="advanced"
+        name="file"
+        accept=".json"
+        [maxFileSize]="1000000"
+        [headers]="httpHeaders"
+        [customUpload]="true"
+        (onClear)="onImportClear()"
+        (onRemove)="onImportClear()"
+        (onSelect)="onImportSelectFile($event)"
+        (uploadHandler)="onThemeUpload()"
+        [showUploadButton]="importError() === 'NONE' && isFormValid()"
+        [uploadLabel]="'ACTIONS.UPLOAD' | translate"
+        [cancelLabel]="'ACTIONS.CANCEL' | translate"
+        [chooseLabel]="'ACTIONS.CHOOSE' | translate"
+      ></p-fileUpload>
 
-      @if (themeNameExists) {
-        <p-message
-          severity="warn"
-          styleClass="mt-3"
-          id="th_import_name_exists_message"
-          [text]="'THEME.IMPORT.NAME_EXISTS_MESSAGE' | translate"
-        ></p-message>
-      } @else if (displayNameExists) {
-        <p-message
-          severity="warn"
-          styleClass="mt-3"
-          id="th_import_display_name_exists_message"
-          [text]="'THEME.IMPORT.DISPLAY_NAME_EXISTS_MESSAGE' | translate"
-        ></p-message>
-      } @else if (themeImportError) {
+      @if (importError() === 'GENERAL') {
         <p-message
           severity="error"
-          styleClass="mt-3"
           id="th_import_parse_error"
-          [text]="'VALIDATION.ERRORS.PARSE_ERROR' | translate"
+          [text]="'VALIDATION.ERRORS.IMPORT_PARSE_ERROR' | translate"
+        ></p-message>
+      } @else if (themeSnapshot) {
+        @if (importError() === 'CONTENT') {
+          <p-message
+            severity="error"
+            id="th_import_parse_error"
+            [text]="'VALIDATION.ERRORS.IMPORT_CONTENT_ERROR' | translate"
+          ></p-message>
+        } @else {
+          <form [formGroup]="formGroup" class="flex flex-wrap justify-content-start align-items-center gap-3 mt-3">
+            <p-floatlabel variant="on" class="w-full md:w-15rem">
+              <input
+                pInputText
+                type="text"
+                id="th_import_theme_name"
+                class="w-full pt-3 pb-2 text-responsive"
+                formControlName="themeName"
+                (keyup)="onThemeNameChange()"
+                [ariaLabel]="'THEME.THEME_NAME' | translate"
+                [pTooltip]="'THEME.THEME_NAME' | translate"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+              />
+              <label class="ocx-required-label" for="th_import_theme_name" aria-hidden="true">
+                {{ 'THEME.THEME_NAME' | translate }}
+              </label>
+            </p-floatlabel>
+            <p-floatlabel variant="on" class="w-full md:w-15rem">
+              <input
+                pInputText
+                type="text"
+                id="th_import_theme_display_name"
+                class="w-full pt-3 pb-2 text-responsive"
+                formControlName="displayName"
+                (keyup)="onThemeNameChange()"
+                [ariaLabel]="'THEME.DISPLAY_NAME' | translate"
+                [pTooltip]="'THEME.DISPLAY_NAME' | translate"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+              />
+              <label class="ocx-required-label" for="th_import_theme_display_name" aria-hidden="true">
+                {{ 'THEME.DISPLAY_NAME' | translate }}
+              </label>
+            </p-floatlabel>
+            @if (properties) {
+              <app-theme-color-box [properties]="properties" styleClass="h-inputtext w-15rem" aria-hidden="true" />
+            } @else {
+              <div role="note">{{ 'THEME.NO_PROPERTIES' | translate }}</div>
+            }
+          </form>
+        }
+
+        @if (themeNameExists) {
+          <p-message
+            severity="warn"
+            id="th_import_name_exists_message"
+            [text]="'THEME.IMPORT.NAME_EXISTS_MESSAGE' | translate"
+          ></p-message>
+        } @else if (displayNameExists) {
+          <p-message
+            severity="warn"
+            id="th_import_display_name_exists_message"
+            [text]="'THEME.IMPORT.DISPLAY_NAME_EXISTS_MESSAGE' | translate"
+          ></p-message>
+        }
+      } @else {
+        <p-message
+          severity="info"
+          id="th_import_name_hint_message"
+          [text]="'THEME.IMPORT.NAME_HINT_MESSAGE' | translate"
         ></p-message>
       }
-    } @else {
-      <p-message
-        severity="info"
-        styleClass="mt-3"
-        id="th_import_name_hint_message"
-        [text]="'THEME.IMPORT.NAME_HINT_MESSAGE' | translate"
-      ></p-message>
-    }
+    </div>
 
     <ng-template pTemplate="footer">
       <div class="flex flex-wrap column-gap-2 row-gap-1 justify-content-end">
