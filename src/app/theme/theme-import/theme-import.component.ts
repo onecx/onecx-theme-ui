@@ -67,7 +67,6 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
   // dialog
   public themeNameExists = false
   public displayNameExists = false
-  //public importError = false
   public themeSnapshot: ThemeSnapshot | null = null
   public httpHeaders!: HttpHeaders
   public properties: ThemeProperties | null = null
@@ -96,7 +95,8 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
     if (this.visible()) {
       this.httpHeaders = new HttpHeaders()
       this.httpHeaders = this.httpHeaders.set('Content-Type', 'application/json')
-    } else this.onImportClear()
+    }
+    this.onImportClear()
   }
 
   ngAfterViewInit() {
@@ -106,7 +106,6 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
   public async onImportSelectFile(event: FileSelectEvent): Promise<void> {
     this.onImportClear()
     return event.files[0].text().then((text) => {
-      this.themeSnapshot = null
       try {
         this.themeSnapshot = JSON.parse(text)
         if (this.isThemeImportRequestDTO(this.themeSnapshot)) {

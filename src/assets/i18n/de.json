@@ -260,8 +260,8 @@
   "VALIDATION": {
     "ERRORS": {
       "FORM_INVALID": "Die Formulardaten sind nicht bereit zum Speichern des Themes.",
-      "IMPORT_GENERAL_ERROR": "Parserfehler: Der Dateiinhalt scheint nicht im JSON-Format zu sein.",
-      "IMPORT_CONTENT_ERROR": "Parserfehler: Die enthaltene Struktur entspricht nicht dem erwarteten Format.",
+      "IMPORT_GENERAL_ERROR": "Parserfehler: Der Dateiinhalt scheint nicht im JSON-Format zu sein. Bitte prüfen Sie die Datei und versuchen Sie es erneut.",
+      "IMPORT_CONTENT_ERROR": "Parserfehler: Die enthaltene Struktur entspricht nicht dem erwarteten Format. Bitte prüfen Sie die Datei und versuchen Sie es erneut.",
       "INTERNAL_ERROR": "Interner Fehler",
       "EMPTY_REQUIRED_FIELD": "Dieses Feld ist ein Pflichtfeld.",
       "MAXIMUM_LENGTH": "Es sind nur {{chars}} Zeichen erlaubt.",
