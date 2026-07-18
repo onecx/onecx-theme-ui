@@ -6,11 +6,11 @@ import {
   inject,
   OnChanges,
   model,
-  input
+  input,
+  output
 } from '@angular/core'
 import { HttpHeaders } from '@angular/common/http'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
-import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 
 import { ButtonModule } from 'primeng/button'
@@ -53,17 +53,15 @@ import { toSignal } from '@angular/core/rxjs-interop'
   styleUrl: './theme-import.component.scss'
 })
 export class ThemeImportComponent implements OnChanges, AfterViewInit {
-  private readonly route = inject(ActivatedRoute)
-  private readonly router = inject(Router)
   private readonly themeApi = inject(ThemesAPIService)
   public readonly translate = inject(TranslateService)
   private readonly msgService = inject(PortalMessageService)
   private readonly cd = inject(ChangeDetectorRef)
   // signals
   public readonly themes = input.required<Theme[]>()
-  public visible = model.required<boolean>()
-  public uploaded = model.required<boolean>()
-  public importError = model<'GENERAL' | 'CONTENT' | 'NONE'>()
+  public readonly visible = model.required<boolean>()
+  public readonly uploaded = output<Theme | undefined>()
+  public readonly importError = model<'GENERAL' | 'CONTENT' | 'NONE'>()
   // dialog
   public themeNameExists = false
   public displayNameExists = false
@@ -83,7 +81,7 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
     ])
   })
   // signals
-  public isFormValid = toSignal(
+  public readonly isFormValid = toSignal(
     this.formGroup.statusChanges.pipe(
       map((status) => status === 'VALID'),
       startWith(this.formGroup.valid) // initial state on component init
@@ -143,19 +141,19 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
 
   public onImportClear(): void {
     this.formGroup.reset()
-    this.themeSnapshot = null
     this.importError.set('NONE')
+    this.themeSnapshot = null
     this.themeNameExists = false
     this.displayNameExists = false
   }
 
   public onThemeUpload(): void {
-    this.uploaded.set(false)
     if (!this.formGroup.valid || !this.properties) return
     if (!this.themeSnapshot?.themes) return
     // Import data preparation
     const key: string[] = Object.keys(this.themeSnapshot?.themes)
-    this.themeSnapshot.themes[key[0]].displayName = this.formGroup.controls['displayName'].value ?? undefined
+    if (this.formGroup.controls['displayName'].value)
+      this.themeSnapshot.themes[key[0]].displayName = this.formGroup.controls['displayName'].value
     if (key[0] !== this.formGroup.controls['themeName'].value) {
       // save the theme properties to be reassigned on new key
       const themeProps = Object.getOwnPropertyDescriptor(this.themeSnapshot.themes, key[0])
@@ -170,9 +168,11 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
       .subscribe({
         next: () => {
           this.msgService.success({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_SUCCESS' })
+          this.uploaded.emit({
+            name: this.formGroup.controls['themeName'].value!,
+            displayName: this.formGroup.controls['displayName'].value!
+          })
           this.onImportClear()
-          this.uploaded.set(true)
-          this.router.navigate([`./${this.formGroup.controls['themeName'].value}`], { relativeTo: this.route })
         },
         error: () => {
           this.msgService.error({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_FAIL' })

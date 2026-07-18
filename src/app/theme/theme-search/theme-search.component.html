@@ -223,7 +223,7 @@
     <!-- IMPORT -->
     <app-theme-import
       [(visible)]="themeImportVisible"
-      [(uploaded)]="themeImported"
+      (uploaded)="onThemeCreation($event)"
       [themes]="convertToThemes(data)"
     ></app-theme-import>
   </ocx-content>
