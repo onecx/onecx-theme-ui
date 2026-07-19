@@ -68,6 +68,7 @@
         <p-message id="th_create_hint" severity="info" [text]="'ACTIONS.CREATE.THEME.HINT' | translate"></p-message>
       }
     </form>
+
     <ng-template pTemplate="footer">
       <div class="flex flex-wrap column-gap-2 row-gap-1 justify-content-end">
         <p-button
@@ -84,7 +85,7 @@
           id="ws_create_action_save"
           icon="pi pi-plus"
           [disabled]="!formGroup.valid"
-          (onClick)="saveTheme()"
+          (onClick)="onSaveTheme()"
           [label]="'ACTIONS.CREATE.THEME' | translate"
           [ariaLabel]="'ACTIONS.CREATE.THEME.TOOLTIP' | translate"
           [pTooltip]="'ACTIONS.CREATE.THEME.TOOLTIP' | translate"

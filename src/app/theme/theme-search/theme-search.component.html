@@ -218,6 +218,7 @@
       [(visible)]="themeCreateVisible"
       (created)="onThemeCreation($event)"
       [themeToBeCreated]="undefined"
+      [themes]="convertToThemes(data)"
     ></app-theme-create>
 
     <!-- IMPORT -->

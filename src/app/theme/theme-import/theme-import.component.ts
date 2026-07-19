@@ -57,7 +57,7 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
   private readonly msgService = inject(PortalMessageService)
   private readonly cd = inject(ChangeDetectorRef)
   // signals
-  public readonly themes = input.required<Theme[]>()
+  public readonly themes = input.required<Theme[] | undefined>()
   public readonly visible = model.required<boolean>()
   public readonly uploaded = output<Theme | undefined>()
   public readonly importError = model<'GENERAL' | 'CONTENT' | 'NONE'>()
@@ -131,9 +131,9 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
   }
 
   public onThemeNameChange() {
-    if (this.themes().length === 0 || !this.formGroup.valid) return
-    this.themeNameExists = this.themes().some((theme) => theme.name === this.formGroup.controls['themeName'].value)
-    this.displayNameExists = this.themes().some(
+    if (this.themes()?.length === 0 || !this.formGroup.valid) return
+    this.themeNameExists = this.themes()!.some((theme) => theme.name === this.formGroup.controls['themeName'].value)
+    this.displayNameExists = this.themes()!.some(
       (theme) => theme.displayName === this.formGroup.controls['displayName'].value
     )
   }

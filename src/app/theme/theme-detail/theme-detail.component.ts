@@ -1,4 +1,14 @@
-import { Component, computed, DestroyRef, EventEmitter, inject, OnInit, signal, viewChild } from '@angular/core'
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  EventEmitter,
+  inject,
+  OnInit,
+  signal,
+  viewChild
+} from '@angular/core'
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop'
 import { AsyncPipe, JsonPipe, Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -59,6 +69,7 @@ type ThemeData = {
     ThemePropsComponent,
     ThemeColorsComponent
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-detail.component.html',
   styleUrl: './theme-detail.component.scss'
 })
@@ -106,14 +117,14 @@ export class ThemeDetailComponent implements OnInit {
   public dateFormat = 'M/d/yy, hh:mm:ss a'
   public isCurrentTheme = false
   public Utils = Utils
+  public toSignal = toSignal
   // page header
   public actions$: Observable<Action[]> = of([])
   public headerImageUrl?: string
   // data
-  public themeName: string | null = null
-  public theme$!: Observable<Theme | undefined>
+  public paramThemeName: string | null = null
+  public readonly theme = signal<Theme | undefined>(undefined)
   public themes$!: Observable<Theme[]>
-  public theme: Theme | undefined
   public themeForProps: Theme | undefined
   public themeForColors: Theme | undefined
   // image
@@ -147,15 +158,15 @@ export class ThemeDetailComponent implements OnInit {
     })
     this.themeUsed.set(false)
     this.dateFormat = this.user.lang$.getValue() === 'de' ? 'dd.MM.yyyy HH:mm:ss' : this.dateFormat
-    this.themeName = this.route.snapshot.paramMap.get('name')
+    this.paramThemeName = this.route.snapshot.paramMap.get('name')
     // Common start
-    this.theme = undefined
+    this.theme.set(undefined)
     this.getTheme()
     // Re-initialize the component when the route parameter changes (e.g. after creating a new theme)
     this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const newThemeName = params.get('name')
-      if (newThemeName && newThemeName !== this.themeName) {
-        this.themeName = newThemeName
+      if (newThemeName && newThemeName !== this.paramThemeName) {
+        this.paramThemeName = newThemeName
         this.changeMode = 'VIEW'
         this.getTheme()
       }
@@ -163,11 +174,11 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   private getTheme(): void {
-    if (!this.themeName) return
+    if (!this.paramThemeName) return
     this.loading = true
     combineLatest([
       this.themeService.currentTheme$.pipe(first()),
-      this.themeApi.getThemeByName({ name: this.themeName })
+      this.themeApi.getThemeByName({ name: this.paramThemeName })
     ])
       .pipe(
         map(([ct, response]) => {
@@ -191,7 +202,7 @@ export class ThemeDetailComponent implements OnInit {
       )
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((theme) => {
-        this.theme = theme
+        this.theme.set(theme)
         this.initSubComponentData(theme)
       })
   }
@@ -241,8 +252,8 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   // Initialize the process of checking if the theme is used in workspaces
-  private startGettingThemeUseData(themeName?: string): void {
-    if (themeName && this.themeUseLoadingState() === 'initial') {
+  private startGettingThemeUseData(paramThemeName?: string): void {
+    if (paramThemeName && this.themeUseLoadingState() === 'initial') {
       this.themeUseLoadingState.set('loading')
       // best customer experience: show the loading indicator for at least 1.5 seconds, even if the data is received faster
       this.themeUseStartTime = performance.now() // store the start time for measuring loading duration
@@ -252,7 +263,7 @@ export class ThemeDetailComponent implements OnInit {
       this.themeUseTimeoutTimer = setTimeout(() => {
         if (this.themeUseLoadingState() === 'loading') this.themeUseLoadingState.set('timeout')
       }, this.MAX_LOADING_TIME)
-      this.themeUsedName.set(themeName) // force checking use in workspaces
+      this.themeUsedName.set(paramThemeName) // force checking use in workspaces
     }
   }
 
@@ -335,7 +346,7 @@ export class ThemeDetailComponent implements OnInit {
       ...data,
       id: undefined,
       operator: undefined,
-      modificationCount: this.theme?.modificationCount,
+      modificationCount: this.theme()?.modificationCount, // the original value!
       // prevent empty strings for urls, as it causes issues for the image service
       logoUrl: data.logoUrl === '' ? undefined : data.logoUrl,
       smallLogoUrl: data.smallLogoUrl === '' ? undefined : data.smallLogoUrl,
@@ -348,17 +359,18 @@ export class ThemeDetailComponent implements OnInit {
     const themeData = this.prepareThemeData()
     if (!themeData) return
     // save
-    if (this.theme?.id)
+    const themeId = this.theme()?.id
+    if (themeId)
       this.themeApi
         .updateTheme({
-          id: this.theme.id,
+          id: themeId,
           updateThemeRequest: { resource: themeData }
         })
         .subscribe({
           next: (data) => {
             this.msgService.success({ summaryKey: 'ACTIONS.EDIT.MESSAGE.OK' })
             this.onChangeMode('VIEW', data.resource)
-            this.theme$ = of(data.resource) // update observable with response data
+            this.theme.set(data.resource)
           },
           error: (err) => {
             console.error('updateTheme', err)
@@ -377,7 +389,7 @@ export class ThemeDetailComponent implements OnInit {
       themeData = this.prepareThemeData()
       if (!themeData) return
     } else {
-      themeData = this.theme
+      themeData = this.theme()
     }
     if (!themeData) return
     this.themeForCreation.set({
@@ -563,14 +575,13 @@ export class ThemeDetailComponent implements OnInit {
   public onUseThemeAsTemplate(selectedTheme: Theme): void {
     if (selectedTheme.id)
       this.themeApi.getThemeById({ id: selectedTheme.id }).subscribe((response) => {
-        this.themeForProps = {
+        this.initSubComponentData({
           ...response.resource,
-          ...this.undefinedThemeData,
-          name: this.theme?.name,
+          ...this.undefinedThemeData, // reset main properties: id, name etc.
+          name: this.theme()?.name,
           displayName: (selectedTheme.displayName ?? 'copy of ') + response.resource.displayName,
-          modificationCount: this.theme?.modificationCount
-        }
-        this.themeForColors = response.resource
+          modificationCount: this.theme()?.modificationCount // use the original value
+        })
         this.msgService.info({ summaryKey: 'THEME.TEMPLATE.CONFIRMATION.OK' })
       })
   }

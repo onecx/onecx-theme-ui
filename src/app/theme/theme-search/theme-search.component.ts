@@ -126,7 +126,8 @@ export class ThemeSearchComponent implements OnInit {
   private sortThemesByName(a: Theme, b: Theme): number {
     return a.displayName!.toUpperCase().localeCompare(b.displayName!.toUpperCase())
   }
-  public convertToThemes(data: RowListGridData[]): Theme[] {
+  public convertToThemes(data?: RowListGridData[]): Theme[] | undefined {
+    if (!data) return undefined
     return data as unknown[] as Theme[]
   }
 
