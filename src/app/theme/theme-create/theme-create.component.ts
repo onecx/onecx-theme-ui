@@ -1,18 +1,7 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  DestroyRef,
-  effect,
-  inject,
-  input,
-  model,
-  output
-} from '@angular/core'
+import { ChangeDetectionStrategy, Component, DestroyRef, effect, inject, input, model, output } from '@angular/core'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
-import { catchError, map, Observable, of } from 'rxjs'
 
 import { ButtonModule } from 'primeng/button'
 import { DialogModule } from 'primeng/dialog'
@@ -25,7 +14,6 @@ import { TooltipModule } from 'primeng/tooltip'
 
 import { PortalMessageService } from '@onecx/angular-integration-interface'
 
-import { Utils } from 'src/app/shared/utils'
 import { Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { themeVariables } from '../theme-detail/theme-variables'
 
