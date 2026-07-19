@@ -173,7 +173,7 @@
 
   @if (isComponentDefined() === true && themeUsedName() && changeMode === 'VIEW') {
     <ocx-slot
-      [name]="slotName"
+      [name]="slotName()"
       [inputs]="{ dataType: 'workspaces', themeName: themeUsedName(), logEnabled: false, logPrefix: 'theme-use' }"
       [outputs]="{ workspaces: slotEmitter }"
     >

@@ -1,9 +1,9 @@
 import { Component, computed, DestroyRef, EventEmitter, inject, OnInit, signal, viewChild } from '@angular/core'
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop'
 import { AsyncPipe, JsonPipe, Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
-import { catchError, combineLatest, finalize, first, map, of, Observable } from 'rxjs'
+import { catchError, combineLatest, finalize, first, map, of, Observable, switchMap } from 'rxjs'
 import FileSaver from 'file-saver'
 
 import { MessageModule } from 'primeng/message'
@@ -17,6 +17,7 @@ import { PortalPageComponent } from '@onecx/angular-utils'
 import { SlotService } from '@onecx/angular-remote-components'
 
 import { Utils, LogoRefType } from 'src/app/shared/utils'
+import { injectInitializedSlotService } from 'src/app/shared/slot.initializer'
 import { ExportThemeRequest, ImagesInternalAPIService, Theme, ThemesAPIService } from 'src/app/shared/generated'
 
 import { ThemeApplyComponent } from './theme-apply/theme-apply.component'
@@ -62,29 +63,29 @@ type ThemeData = {
   styleUrl: './theme-detail.component.scss'
 })
 export class ThemeDetailComponent implements OnInit {
-  private readonly user = inject(UserService)
   private readonly route = inject(ActivatedRoute)
   private readonly router = inject(Router)
   private readonly location = inject(Location)
-  private readonly themeApi = inject(ThemesAPIService)
+  private readonly destroyRef = inject(DestroyRef)
   private readonly themeService = inject(ThemeService)
+  private readonly user = inject(UserService)
+  private readonly slotService = injectInitializedSlotService()
   private readonly msgService = inject(PortalMessageService)
   private readonly translate = inject(TranslateService)
+  private readonly themeApi = inject(ThemesAPIService)
   private readonly imageApi = inject(ImagesInternalAPIService)
-  private readonly slotService = inject(SlotService)
-  private readonly destroyRef = inject(DestroyRef)
   // signals
   public readonly themeDeleteVisible = signal<boolean>(false)
   public readonly themeCreateVisible = signal<boolean>(false)
   public readonly themeToBeDeleted = signal<Theme | undefined>(undefined)
   public readonly themeForCreation = signal<Theme | undefined>(undefined)
   public readonly checkThemeUse = signal<boolean>(false)
-  public readonly isComponentDefined = signal<boolean>(false)
+  //public readonly isComponentDefined = signal<boolean>(false)
   public readonly themeUsed = signal<boolean>(false)
   public readonly themeUsedName = signal<string | undefined>(undefined)
   public readonly themeUsedByWorkspaces = signal<Workspace[]>([])
   public readonly themeUseLoadingState = signal<LoadingState>('initial')
-  // signals: Combine the data from the sub components to a single theme object and check if the forms are valid
+  // signals: Combine the data from the sub components to a single theme object
   public themeData = computed(() => this.computeThemeData())
   // signals: components
   public readonly tabComponent = viewChild(Tabs)
@@ -118,7 +119,7 @@ export class ThemeDetailComponent implements OnInit {
   // image
   public imageBasePath = this.imageApi.configuration.basePath
   // receive the slot output
-  public slotName = 'onecx-workspace-data'
+  public slotName = signal<string>('onecx-workspace-data')
   public slotEmitter = new EventEmitter<Workspace[]>()
 
   // Partial theme with undefined values for internal use (copying, editing) to prevent issues with form patching and image url handling when required properties are missing
@@ -133,24 +134,18 @@ export class ThemeDetailComponent implements OnInit {
     creationUser: undefined
   } as Theme
 
+  // trigger the request to the workspace service via slot to get the workspaces that use the theme
+  public readonly isComponentDefined = toSignal(
+    toObservable(this.slotName).pipe(switchMap((name) => this.slotService.isSomeComponentDefinedForSlot(name!))),
+    { initialValue: false }
+  )
+
   ngOnInit(): void {
-    // old constructor starts here
-    // Initialize the slot service for getting workspaces using the theme.
-    slotInitializer(this.slotService)
-    this.slotService
-      .isSomeComponentDefinedForSlot(this.slotName)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((isDefined) => {
-        this.isComponentDefined.set(isDefined)
-      })
-    // trigger the request to the workspace service via slot to get the workspaces that use the theme
-    this.themeUsed.set(false)
     // receive data and stop process
     this.slotEmitter.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((res) => {
       this.stopGettingThemeUseData(res)
     })
-
-    // old constructor ends here
+    this.themeUsed.set(false)
     this.dateFormat = this.user.lang$.getValue() === 'de' ? 'dd.MM.yyyy HH:mm:ss' : this.dateFormat
     this.themeName = this.route.snapshot.paramMap.get('name')
     // Common start
@@ -194,15 +189,18 @@ export class ThemeDetailComponent implements OnInit {
           this.tabComponent()?.value.set(this.selectedTabIndex) // Forces tab change
         })
       )
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((theme) => {
         this.theme = theme
         this.initSubComponentData(theme)
       })
   }
+
+  // Derive the data for the sub components
   private initSubComponentData(theme: Theme | undefined): void {
     if (!theme) return
     this.themeForProps = { ...theme, id: undefined }
-    this.themeForColors = { properties: theme.properties } // only pass properties to colors component
+    this.themeForColors = { properties: theme.properties } // pass only properties
   }
 
   // Get themes for the template dropdown

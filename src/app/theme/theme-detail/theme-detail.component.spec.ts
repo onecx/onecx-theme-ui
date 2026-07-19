@@ -32,6 +32,7 @@ const theme: Theme = {
 describe('ThemeDetailComponent', () => {
   let component: ThemeDetailComponent
   let fixture: ComponentFixture<ThemeDetailComponent>
+  let slotServiceSpy: jasmine.SpyObj<SlotService>
 
   const mockUserService = { lang$: { getValue: jasmine.createSpy('getValue').and.returnValue('en') } }
   const msgServiceSpy = jasmine.createSpyObj<PortalMessageService>('PortalMessageService', ['success', 'error', 'info'])
@@ -47,9 +48,8 @@ describe('ThemeDetailComponent', () => {
   ])
   const currentTheme$ = new BehaviorSubject<any>({ name: 'currentTheme' })
   const mockThemeService = { currentTheme$: currentTheme$.asObservable() }
+  const mockSlotService = jasmine.createSpyObj('SlotService', ['init', 'isSomeComponentDefinedForSlot'])
   const imgServiceSpy = { configuration: { basePath: '/basePath' } }
-  let slotServiceMock: any
-  let slotSubject: BehaviorSubject<boolean>
 
   function initTestComponent(): void {
     fixture = TestBed.createComponent(ThemeDetailComponent)
@@ -58,14 +58,6 @@ describe('ThemeDetailComponent', () => {
   }
 
   beforeEach(waitForAsync(() => {
-    slotSubject = new BehaviorSubject<boolean>(false)
-    // Mock für den Service erstellen
-    slotServiceMock = {
-      isSomeComponentDefinedForSlot: jasmine
-        .createSpy('isSomeComponentDefinedForSlot')
-        .and.returnValue(slotSubject.asObservable())
-    }
-
     TestBed.configureTestingModule({
       imports: [
         ThemeDetailComponent,
@@ -82,8 +74,8 @@ describe('ThemeDetailComponent', () => {
         provideRouter([{ path: '', component: ThemeDetailComponent }]),
         { provide: Location, useValue: locationSpy },
         { provide: ThemeService, useValue: mockThemeService },
+        { provide: SlotService, useValue: mockSlotService },
         { provide: ImagesInternalAPIService, useValue: imgServiceSpy },
-        { provide: SlotService, useValue: slotServiceMock },
         { provide: DestroyRef, useValue: { onDestroy: () => {} } }
       ]
     })
@@ -97,6 +89,7 @@ describe('ThemeDetailComponent', () => {
         }
       })
       .compileComponents()
+    slotServiceSpy = TestBed.inject(SlotService) as jasmine.SpyObj<SlotService>
   }))
 
   beforeEach(() => {
@@ -110,6 +103,8 @@ describe('ThemeDetailComponent', () => {
     themesApiSpy.updateTheme.calls.reset()
     themesApiSpy.createTheme.calls.reset()
     locationSpy.back.calls.reset()
+    // default values
+    mockSlotService.isSomeComponentDefinedForSlot.and.returnValue(of(true))
     themesApiSpy.getThemeByName.and.returnValue(of({ resource: {} }) as any)
     themesApiSpy.getThemeById.and.returnValue(of({ resource: {} }) as any)
     themesApiSpy.exportThemes.and.returnValue(of({}) as any)
@@ -410,24 +405,10 @@ describe('ThemeDetailComponent', () => {
 
   describe('slot service', () => {
     it('should test if component is assigned to slot', () => {
-      slotSubject.next(true)
-      fixture = TestBed.createComponent(ThemeDetailComponent)
-      component = fixture.componentInstance
       fixture.detectChanges() // trigger ngOnInit
 
-      expect(slotServiceMock.isSomeComponentDefinedForSlot).toHaveBeenCalledWith(component.slotName)
+      expect(slotServiceSpy.isSomeComponentDefinedForSlot).toHaveBeenCalledWith(component.slotName())
       expect(component.isComponentDefined()).toBeTrue()
-    })
-
-    it('should destroy the stream when the component is destroyed', () => {
-      fixture = TestBed.createComponent(ThemeDetailComponent)
-      component = fixture.componentInstance
-
-      fixture.destroy()
-      slotSubject.next(true) // new value emitted after component destroyed
-
-      // No change of the signal after component destroyed
-      expect(component.isComponentDefined()).toBeFalse()
     })
   })
 

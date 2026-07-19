@@ -9,9 +9,11 @@ import {
   input,
   output
 } from '@angular/core'
+import { toSignal } from '@angular/core/rxjs-interop'
 import { HttpHeaders } from '@angular/common/http'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
+import { map, startWith } from 'rxjs'
 
 import { ButtonModule } from 'primeng/button'
 import { DialogModule } from 'primeng/dialog'
@@ -27,9 +29,6 @@ import { PortalMessageService } from '@onecx/angular-integration-interface'
 import { Theme, ThemesAPIService, ThemeSnapshot } from 'src/app/shared/generated'
 import { ThemeColorBoxComponent } from 'src/app/shared/theme-color-box/theme-color-box.component'
 import { ThemeProperties } from 'src/app/shared/models/theme.model'
-import { startWith } from 'rxjs/internal/operators/startWith'
-import { map } from 'rxjs/internal/operators/map'
-import { toSignal } from '@angular/core/rxjs-interop'
 
 @Component({
   selector: 'app-theme-import',
@@ -161,23 +160,19 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
       delete this.themeSnapshot.themes[key[0]]
     }
     // Import execution: upload
-    this.themeApi
-      .importThemes({
-        themeSnapshot: this.themeSnapshot
-      })
-      .subscribe({
-        next: () => {
-          this.msgService.success({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_SUCCESS' })
-          this.uploaded.emit({
-            name: this.formGroup.controls['themeName'].value!,
-            displayName: this.formGroup.controls['displayName'].value!
-          })
-          this.onImportClear()
-        },
-        error: () => {
-          this.msgService.error({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_FAIL' })
-        }
-      })
+    this.themeApi.importThemes({ themeSnapshot: this.themeSnapshot }).subscribe({
+      next: () => {
+        this.msgService.success({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_SUCCESS' })
+        this.uploaded.emit({
+          name: this.formGroup.controls['themeName'].value!,
+          displayName: this.formGroup.controls['displayName'].value!
+        })
+        this.onImportClear()
+      },
+      error: () => {
+        this.msgService.error({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_FAIL' })
+      }
+    })
   }
 
   private isThemeImportRequestDTO(obj: unknown): obj is ThemeSnapshot {

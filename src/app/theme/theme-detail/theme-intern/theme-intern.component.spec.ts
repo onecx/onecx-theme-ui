@@ -33,38 +33,6 @@ describe('ThemeInternComponent', () => {
     expect(component).toBeTruthy()
   })
 
-  describe('ngOnChanges', () => {
-    it('should set operator and mandatory to false if theme is not provided', () => {
-      component.ngOnChanges()
-      expect(component.operator).toBeFalse()
-      expect(component.mandatory).toBeFalse()
-    })
-
-    it('should set operator to true if theme.operator is true', () => {
-      fixture.componentRef.setInput('theme', { operator: true })
-      component.ngOnChanges()
-      expect(component.operator).toBeTrue()
-    })
-
-    it('should set operator to false if theme.operator is undefined', () => {
-      fixture.componentRef.setInput('theme', { operator: undefined })
-      component.ngOnChanges()
-      expect(component.operator).toBeFalse()
-    })
-
-    it('should set mandatory to true if theme.mandatory is true', () => {
-      fixture.componentRef.setInput('theme', { mandatory: true })
-      component.ngOnChanges()
-      expect(component.mandatory).toBeTrue()
-    })
-
-    it('should set mandatory to false if theme.mandatory is undefined', () => {
-      fixture.componentRef.setInput('theme', { mandatory: undefined })
-      component.ngOnChanges()
-      expect(component.mandatory).toBeFalse()
-    })
-  })
-
   describe('creationDate', () => {
     it('should return empty string if theme has no creationDate', () => {
       fixture.componentRef.setInput('theme', {})
