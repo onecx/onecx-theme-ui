@@ -1,4 +1,3 @@
-import { SimpleChange } from '@angular/core'
 import { ComponentFixture, fakeAsync, flush, TestBed, waitForAsync } from '@angular/core/testing'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 
