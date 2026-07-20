@@ -483,20 +483,6 @@
   }
 }
 
-@mixin tabview-reduce-padding {
-  :host ::ng-deep {
-    .p-tabview .p-tabview-panels {
-      padding: 1.4rem 0 0 0;
-    }
-  }
-}
-
-@mixin tabview-fix-color-selected-tab {
-  :host ::ng-deep {
-    --tabview-header-active-bg: rgb(from var(--primary-color) r g b / 0.12) !important;
-  }
-}
-
 /* **********************************************
  *  TABs
  * **********************************************/
