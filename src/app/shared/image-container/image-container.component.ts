@@ -1,7 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject, input, OnChanges, output } from '@angular/core'
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, OnChanges, output } from '@angular/core'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { TranslateModule } from '@ngx-translate/core'
-import { TooltipModule } from 'primeng/tooltip'
 import { map } from 'rxjs'
+
+import { TooltipModule } from 'primeng/tooltip'
 
 import { AppStateService } from '@onecx/angular-integration-interface'
 import { AngularAcceleratorModule } from '@onecx/angular-accelerator'
@@ -23,6 +25,7 @@ import { Utils } from 'src/app/shared/utils'
   templateUrl: './image-container.component.html'
 })
 export class ImageContainerComponent implements OnChanges {
+  private readonly destroyRef = inject(DestroyRef)
   // signals: HTML properties
   public readonly id = input<string>('th_image_container')
   public readonly title = input<string | undefined>()
@@ -41,6 +44,7 @@ export class ImageContainerComponent implements OnChanges {
   constructor() {
     inject(AppStateService)
       .currentMfe$.pipe(map((mfe) => Utils.prepareUrlPath(mfe.remoteBaseUrl, environment.DEFAULT_LOGO_PATH)))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data) => (this.defaultImageUrl = data))
   }
 

@@ -281,13 +281,18 @@ describe('ThemeSearchComponent', () => {
 
   describe('conversion', () => {
     it('should convert rows to Themes', () => {
-      const rows: RowListGridData[] = [
-        { name: 'onecx', displayName: 'OneCX', description: 'OneCX theme' } as unknown as RowListGridData
-      ]
+      const theme = { name: 'onecx', displayName: 'OneCX', description: 'OneCX theme' } as Theme
+      const rows: RowListGridData[] = [theme as unknown as RowListGridData]
 
-      component.convertToThemes(rows)
+      const themes = component.convertToThemes(rows)
 
-      expect().nothing()
+      expect(themes).toEqual([theme])
+    })
+
+    it('should convert rows to Themes', () => {
+      const themes = component.convertToThemes(undefined)
+
+      expect(themes).toBeUndefined()
     })
   })
 })

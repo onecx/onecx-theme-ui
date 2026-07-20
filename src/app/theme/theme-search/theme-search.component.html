@@ -218,12 +218,13 @@
       [(visible)]="themeCreateVisible"
       (created)="onThemeCreation($event)"
       [themeToBeCreated]="undefined"
+      [themes]="convertToThemes(data)"
     ></app-theme-create>
 
     <!-- IMPORT -->
     <app-theme-import
       [(visible)]="themeImportVisible"
-      [(uploaded)]="themeImported"
+      (uploaded)="onThemeCreation($event)"
       [themes]="convertToThemes(data)"
     ></app-theme-import>
   </ocx-content>

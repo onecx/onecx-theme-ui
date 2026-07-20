@@ -1,7 +1,7 @@
 <ocx-portal-page permission="THEME#VIEW" helpArticleId="PAGE_THEME_DETAIL">
   <ocx-page-header
     [loading]="loading"
-    [header]="theme?.displayName"
+    [header]="theme()?.displayName"
     [subheader]="'DIALOG.HEADER.DETAIL.SUBHEADER' | translate"
     [actions]="(actions$ | async) ?? []"
     [figureImage]="headerImageUrl"
@@ -12,7 +12,7 @@
   <ocx-content class="ocx-content">
     <!-- showOperatorMessage -->
     <ng-container *ocxIfPermission="'THEME#EDIT'">
-      @if (theme?.operator && showOperatorMessage) {
+      @if (theme()?.operator && showOperatorMessage) {
         <p-message
           [style]="{ 'margin-top': '35px', right: '22px', left: '22px' }"
           styleClass="absolute z-1"
@@ -26,7 +26,7 @@
       }
     </ng-container>
 
-    <p-tabs #tabComponent [lazy]="false" [(value)]="selectedTabIndex" (valueChange)="onTabChange($event, theme)">
+    <p-tabs #tabComponent [lazy]="false" [(value)]="selectedTabIndex" (valueChange)="onTabChange($event, theme())">
       <p-tablist>
         <p-tab
           value="0"
@@ -94,9 +94,9 @@
               styleClass="m-3"
               [text]="exceptionKey | translate"
             ></p-message>
-          } @else if (theme) {
+          } @else if (theme()) {
             <app-theme-apply
-              [theme]="theme"
+              [theme]="theme()"
               [themes$]="themes$"
               [changeMode]="changeMode"
               [isCurrentTheme]="isCurrentTheme"
@@ -126,9 +126,9 @@
               styleClass="m-3"
               [text]="exceptionKey | translate"
             ></p-message>
-          } @else if (theme) {
+          } @else if (theme()) {
             <app-theme-apply
-              [theme]="theme"
+              [theme]="theme()"
               [themes$]="themes$"
               [changeMode]="changeMode"
               [isCurrentTheme]="isCurrentTheme"
@@ -148,7 +148,7 @@
       @if (changeMode === 'VIEW') {
         <!-- VARIABLES -->
         <p-tabpanel value="2" id="th_detail_panel_variables">
-          <pre class="my-2 mx-3 pt-1 pb-0 surface-50">{{ theme?.properties | json }}</pre>
+          <pre class="my-2 mx-3 pt-1 pb-0 surface-50">{{ theme()?.properties | json }}</pre>
         </p-tabpanel>
 
         <!-- USE -->
@@ -164,7 +164,7 @@
         <!-- INTERN -->
         <p-tabpanel value="4">
           <div class="m-2 mt-4">
-            <app-theme-intern [theme]="theme" [dateFormat]="dateFormat"></app-theme-intern>
+            <app-theme-intern [theme]="theme()" [dateFormat]="dateFormat"></app-theme-intern>
           </div>
         </p-tabpanel>
       }
@@ -173,7 +173,7 @@
 
   @if (isComponentDefined() === true && themeUsedName() && changeMode === 'VIEW') {
     <ocx-slot
-      [name]="slotName"
+      [name]="slotName()"
       [inputs]="{ dataType: 'workspaces', themeName: themeUsedName(), logEnabled: false, logPrefix: 'theme-use' }"
       [outputs]="{ workspaces: slotEmitter }"
     >
@@ -186,6 +186,7 @@
     (visibleChange)="$event === false ? themeForCreation.set(undefined) : null"
     (created)="onThemeCreation($event)"
     [themeToBeCreated]="themeForCreation()"
+    [themes]="(themes$ | async) ?? undefined"
   ></app-theme-create>
 
   <!-- DELETE -->

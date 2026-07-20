@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Inject, Input } from '@angular/core'
+import { ChangeDetectionStrategy, Component, DestroyRef, EventEmitter, inject, Input, OnInit } from '@angular/core'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { AsyncPipe, Location } from '@angular/common'
 import { UntilDestroy } from '@ngneat/until-destroy'
-import { BehaviorSubject, first, Observable, ReplaySubject } from 'rxjs'
+import { BehaviorSubject, first, ReplaySubject } from 'rxjs'
 
 import {
   AngularRemoteComponentsModule,
@@ -10,7 +11,7 @@ import {
 } from '@onecx/angular-remote-components'
 import { AngularAcceleratorModule } from '@onecx/angular-accelerator'
 import { REMOTE_COMPONENT_CONFIG, RemoteComponentConfig } from '@onecx/angular-utils'
-import { AppConfigService, Theme, ThemeService } from '@onecx/angular-integration-interface'
+import { AppConfigService, ThemeService } from '@onecx/angular-integration-interface'
 
 import { Configuration, ThemesAPIService } from 'src/app/shared/generated'
 import { Utils, LogoRefType } from 'src/app/shared/utils'
@@ -24,7 +25,12 @@ import { environment } from 'src/environments/environment'
   templateUrl: './current-theme-logo.component.html'
 })
 @UntilDestroy()
-export class OneCXCurrentThemeLogoComponent implements ocxRemoteComponent, ocxRemoteWebcomponent {
+export class OneCXCurrentThemeLogoComponent implements OnInit, ocxRemoteComponent, ocxRemoteWebcomponent {
+  private readonly remoteComponentConfig = inject<ReplaySubject<RemoteComponentConfig>>(REMOTE_COMPONENT_CONFIG)
+  private readonly appConfigService = inject(AppConfigService)
+  private readonly destroyRef = inject(DestroyRef)
+  private readonly themeApi = inject(ThemesAPIService)
+  private readonly themeService = inject(ThemeService)
   // input
   @Input() refresh: boolean | undefined = false // on any change here a reload is triggered
   @Input() imageId: string | undefined = undefined
@@ -39,23 +45,19 @@ export class OneCXCurrentThemeLogoComponent implements ocxRemoteComponent, ocxRe
   // output
   @Input() imageLoadingFailed = new EventEmitter<boolean>()
 
-  public currentTheme$: Observable<Theme | undefined>
+  public currentTheme$ = this.themeService.currentTheme$.asObservable()
   public themeName: string | undefined
   public imageUrl$ = new BehaviorSubject<string | undefined>(undefined)
   public defaultImageUrl: string | undefined = undefined
 
-  constructor(
-    @Inject(REMOTE_COMPONENT_CONFIG)
-    private readonly remoteComponentConfig: ReplaySubject<RemoteComponentConfig>,
-    private readonly appConfigService: AppConfigService,
-    private readonly themeService: ThemeService,
-    private readonly themeApi: ThemesAPIService
-  ) {
-    this.currentTheme$ = this.themeService.currentTheme$.asObservable()
-    this.currentTheme$.pipe(first()).subscribe((theme) => {
-      this.themeName = theme?.name
-      this.imageUrl$.next(this.getImageUrl(this.themeName, 'url'))
-    })
+  ngOnInit(): void {
+    this.currentTheme$
+      .pipe(first())
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((theme) => {
+        this.themeName = theme?.name
+        this.imageUrl$.next(this.getImageUrl(this.themeName, 'url'))
+      })
   }
 
   // initialize this component as remote

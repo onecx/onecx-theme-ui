@@ -32,6 +32,7 @@ const theme: Theme = {
 describe('ThemeDetailComponent', () => {
   let component: ThemeDetailComponent
   let fixture: ComponentFixture<ThemeDetailComponent>
+  let slotServiceSpy: jasmine.SpyObj<SlotService>
 
   const mockUserService = { lang$: { getValue: jasmine.createSpy('getValue').and.returnValue('en') } }
   const msgServiceSpy = jasmine.createSpyObj<PortalMessageService>('PortalMessageService', ['success', 'error', 'info'])
@@ -47,9 +48,8 @@ describe('ThemeDetailComponent', () => {
   ])
   const currentTheme$ = new BehaviorSubject<any>({ name: 'currentTheme' })
   const mockThemeService = { currentTheme$: currentTheme$.asObservable() }
+  const mockSlotService = jasmine.createSpyObj('SlotService', ['init', 'isSomeComponentDefinedForSlot'])
   const imgServiceSpy = { configuration: { basePath: '/basePath' } }
-  let slotServiceMock: any
-  let slotSubject: BehaviorSubject<boolean>
 
   function initTestComponent(): void {
     fixture = TestBed.createComponent(ThemeDetailComponent)
@@ -58,14 +58,6 @@ describe('ThemeDetailComponent', () => {
   }
 
   beforeEach(waitForAsync(() => {
-    slotSubject = new BehaviorSubject<boolean>(false)
-    // Mock für den Service erstellen
-    slotServiceMock = {
-      isSomeComponentDefinedForSlot: jasmine
-        .createSpy('isSomeComponentDefinedForSlot')
-        .and.returnValue(slotSubject.asObservable())
-    }
-
     TestBed.configureTestingModule({
       imports: [
         ThemeDetailComponent,
@@ -82,8 +74,8 @@ describe('ThemeDetailComponent', () => {
         provideRouter([{ path: '', component: ThemeDetailComponent }]),
         { provide: Location, useValue: locationSpy },
         { provide: ThemeService, useValue: mockThemeService },
+        { provide: SlotService, useValue: mockSlotService },
         { provide: ImagesInternalAPIService, useValue: imgServiceSpy },
-        { provide: SlotService, useValue: slotServiceMock },
         { provide: DestroyRef, useValue: { onDestroy: () => {} } }
       ]
     })
@@ -97,6 +89,7 @@ describe('ThemeDetailComponent', () => {
         }
       })
       .compileComponents()
+    slotServiceSpy = TestBed.inject(SlotService) as jasmine.SpyObj<SlotService>
   }))
 
   beforeEach(() => {
@@ -110,6 +103,8 @@ describe('ThemeDetailComponent', () => {
     themesApiSpy.updateTheme.calls.reset()
     themesApiSpy.createTheme.calls.reset()
     locationSpy.back.calls.reset()
+    // default values
+    mockSlotService.isSomeComponentDefinedForSlot.and.returnValue(of(true))
     themesApiSpy.getThemeByName.and.returnValue(of({ resource: {} }) as any)
     themesApiSpy.getThemeById.and.returnValue(of({ resource: {} }) as any)
     themesApiSpy.exportThemes.and.returnValue(of({}) as any)
@@ -178,8 +173,8 @@ describe('ThemeDetailComponent', () => {
       expect(component['getTheme']).toHaveBeenCalled()
     })
 
-    it('should not load theme if no themeName', () => {
-      component['themeName'] = null
+    it('should not load theme if no paramThemeName', () => {
+      component['paramThemeName'] = null
       themesApiSpy.getThemeByName.calls.reset()
 
       component['getTheme']()
@@ -193,17 +188,17 @@ describe('ThemeDetailComponent', () => {
       spyOnProperty(route, 'paramMap').and.returnValue(paramMapSubject.asObservable())
       themesApiSpy.getThemeByName.calls.reset()
 
-      component['themeName'] = 'oldName'
+      component['paramThemeName'] = 'oldName'
       component.ngOnInit()
 
       // Emit a new param with a different name
       paramMapSubject.next({ get: () => 'newName', has: () => true, getAll: () => [], keys: [] } as any)
 
-      expect(component['themeName']).toBe('newName')
+      expect(component['paramThemeName']).toBe('newName')
       expect(themesApiSpy.getThemeByName).toHaveBeenCalled()
     })
 
-    it('should not re-initialize when route param is the same as current themeName', () => {
+    it('should not re-initialize when route param is the same as current paramThemeName', () => {
       const route = TestBed.inject(ActivatedRoute)
       spyOn(route.snapshot.paramMap, 'get').and.callFake((key: string) => (key === 'name' ? 'sameName' : null))
       const paramMapSubject = new BehaviorSubject(route.snapshot.paramMap)
@@ -230,7 +225,7 @@ describe('ThemeDetailComponent', () => {
       // Emit param with null name
       paramMapSubject.next({ get: () => null, has: () => false, getAll: () => [], keys: [] } as any)
 
-      expect(component['themeName']).toBe('existingName')
+      expect(component['paramThemeName']).toBe('existingName')
       expect(themesApiSpy.getThemeByName).not.toHaveBeenCalled()
     })
   })
@@ -256,7 +251,7 @@ describe('ThemeDetailComponent', () => {
 
   describe('getTheme', () => {
     beforeEach(() => {
-      component['themeName'] = theme.name!
+      component['paramThemeName'] = theme.name!
     })
 
     it('should get theme - success', () => {
@@ -264,7 +259,7 @@ describe('ThemeDetailComponent', () => {
 
       component['getTheme']()
 
-      expect(component.theme).toEqual(theme)
+      expect(component.theme()).toEqual(theme)
       expect(component.themeForProps).toEqual({ ...theme, id: undefined })
       expect(component.themeForColors).toEqual({ properties: theme.properties })
       expect(component.headerImageUrl).toBe(theme.logoUrl)
@@ -410,24 +405,10 @@ describe('ThemeDetailComponent', () => {
 
   describe('slot service', () => {
     it('should test if component is assigned to slot', () => {
-      slotSubject.next(true)
-      fixture = TestBed.createComponent(ThemeDetailComponent)
-      component = fixture.componentInstance
       fixture.detectChanges() // trigger ngOnInit
 
-      expect(slotServiceMock.isSomeComponentDefinedForSlot).toHaveBeenCalledWith(component.slotName)
+      expect(slotServiceSpy.isSomeComponentDefinedForSlot).toHaveBeenCalledWith(component.slotName())
       expect(component.isComponentDefined()).toBeTrue()
-    })
-
-    it('should destroy the stream when the component is destroyed', () => {
-      fixture = TestBed.createComponent(ThemeDetailComponent)
-      component = fixture.componentInstance
-
-      fixture.destroy()
-      slotSubject.next(true) // new value emitted after component destroyed
-
-      // No change of the signal after component destroyed
-      expect(component.isComponentDefined()).toBeFalse()
     })
   })
 
@@ -615,7 +596,7 @@ describe('ThemeDetailComponent', () => {
 
     it('should show back, export, edit, delete in VIEW mode', (done: DoneFn) => {
       component.changeMode = 'VIEW'
-      component.theme = theme // needed for save_as_on_view condition (this.theme !== undefined)
+      component.theme.set(theme) // needed for save_as_on_view condition (this.theme !== undefined)
 
       component.preparePageActions(theme)
 
@@ -644,7 +625,7 @@ describe('ThemeDetailComponent', () => {
 
     it('should show cancel, save in EDIT mode', (done: DoneFn) => {
       component.changeMode = 'EDIT'
-      component.theme = theme
+      component.theme.set(theme)
 
       component.preparePageActions(theme)
 
@@ -711,7 +692,7 @@ describe('ThemeDetailComponent', () => {
     })
 
     it('should trigger edit action callback', (done: DoneFn) => {
-      component['themeName'] = theme.name!
+      component['paramThemeName'] = theme.name!
       themesApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
       component.changeMode = 'VIEW'
       component.preparePageActions(theme)
@@ -767,7 +748,7 @@ describe('ThemeDetailComponent', () => {
     it('should trigger save_as callback in VIEW mode (overflow)', (done: DoneFn) => {
       spyOn(component, 'onSaveAs')
       component.changeMode = 'VIEW'
-      component.theme = theme
+      component.theme.set(theme)
       component.preparePageActions(theme)
 
       component.actions$.subscribe((actions) => {
@@ -781,7 +762,7 @@ describe('ThemeDetailComponent', () => {
 
   describe('onChangeMode', () => {
     beforeEach(() => {
-      component['themeName'] = theme.name!
+      component['paramThemeName'] = theme.name!
       themesApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
     })
 
@@ -810,12 +791,12 @@ describe('ThemeDetailComponent', () => {
   describe('onUpdateTheme', () => {
     beforeEach(() => {
       component.themeData = signal({ theme: { ...theme, properties: {} }, propsValid: true, colorsValid: true }) as any
-      component['themeName'] = theme.name!
-      component.theme = { ...theme, id: 'themeId', modificationCount: 1 }
+      component['paramThemeName'] = theme.name!
+      component.theme.set({ ...theme, id: 'themeId', modificationCount: 1 })
       spyOn(console, 'log')
     })
 
-    it('should call updateTheme on save with valid forms', (done: DoneFn) => {
+    it('should call updateTheme on save with valid forms', () => {
       const updatedTheme = { ...theme, id: 'themeId' }
       themesApiSpy.updateTheme.and.returnValue(of({ resource: updatedTheme }) as any)
       themesApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
@@ -824,11 +805,7 @@ describe('ThemeDetailComponent', () => {
 
       expect(themesApiSpy.updateTheme).toHaveBeenCalledWith(jasmine.objectContaining({ id: 'themeId' }))
       expect(msgServiceSpy.success).toHaveBeenCalledWith({ summaryKey: 'ACTIONS.EDIT.MESSAGE.OK' })
-      // subscribe to theme$ to cover the Observable subscriber
-      component.theme$!.subscribe((data) => {
-        expect(data).toEqual(updatedTheme)
-        done()
-      })
+      expect(component.theme()).toEqual(updatedTheme)
     })
 
     it('should not proceed if propsValid is false', () => {
@@ -884,7 +861,7 @@ describe('ThemeDetailComponent', () => {
     })
 
     it('should not call updateTheme when component theme has no id', () => {
-      component.theme = { ...theme, id: undefined }
+      component.theme.set({ ...theme, id: undefined })
 
       component['onUpdateTheme']()
 
@@ -896,23 +873,21 @@ describe('ThemeDetailComponent', () => {
     it('should load theme by id and set themeForColors', () => {
       const templateTheme = { name: 'template', displayName: 'Template', properties: { color: 'red' } }
       themesApiSpy.getThemeById.and.returnValue(of({ resource: templateTheme }) as any)
-      spyOn(console, 'log')
 
       component.onUseThemeAsTemplate({ id: '123', displayName: 'Copy of' })
 
       expect(themesApiSpy.getThemeById).toHaveBeenCalledWith({ id: '123' })
-      expect(component.themeForColors).toEqual(templateTheme as any)
+      expect(component.themeForColors?.properties).toEqual(templateTheme.properties)
       expect(msgServiceSpy.info).toHaveBeenCalledWith({ summaryKey: 'THEME.TEMPLATE.CONFIRMATION.OK' })
     })
 
     it('should use component theme name in EDIT mode', () => {
-      const templateTheme = { name: 'template', displayName: 'Template', properties: {} }
+      const templateTheme = { name: 'template', displayName: 'Template', properties: {} } as Theme
       themesApiSpy.getThemeById.and.returnValue(of({ resource: templateTheme }) as any)
       component.changeMode = 'EDIT'
-      component.theme = { name: 'original' }
-      spyOn(console, 'log')
+      component.theme.set({ name: 'original' })
 
-      component.onUseThemeAsTemplate({ id: '123' })
+      component.onUseThemeAsTemplate({ id: '123', modificationCount: 0 })
 
       expect(component.themeForProps!.name).toBe('original')
     })
@@ -923,7 +898,7 @@ describe('ThemeDetailComponent', () => {
 
     it('should set themeForCreation and open dialog in VIEW mode', () => {
       component.changeMode = 'VIEW'
-      component.theme = theme
+      component.theme.set(theme)
 
       component.onSaveAs(copyOfPrefix)
 
@@ -938,7 +913,7 @@ describe('ThemeDetailComponent', () => {
 
     it('should not open dialog if theme is undefined in VIEW mode', () => {
       component.changeMode = 'VIEW'
-      component.theme = undefined
+      component.theme.set(undefined)
 
       component.onSaveAs(copyOfPrefix)
 
@@ -948,7 +923,7 @@ describe('ThemeDetailComponent', () => {
     it('should use sub-component data in EDIT mode', () => {
       component.changeMode = 'EDIT'
       component.themeData = signal({ theme: { ...theme, properties: {} }, propsValid: true, colorsValid: true }) as any
-      component.theme = { ...theme, modificationCount: 2 }
+      component.theme.set({ ...theme, modificationCount: 2 })
       spyOn(console, 'log')
 
       component.onSaveAs(copyOfPrefix)

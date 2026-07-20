@@ -1,8 +1,8 @@
 import {
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   computed,
+  DestroyRef,
   inject,
   input,
   model,
@@ -10,7 +10,7 @@ import {
   Signal,
   SimpleChanges
 } from '@angular/core'
-import { toSignal } from '@angular/core/rxjs-interop'
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, FormBuilder } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { combineLatest, debounceTime, map, startWith } from 'rxjs'
@@ -64,7 +64,7 @@ export class ThemeColorsComponent implements OnChanges {
   private readonly fb = inject(FormBuilder)
   private readonly translate = inject(TranslateService)
   private readonly msgService = inject(PortalMessageService)
-  private readonly cd = inject(ChangeDetectorRef)
+  private readonly destroyRef = inject(DestroyRef)
   // signals
   public readonly theme = model.required<Theme | undefined>()
   public readonly changeMode = input.required<ChangeMode>()
@@ -153,23 +153,32 @@ export class ThemeColorsComponent implements OnChanges {
   private initColorForms() {
     for (const v of themeVariables.general) {
       const fc = new FormControl<string | null>(null)
-      fc.valueChanges.pipe(debounceTime(300)).subscribe((formVal) => {
-        if (this.autoApply()) this.updateCssVar(v, formVal)
-      })
+      fc.valueChanges
+        .pipe(debounceTime(300))
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe((formVal) => {
+          if (this.autoApply()) this.updateCssVar(v, formVal)
+        })
       this.generalForm.addControl(v, fc)
     }
     for (const v of themeVariables.topbar) {
       const fc = new FormControl<string | null>(null)
-      fc.valueChanges.pipe(debounceTime(300)).subscribe((formVal) => {
-        if (this.autoApply()) this.updateCssVar(v, formVal)
-      })
+      fc.valueChanges
+        .pipe(debounceTime(300))
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe((formVal) => {
+          if (this.autoApply()) this.updateCssVar(v, formVal)
+        })
       this.topbarForm.addControl(v, fc)
     }
     for (const v of themeVariables.sidebar) {
       const fc = new FormControl<string | null>(null)
-      fc.valueChanges.pipe(debounceTime(300)).subscribe((formVal) => {
-        if (this.autoApply()) this.updateCssVar(v, formVal)
-      })
+      fc.valueChanges
+        .pipe(debounceTime(300))
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe((formVal) => {
+          if (this.autoApply()) this.updateCssVar(v, formVal)
+        })
       this.sidebarForm.addControl(v, fc)
     }
   }

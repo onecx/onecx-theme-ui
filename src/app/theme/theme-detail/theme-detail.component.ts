@@ -1,9 +1,19 @@
-import { Component, computed, DestroyRef, EventEmitter, inject, OnInit, signal, viewChild } from '@angular/core'
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  EventEmitter,
+  inject,
+  OnInit,
+  signal,
+  viewChild
+} from '@angular/core'
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop'
 import { AsyncPipe, JsonPipe, Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
-import { catchError, combineLatest, finalize, first, map, of, Observable } from 'rxjs'
+import { catchError, combineLatest, finalize, first, map, of, Observable, switchMap } from 'rxjs'
 import FileSaver from 'file-saver'
 
 import { MessageModule } from 'primeng/message'
@@ -17,6 +27,7 @@ import { PortalPageComponent } from '@onecx/angular-utils'
 import { SlotService } from '@onecx/angular-remote-components'
 
 import { Utils, LogoRefType } from 'src/app/shared/utils'
+import { injectInitializedSlotService } from 'src/app/shared/slot.initializer'
 import { ExportThemeRequest, ImagesInternalAPIService, Theme, ThemesAPIService } from 'src/app/shared/generated'
 
 import { ThemeApplyComponent } from './theme-apply/theme-apply.component'
@@ -58,33 +69,34 @@ type ThemeData = {
     ThemePropsComponent,
     ThemeColorsComponent
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-detail.component.html',
   styleUrl: './theme-detail.component.scss'
 })
 export class ThemeDetailComponent implements OnInit {
-  private readonly user = inject(UserService)
   private readonly route = inject(ActivatedRoute)
   private readonly router = inject(Router)
   private readonly location = inject(Location)
-  private readonly themeApi = inject(ThemesAPIService)
+  private readonly destroyRef = inject(DestroyRef)
   private readonly themeService = inject(ThemeService)
+  private readonly user = inject(UserService)
+  private readonly slotService = injectInitializedSlotService()
   private readonly msgService = inject(PortalMessageService)
   private readonly translate = inject(TranslateService)
+  private readonly themeApi = inject(ThemesAPIService)
   private readonly imageApi = inject(ImagesInternalAPIService)
-  private readonly slotService = inject(SlotService)
-  private readonly destroyRef = inject(DestroyRef)
   // signals
   public readonly themeDeleteVisible = signal<boolean>(false)
   public readonly themeCreateVisible = signal<boolean>(false)
   public readonly themeToBeDeleted = signal<Theme | undefined>(undefined)
   public readonly themeForCreation = signal<Theme | undefined>(undefined)
   public readonly checkThemeUse = signal<boolean>(false)
-  public readonly isComponentDefined = signal<boolean>(false)
+  //public readonly isComponentDefined = signal<boolean>(false)
   public readonly themeUsed = signal<boolean>(false)
   public readonly themeUsedName = signal<string | undefined>(undefined)
   public readonly themeUsedByWorkspaces = signal<Workspace[]>([])
   public readonly themeUseLoadingState = signal<LoadingState>('initial')
-  // signals: Combine the data from the sub components to a single theme object and check if the forms are valid
+  // signals: Combine the data from the sub components to a single theme object
   public themeData = computed(() => this.computeThemeData())
   // signals: components
   public readonly tabComponent = viewChild(Tabs)
@@ -105,20 +117,20 @@ export class ThemeDetailComponent implements OnInit {
   public dateFormat = 'M/d/yy, hh:mm:ss a'
   public isCurrentTheme = false
   public Utils = Utils
+  public toSignal = toSignal
   // page header
   public actions$: Observable<Action[]> = of([])
   public headerImageUrl?: string
   // data
-  public themeName: string | null = null
-  public theme$!: Observable<Theme | undefined>
+  public paramThemeName: string | null = null
+  public readonly theme = signal<Theme | undefined>(undefined)
   public themes$!: Observable<Theme[]>
-  public theme: Theme | undefined
   public themeForProps: Theme | undefined
   public themeForColors: Theme | undefined
   // image
   public imageBasePath = this.imageApi.configuration.basePath
   // receive the slot output
-  public slotName = 'onecx-workspace-data'
+  public slotName = signal<string>('onecx-workspace-data')
   public slotEmitter = new EventEmitter<Workspace[]>()
 
   // Partial theme with undefined values for internal use (copying, editing) to prevent issues with form patching and image url handling when required properties are missing
@@ -133,34 +145,28 @@ export class ThemeDetailComponent implements OnInit {
     creationUser: undefined
   } as Theme
 
+  // trigger the request to the workspace service via slot to get the workspaces that use the theme
+  public readonly isComponentDefined = toSignal(
+    toObservable(this.slotName).pipe(switchMap((name) => this.slotService.isSomeComponentDefinedForSlot(name!))),
+    { initialValue: false }
+  )
+
   ngOnInit(): void {
-    // old constructor starts here
-    // Initialize the slot service for getting workspaces using the theme.
-    slotInitializer(this.slotService)
-    this.slotService
-      .isSomeComponentDefinedForSlot(this.slotName)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((isDefined) => {
-        this.isComponentDefined.set(isDefined)
-      })
-    // trigger the request to the workspace service via slot to get the workspaces that use the theme
-    this.themeUsed.set(false)
     // receive data and stop process
     this.slotEmitter.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((res) => {
       this.stopGettingThemeUseData(res)
     })
-
-    // old constructor ends here
+    this.themeUsed.set(false)
     this.dateFormat = this.user.lang$.getValue() === 'de' ? 'dd.MM.yyyy HH:mm:ss' : this.dateFormat
-    this.themeName = this.route.snapshot.paramMap.get('name')
+    this.paramThemeName = this.route.snapshot.paramMap.get('name')
     // Common start
-    this.theme = undefined
+    this.theme.set(undefined)
     this.getTheme()
     // Re-initialize the component when the route parameter changes (e.g. after creating a new theme)
     this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const newThemeName = params.get('name')
-      if (newThemeName && newThemeName !== this.themeName) {
-        this.themeName = newThemeName
+      if (newThemeName && newThemeName !== this.paramThemeName) {
+        this.paramThemeName = newThemeName
         this.changeMode = 'VIEW'
         this.getTheme()
       }
@@ -168,11 +174,11 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   private getTheme(): void {
-    if (!this.themeName) return
+    if (!this.paramThemeName) return
     this.loading = true
     combineLatest([
       this.themeService.currentTheme$.pipe(first()),
-      this.themeApi.getThemeByName({ name: this.themeName })
+      this.themeApi.getThemeByName({ name: this.paramThemeName })
     ])
       .pipe(
         map(([ct, response]) => {
@@ -194,15 +200,18 @@ export class ThemeDetailComponent implements OnInit {
           this.tabComponent()?.value.set(this.selectedTabIndex) // Forces tab change
         })
       )
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((theme) => {
-        this.theme = theme
+        this.theme.set(theme)
         this.initSubComponentData(theme)
       })
   }
+
+  // Derive the data for the sub components
   private initSubComponentData(theme: Theme | undefined): void {
     if (!theme) return
     this.themeForProps = { ...theme, id: undefined }
-    this.themeForColors = { properties: theme.properties } // only pass properties to colors component
+    this.themeForColors = { properties: theme.properties } // pass only properties
   }
 
   // Get themes for the template dropdown
@@ -243,8 +252,8 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   // Initialize the process of checking if the theme is used in workspaces
-  private startGettingThemeUseData(themeName?: string): void {
-    if (themeName && this.themeUseLoadingState() === 'initial') {
+  private startGettingThemeUseData(paramThemeName?: string): void {
+    if (paramThemeName && this.themeUseLoadingState() === 'initial') {
       this.themeUseLoadingState.set('loading')
       // best customer experience: show the loading indicator for at least 1.5 seconds, even if the data is received faster
       this.themeUseStartTime = performance.now() // store the start time for measuring loading duration
@@ -254,7 +263,7 @@ export class ThemeDetailComponent implements OnInit {
       this.themeUseTimeoutTimer = setTimeout(() => {
         if (this.themeUseLoadingState() === 'loading') this.themeUseLoadingState.set('timeout')
       }, this.MAX_LOADING_TIME)
-      this.themeUsedName.set(themeName) // force checking use in workspaces
+      this.themeUsedName.set(paramThemeName) // force checking use in workspaces
     }
   }
 
@@ -337,7 +346,7 @@ export class ThemeDetailComponent implements OnInit {
       ...data,
       id: undefined,
       operator: undefined,
-      modificationCount: this.theme?.modificationCount,
+      modificationCount: this.theme()?.modificationCount, // the original value!
       // prevent empty strings for urls, as it causes issues for the image service
       logoUrl: data.logoUrl === '' ? undefined : data.logoUrl,
       smallLogoUrl: data.smallLogoUrl === '' ? undefined : data.smallLogoUrl,
@@ -350,17 +359,18 @@ export class ThemeDetailComponent implements OnInit {
     const themeData = this.prepareThemeData()
     if (!themeData) return
     // save
-    if (this.theme?.id)
+    const themeId = this.theme()?.id
+    if (themeId)
       this.themeApi
         .updateTheme({
-          id: this.theme.id,
+          id: themeId,
           updateThemeRequest: { resource: themeData }
         })
         .subscribe({
           next: (data) => {
             this.msgService.success({ summaryKey: 'ACTIONS.EDIT.MESSAGE.OK' })
             this.onChangeMode('VIEW', data.resource)
-            this.theme$ = of(data.resource) // update observable with response data
+            this.theme.set(data.resource)
           },
           error: (err) => {
             console.error('updateTheme', err)
@@ -379,7 +389,7 @@ export class ThemeDetailComponent implements OnInit {
       themeData = this.prepareThemeData()
       if (!themeData) return
     } else {
-      themeData = this.theme
+      themeData = this.theme()
     }
     if (!themeData) return
     this.themeForCreation.set({
@@ -565,14 +575,13 @@ export class ThemeDetailComponent implements OnInit {
   public onUseThemeAsTemplate(selectedTheme: Theme): void {
     if (selectedTheme.id)
       this.themeApi.getThemeById({ id: selectedTheme.id }).subscribe((response) => {
-        this.themeForProps = {
+        this.initSubComponentData({
           ...response.resource,
-          ...this.undefinedThemeData,
-          name: this.theme?.name,
+          ...this.undefinedThemeData, // reset main properties: id, name etc.
+          name: this.theme()?.name,
           displayName: (selectedTheme.displayName ?? 'copy of ') + response.resource.displayName,
-          modificationCount: this.theme?.modificationCount
-        }
-        this.themeForColors = response.resource
+          modificationCount: this.theme()?.modificationCount // use the original value
+        })
         this.msgService.info({ summaryKey: 'THEME.TEMPLATE.CONFIRMATION.OK' })
       })
   }

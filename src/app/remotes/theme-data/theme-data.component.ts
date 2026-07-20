@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, EventEmitter, Inject, Input, OnChanges } from '@angular/core'
+import { ChangeDetectionStrategy, Component, DestroyRef, EventEmitter, inject, Input, OnChanges } from '@angular/core'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { AsyncPipe, Location } from '@angular/common'
 import { UntilDestroy } from '@ngneat/until-destroy'
 import { TranslateModule } from '@ngx-translate/core'
@@ -37,6 +38,11 @@ type DataType = 'logo' | 'favicon' | 'themes' | 'theme'
 })
 @UntilDestroy()
 export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWebcomponent, OnChanges {
+  private readonly remoteComponentConfig = inject<ReplaySubject<RemoteComponentConfig>>(REMOTE_COMPONENT_CONFIG)
+  private readonly appConfigService = inject(AppConfigService)
+  private readonly destroyRef = inject(DestroyRef)
+  private readonly slotService = inject(SlotService)
+  private readonly themeApi = inject(ThemesAPIService)
   // input
   @Input() refresh: boolean | undefined = false // on any change here a reload is triggered
   @Input() dataType: DataType | undefined = undefined // which response data is expected
@@ -59,15 +65,6 @@ export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWeb
   public theme$: Observable<Theme> | undefined
   public imageUrl$ = new BehaviorSubject<string | undefined>(undefined)
   public defaultImageUrl: string | undefined = undefined
-
-  constructor(
-    @Inject(REMOTE_COMPONENT_CONFIG)
-    private readonly remoteComponentConfig: ReplaySubject<RemoteComponentConfig>,
-    private readonly appConfigService: AppConfigService,
-    private readonly destroyRef: DestroyRef,
-    private readonly slotService: SlotService,
-    private readonly themeApi: ThemesAPIService
-  ) {}
 
   // initialize this component as remote
   public ocxInitRemoteComponent(config: RemoteComponentConfig): void {
@@ -111,7 +108,7 @@ export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWeb
         return of([])
       })
     )
-    this.themes$.subscribe(this.themes)
+    this.themes$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(this.themes)
   }
 
   /**
@@ -127,7 +124,7 @@ export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWeb
         return of({})
       })
     )
-    this.theme$.subscribe(this.theme)
+    this.theme$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(this.theme)
   }
 
   /**

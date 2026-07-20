@@ -2,7 +2,6 @@ import { outputToObservable } from '@angular/core/rxjs-interop'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { FormControl, FormGroup, Validators } from '@angular/forms'
 import { provideNoopAnimations } from '@angular/platform-browser/animations'
 import { provideRouter } from '@angular/router'
 import { TranslateTestingModule } from 'ngx-translate-testing'
@@ -55,11 +54,6 @@ describe('ThemeCreateComponent', () => {
     // initialize component state
     component.visible.set(true)
     component.themeToBeCreated.set(undefined)
-    component.formGroup = new FormGroup({
-      name: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(50)]),
-      displayName: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(100)]),
-      description: new FormControl(null, [Validators.maxLength(255)])
-    })
     fixture.detectChanges()
   })
 
@@ -108,36 +102,98 @@ describe('ThemeCreateComponent', () => {
     })
   })
 
-  describe('saveTheme', () => {
-    it('should create a theme and set created', async () => {
+  describe('onSaveTheme', () => {
+    const themes = [
+      { name: 'theme1', displayName: 'Theme 1' },
+      { name: 'theme2', displayName: 'Theme 2' }
+    ]
+
+    it('should create a new theme successfully and set created', async () => {
       themesApiSpy.createTheme.and.returnValue(of({ resource: theme }))
+      fixture.componentRef.setInput('themeToBeCreated', theme)
+      fixture.detectChanges()
       const createdPromise = firstValueFrom(outputToObservable(component.created))
 
-      component.saveTheme()
+      component.onSaveTheme()
 
       expect(msgServiceSpy.success).toHaveBeenCalledWith({ summaryKey: 'ACTIONS.CREATE.MESSAGE.OK' })
       await expectAsync(createdPromise).toBeResolved()
     })
 
-    it('should use themeToBeCreated properties when set', () => {
-      component.themeToBeCreated.set({ ...theme, properties: { general: { 'primary-color': '#000' } } })
-      themesApiSpy.createTheme.and.returnValue(of({ resource: theme }))
+    it('should use themeToBeCreated properties when create', () => {
+      const newTheme = {
+        ...theme,
+        description: undefined,
+        properties: { general: { 'primary-color': '#000' } }
+      } as Theme
+      fixture.componentRef.setInput('themeToBeCreated', newTheme)
+      fixture.detectChanges()
+      themesApiSpy.createTheme.and.returnValue(of({ resource: newTheme }))
 
-      component.saveTheme()
+      component.onSaveTheme()
 
       const callArgs = themesApiSpy.createTheme.calls.mostRecent().args[0]
       expect(callArgs.createThemeRequest.resource.properties).toEqual({ general: { 'primary-color': '#000' } })
     })
 
     it('should display error when theme creation fails', () => {
-      const errorResponse = { status: 400, statusText: 'Error on creating a theme' }
+      const errorResponse = {
+        status: 400,
+        statusText: 'Could not update ...',
+        error: { errorCode: 'PERSIST_ENTITY_FAILED' }
+      }
       themesApiSpy.createTheme.and.returnValue(throwError(() => errorResponse))
+      fixture.componentRef.setInput('themeToBeCreated', theme)
+      fixture.detectChanges()
       spyOn(console, 'error')
 
-      component.saveTheme()
+      component.onSaveTheme()
 
-      expect(msgServiceSpy.error).toHaveBeenCalledWith({ summaryKey: 'ACTIONS.CREATE.MESSAGE.NOK' })
+      expect(msgServiceSpy.error).toHaveBeenCalledWith({
+        summaryKey: 'ACTIONS.CREATE.MESSAGE.NOK',
+        detailKey: 'VALIDATION.ERRORS.PERSIST_ENTITY_FAILED'
+      })
       expect(console.error).toHaveBeenCalledWith('createTheme', errorResponse)
+    })
+
+    it('should display error when theme creation fails', () => {
+      const errorResponse = {
+        status: 400,
+        statusText: 'Could not update ...',
+        error: { errorCode: '12345' }
+      }
+      themesApiSpy.createTheme.and.returnValue(throwError(() => errorResponse))
+      fixture.componentRef.setInput('themeToBeCreated', theme)
+      fixture.detectChanges()
+      spyOn(console, 'error')
+
+      component.onSaveTheme()
+
+      expect(msgServiceSpy.error).toHaveBeenCalledWith({
+        summaryKey: 'ACTIONS.CREATE.MESSAGE.NOK',
+        detailKey: '12345'
+      })
+      expect(console.error).toHaveBeenCalledWith('createTheme', errorResponse)
+    })
+
+    it('should prevent creating a theme if theme with same name exists', async () => {
+      const newTheme = { ...theme, name: 'theme1' } as Theme
+      fixture.componentRef.setInput('themeToBeCreated', newTheme)
+      fixture.componentRef.setInput('themes', themes)
+      fixture.detectChanges()
+      component.onSaveTheme()
+
+      expect(msgServiceSpy.error).toHaveBeenCalledWith({ summaryKey: 'VALIDATION.ERRORS.PERSIST_ENTITY_FAILED' })
+    })
+
+    it('should prevent creating a theme if theme with same display name exists', async () => {
+      const newTheme = { ...theme, displayName: 'Theme 1' } as Theme
+      fixture.componentRef.setInput('themeToBeCreated', newTheme)
+      fixture.componentRef.setInput('themes', themes)
+      fixture.detectChanges()
+      component.onSaveTheme()
+
+      expect(msgServiceSpy.error).toHaveBeenCalledWith({ summaryKey: 'VALIDATION.ERRORS.PERSIST_ENTITY_FAILED' })
     })
   })
 })

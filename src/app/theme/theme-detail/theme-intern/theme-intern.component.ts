@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, OnChanges } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core'
 import { DatePipe } from '@angular/common'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { TranslateModule } from '@ngx-translate/core'
@@ -26,7 +26,7 @@ import { Theme } from 'src/app/shared/generated'
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-intern.component.html'
 })
-export class ThemeInternComponent implements OnChanges {
+export class ThemeInternComponent {
   private readonly datePipe = inject(DatePipe)
   // signals
   public readonly theme = input.required<Theme | undefined>()
@@ -42,14 +42,4 @@ export class ThemeInternComponent implements OnChanges {
     if (!date) return '' // fallback
     return this.datePipe.transform(date, this.dateFormat() ?? 'medium') || ''
   })
-  // data
-  public mandatory = false
-  public operator = false
-
-  public ngOnChanges(): void {
-    if (this.theme()) {
-      this.mandatory = this.theme()!.mandatory ?? false
-      this.operator = this.theme()!.operator ?? false
-    }
-  }
 }

@@ -13,7 +13,7 @@ import {
 import { toSignal } from '@angular/core/rxjs-interop'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
-import { combineLatest, map, ReplaySubject, startWith } from 'rxjs'
+import { combineLatest, map, startWith } from 'rxjs'
 
 import { ButtonModule } from 'primeng/button'
 import { CheckboxModule } from 'primeng/checkbox'
@@ -82,7 +82,6 @@ export class ThemePropsComponent implements OnChanges {
   // data
   public basicForm: FormGroup = new FormGroup({})
   public fontForm: FormGroup = new FormGroup({})
-  public themeFormValues$ = new ReplaySubject<{ theme: string }>(1) // async storage of formgroup value to manage change detection
 
   constructor() {
     this.initForms()
@@ -164,7 +163,6 @@ export class ThemePropsComponent implements OnChanges {
         Validators.pattern('^(http|https)://.{6,245}')
       ])
     })
-    this.basicForm.valueChanges.subscribe(this.themeFormValues$)
     // font
     for (const v of themeVariables.font) {
       const fc = new FormControl<string | null>(null, [Validators.maxLength(255)])
