@@ -143,7 +143,7 @@ describe('ThemeImportComponent', () => {
 
       await component.onImportSelectFile(event)
 
-      expect(console.error).toHaveBeenCalledOnceWith('Theme Import Parse Error', jasmine.any(Object))
+      expect(console.error).toHaveBeenCalledOnceWith('Theme Import Error: parse error', jasmine.any(Object))
       expect(component.themeSnapshot).toBeNull()
     })
 
@@ -206,7 +206,7 @@ describe('ThemeImportComponent', () => {
 
       component.onThemeUpload()
 
-      expect(msgServiceSpy.success).toHaveBeenCalledOnceWith({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_SUCCESS' })
+      expect(msgServiceSpy.success).toHaveBeenCalledOnceWith({ summaryKey: 'THEME.IMPORT.THEME_SUCCESS' })
       expect(component.uploaded.emit).toHaveBeenCalledWith({
         name: 'themeName',
         displayName: 'themeDisplayName'
@@ -250,7 +250,7 @@ describe('ThemeImportComponent', () => {
       component.properties = {}
       component.onThemeUpload()
 
-      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_FAIL' })
+      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'THEME.IMPORT.THEME_FAIL' })
     })
   })
 

@@ -1,7 +1,7 @@
 import { importProvidersFrom } from '@angular/core'
 import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
-import { MissingTranslationHandler, TranslateLoader } from '@ngx-translate/core'
+import { TranslateLoader, MissingTranslationHandler } from '@ngx-translate/core'
 import { ReplaySubject } from 'rxjs'
 
 import { AngularAuthModule } from '@onecx/angular-auth'
@@ -20,11 +20,13 @@ import { environment } from 'src/environments/environment'
 import { OneCXCurrentThemeLogoComponent } from './current-theme-logo.component'
 
 bootstrapRemoteComponent(OneCXCurrentThemeLogoComponent, 'ocx-current-theme-logo-component', environment.production, [
-  provideHttpClient(withInterceptorsFromDi()),
   {
     provide: REMOTE_COMPONENT_CONFIG,
     useValue: new ReplaySubject<RemoteComponentConfig>(1)
   },
+  importProvidersFrom(AngularAcceleratorModule, AngularAuthModule, BrowserAnimationsModule),
+  provideHttpClient(withInterceptorsFromDi()),
+  provideThemeConfig(),
   provideTranslationPathFromMeta(import.meta.url, 'assets/i18n/'),
   provideTranslateServiceForRoot({
     isolate: true,
@@ -37,7 +39,5 @@ bootstrapRemoteComponent(OneCXCurrentThemeLogoComponent, 'ocx-current-theme-logo
       provide: MissingTranslationHandler,
       useClass: AngularAcceleratorMissingTranslationHandler
     }
-  }),
-  importProvidersFrom(AngularAcceleratorModule, AngularAuthModule, BrowserAnimationsModule),
-  provideThemeConfig()
+  })
 ])

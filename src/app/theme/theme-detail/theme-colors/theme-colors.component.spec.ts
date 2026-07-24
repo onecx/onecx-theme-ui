@@ -1,5 +1,4 @@
-import { SimpleChange } from '@angular/core'
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
+import { ComponentFixture, fakeAsync, flush, TestBed, waitForAsync } from '@angular/core/testing'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 
 import { PortalMessageService } from '@onecx/angular-integration-interface'
@@ -89,48 +88,51 @@ describe('ThemeColorsComponent', () => {
       expect(component.isComponentValid()).toBeFalse()
     })
 
-    it('isComponentValid should be true when all forms are enabled and valid', () => {
+    it('isComponentValid should be true when all forms are enabled and valid', fakeAsync(() => {
       const theme: Theme = { name: 'test', properties: {} }
       fixture.componentRef.setInput('changeMode', 'EDIT')
       fixture.componentRef.setInput('theme', theme)
-      component.ngOnChanges({ theme: new SimpleChange(undefined, theme, true) })
+      fixture.detectChanges()
+      flush()
 
       expect(component.isComponentValid()).toBeTrue()
-    })
+    }))
 
-    it('isComponentValid should be false when general form has errors', () => {
+    it('isComponentValid should be false when general form has errors', fakeAsync(() => {
       const theme: Theme = { name: 'test', properties: {} }
       fixture.componentRef.setInput('changeMode', 'EDIT')
       fixture.componentRef.setInput('theme', theme)
-      component.ngOnChanges({ theme: new SimpleChange(undefined, theme, true) })
+      fixture.detectChanges()
+      flush()
       component.generalForm.setErrors({ invalid: true })
 
       expect(component.isComponentValid()).toBeFalse()
-    })
+    }))
 
-    it('isComponentValid should be false when topbar form has errors', () => {
+    it('isComponentValid should be false when topbar form has errors', fakeAsync(() => {
       const theme: Theme = { name: 'test', properties: {} }
       fixture.componentRef.setInput('changeMode', 'EDIT')
       fixture.componentRef.setInput('theme', theme)
-      component.ngOnChanges({ theme: new SimpleChange(undefined, theme, true) })
+      fixture.detectChanges()
+      flush()
       component.topbarForm.setErrors({ invalid: true })
 
       expect(component.isComponentValid()).toBeFalse()
-    })
+    }))
 
-    it('isComponentValid should be false when sidebar form has errors', () => {
+    it('isComponentValid should be false when sidebar form has errors', fakeAsync(() => {
       const theme: Theme = { name: 'test', properties: {} }
       fixture.componentRef.setInput('changeMode', 'EDIT')
       fixture.componentRef.setInput('theme', theme)
-      component.ngOnChanges({ theme: new SimpleChange(undefined, theme, true) })
+      flush()
       component.sidebarForm.setErrors({ invalid: true })
 
       expect(component.isComponentValid()).toBeFalse()
-    })
+    }))
   })
 
   describe('ngOnChanges', () => {
-    it('should fill the form when theme is set', () => {
+    it('should fill the form when theme is set', fakeAsync(() => {
       const theme: Theme = {
         name: 'test-theme',
         properties: {
@@ -140,37 +142,41 @@ describe('ThemeColorsComponent', () => {
         }
       }
       fixture.componentRef.setInput('theme', theme)
-      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme(), true) })
+      fixture.detectChanges()
+      flush()
 
       expect(component.generalForm.get('primary-color')?.value).toBe('#ff0000')
       expect(component.topbarForm.get('topbar-bg-color')?.value).toBe('#00ff00')
       expect(component.sidebarForm.get('menu-text-color')?.value).toBe('#0000ff')
-    })
+    }))
 
-    it('should not fill form when theme is undefined', () => {
+    it('should not fill form when theme is undefined', fakeAsync(() => {
       fixture.componentRef.setInput('theme', undefined)
-      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme(), true) })
+      fixture.detectChanges()
+      flush()
 
       expect(component.generalForm.get('primary-color')?.value).toBeNull()
       expect(component.topbarForm.get('topbar-bg-color')?.value).toBeNull()
       expect(component.sidebarForm.get('menu-text-color')?.value).toBeNull()
-    })
+    }))
 
-    it('should default operator to undefined if not set on theme', () => {
+    it('should default operator to undefined if not set on theme', fakeAsync(() => {
       const theme: Theme = { name: 'test-theme' }
       fixture.componentRef.setInput('theme', theme)
-      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme(), true) })
+      fixture.detectChanges()
+      flush()
 
       expect(component.theme()?.operator).toBeUndefined()
-    })
+    }))
 
-    it('should reset form before patching new values', () => {
+    it('should reset form before patching new values', fakeAsync(() => {
       const theme1: Theme = {
         name: 'theme1',
         properties: { general: { 'primary-color': '#111111' } }
       }
       fixture.componentRef.setInput('theme', theme1)
-      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme(), true) })
+      fixture.detectChanges()
+      flush()
 
       expect(component.generalForm.get('primary-color')?.value).toBe('#111111')
 
@@ -179,11 +185,12 @@ describe('ThemeColorsComponent', () => {
         properties: { general: { 'secondary-color': '#222222' } }
       }
       fixture.componentRef.setInput('theme', theme2)
-      component.ngOnChanges({ theme: new SimpleChange(undefined, component.theme(), true) })
+      fixture.detectChanges()
+      flush()
 
       expect(component.generalForm.get('primary-color')?.value).toBeNull()
       expect(component.generalForm.get('secondary-color')?.value).toBe('#222222')
-    })
+    }))
   })
 
   describe('autoApply', () => {

@@ -1,15 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  DestroyRef,
-  inject,
-  input,
-  model,
-  OnChanges,
-  Signal,
-  SimpleChanges
-} from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, input, OnInit } from '@angular/core'
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, FormBuilder } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
@@ -60,22 +49,17 @@ import { ChangeMode } from '../theme-detail.component'
   templateUrl: './theme-colors.component.html',
   styleUrl: './theme-colors.component.scss'
 })
-export class ThemeColorsComponent implements OnChanges {
+export class ThemeColorsComponent implements OnInit {
   private readonly fb = inject(FormBuilder)
   private readonly translate = inject(TranslateService)
   private readonly msgService = inject(PortalMessageService)
   private readonly destroyRef = inject(DestroyRef)
   // signals
-  public readonly theme = model.required<Theme | undefined>()
+  public readonly theme = input<Theme | undefined>()
   public readonly changeMode = input.required<ChangeMode>()
   public readonly autoApply = input.required<boolean>()
-  // signals for forms
-  public isComponentValid!: Signal<boolean>
-  public isGeneralFormValid!: Signal<boolean>
-  public isTopbarFormValid!: Signal<boolean>
-  public isSidebarFormValid!: Signal<boolean>
-  public combinedFormValues!: Signal<Theme>
   // Form
+  public themeVars = themeVariables // used to initialize the form fields
   public generalForm: FormGroup = new FormGroup({})
   public topbarForm: FormGroup = new FormGroup({})
   public sidebarForm: FormGroup = new FormGroup({})
@@ -93,61 +77,66 @@ export class ThemeColorsComponent implements OnChanges {
     { key: 'topbar', titleKey: 'THEME.COLORS.TOPBAR', formGroup: this.topbarForm },
     { key: 'sidebar', titleKey: 'THEME.COLORS.SIDEBAR', formGroup: this.sidebarForm }
   ]
-  public themeVars = themeVariables // make it available in HTML
+  // signals for form validation
+  public isGeneralFormValid = toSignal(
+    this.generalForm.statusChanges.pipe(
+      map((status) => status === 'VALID'),
+      startWith(this.generalForm.valid) // initial state on component init
+    ),
+    { requireSync: true }
+  )
+  public isTopbarFormValid = toSignal(
+    this.topbarForm.statusChanges.pipe(
+      map((status) => status === 'VALID'),
+      startWith(this.topbarForm.valid) // initial state on component init
+    ),
+    { requireSync: true }
+  )
+  public isSidebarFormValid = toSignal(
+    this.sidebarForm.statusChanges.pipe(
+      map((status) => status === 'VALID'),
+      startWith(this.sidebarForm.valid) // initial state on component init
+    ),
+    { requireSync: true }
+  )
+  public isComponentValid = computed(() => {
+    return this.isGeneralFormValid() && this.isTopbarFormValid() && this.isSidebarFormValid()
+  })
+  // Combine the form values to a Theme
+  public combinedFormValues = toSignal<Theme>(
+    combineLatest([
+      this.generalForm.valueChanges.pipe(startWith(this.generalForm.value)),
+      this.topbarForm.valueChanges.pipe(startWith(this.topbarForm.value)),
+      this.sidebarForm.valueChanges.pipe(startWith(this.sidebarForm.value))
+    ]).pipe(
+      map(([generalValue, topbarValue, sidebarValue]) => {
+        return {
+          properties: { general: generalValue, topbar: topbarValue, sidebar: sidebarValue }
+        } as Theme
+      })
+    ),
+    { requireSync: true }
+  )
 
   constructor() {
-    this.isGeneralFormValid = toSignal(
-      this.generalForm.statusChanges.pipe(
-        map((status) => status === 'VALID'),
-        startWith(this.generalForm.valid) // initial state on component init
-      ),
-      { requireSync: true }
-    )
-    this.isTopbarFormValid = toSignal(
-      this.topbarForm.statusChanges.pipe(
-        map((status) => status === 'VALID'),
-        startWith(this.topbarForm.valid) // initial state on component init
-      ),
-      { requireSync: true }
-    )
-    this.isSidebarFormValid = toSignal(
-      this.sidebarForm.statusChanges.pipe(
-        map((status) => status === 'VALID'),
-        startWith(this.sidebarForm.valid) // initial state on component init
-      ),
-      { requireSync: true }
-    )
-    this.isComponentValid = computed(() => {
-      return this.isGeneralFormValid() && this.isTopbarFormValid() && this.isSidebarFormValid()
+    effect(() => {
+      const currentTheme = this.theme()
+      const mode = this.changeMode()
+
+      this.colorsForm.disable()
+      if (currentTheme) {
+        this.fillForm(currentTheme)
+        if (mode !== 'VIEW') {
+          this.colorsForm.enable()
+        }
+      } else {
+        this.colorsForm.reset()
+      }
     })
-    // Combine the form values to a Theme
-    this.combinedFormValues = toSignal<Theme>(
-      combineLatest([
-        this.generalForm.valueChanges.pipe(startWith(this.generalForm.value)),
-        this.topbarForm.valueChanges.pipe(startWith(this.topbarForm.value)),
-        this.sidebarForm.valueChanges.pipe(startWith(this.sidebarForm.value))
-      ]).pipe(
-        map(([generalValue, topbarValue, sidebarValue]) => {
-          return {
-            properties: { general: generalValue, topbar: topbarValue, sidebar: sidebarValue }
-          } as Theme
-        })
-      ),
-      { requireSync: true }
-    )
-    this.initColorForms()
   }
 
-  public ngOnChanges(changes: SimpleChanges): void {
-    this.colorsForm.disable()
-    if (this.theme()) {
-      if (changes['theme']) this.fillForm(this.theme()!)
-      if (this.changeMode() !== 'VIEW') {
-        this.colorsForm.enable()
-      }
-    } else {
-      this.colorsForm.reset()
-    }
+  public ngOnInit() {
+    this.initColorForms()
   }
 
   private initColorForms() {
