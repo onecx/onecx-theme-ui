@@ -143,7 +143,7 @@ describe('ThemeImportComponent', () => {
 
       await component.onImportSelectFile(event)
 
-      expect(console.error).toHaveBeenCalledOnceWith('Theme Import Parse Error', jasmine.any(Object))
+      expect(console.error).toHaveBeenCalledOnceWith('Theme Import Error: parse error', jasmine.any(Object))
       expect(component.themeSnapshot).toBeNull()
     })
 
