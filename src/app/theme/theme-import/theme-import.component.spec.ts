@@ -206,7 +206,7 @@ describe('ThemeImportComponent', () => {
 
       component.onThemeUpload()
 
-      expect(msgServiceSpy.success).toHaveBeenCalledOnceWith({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_SUCCESS' })
+      expect(msgServiceSpy.success).toHaveBeenCalledOnceWith({ summaryKey: 'THEME.IMPORT.THEME_SUCCESS' })
       expect(component.uploaded.emit).toHaveBeenCalledWith({
         name: 'themeName',
         displayName: 'themeDisplayName'
@@ -250,7 +250,7 @@ describe('ThemeImportComponent', () => {
       component.properties = {}
       component.onThemeUpload()
 
-      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_FAIL' })
+      expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'THEME.IMPORT.THEME_FAIL' })
     })
   })
 
