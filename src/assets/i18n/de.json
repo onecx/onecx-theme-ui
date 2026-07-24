@@ -206,9 +206,9 @@
     },
     "IMPORT": {
       "HEADER": "Import Theme",
-      "IMPORT_THEME_SUCCESS": "Theme wurde erfolgreich importiert.",
-      "IMPORT_THEME_FAIL": "Ein Fehler ist aufgetreten. Das Theme wurde nicht importiert.",
-      "NAME_HINT_MESSAGE": "Wählen Sie zunächst eine Datei aus. Sie können die Namen anpassen und bei Fehlerfreiheit die Datei hochladen.",
+      "THEME_SUCCESS": "Theme wurde erfolgreich importiert.",
+      "THEME_FAIL": "Ein Fehler ist aufgetreten. Das Theme wurde nicht importiert.",
+      "GENERAL_MESSAGE": "Wählen Sie zunächst eine Datei aus. Sie können die Namen anpassen und bei Fehlerfreiheit die Datei hochladen.",
       "NAME_EXISTS_MESSAGE": "Ein Theme mit diesem Namen existiert bereits. Dessen Definition wird überschrieben.",
       "DISPLAY_NAME_EXISTS_MESSAGE": "Ein Theme mit diesem Anzeigenamen existiert bereits. Importieren ist möglich, führt jedoch zu Themes mit demselben Anzeigenamen.",
       "THEME_COLOR_PRIMARY": "Primärfarbe",

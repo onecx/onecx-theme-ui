@@ -124,7 +124,7 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
         }
         this.cd.markForCheck() // force change detection to update the view with the new properties
       } catch (err) {
-        console.error('Theme Import Parse Error', err)
+        console.error('Theme Import Error: parse error', err)
         this.importError.set('GENERAL')
       }
     })
@@ -162,7 +162,7 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
     // Import execution: upload
     this.themeApi.importThemes({ themeSnapshot: this.themeSnapshot }).subscribe({
       next: () => {
-        this.msgService.success({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_SUCCESS' })
+        this.msgService.success({ summaryKey: 'THEME.IMPORT.THEME_SUCCESS' })
         this.uploaded.emit({
           name: this.formGroup.controls['themeName'].value!,
           displayName: this.formGroup.controls['displayName'].value!
@@ -170,7 +170,7 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
         this.onImportClear()
       },
       error: () => {
-        this.msgService.error({ summaryKey: 'THEME.IMPORT.IMPORT_THEME_FAIL' })
+        this.msgService.error({ summaryKey: 'THEME.IMPORT.THEME_FAIL' })
       }
     })
   }
