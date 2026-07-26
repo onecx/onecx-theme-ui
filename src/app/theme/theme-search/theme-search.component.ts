@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { AsyncPipe } from '@angular/common'
 import { ActivatedRoute, Router, RouterModule } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
-import { BehaviorSubject, catchError, finalize, map, Observable, of, Subscription } from 'rxjs'
+import { BehaviorSubject, catchError, finalize, map, Observable, of, Subject, switchMap } from 'rxjs'
 
 import { ButtonModule } from 'primeng/button'
 import { CardModule } from 'primeng/card'
@@ -71,7 +71,7 @@ export class ThemeSearchComponent implements OnInit {
   // data
   private readonly dataSubject$ = new BehaviorSubject<RowListGridData[]>([])
   public data$: Observable<RowListGridData[] | null> = this.dataSubject$.asObservable()
-  private searchSubscription?: Subscription // to cancel ongoing search if new search is triggered
+  private readonly loadTrigger$ = new Subject<void>()
   public filteredData: RowListGridData[] | undefined = undefined
   // dialog
   public loading = false
@@ -89,6 +89,29 @@ export class ThemeSearchComponent implements OnInit {
   public LogoRefType = LogoRefType
 
   constructor() {
+    this.loadTrigger$
+      .pipe(
+        switchMap(() => {
+          this.loading = true
+          this.exceptionKey = undefined
+          return this.themeApi.searchThemes({ searchThemeRequest: {} }).pipe(
+            map((data) => {
+              const themes = data?.stream ?? []
+              themes.sort(Utils.sortByDisplayName)
+              return themes as unknown[] as RowListGridData[]
+            }),
+            catchError((err) => {
+              this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + err.status + '.THEME'
+              console.error('searchThemes', err)
+              return of([] as RowListGridData[])
+            }),
+            finalize(() => (this.loading = false))
+          )
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((data) => this.dataSubject$.next(data))
+
     effect(() => {
       if (this.themeImported()) {
         this.loadThemes()
@@ -102,26 +125,7 @@ export class ThemeSearchComponent implements OnInit {
   }
 
   public loadThemes(): void {
-    this.loading = true
-    this.exceptionKey = undefined
-    this.searchSubscription?.unsubscribe()
-    this.searchSubscription = this.themeApi
-      .searchThemes({ searchThemeRequest: {} })
-      .pipe(
-        map((data) => {
-          const themes = data?.stream ?? []
-          themes.sort(Utils.sortByDisplayName)
-          return themes as unknown[] as RowListGridData[]
-        }),
-        catchError((err) => {
-          this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + err.status + '.THEME'
-          console.error('searchThemes', err)
-          return of([] as RowListGridData[])
-        }),
-        finalize(() => (this.loading = false)),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe((data) => this.dataSubject$.next(data))
+    this.loadTrigger$.next()
   }
 
   public convertToThemes(data?: RowListGridData[]): Theme[] | undefined {
