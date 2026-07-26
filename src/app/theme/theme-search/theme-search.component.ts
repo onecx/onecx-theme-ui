@@ -110,7 +110,7 @@ export class ThemeSearchComponent implements OnInit {
       .pipe(
         map((data) => {
           const themes = data?.stream ?? []
-          themes.sort(this.sortThemesByName)
+          themes.sort(Utils.sortByDisplayName)
           return themes as unknown[] as RowListGridData[]
         }),
         catchError((err) => {
@@ -123,9 +123,7 @@ export class ThemeSearchComponent implements OnInit {
       )
       .subscribe((data) => this.dataSubject$.next(data))
   }
-  private sortThemesByName(a: Theme, b: Theme): number {
-    return a.displayName!.toUpperCase().localeCompare(b.displayName!.toUpperCase())
-  }
+
   public convertToThemes(data?: RowListGridData[]): Theme[] | undefined {
     if (!data) return undefined
     return data as unknown[] as Theme[]

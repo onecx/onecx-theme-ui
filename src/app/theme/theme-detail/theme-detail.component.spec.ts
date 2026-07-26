@@ -16,7 +16,7 @@ import { SlotService } from '@onecx/angular-remote-components'
 import { ImagesInternalAPIService, Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { Utils, LogoRefType } from 'src/app/shared/utils'
 
-import { slotInitializer, ThemeDetailComponent } from './theme-detail.component'
+import { ThemeDetailComponent } from './theme-detail.component'
 import { Workspace } from './theme-use/theme-use.component'
 
 const theme: Theme = {
@@ -147,21 +147,6 @@ describe('ThemeDetailComponent', () => {
       spyOn(route.snapshot.paramMap, 'get').and.returnValue('someName')
       initTestComponent()
       expect(component.changeMode).toEqual('VIEW')
-    })
-  })
-
-  describe('slotInitializer', () => {
-    let slotService: jasmine.SpyObj<SlotService>
-
-    beforeEach(() => {
-      slotService = jasmine.createSpyObj('SlotService', ['init'])
-    })
-
-    it('should call SlotService.init', () => {
-      const initializer = slotInitializer(slotService)
-      initializer()
-
-      expect(slotService.init).toHaveBeenCalled()
     })
   })
 
@@ -407,7 +392,7 @@ describe('ThemeDetailComponent', () => {
     it('should test if component is assigned to slot', () => {
       fixture.detectChanges() // trigger ngOnInit
 
-      expect(slotServiceSpy.isSomeComponentDefinedForSlot).toHaveBeenCalledWith(component.slotName())
+      expect(slotServiceSpy.isSomeComponentDefinedForSlot).toHaveBeenCalledWith(component.slotName)
       expect(component.isComponentDefined()).toBeTrue()
     })
   })
@@ -458,7 +443,7 @@ describe('ThemeDetailComponent', () => {
         fixture.detectChanges() // trigger ngOnInit
         const stopSpy = spyOn<any>(component, 'stopGettingThemeUseData').and.callThrough()
 
-        component.slotEmitter.emit(workspaces)
+        component.slotEmitter.next(workspaces)
 
         expect(stopSpy).toHaveBeenCalledOnceWith(workspaces)
       })
@@ -471,7 +456,7 @@ describe('ThemeDetailComponent', () => {
         component['themeUseTimeoutTimer'] = setTimeout(() => {}, 10) // should exist for cleanup only
         component['themeUseStartTime'] = Date.now() - 1 // simulate that 1 second has passed
 
-        component.slotEmitter.emit(workspaces)
+        component.slotEmitter.next(workspaces)
         tick(component['MIN_LOADING_TIME'] - 1) // wait until min loading time
 
         expect(stopSpy).toHaveBeenCalledOnceWith(workspaces)
@@ -483,7 +468,7 @@ describe('ThemeDetailComponent', () => {
         const stopSpy = spyOn<any>(component, 'stopGettingThemeUseData').and.callThrough()
 
         fixture.destroy()
-        component.slotEmitter.emit(workspaces)
+        component.slotEmitter.next(workspaces)
 
         expect(stopSpy).not.toHaveBeenCalled()
       })

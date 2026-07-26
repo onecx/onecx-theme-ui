@@ -69,7 +69,7 @@ export class ThemePropsComponent implements OnChanges {
   // signals for forms, initialized in constructor
   public isBasicFormValid!: Signal<boolean>
   public isFontFormValid!: Signal<boolean>
-  public isComponentValid!: Signal<Theme>
+  public isComponentValid!: Signal<boolean>
   public combinedFormValues!: Signal<Theme>
   // image
   public bffUrl: Partial<Record<LogoRefType, string | undefined>> = {}

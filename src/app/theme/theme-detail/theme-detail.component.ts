@@ -40,9 +40,6 @@ import { ThemeDeleteComponent } from '../theme-delete/theme-delete.component'
 
 export type ChangeMode = 'VIEW' | 'EDIT'
 export type LoadingState = 'initial' | 'ready' | 'loading' | 'timeout'
-export function slotInitializer(slotService: SlotService) {
-  return () => slotService.init()
-}
 type ThemeData = {
   theme: Theme
   propsValid: boolean | undefined
@@ -130,7 +127,7 @@ export class ThemeDetailComponent implements OnInit {
   // image
   public imageBasePath = this.imageApi.configuration.basePath
   // receive the slot output
-  public slotName = signal<string>('onecx-workspace-data')
+  public slotName = 'onecx-workspace-data'
   public slotEmitter = new EventEmitter<Workspace[]>()
 
   // Partial theme with undefined values for internal use (copying, editing) to prevent issues with form patching and image url handling when required properties are missing
@@ -146,10 +143,9 @@ export class ThemeDetailComponent implements OnInit {
   } as Theme
 
   // trigger the request to the workspace service via slot to get the workspaces that use the theme
-  public readonly isComponentDefined = toSignal(
-    toObservable(this.slotName).pipe(switchMap((name) => this.slotService.isSomeComponentDefinedForSlot(name!))),
-    { initialValue: false }
-  )
+  public readonly isComponentDefined = toSignal(this.slotService.isSomeComponentDefinedForSlot(this.slotName), {
+    initialValue: false
+  })
 
   ngOnInit(): void {
     // receive data and stop process
