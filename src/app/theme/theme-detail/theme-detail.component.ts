@@ -9,11 +9,11 @@ import {
   signal,
   viewChild
 } from '@angular/core'
-import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop'
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop'
 import { AsyncPipe, JsonPipe, Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
-import { catchError, combineLatest, finalize, first, map, of, Observable, switchMap } from 'rxjs'
+import { catchError, combineLatest, finalize, first, map, of, Observable } from 'rxjs'
 import FileSaver from 'file-saver'
 
 import { MessageModule } from 'primeng/message'
@@ -24,7 +24,6 @@ import { PortalMessageService, ThemeService, UserService } from '@onecx/angular-
 
 import { Action, AngularAcceleratorModule } from '@onecx/angular-accelerator'
 import { PortalPageComponent } from '@onecx/angular-utils'
-import { SlotService } from '@onecx/angular-remote-components'
 
 import { Utils, LogoRefType } from 'src/app/shared/utils'
 import { injectInitializedSlotService } from 'src/app/shared/slot.initializer'
