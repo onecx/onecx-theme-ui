@@ -34,7 +34,7 @@
           id="th_import_parse_error"
           [text]="'VALIDATION.ERRORS.IMPORT_PARSE_ERROR' | translate"
         ></p-message>
-      } @else if (themeSnapshot) {
+      } @else if (themeSnapshot()) {
         @if (importError() === 'CONTENT') {
           <p-message
             severity="error"
@@ -77,21 +77,21 @@
                 {{ 'THEME.DISPLAY_NAME' | translate }}
               </label>
             </p-floatlabel>
-            @if (properties) {
-              <app-theme-color-box [properties]="properties" styleClass="h-inputtext w-15rem" aria-hidden="true" />
+            @if (properties()) {
+              <app-theme-color-box [properties]="properties()!" styleClass="h-inputtext w-15rem" aria-hidden="true" />
             } @else {
               <div role="note">{{ 'THEME.NO_PROPERTIES' | translate }}</div>
             }
           </form>
         }
 
-        @if (themeNameExists) {
+        @if (themeNameExists()) {
           <p-message
             severity="warn"
             id="th_import_name_exists_message"
             [text]="'THEME.IMPORT.NAME_EXISTS_MESSAGE' | translate"
           ></p-message>
-        } @else if (displayNameExists) {
+        } @else if (displayNameExists()) {
           <p-message
             severity="warn"
             id="th_import_display_name_exists_message"

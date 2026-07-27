@@ -68,12 +68,12 @@ describe('ThemeImportComponent', () => {
 
   it('should clear form on hide', () => {
     component.importError.set('GENERAL')
-    component.themeSnapshot = { themes: { theme: {} } }
+    component.themeSnapshot.set({ themes: { theme: {} } })
 
     component.visible.set(false)
     component.ngOnChanges()
 
-    expect(component.themeSnapshot).toBeNull()
+    expect(component.themeSnapshot()).toBeNull()
     expect(component.importError()).toBe('NONE')
   })
 
@@ -96,11 +96,11 @@ describe('ThemeImportComponent', () => {
       await component.onImportSelectFile(event)
 
       expect(component.importError()).toBe('NONE')
-      expect(component.themeSnapshot).toBeDefined()
-      expect(component.properties).toEqual({ general: { 'primary-color': '#000000' } })
+      expect(component.themeSnapshot()).toBeDefined()
+      expect(component.properties()).toEqual({ general: { 'primary-color': '#000000' } })
       expect(component.formGroup.controls['themeName'].value).toEqual('themeName')
       expect(component.formGroup.controls['displayName'].value).toEqual('themeDisplayName')
-      expect(component.themeNameExists).toBe(false)
+      expect(component.themeNameExists()).toBe(false)
     })
 
     it('should read file on theme import select - without displayName', async () => {
@@ -117,7 +117,7 @@ describe('ThemeImportComponent', () => {
       await component.onImportSelectFile(event)
 
       expect(component.importError()).toBe('NONE')
-      expect(component.themeSnapshot).toBeDefined()
+      expect(component.themeSnapshot()).toBeDefined()
       expect(component.formGroup.controls['themeName'].value).toEqual('themeName')
       expect(component.formGroup.controls['displayName'].value).toBeNull()
       expect(component.formGroup.valid).toBeFalse()
@@ -131,7 +131,7 @@ describe('ThemeImportComponent', () => {
       await component.onImportSelectFile(event)
 
       expect(component.importError()).toBe('CONTENT')
-      expect(component.themeSnapshot).toBeDefined()
+      expect(component.themeSnapshot()).toBeDefined()
       expect(console.error).toHaveBeenCalledOnceWith('Theme Import Error: not valid data ')
     })
 
@@ -144,7 +144,7 @@ describe('ThemeImportComponent', () => {
       await component.onImportSelectFile(event)
 
       expect(console.error).toHaveBeenCalledOnceWith('Theme Import Error: parse error', jasmine.any(Object))
-      expect(component.themeSnapshot).toBeNull()
+      expect(component.themeSnapshot()).toBeNull()
     })
 
     it('should indicate theme name existance if already present', async () => {
@@ -163,9 +163,9 @@ describe('ThemeImportComponent', () => {
       await component.onImportSelectFile(event)
 
       expect(component.importError()).toBe('NONE')
-      expect(component.themeSnapshot).toBeDefined()
-      expect(component.themeNameExists).toBe(true)
-      expect(component.displayNameExists).toBe(true)
+      expect(component.themeSnapshot()).toBeDefined()
+      expect(component.themeNameExists()).toBe(true)
+      expect(component.displayNameExists()).toBe(true)
     })
 
     it('should clear error and import data on import clear', () => {
@@ -195,14 +195,14 @@ describe('ThemeImportComponent', () => {
           })
         )
       )
-      component.themeSnapshot = {
+      component.themeSnapshot.set({
         id: 'id',
         created: 'created',
         themes: { ['theme']: { description: 'themeDescription' } }
-      }
+      })
       component.formGroup.controls['themeName'].setValue('themeName')
       component.formGroup.controls['displayName'].setValue('themeDisplayName')
-      component.properties = {}
+      component.properties.set({})
 
       component.onThemeUpload()
 
@@ -217,12 +217,12 @@ describe('ThemeImportComponent', () => {
       themesApiSpy.importThemes.and.returnValue(of(new HttpResponse({ body: { id: 'id' } })))
       component.formGroup.controls['themeName'].setValue('themeName')
       component.formGroup.controls['displayName'].setValue('themeDisplayName')
-      component.properties = {}
+      component.properties.set({})
 
       component.onThemeUpload()
 
-      expect(component.themeNameExists).toBe(false)
-      expect(component.displayNameExists).toBe(false)
+      expect(component.themeNameExists()).toBe(false)
+      expect(component.displayNameExists()).toBe(false)
     })
 
     it('should prevent import if form is not ready', () => {
@@ -239,15 +239,15 @@ describe('ThemeImportComponent', () => {
 
     it('should display error on api call fail during upload', () => {
       themesApiSpy.importThemes.and.returnValue(throwError(() => new Error()))
-      component.themeSnapshot = {
+      component.themeSnapshot.set({
         id: 'id',
         created: 'created',
         themes: { ['theme']: { description: 'themeDescription' } }
-      }
+      })
 
       component.formGroup.controls['themeName'].setValue('themeName')
       component.formGroup.controls['displayName'].setValue('themeDisplayName')
-      component.properties = {}
+      component.properties.set({})
       component.onThemeUpload()
 
       expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'THEME.IMPORT.THEME_FAIL' })
@@ -255,11 +255,11 @@ describe('ThemeImportComponent', () => {
   })
 
   it('should not check existence if form is not ready', () => {
-    component.themeNameExists = true
+    component.themeNameExists.set(true)
     spyOnProperty(component.formGroup, 'valid').and.returnValue(false)
     component.onThemeNameChange()
 
-    expect(component.themeNameExists).toBeTrue()
+    expect(component.themeNameExists()).toBeTrue()
   })
 
   describe('isFormValid', () => {
