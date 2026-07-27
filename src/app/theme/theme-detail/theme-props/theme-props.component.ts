@@ -23,7 +23,6 @@ import { InputGroupModule } from 'primeng/inputgroup'
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon'
 import { InputTextModule } from 'primeng/inputtext'
 import { MessageModule } from 'primeng/message'
-import { ToastModule } from 'primeng/toast'
 import { TooltipModule } from 'primeng/tooltip'
 
 import { getLocation } from '@onecx/accelerator'
@@ -50,7 +49,6 @@ import { DictionaryObject } from 'src/app/shared/models/theme.model'
     InputTextModule,
     MessageModule,
     ReactiveFormsModule,
-    ToastModule,
     TooltipModule,
     TranslateModule,
     ImageContainerComponent

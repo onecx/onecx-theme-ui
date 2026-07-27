@@ -11,7 +11,6 @@ import { FloatLabelModule } from 'primeng/floatlabel'
 import { InputGroupModule } from 'primeng/inputgroup'
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon'
 import { MessageModule } from 'primeng/message'
-import { ToastModule } from 'primeng/toast'
 import { TooltipModule } from 'primeng/tooltip'
 
 import {
@@ -44,7 +43,6 @@ import { ThemeImportComponent } from '../theme-import/theme-import.component'
     InputGroupAddonModule,
     MessageModule,
     RouterModule,
-    ToastModule,
     TooltipModule,
     TranslateModule,
     PortalPageComponent,
