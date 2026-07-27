@@ -3,7 +3,6 @@ import {
   Component,
   computed,
   DestroyRef,
-  EventEmitter,
   inject,
   OnInit,
   signal,
@@ -13,7 +12,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop'
 import { AsyncPipe, JsonPipe, Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
-import { catchError, combineLatest, finalize, first, map, of, Observable } from 'rxjs'
+import { catchError, combineLatest, finalize, first, map, of, Observable, Subject } from 'rxjs'
 import FileSaver from 'file-saver'
 
 import { MessageModule } from 'primeng/message'
@@ -112,7 +111,6 @@ export class ThemeDetailComponent implements OnInit {
   public dateFormat = 'M/d/yy, hh:mm:ss a'
   public isCurrentTheme = false
   public Utils = Utils
-  public toSignal = toSignal
   // page header
   public actions$: Observable<Action[]> = of([])
   public headerImageUrl?: string
@@ -126,7 +124,7 @@ export class ThemeDetailComponent implements OnInit {
   public imageBasePath = this.imageApi.configuration.basePath
   // receive the slot output
   public slotName = 'onecx-workspace-data'
-  public slotEmitter = new EventEmitter<Workspace[]>()
+  public readonly slotEmitter = new Subject<Workspace[]>()
 
   // Partial theme with undefined values for internal use (copying, editing) to prevent issues with form patching and image url handling when required properties are missing
   private readonly undefinedThemeData = {

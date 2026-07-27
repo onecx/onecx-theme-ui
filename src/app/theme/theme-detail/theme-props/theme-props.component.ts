@@ -280,6 +280,7 @@ export class ThemePropsComponent implements OnChanges {
   }
 
   public onRemoveImage(refType: LogoRefType) {
+    console.log('onRemoveImage', refType, this.theme?.name, this.bffUrl[refType])
     if (this.theme?.name && this.bffUrl[refType]) {
       // On VIEW mode: manage image is enabled
       this.imageApi.deleteImage({ refId: this.theme?.name, refType: refType }).subscribe({
