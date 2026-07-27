@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   DestroyRef,
+  EventEmitter,
   inject,
   OnInit,
   signal,
@@ -12,7 +13,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop'
 import { AsyncPipe, JsonPipe, Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
-import { catchError, combineLatest, finalize, first, map, of, Observable, Subject } from 'rxjs'
+import { catchError, combineLatest, finalize, first, map, of, Observable } from 'rxjs'
 import FileSaver from 'file-saver'
 
 import { MessageModule } from 'primeng/message'
@@ -124,7 +125,9 @@ export class ThemeDetailComponent implements OnInit {
   public imageBasePath = this.imageApi.configuration.basePath
   // receive the slot output
   public slotName = 'onecx-workspace-data'
-  public readonly slotEmitter = new Subject<Workspace[]>()
+  // EventEmitter is required here (not Subject) because ocx-slot [outputs] is typed as
+  // { [key: string]: EventEmitter<any> } and calls .emit() on the provided instance.
+  public readonly slotEmitter = new EventEmitter<Workspace[]>()
 
   // Partial theme with undefined values for internal use (copying, editing) to prevent issues with form patching and image url handling when required properties are missing
   private readonly undefinedThemeData = {
