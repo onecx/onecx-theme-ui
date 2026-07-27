@@ -4,6 +4,7 @@ import { Router, RouterModule } from '@angular/router'
 import { TranslateModule } from '@ngx-translate/core'
 import { Observable, of } from 'rxjs'
 
+import { MessageModule } from 'primeng/message'
 import { TooltipModule } from 'primeng/tooltip'
 
 import { WorkspaceService } from '@onecx/angular-integration-interface'
@@ -30,7 +31,7 @@ export type Workspace = {
 @Component({
   selector: 'app-theme-use',
   standalone: true,
-  imports: [AsyncPipe, RouterModule, TooltipModule, TranslateModule],
+  imports: [AsyncPipe, MessageModule, RouterModule, TooltipModule, TranslateModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-use.component.html'
 })
