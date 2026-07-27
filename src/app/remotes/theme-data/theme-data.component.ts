@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, EventEmitter, inject, Input, OnChanges } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { AsyncPipe, Location } from '@angular/common'
-import { UntilDestroy } from '@ngneat/until-destroy'
 import { TranslateModule } from '@ngx-translate/core'
 import { BehaviorSubject, catchError, first, map, Observable, of, ReplaySubject } from 'rxjs'
 
@@ -36,7 +35,6 @@ type DataType = 'logo' | 'favicon' | 'themes' | 'theme'
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-data.component.html'
 })
-@UntilDestroy()
 export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWebcomponent, OnChanges {
   private readonly remoteComponentConfig = inject<ReplaySubject<RemoteComponentConfig>>(REMOTE_COMPONENT_CONFIG)
   private readonly appConfigService = inject(AppConfigService)

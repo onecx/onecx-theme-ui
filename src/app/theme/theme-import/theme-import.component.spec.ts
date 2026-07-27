@@ -169,18 +169,18 @@ describe('ThemeImportComponent', () => {
     })
 
     it('should clear error and import data on import clear', () => {
-      component.themeSnapshot = {
+      component.themeSnapshot.set({
         themes: {
           themeName: {
             logoUrl: 'logo_url'
           }
         }
-      }
+      })
       component.importError.set('GENERAL')
 
       component.onImportClear()
 
-      expect(component.themeSnapshot).toBeNull()
+      expect(component.themeSnapshot()).toBeNull()
       expect(component.importError()).toBe('NONE')
     })
   })

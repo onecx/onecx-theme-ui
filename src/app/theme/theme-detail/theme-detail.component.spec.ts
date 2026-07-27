@@ -26,6 +26,7 @@ const theme: Theme = {
   logoUrl: 'path-to-logo',
   smallLogoUrl: '/path-to-small-logo',
   faviconUrl: '/path-to-favicon',
+  mandatory: false,
   operator: false
 }
 
@@ -378,7 +379,7 @@ describe('ThemeDetailComponent', () => {
       component.onTabChange('3', theme)
 
       expect(component.selectedTabIndex).toBe('3')
-      expect(component['startGettingThemeUseData']).toHaveBeenCalledWith(theme.name)
+      expect(component['startGettingThemeUseData']).toHaveBeenCalledWith(theme)
     })
 
     it('should set selectedTabIndex to 0 if theme is undefined', () => {
@@ -400,7 +401,7 @@ describe('ThemeDetailComponent', () => {
   describe('getting theme use data', () => {
     const workspaces = [{ name: 'Workspace 1' }, { name: 'Workspace 2' }] as Workspace[]
 
-    it('should start first time', () => {
+    it('should start first time - normal theme', () => {
       component.themeUseLoadingState.set('initial')
 
       component.onTabChange('3', theme)
@@ -476,7 +477,7 @@ describe('ThemeDetailComponent', () => {
   })
 
   describe('Theme deletion', () => {
-    it('should show delete dialog', () => {
+    it('should show delete dialog - normal theme', () => {
       component.themeDeleteVisible.set(false)
       spyOn<any>(component, 'startGettingThemeUseData')
 
@@ -484,7 +485,19 @@ describe('ThemeDetailComponent', () => {
 
       expect(component.themeDeleteVisible()).toBeTrue()
       expect(component.themeToBeDeleted()).toEqual(theme)
-      expect(component['startGettingThemeUseData']).toHaveBeenCalledWith(theme.name)
+      expect(component['startGettingThemeUseData']).toHaveBeenCalledWith(theme)
+    })
+
+    it('should show delete dialog - mandatory theme', () => {
+      component.themeDeleteVisible.set(false)
+      const aTheme = { ...theme, mandatory: true } as Theme
+      component.theme.set(aTheme)
+      spyOn<any>(component, 'startGettingThemeUseData').and.callThrough()
+
+      component.onDeleteTheme(aTheme)
+
+      expect(component.themeDeleteVisible()).toBeTrue()
+      expect(component.themeUseLoadingState()).toBe('ready') // no use detection for mandatory themes
     })
 
     it('should navigate back on theme deleted', () => {

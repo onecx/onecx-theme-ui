@@ -247,11 +247,10 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   // Initialize the process of checking if the theme is used in workspaces
-  private startGettingThemeUseData(paramThemeName?: string): void {
-    if (paramThemeName && this.themeUseLoadingState() === 'initial') {
-      if (this.theme()?.mandatory) {
-        // stop here
-        this.themeUseLoadingState.set('ready')
+  private startGettingThemeUseData(theme?: Theme): void {
+    if (theme && this.themeUseLoadingState() === 'initial') {
+      if (theme.mandatory) {
+        this.themeUseLoadingState.set('ready') // stop here
         return
       }
       this.themeUseLoadingState.set('loading')
@@ -263,7 +262,7 @@ export class ThemeDetailComponent implements OnInit {
       this.themeUseTimeoutTimer = setTimeout(() => {
         if (this.themeUseLoadingState() === 'loading') this.themeUseLoadingState.set('timeout')
       }, this.MAX_LOADING_TIME)
-      this.themeUsedName.set(paramThemeName) // force checking use in workspaces
+      this.themeUsedName.set(theme.name) // force checking use in workspaces
     }
   }
 
@@ -300,7 +299,7 @@ export class ThemeDetailComponent implements OnInit {
       this.showOperatorMessage = false
       this.selectedTabIndex = typeof tabValue === 'number' ? tabValue.toString() : tabValue
       if (this.selectedTabIndex === '3') {
-        this.startGettingThemeUseData(theme?.name)
+        this.startGettingThemeUseData(theme)
       }
     } else this.selectedTabIndex = '0'
   }
@@ -414,7 +413,7 @@ export class ThemeDetailComponent implements OnInit {
    */
   public onDeleteTheme(theme: Theme): void {
     this.themeToBeDeleted.set(theme)
-    this.startGettingThemeUseData(theme?.name)
+    this.startGettingThemeUseData(theme)
     this.themeDeleteVisible.set(true)
   }
 
