@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, OnChanges, output } from '@angular/core'
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
+import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core'
+import { toSignal } from '@angular/core/rxjs-interop'
 import { TranslateModule } from '@ngx-translate/core'
 import { map } from 'rxjs'
 
@@ -24,8 +24,7 @@ import { Utils } from 'src/app/shared/utils'
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './image-container.component.html'
 })
-export class ImageContainerComponent implements OnChanges {
-  private readonly destroyRef = inject(DestroyRef)
+export class ImageContainerComponent {
   // signals: HTML properties
   public readonly id = input<string>('th_image_container')
   public readonly title = input<string | undefined>()
@@ -37,58 +36,52 @@ export class ImageContainerComponent implements OnChanges {
 
   public readonly imageLoadResult = output<boolean>() // inform caller
 
-  public url: string | undefined = undefined
+  private readonly defaultImageUrl = toSignal(
+    inject(AppStateService).currentMfe$.pipe(
+      map((mfe) => Utils.prepareUrlPath(mfe.remoteBaseUrl, environment.DEFAULT_LOGO_PATH))
+    )
+  )
+  private readonly _url = signal<string | undefined>(undefined)
+  public readonly url = this._url.asReadonly()
   private urlType: 'ext-url' | 'bff-url' | 'def-url' = 'ext-url'
-  private defaultImageUrl: string | undefined = undefined
 
   constructor() {
-    inject(AppStateService)
-      .currentMfe$.pipe(map((mfe) => Utils.prepareUrlPath(mfe.remoteBaseUrl, environment.DEFAULT_LOGO_PATH)))
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((data) => (this.defaultImageUrl = data))
-  }
-
-  public ngOnChanges(): void {
-    if (this.imageUrl()) {
-      if (/^(http|https):\/\/.{6,245}$/.exec(this.imageUrl()!)) {
-        this.url = this.imageUrl()
+    effect(() => {
+      const imageUrl = this.imageUrl()
+      const bffUrl = this.bffUrl()
+      const defaultUrl = this.defaultImageUrl()
+      if (imageUrl && /^(http|https):\/\/.{6,245}$/.exec(imageUrl)) {
+        this._url.set(imageUrl)
         this.urlType = 'ext-url'
+      } else if (bffUrl) {
+        this._url.set(bffUrl)
+        this.urlType = 'bff-url'
       } else {
-        this.url = this.defaultImageUrl
+        this._url.set(defaultUrl)
         this.urlType = 'def-url'
       }
-    } else if (this.bffUrl()) {
-      this.url = this.bffUrl()
-      this.urlType = 'bff-url'
-    } else {
-      this.url = this.defaultImageUrl
-      this.urlType = 'def-url'
+    })
+  }
+
+  public onImageLoadSuccess(): void {
+    if (this.url() !== undefined && this.url() !== this.defaultImageUrl()) {
+      this.imageLoadResult.emit(true)
     }
   }
 
-  /**
-   * Emit image loading results
-   */
-  public onImageLoadSuccess(): void {
-    if (this.url !== undefined && this.url !== this.defaultImageUrl) this.imageLoadResult.emit(true)
-  }
-
-  // on loading error switch URL
   public onImageLoadError(): void {
-    if (this.url !== undefined) this.imageLoadResult.emit(false)
+    if (this.url() !== undefined) this.imageLoadResult.emit(false)
 
-    // using ext-url not possible, use bff URL
     if (this.urlType === 'ext-url' && this.cascadeUse()) {
       if (this.bffUrl()) {
-        this.url = this.bffUrl()
+        this._url.set(this.bffUrl())
         this.urlType = 'bff-url'
       } else {
-        this.url = this.defaultImageUrl
+        this._url.set(this.defaultImageUrl())
         this.urlType = 'def-url'
       }
-      // using bff-url not possible, use default URL
-    } else if (this.defaultImageUrl) {
-      this.url = this.defaultImageUrl
+    } else if (this.defaultImageUrl()) {
+      this._url.set(this.defaultImageUrl())
       this.urlType = 'def-url'
     }
   }

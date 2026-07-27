@@ -16,7 +16,7 @@ import { SlotService } from '@onecx/angular-remote-components'
 import { ImagesInternalAPIService, Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { Utils, LogoRefType } from 'src/app/shared/utils'
 
-import { slotInitializer, ThemeDetailComponent } from './theme-detail.component'
+import { ThemeDetailComponent } from './theme-detail.component'
 import { Workspace } from './theme-use/theme-use.component'
 
 const theme: Theme = {
@@ -26,6 +26,7 @@ const theme: Theme = {
   logoUrl: 'path-to-logo',
   smallLogoUrl: '/path-to-small-logo',
   faviconUrl: '/path-to-favicon',
+  mandatory: false,
   operator: false
 }
 
@@ -147,21 +148,6 @@ describe('ThemeDetailComponent', () => {
       spyOn(route.snapshot.paramMap, 'get').and.returnValue('someName')
       initTestComponent()
       expect(component.changeMode).toEqual('VIEW')
-    })
-  })
-
-  describe('slotInitializer', () => {
-    let slotService: jasmine.SpyObj<SlotService>
-
-    beforeEach(() => {
-      slotService = jasmine.createSpyObj('SlotService', ['init'])
-    })
-
-    it('should call SlotService.init', () => {
-      const initializer = slotInitializer(slotService)
-      initializer()
-
-      expect(slotService.init).toHaveBeenCalled()
     })
   })
 
@@ -319,7 +305,7 @@ describe('ThemeDetailComponent', () => {
 
       component['getThemes']()
 
-      component.themes$.subscribe((result) => {
+      component.themes$!.subscribe((result) => {
         expect(result).toHaveSize(2)
         expect(result[0].displayName).toBe('Alpha')
         done()
@@ -333,7 +319,7 @@ describe('ThemeDetailComponent', () => {
 
       component['getThemes']()
 
-      component.themes$.subscribe((result) => {
+      component.themes$!.subscribe((result) => {
         expect(result).toEqual([])
         expect(console.error).toHaveBeenCalledWith('searchThemes', errorResponse)
         expect(component.exceptionKey).toBe('EXCEPTIONS.HTTP_STATUS_500.THEME')
@@ -346,7 +332,7 @@ describe('ThemeDetailComponent', () => {
 
       component['getThemes']()
 
-      component.themes$.subscribe((result) => {
+      component.themes$!.subscribe((result) => {
         expect(result).toEqual([])
         done()
       })
@@ -393,7 +379,7 @@ describe('ThemeDetailComponent', () => {
       component.onTabChange('3', theme)
 
       expect(component.selectedTabIndex).toBe('3')
-      expect(component['startGettingThemeUseData']).toHaveBeenCalledWith(theme.name)
+      expect(component['startGettingThemeUseData']).toHaveBeenCalledWith(theme)
     })
 
     it('should set selectedTabIndex to 0 if theme is undefined', () => {
@@ -407,7 +393,7 @@ describe('ThemeDetailComponent', () => {
     it('should test if component is assigned to slot', () => {
       fixture.detectChanges() // trigger ngOnInit
 
-      expect(slotServiceSpy.isSomeComponentDefinedForSlot).toHaveBeenCalledWith(component.slotName())
+      expect(slotServiceSpy.isSomeComponentDefinedForSlot).toHaveBeenCalledWith(component.slotName)
       expect(component.isComponentDefined()).toBeTrue()
     })
   })
@@ -415,7 +401,7 @@ describe('ThemeDetailComponent', () => {
   describe('getting theme use data', () => {
     const workspaces = [{ name: 'Workspace 1' }, { name: 'Workspace 2' }] as Workspace[]
 
-    it('should start first time', () => {
+    it('should start first time - normal theme', () => {
       component.themeUseLoadingState.set('initial')
 
       component.onTabChange('3', theme)
@@ -491,7 +477,7 @@ describe('ThemeDetailComponent', () => {
   })
 
   describe('Theme deletion', () => {
-    it('should show delete dialog', () => {
+    it('should show delete dialog - normal theme', () => {
       component.themeDeleteVisible.set(false)
       spyOn<any>(component, 'startGettingThemeUseData')
 
@@ -499,7 +485,19 @@ describe('ThemeDetailComponent', () => {
 
       expect(component.themeDeleteVisible()).toBeTrue()
       expect(component.themeToBeDeleted()).toEqual(theme)
-      expect(component['startGettingThemeUseData']).toHaveBeenCalledWith(theme.name)
+      expect(component['startGettingThemeUseData']).toHaveBeenCalledWith(theme)
+    })
+
+    it('should show delete dialog - mandatory theme', () => {
+      component.themeDeleteVisible.set(false)
+      const aTheme = { ...theme, mandatory: true } as Theme
+      component.theme.set(aTheme)
+      spyOn<any>(component, 'startGettingThemeUseData').and.callThrough()
+
+      component.onDeleteTheme(aTheme)
+
+      expect(component.themeDeleteVisible()).toBeTrue()
+      expect(component.themeUseLoadingState()).toBe('ready') // no use detection for mandatory themes
     })
 
     it('should navigate back on theme deleted', () => {

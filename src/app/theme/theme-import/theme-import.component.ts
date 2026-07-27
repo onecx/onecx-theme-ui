@@ -1,13 +1,13 @@
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
+  effect,
   inject,
-  OnChanges,
   model,
   input,
-  output
+  output,
+  signal,
+  computed
 } from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { HttpHeaders } from '@angular/common/http'
@@ -21,7 +21,6 @@ import { FileUploadModule, FileSelectEvent } from 'primeng/fileupload'
 import { FloatLabelModule } from 'primeng/floatlabel'
 import { InputTextModule } from 'primeng/inputtext'
 import { MessageModule } from 'primeng/message'
-import { ToastModule } from 'primeng/toast'
 import { TooltipModule } from 'primeng/tooltip'
 
 import { PortalMessageService } from '@onecx/angular-integration-interface'
@@ -44,29 +43,26 @@ import { ThemeProperties } from 'src/app/shared/models/theme.model'
     ReactiveFormsModule,
     TranslateModule,
     TooltipModule,
-    ToastModule,
     ThemeColorBoxComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-import.component.html',
   styleUrl: './theme-import.component.scss'
 })
-export class ThemeImportComponent implements OnChanges, AfterViewInit {
+export class ThemeImportComponent {
   private readonly themeApi = inject(ThemesAPIService)
   public readonly translate = inject(TranslateService)
   private readonly msgService = inject(PortalMessageService)
-  private readonly cd = inject(ChangeDetectorRef)
   // signals
   public readonly themes = input.required<Theme[] | undefined>()
   public readonly visible = model.required<boolean>()
   public readonly uploaded = output<Theme | undefined>()
   public readonly importError = model<'GENERAL' | 'CONTENT' | 'NONE'>()
   // dialog
-  public themeNameExists = false
-  public displayNameExists = false
-  public themeSnapshot: ThemeSnapshot | null = null
-  public httpHeaders!: HttpHeaders
-  public properties: ThemeProperties | null = null
+  public readonly themeNameExists = signal(false)
+  public readonly displayNameExists = signal(false)
+  public readonly themeSnapshot = signal<ThemeSnapshot | null>(null)
+  public readonly properties = signal<ThemeProperties | null>(null)
   public formGroup = new FormGroup({
     themeName: new FormControl<string | null>(null, [
       Validators.required,
@@ -88,30 +84,33 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
     { requireSync: true }
   )
 
-  ngOnChanges(): void {
-    if (this.visible()) {
-      this.httpHeaders = new HttpHeaders()
-      this.httpHeaders = this.httpHeaders.set('Content-Type', 'application/json')
-    }
-    this.onImportClear()
-  }
+  public readonly httpHeaders = computed(() =>
+    this.visible() ? new HttpHeaders().set('Content-Type', 'application/json') : new HttpHeaders()
+  )
 
-  ngAfterViewInit() {
-    this.cd.detectChanges()
+  constructor() {
+    // reset the dialog state whenever visibility changes (dialog opens or closes)
+    effect(() => {
+      const v = this.visible()
+      if (v === false) {
+        this.onImportClear()
+      }
+    })
   }
 
   public async onImportSelectFile(event: FileSelectEvent): Promise<void> {
     this.onImportClear()
     return event.files[0].text().then((text) => {
       try {
-        this.themeSnapshot = JSON.parse(text)
-        if (this.isThemeImportRequestDTO(this.themeSnapshot)) {
-          if (this.themeSnapshot.themes) {
+        const snapshot: ThemeSnapshot = JSON.parse(text)
+        this.themeSnapshot.set(snapshot)
+        if (this.isThemeImportRequestDTO(snapshot)) {
+          if (snapshot.themes) {
             // the theme export does not include more than one theme, so we can safely take the first key
-            const key: string[] = Object.keys(this.themeSnapshot.themes)
-            this.properties = this.themeSnapshot.themes[key[0]].properties as ThemeProperties
+            const key: string[] = Object.keys(snapshot.themes)
+            this.properties.set(snapshot.themes[key[0]].properties as ThemeProperties)
             this.formGroup.controls['themeName'].setValue(key[0])
-            this.formGroup.controls['displayName'].setValue(this.themeSnapshot.themes[key[0]].displayName ?? null)
+            this.formGroup.controls['displayName'].setValue(snapshot.themes[key[0]].displayName ?? null)
             if (this.formGroup.controls['displayName'].value === null) {
               this.formGroup.controls['displayName'].setErrors({ required: true })
               this.formGroup.controls['displayName'].markAsDirty()
@@ -122,7 +121,6 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
           console.error('Theme Import Error: not valid data ')
           this.importError.set('CONTENT')
         }
-        this.cd.markForCheck() // force change detection to update the view with the new properties
       } catch (err) {
         console.error('Theme Import Error: parse error', err)
         this.importError.set('GENERAL')
@@ -132,35 +130,37 @@ export class ThemeImportComponent implements OnChanges, AfterViewInit {
 
   public onThemeNameChange() {
     if (this.themes()?.length === 0 || !this.formGroup.valid) return
-    this.themeNameExists = this.themes()!.some((theme) => theme.name === this.formGroup.controls['themeName'].value)
-    this.displayNameExists = this.themes()!.some(
-      (theme) => theme.displayName === this.formGroup.controls['displayName'].value
+    this.themeNameExists.set(this.themes()!.some((theme) => theme.name === this.formGroup.controls['themeName'].value))
+    this.displayNameExists.set(
+      this.themes()!.some((theme) => theme.displayName === this.formGroup.controls['displayName'].value)
     )
   }
 
   public onImportClear(): void {
-    this.formGroup.reset()
+    if (this.formGroup) this.formGroup.reset()
     this.importError.set('NONE')
-    this.themeSnapshot = null
-    this.themeNameExists = false
-    this.displayNameExists = false
+    this.themeSnapshot.set(null)
+    this.properties.set(null)
+    this.themeNameExists.set(false)
+    this.displayNameExists.set(false)
   }
 
   public onThemeUpload(): void {
-    if (!this.formGroup.valid || !this.properties) return
-    if (!this.themeSnapshot?.themes) return
+    if (!this.formGroup.valid || !this.properties()) return
+    const snapshot = this.themeSnapshot()
+    if (!snapshot?.themes) return
     // Import data preparation
-    const key: string[] = Object.keys(this.themeSnapshot?.themes)
+    const key: string[] = Object.keys(snapshot.themes)
     if (this.formGroup.controls['displayName'].value)
-      this.themeSnapshot.themes[key[0]].displayName = this.formGroup.controls['displayName'].value
+      snapshot.themes[key[0]].displayName = this.formGroup.controls['displayName'].value
     if (key[0] !== this.formGroup.controls['themeName'].value) {
       // save the theme properties to be reassigned on new key
-      const themeProps = Object.getOwnPropertyDescriptor(this.themeSnapshot.themes, key[0])
-      Object.defineProperty(this.themeSnapshot.themes, this.formGroup.controls['themeName'].value!, themeProps!)
-      delete this.themeSnapshot.themes[key[0]]
+      const themeProps = Object.getOwnPropertyDescriptor(snapshot.themes, key[0])
+      Object.defineProperty(snapshot.themes, this.formGroup.controls['themeName'].value!, themeProps!)
+      delete snapshot.themes[key[0]]
     }
     // Import execution: upload
-    this.themeApi.importThemes({ themeSnapshot: this.themeSnapshot }).subscribe({
+    this.themeApi.importThemes({ themeSnapshot: snapshot }).subscribe({
       next: () => {
         this.msgService.success({ summaryKey: 'THEME.IMPORT.THEME_SUCCESS' })
         this.uploaded.emit({

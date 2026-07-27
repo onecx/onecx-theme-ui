@@ -9,7 +9,6 @@ import { FloatLabelModule } from 'primeng/floatlabel'
 import { TextareaModule } from 'primeng/textarea'
 import { InputTextModule } from 'primeng/inputtext'
 import { MessageModule } from 'primeng/message'
-import { ToastModule } from 'primeng/toast'
 import { TooltipModule } from 'primeng/tooltip'
 
 import { PortalMessageService } from '@onecx/angular-integration-interface'
@@ -37,8 +36,7 @@ type ErrorMessage = { summaryKey: string; detailKey?: string }
     MessageModule,
     ReactiveFormsModule,
     TranslateModule,
-    TooltipModule,
-    ToastModule
+    TooltipModule
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-create.component.html',

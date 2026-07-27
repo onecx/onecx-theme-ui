@@ -12,7 +12,6 @@ import { DialogModule } from 'primeng/dialog'
 import { FloatLabelModule } from 'primeng/floatlabel'
 import { MessageModule } from 'primeng/message'
 import { Select, SelectModule } from 'primeng/select'
-import { ToastModule } from 'primeng/toast'
 import { ToggleSwitchModule } from 'primeng/toggleswitch'
 import { TooltipModule } from 'primeng/tooltip'
 
@@ -38,8 +37,7 @@ import { ChangeMode } from '../theme-detail.component'
     SelectModule,
     TranslateModule,
     ToggleSwitchModule,
-    TooltipModule,
-    ToastModule
+    TooltipModule
   ],
   providers: [ConfirmationService],
   changeDetection: ChangeDetectionStrategy.OnPush,

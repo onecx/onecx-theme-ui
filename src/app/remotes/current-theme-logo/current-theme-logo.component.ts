@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, EventEmitter, inject, Input, OnInit } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { AsyncPipe, Location } from '@angular/common'
-import { UntilDestroy } from '@ngneat/until-destroy'
 import { BehaviorSubject, first, ReplaySubject } from 'rxjs'
 
 import {
@@ -24,7 +23,6 @@ import { environment } from 'src/environments/environment'
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './current-theme-logo.component.html'
 })
-@UntilDestroy()
 export class OneCXCurrentThemeLogoComponent implements OnInit, ocxRemoteComponent, ocxRemoteWebcomponent {
   private readonly remoteComponentConfig = inject<ReplaySubject<RemoteComponentConfig>>(REMOTE_COMPONENT_CONFIG)
   private readonly appConfigService = inject(AppConfigService)

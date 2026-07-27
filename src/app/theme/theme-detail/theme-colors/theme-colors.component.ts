@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, input, OnInit } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, input } from '@angular/core'
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, FormBuilder } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
@@ -14,7 +14,6 @@ import { InputTextModule } from 'primeng/inputtext'
 import { MessageModule } from 'primeng/message'
 import { PopoverModule } from 'primeng/popover'
 import { PanelModule } from 'primeng/panel'
-import { ToastModule } from 'primeng/toast'
 import { TooltipModule } from 'primeng/tooltip'
 
 import { AngularAcceleratorModule } from '@onecx/angular-accelerator'
@@ -41,7 +40,6 @@ import { ChangeMode } from '../theme-detail.component'
     PanelModule,
     PopoverModule,
     ReactiveFormsModule,
-    ToastModule,
     TooltipModule,
     TranslateModule
   ],
@@ -49,7 +47,7 @@ import { ChangeMode } from '../theme-detail.component'
   templateUrl: './theme-colors.component.html',
   styleUrl: './theme-colors.component.scss'
 })
-export class ThemeColorsComponent implements OnInit {
+export class ThemeColorsComponent {
   private readonly fb = inject(FormBuilder)
   private readonly translate = inject(TranslateService)
   private readonly msgService = inject(PortalMessageService)
@@ -119,6 +117,7 @@ export class ThemeColorsComponent implements OnInit {
   )
 
   constructor() {
+    this.initColorForms()
     effect(() => {
       const currentTheme = this.theme()
       const mode = this.changeMode()
@@ -133,10 +132,6 @@ export class ThemeColorsComponent implements OnInit {
         this.colorsForm.reset()
       }
     })
-  }
-
-  public ngOnInit() {
-    this.initColorForms()
   }
 
   private initColorForms() {

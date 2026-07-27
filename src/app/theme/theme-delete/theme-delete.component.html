@@ -16,7 +16,7 @@
             ? 'pi-spin pi-cog'
             : useLoadingState() === 'timeout'
               ? 'pi-exclamation-triangle'
-              : useLoadingState() === 'ready' && themeUsed()
+              : useLoadingState() === 'ready' && (themeToBeDeleted()?.mandatory || themeUsed())
                 ? 'pi-ban'
                 : 'pi-question-circle';
         @let color = useLoadingState() === 'ready' && !themeUsed() ? 'var(--danger-button-bg)' : 'var(--text-color)';

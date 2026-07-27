@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { AsyncPipe } from '@angular/common'
 import { ActivatedRoute, Router, RouterModule } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
-import { BehaviorSubject, catchError, finalize, map, Observable, of, Subscription } from 'rxjs'
+import { BehaviorSubject, catchError, finalize, map, Observable, of, Subject, switchMap } from 'rxjs'
 
 import { ButtonModule } from 'primeng/button'
 import { CardModule } from 'primeng/card'
@@ -11,7 +11,6 @@ import { FloatLabelModule } from 'primeng/floatlabel'
 import { InputGroupModule } from 'primeng/inputgroup'
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon'
 import { MessageModule } from 'primeng/message'
-import { ToastModule } from 'primeng/toast'
 import { TooltipModule } from 'primeng/tooltip'
 
 import {
@@ -44,7 +43,6 @@ import { ThemeImportComponent } from '../theme-import/theme-import.component'
     InputGroupAddonModule,
     MessageModule,
     RouterModule,
-    ToastModule,
     TooltipModule,
     TranslateModule,
     PortalPageComponent,
@@ -65,19 +63,18 @@ export class ThemeSearchComponent implements OnInit {
   private readonly imageApi = inject(ImagesInternalAPIService)
   private readonly destroyRef = inject(DestroyRef)
   // signals
-  public themeImportVisible = signal(false)
-  public themeCreateVisible = signal(false)
-  public themeImported = signal(false)
+  public readonly themeImportVisible = signal(false)
+  public readonly themeCreateVisible = signal(false)
+  public readonly themeImported = signal(false)
   // data
   private readonly dataSubject$ = new BehaviorSubject<RowListGridData[]>([])
   public data$: Observable<RowListGridData[] | null> = this.dataSubject$.asObservable()
-  private searchSubscription?: Subscription // to cancel ongoing search if new search is triggered
+  private readonly loadTrigger$ = new Subject<void>()
   public filteredData: RowListGridData[] | undefined = undefined
   // dialog
   public loading = false
   public exceptionKey: string | undefined = undefined
   public actions$: Observable<Action[]> | undefined
-  public textFilterValue$ = new BehaviorSubject<string | undefined>(undefined)
   public globalFilterValue = ''
   public sortColumns = this.prepareSortColumns()
   public sortColumnKeys = this.sortColumns.map((c) => c.id)
@@ -89,6 +86,29 @@ export class ThemeSearchComponent implements OnInit {
   public LogoRefType = LogoRefType
 
   constructor() {
+    this.loadTrigger$
+      .pipe(
+        switchMap(() => {
+          this.loading = true
+          this.exceptionKey = undefined
+          return this.themeApi.searchThemes({ searchThemeRequest: {} }).pipe(
+            map((data) => {
+              const themes = data?.stream ?? []
+              themes.sort(Utils.sortByDisplayName)
+              return themes as unknown[] as RowListGridData[]
+            }),
+            catchError((err) => {
+              this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + err.status + '.THEME'
+              console.error('searchThemes', err)
+              return of([] as RowListGridData[])
+            }),
+            finalize(() => (this.loading = false))
+          )
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((data) => this.dataSubject$.next(data))
+
     effect(() => {
       if (this.themeImported()) {
         this.loadThemes()
@@ -102,30 +122,9 @@ export class ThemeSearchComponent implements OnInit {
   }
 
   public loadThemes(): void {
-    this.loading = true
-    this.exceptionKey = undefined
-    this.searchSubscription?.unsubscribe()
-    this.searchSubscription = this.themeApi
-      .searchThemes({ searchThemeRequest: {} })
-      .pipe(
-        map((data) => {
-          const themes = data?.stream ?? []
-          themes.sort(this.sortThemesByName)
-          return themes as unknown[] as RowListGridData[]
-        }),
-        catchError((err) => {
-          this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + err.status + '.THEME'
-          console.error('searchThemes', err)
-          return of([] as RowListGridData[])
-        }),
-        finalize(() => (this.loading = false)),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe((data) => this.dataSubject$.next(data))
+    this.loadTrigger$.next()
   }
-  private sortThemesByName(a: Theme, b: Theme): number {
-    return a.displayName!.toUpperCase().localeCompare(b.displayName!.toUpperCase())
-  }
+
   public convertToThemes(data?: RowListGridData[]): Theme[] | undefined {
     if (!data) return undefined
     return data as unknown[] as Theme[]
