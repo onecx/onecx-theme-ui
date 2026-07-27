@@ -304,7 +304,7 @@ describe('ThemeDetailComponent', () => {
 
       component['getThemes']()
 
-      component.themes$.subscribe((result) => {
+      component.themes$!.subscribe((result) => {
         expect(result).toHaveSize(2)
         expect(result[0].displayName).toBe('Alpha')
         done()
@@ -318,7 +318,7 @@ describe('ThemeDetailComponent', () => {
 
       component['getThemes']()
 
-      component.themes$.subscribe((result) => {
+      component.themes$!.subscribe((result) => {
         expect(result).toEqual([])
         expect(console.error).toHaveBeenCalledWith('searchThemes', errorResponse)
         expect(component.exceptionKey).toBe('EXCEPTIONS.HTTP_STATUS_500.THEME')
@@ -331,7 +331,7 @@ describe('ThemeDetailComponent', () => {
 
       component['getThemes']()
 
-      component.themes$.subscribe((result) => {
+      component.themes$!.subscribe((result) => {
         expect(result).toEqual([])
         done()
       })

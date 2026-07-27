@@ -49,8 +49,8 @@ type ThemeData = {
   standalone: true,
   imports: [
     AngularAcceleratorModule,
-    AsyncPipe,
-    JsonPipe,
+    AsyncPipe, // used in HTML
+    JsonPipe, // used in HTML
     MessageModule,
     TabsModule,
     TooltipModule,
@@ -118,7 +118,7 @@ export class ThemeDetailComponent implements OnInit {
   // data
   public paramThemeName: string | null = null
   public readonly theme = signal<Theme | undefined>(undefined)
-  public themes$!: Observable<Theme[]>
+  public themes$: Observable<Theme[]> | undefined
   public themeForProps: Theme | undefined
   public themeForColors: Theme | undefined
   // image
