@@ -206,9 +206,10 @@ describe('ThemePropsComponent', () => {
         // clear external URLs
         component.onRemoveImageUrl(LogoRefType.Logo)
         expect(component.basicForm.get('logoUrl')?.value).toBeNull()
-
         component.onRemoveImageUrl(LogoRefType.LogoSmall)
         expect(component.basicForm.get('smallLogoUrl')?.value).toBeNull()
+        component.onRemoveImageUrl(LogoRefType.Favicon)
+        expect(component.basicForm.get('faviconUrl')?.value).toBeNull()
       })
 
       it('should delete image - successful', () => {

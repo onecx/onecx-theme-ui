@@ -69,10 +69,17 @@ export class ThemePropsComponent implements OnChanges {
   public readonly changeMode = input.required<ChangeMode>()
   public readonly headerImageUrl = output<string | undefined>()
   // signals for forms, initialized in constructor
-  public isBasicFormValid!: Signal<boolean>
-  public isFontFormValid!: Signal<boolean>
-  public isComponentValid!: Signal<boolean>
-  public combinedFormValues!: Signal<Theme>
+  public readonly isBasicFormValid!: Signal<boolean>
+  public readonly isFontFormValid!: Signal<boolean>
+  public readonly isComponentValid!: Signal<boolean>
+  public readonly combinedFormValues!: Signal<Theme>
+  // signals for forms, initialized in constructor: URLs
+  private readonly logoUrlValue!: Signal<string | null>
+  public readonly isLogoUrlEmpty!: Signal<boolean>
+  private readonly smallLogoUrlValue!: Signal<string | null>
+  public readonly isSmallLogoUrlEmpty!: Signal<boolean>
+  private readonly faviconUrlValue!: Signal<string | null>
+  public readonly isFaviconUrlEmpty!: Signal<boolean>
   // image
   public bffUrl: Partial<Record<LogoRefType, string | undefined>> = {}
   public imageBasePath = this.imageApi.configuration.basePath
@@ -87,6 +94,33 @@ export class ThemePropsComponent implements OnChanges {
 
   constructor() {
     this.initForms()
+    // register value changes for URL controls to determine if they are empty or not, for use in HTML
+    this.logoUrlValue = toSignal(
+      this.basicForm.controls['logoUrl'].valueChanges.pipe(startWith(this.basicForm.controls['logoUrl'].value)),
+      { requireSync: true }
+    )
+    this.isLogoUrlEmpty = computed(() => {
+      const logoUrl = this.logoUrlValue()
+      return logoUrl === null || logoUrl.trim().length === 0
+    })
+    this.smallLogoUrlValue = toSignal(
+      this.basicForm.controls['smallLogoUrl'].valueChanges.pipe(
+        startWith(this.basicForm.controls['smallLogoUrl'].value)
+      ),
+      { requireSync: true }
+    )
+    this.isSmallLogoUrlEmpty = computed(() => {
+      const smallLogoUrl = this.smallLogoUrlValue()
+      return smallLogoUrl === null || smallLogoUrl.trim().length === 0
+    })
+    this.faviconUrlValue = toSignal(
+      this.basicForm.controls['faviconUrl'].valueChanges.pipe(startWith(this.basicForm.controls['faviconUrl'].value)),
+      { requireSync: true }
+    )
+    this.isFaviconUrlEmpty = computed(() => {
+      const faviconUrl = this.faviconUrlValue()
+      return faviconUrl === null || faviconUrl.trim().length === 0
+    })
     // build signals for form validation: basic and font form, for internal use in this component only
     this.isBasicFormValid = toSignal(
       this.basicForm.statusChanges.pipe(
@@ -279,13 +313,15 @@ export class ThemePropsComponent implements OnChanges {
     if (refType === LogoRefType.LogoSmall && this.basicForm.get('smallLogoUrl')?.value) {
       this.basicForm.get('smallLogoUrl')?.setValue(null)
     }
-    this.bffUrl[refType] = Utils.bffImageUrl(this.imageBasePath, this.theme()?.name, refType)
+    if (refType === LogoRefType.Favicon && this.basicForm.get('faviconUrl')?.value) {
+      this.basicForm.get('faviconUrl')?.setValue(null)
+    }
   }
 
   public onRemoveImage(refType: LogoRefType) {
-    if (this.theme()?.name && this.bffUrl[refType]) {
-      // On VIEW mode: manage image is enabled
-      this.imageApi.deleteImage({ refId: this.theme()?.name!, refType: refType }).subscribe({
+    const themeName = this.theme()?.name
+    if (themeName && this.bffUrl[refType]) {
+      this.imageApi.deleteImage({ refId: themeName, refType: refType }).subscribe({
         next: () => {
           // reset - important to trigger the change in UI
           this.bffUrl[refType] = undefined
