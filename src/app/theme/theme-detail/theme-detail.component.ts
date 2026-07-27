@@ -86,7 +86,6 @@ export class ThemeDetailComponent implements OnInit {
   public readonly themeCreateVisible = signal<boolean>(false)
   public readonly themeToBeDeleted = signal<Theme | undefined>(undefined)
   public readonly themeForCreation = signal<Theme | undefined>(undefined)
-  public readonly checkThemeUse = signal<boolean>(false)
   public readonly themeUsed = signal<boolean>(false)
   public readonly themeUsedName = signal<string | undefined>(undefined)
   public readonly themeUsedByWorkspaces = signal<Workspace[]>([])

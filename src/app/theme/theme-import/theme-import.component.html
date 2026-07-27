@@ -16,7 +16,7 @@
         name="file"
         accept=".json"
         [maxFileSize]="1000000"
-        [headers]="httpHeaders"
+        [headers]="httpHeaders()"
         [customUpload]="true"
         (onClear)="onImportClear()"
         (onRemove)="onImportClear()"

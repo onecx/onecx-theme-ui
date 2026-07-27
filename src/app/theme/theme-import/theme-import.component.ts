@@ -1,4 +1,14 @@
-import { ChangeDetectionStrategy, Component, inject, OnChanges, model, input, output, signal } from '@angular/core'
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+  model,
+  input,
+  output,
+  signal,
+  computed
+} from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { HttpHeaders } from '@angular/common/http'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
@@ -41,7 +51,7 @@ import { ThemeProperties } from 'src/app/shared/models/theme.model'
   templateUrl: './theme-import.component.html',
   styleUrl: './theme-import.component.scss'
 })
-export class ThemeImportComponent implements OnChanges {
+export class ThemeImportComponent {
   private readonly themeApi = inject(ThemesAPIService)
   public readonly translate = inject(TranslateService)
   private readonly msgService = inject(PortalMessageService)
@@ -54,7 +64,6 @@ export class ThemeImportComponent implements OnChanges {
   public readonly themeNameExists = signal(false)
   public readonly displayNameExists = signal(false)
   public readonly themeSnapshot = signal<ThemeSnapshot | null>(null)
-  public httpHeaders = new HttpHeaders()
   public readonly properties = signal<ThemeProperties | null>(null)
   public formGroup = new FormGroup({
     themeName: new FormControl<string | null>(null, [
@@ -77,12 +86,18 @@ export class ThemeImportComponent implements OnChanges {
     { requireSync: true }
   )
 
-  ngOnChanges(): void {
-    if (this.visible()) {
-      this.httpHeaders = new HttpHeaders()
-      this.httpHeaders = this.httpHeaders.set('Content-Type', 'application/json')
-    }
-    this.onImportClear()
+  public readonly httpHeaders = computed(() =>
+    this.visible() ? new HttpHeaders().set('Content-Type', 'application/json') : new HttpHeaders()
+  )
+
+  constructor() {
+    // reset the dialog state whenever visibility changes (dialog opens or closes)
+    effect(() => {
+      const v = this.visible()
+      if (v === false) {
+        this.onImportClear()
+      }
+    })
   }
 
   public async onImportSelectFile(event: FileSelectEvent): Promise<void> {
@@ -124,7 +139,7 @@ export class ThemeImportComponent implements OnChanges {
   }
 
   public onImportClear(): void {
-    this.formGroup.reset()
+    if (this.formGroup) this.formGroup.reset()
     this.importError.set('NONE')
     this.themeSnapshot.set(null)
     this.properties.set(null)

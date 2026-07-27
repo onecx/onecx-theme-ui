@@ -65,9 +65,9 @@ export class ThemeSearchComponent implements OnInit {
   private readonly imageApi = inject(ImagesInternalAPIService)
   private readonly destroyRef = inject(DestroyRef)
   // signals
-  public themeImportVisible = signal(false)
-  public themeCreateVisible = signal(false)
-  public themeImported = signal(false)
+  public readonly themeImportVisible = signal(false)
+  public readonly themeCreateVisible = signal(false)
+  public readonly themeImported = signal(false)
   // data
   private readonly dataSubject$ = new BehaviorSubject<RowListGridData[]>([])
   public data$: Observable<RowListGridData[] | null> = this.dataSubject$.asObservable()
@@ -77,7 +77,6 @@ export class ThemeSearchComponent implements OnInit {
   public loading = false
   public exceptionKey: string | undefined = undefined
   public actions$: Observable<Action[]> | undefined
-  public textFilterValue$ = new BehaviorSubject<string | undefined>(undefined)
   public globalFilterValue = ''
   public sortColumns = this.prepareSortColumns()
   public sortColumnKeys = this.sortColumns.map((c) => c.id)

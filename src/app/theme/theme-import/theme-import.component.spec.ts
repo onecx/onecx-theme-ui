@@ -63,18 +63,21 @@ describe('ThemeImportComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy()
-    component.ngOnChanges()
   })
 
   it('should clear form on hide', () => {
     component.importError.set('GENERAL')
     component.themeSnapshot.set({ themes: { theme: {} } })
+    component.themeNameExists.set(true)
+    component.displayNameExists.set(true)
 
     component.visible.set(false)
-    component.ngOnChanges()
+    fixture.detectChanges()
 
     expect(component.themeSnapshot()).toBeNull()
     expect(component.importError()).toBe('NONE')
+    expect(component.themeNameExists()).toBeFalse()
+    expect(component.displayNameExists()).toBeFalse()
   })
 
   describe('upload', () => {
@@ -276,6 +279,18 @@ describe('ThemeImportComponent', () => {
       component.formGroup.controls['themeName'].setValue('theme1')
       component.formGroup.controls['displayName'].setValue('Theme Display')
       expect(component.isFormValid()).toBeTrue()
+    })
+  })
+
+  describe('httpHeaders', () => {
+    it('should include Content-Type header when dialog is visible', () => {
+      component.visible.set(true)
+      expect(component.httpHeaders().get('Content-Type')).toBe('application/json')
+    })
+
+    it('should return empty headers when dialog is not visible', () => {
+      component.visible.set(false)
+      expect(component.httpHeaders().get('Content-Type')).toBeNull()
     })
   })
 })
