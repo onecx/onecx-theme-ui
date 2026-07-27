@@ -1,5 +1,6 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   computed,
   inject,
@@ -59,6 +60,7 @@ import { DictionaryObject } from 'src/app/shared/models/theme.model'
   styleUrl: './theme-props.component.scss'
 })
 export class ThemePropsComponent implements OnChanges {
+  private readonly cdr = inject(ChangeDetectorRef)
   private readonly msgService = inject(PortalMessageService)
   private readonly translate = inject(TranslateService)
   private readonly imageApi = inject(ImagesInternalAPIService)
@@ -265,6 +267,7 @@ export class ThemePropsComponent implements OnChanges {
       this.msgService.success({ summaryKey: 'IMAGE.UPLOAD.OK' })
       this.bffUrl[refType] = Utils.bffImageUrl(this.imageBasePath, name, refType)
       if (refType === LogoRefType.Logo) this.headerImageUrl.emit(this.bffUrl[refType])
+      this.cdr.detectChanges()
     }
   }
 
@@ -276,18 +279,18 @@ export class ThemePropsComponent implements OnChanges {
     if (refType === LogoRefType.LogoSmall && this.basicForm.get('smallLogoUrl')?.value) {
       this.basicForm.get('smallLogoUrl')?.setValue(null)
     }
-    this.bffUrl[refType] = Utils.bffImageUrl(this.imageBasePath, this.theme?.name, refType)
+    this.bffUrl[refType] = Utils.bffImageUrl(this.imageBasePath, this.theme()?.name, refType)
   }
 
   public onRemoveImage(refType: LogoRefType) {
-    console.log('onRemoveImage', refType, this.theme?.name, this.bffUrl[refType])
-    if (this.theme?.name && this.bffUrl[refType]) {
+    if (this.theme()?.name && this.bffUrl[refType]) {
       // On VIEW mode: manage image is enabled
-      this.imageApi.deleteImage({ refId: this.theme?.name, refType: refType }).subscribe({
+      this.imageApi.deleteImage({ refId: this.theme()?.name!, refType: refType }).subscribe({
         next: () => {
           // reset - important to trigger the change in UI
           this.bffUrl[refType] = undefined
           if (refType === LogoRefType.Logo) this.headerImageUrl.emit(undefined)
+          this.cdr.detectChanges()
         },
         error: (err) => console.error('deleteImage', err)
       })
