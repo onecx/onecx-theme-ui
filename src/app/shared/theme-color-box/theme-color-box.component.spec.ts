@@ -59,14 +59,67 @@ describe('ThemeColorBoxComponent', () => {
     })
   })
 
-  describe('signals', () => {
-    it('should compute signals', () => {
-      fixture.componentRef.setInput('properties', colorProperties)
-      fixture.detectChanges()
+  describe('computed signals', () => {
+    describe('with default input', () => {
+      it('should return the default generalProperties', () => {
+        expect(component.generalProperties()).toEqual({
+          'primary-color': 'gray',
+          'secondary-color': 'silver',
+          'text-color': 'black',
+          'body-bg-color': 'lightgray',
+          'content-bg-color': 'white'
+        })
+      })
 
-      expect(component.generalProperties()).toEqual(colorProperties.general)
-      expect(component.topbarProperties()).toEqual(colorProperties.topbar)
-      expect(component.sidebarProperties()).toEqual(colorProperties.sidebar)
+      it('should return the default topbarProperties', () => {
+        expect(component.topbarProperties()).toEqual({
+          'topbar-text-color': 'darkgray',
+          'topbar-bg-color': 'lightgray'
+        })
+      })
+
+      it('should return the default sidebarProperties', () => {
+        expect(component.sidebarProperties()).toEqual({
+          'menu-item-text-color': 'black',
+          'menu-bg-color': 'silver'
+        })
+      })
+    })
+
+    describe('with explicit properties input', () => {
+      beforeEach(() => {
+        fixture.componentRef.setInput('properties', colorProperties)
+      })
+
+      it('should return generalProperties from the general section of the input', () => {
+        expect(component.generalProperties()).toEqual(colorProperties.general)
+      })
+
+      it('should return topbarProperties from the topbar section of the input', () => {
+        expect(component.topbarProperties()).toEqual(colorProperties.topbar)
+      })
+
+      it('should return sidebarProperties from the sidebar section of the input', () => {
+        expect(component.sidebarProperties()).toEqual(colorProperties.sidebar)
+      })
+    })
+
+    describe('with missing properties sections', () => {
+      beforeEach(() => {
+        fixture.componentRef.setInput('properties', {})
+      })
+
+      it('should return undefined for generalProperties when the general section is absent', () => {
+        expect(component.generalProperties()).toBeUndefined()
+      })
+
+      it('should return undefined for topbarProperties when the topbar section is absent', () => {
+        expect(component.topbarProperties()).toBeUndefined()
+      })
+
+      it('should return undefined for sidebarProperties when the sidebar section is absent', () => {
+        expect(component.sidebarProperties()).toBeUndefined()
+      })
     })
   })
 })
