@@ -1,16 +1,7 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  DestroyRef,
-  EventEmitter,
-  inject,
-  input,
-  Input,
-  OnInit
-} from '@angular/core'
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
+import { ChangeDetectionStrategy, Component, effect, EventEmitter, inject, input, Input } from '@angular/core'
+import { toSignal } from '@angular/core/rxjs-interop'
 import { AsyncPipe, Location } from '@angular/common'
-import { BehaviorSubject, first, ReplaySubject } from 'rxjs'
+import { BehaviorSubject, ReplaySubject } from 'rxjs'
 
 import {
   AngularRemoteComponentsModule,
@@ -32,10 +23,9 @@ import { environment } from 'src/environments/environment'
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './current-theme-logo.component.html'
 })
-export class OneCXCurrentThemeLogoComponent implements OnInit, ocxRemoteComponent, ocxRemoteWebcomponent {
+export class OneCXCurrentThemeLogoComponent implements ocxRemoteComponent, ocxRemoteWebcomponent {
   private readonly remoteComponentConfig = inject<ReplaySubject<RemoteComponentConfig>>(REMOTE_COMPONENT_CONFIG)
   private readonly appConfigService = inject(AppConfigService)
-  private readonly destroyRef = inject(DestroyRef)
   private readonly themeApi = inject(ThemesAPIService)
   private readonly themeService = inject(ThemeService)
   // input
@@ -52,19 +42,16 @@ export class OneCXCurrentThemeLogoComponent implements OnInit, ocxRemoteComponen
   // output
   @Input() imageLoadingFailed = new EventEmitter<boolean>()
 
-  public currentTheme$ = this.themeService.currentTheme$.asObservable()
   public themeName: string | undefined
   public imageUrl$ = new BehaviorSubject<string | undefined>(undefined)
   public defaultImageUrl: string | undefined = undefined
+  private readonly currentTheme = toSignal(this.themeService.currentTheme$.asObservable())
 
-  ngOnInit(): void {
-    this.currentTheme$
-      .pipe(first())
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((theme) => {
-        this.themeName = theme?.name
-        this.imageUrl$.next(this.getImageUrl(this.themeName, 'url'))
-      })
+  constructor() {
+    effect(() => {
+      this.themeName = this.currentTheme()?.name
+      this.imageUrl$.next(this.getImageUrl(this.themeName, 'url'))
+    })
   }
 
   // initialize this component as remote

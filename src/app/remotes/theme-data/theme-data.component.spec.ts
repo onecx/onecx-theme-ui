@@ -117,9 +117,8 @@ describe('OneCXThemeDataComponent', () => {
       initializeComponent()
       const mockResponse: SearchThemeResponse = { stream: themes }
       themeApiSpy.searchThemes.and.returnValue(of(mockResponse))
-      component.dataType = 'themes'
-
-      component.ngOnChanges()
+      fixture.componentRef.setInput('dataType', 'themes')
+      fixture.detectChanges()
 
       component.themes$?.subscribe({
         next: (data) => {
@@ -136,9 +135,8 @@ describe('OneCXThemeDataComponent', () => {
       initializeComponent()
       const mockResponse: SearchThemeResponse = { stream: [] }
       themeApiSpy.searchThemes.and.returnValue(of(mockResponse))
-      component.dataType = 'themes'
-
-      component.ngOnChanges()
+      fixture.componentRef.setInput('dataType', 'themes')
+      fixture.detectChanges()
 
       component.themes$?.subscribe({
         next: (data) => {
@@ -155,9 +153,8 @@ describe('OneCXThemeDataComponent', () => {
       initializeComponent()
       const mockResponse: SearchThemeResponse = { stream: undefined }
       themeApiSpy.searchThemes.and.returnValue(of(mockResponse))
-      component.dataType = 'themes'
-
-      component.ngOnChanges()
+      fixture.componentRef.setInput('dataType', 'themes')
+      fixture.detectChanges()
 
       component.themes$?.subscribe({
         next: (data) => {
@@ -174,10 +171,10 @@ describe('OneCXThemeDataComponent', () => {
       initializeComponent()
       const errorResponse = { status: 400, statusText: 'Error on getting themes' }
       themeApiSpy.searchThemes.and.returnValue(throwError(() => errorResponse))
-      component.dataType = 'themes'
+      fixture.componentRef.setInput('dataType', 'themes')
       spyOn(console, 'error')
 
-      component.ngOnChanges()
+      fixture.detectChanges()
       component.themes$?.subscribe({
         next: (data) => {
           if (data) {
@@ -193,10 +190,9 @@ describe('OneCXThemeDataComponent', () => {
   describe('getting theme', () => {
     it('should get theme - successful with data', () => {
       initializeComponent()
-      component.dataType = 'theme'
+      fixture.componentRef.setInput('dataType', 'theme')
       themeApiSpy.getThemeByName.and.returnValue(of(theme1))
-
-      component.ngOnChanges()
+      fixture.detectChanges()
 
       expect(themeApiSpy.getThemeByName).not.toHaveBeenCalled()
     })
@@ -204,10 +200,9 @@ describe('OneCXThemeDataComponent', () => {
     it('should get theme - successful with data', (done) => {
       initializeComponent()
       themeApiSpy.getThemeByName.and.returnValue(of(theme1))
-      component.dataType = 'theme'
-      component.themeName = theme1.name
-
-      component.ngOnChanges()
+      fixture.componentRef.setInput('dataType', 'theme')
+      fixture.componentRef.setInput('themeName', theme1.name)
+      fixture.detectChanges()
 
       component.theme$?.subscribe({
         next: (data) => {
@@ -224,11 +219,11 @@ describe('OneCXThemeDataComponent', () => {
       initializeComponent()
       const errorResponse = { status: 400, statusText: 'Error on getting themes' }
       themeApiSpy.getThemeByName.and.returnValue(throwError(() => errorResponse))
-      component.dataType = 'theme'
-      component.themeName = theme1.name
+      fixture.componentRef.setInput('dataType', 'theme')
+      fixture.componentRef.setInput('themeName', theme1.name)
       spyOn(console, 'error')
 
-      component.ngOnChanges()
+      fixture.detectChanges()
 
       component.theme$?.subscribe({
         next: (data) => {
@@ -245,12 +240,11 @@ describe('OneCXThemeDataComponent', () => {
   describe('provide logo', () => {
     it('should load - initially', (done) => {
       initializeComponent()
-      component.logEnabled = true
-      component.logPrefix = 'get image url'
-      component.themeName = theme1.name
-      component.dataType = 'logo'
-
-      component.ngOnChanges()
+      fixture.componentRef.setInput('logEnabled', true)
+      fixture.componentRef.setInput('logPrefix', 'get image url')
+      fixture.componentRef.setInput('themeName', theme1.name)
+      fixture.componentRef.setInput('dataType', 'logo')
+      fixture.detectChanges()
       component.onImageLoad()
 
       component.imageUrl$?.subscribe({
@@ -267,13 +261,14 @@ describe('OneCXThemeDataComponent', () => {
     describe('provide logo - on error', () => {
       it('should load - failed - used: url', (done) => {
         initializeComponent()
-        component.logEnabled = true // log without prefix !
-        component.themeName = theme1.name
-        component.imageUrl = 'http://image/url'
-        component.dataType = 'logo'
+        fixture.componentRef.setInput('logEnabled', true)
+        fixture.componentRef.setInput('themeName', theme1.name)
+        fixture.componentRef.setInput('imageUrl', 'http://image/url')
+        fixture.componentRef.setInput('dataType', 'logo')
+        fixture.detectChanges()
         spyOn(component, 'getImageUrl').and.callThrough()
 
-        component.onImageLoadError(component.imageUrl)
+        component.onImageLoadError(component.imageUrl())
 
         component.imageUrl$?.subscribe({
           next: (data) => {
@@ -289,10 +284,11 @@ describe('OneCXThemeDataComponent', () => {
 
       it('should use image - failed - use default', (done) => {
         initializeComponent()
-        component.logEnabled = false
-        component.logPrefix = 'default logo'
-        component.themeName = theme1.name
-        component.dataType = 'logo'
+        fixture.componentRef.setInput('logEnabled', false)
+        fixture.componentRef.setInput('logPrefix', 'default logo')
+        fixture.componentRef.setInput('themeName', theme1.name)
+        fixture.componentRef.setInput('dataType', 'logo')
+        fixture.detectChanges()
         spyOn(component, 'getImageUrl').and.callThrough()
 
         component.onImageLoadError('base_url/bff/images/theme1/logo')
@@ -313,8 +309,9 @@ describe('OneCXThemeDataComponent', () => {
     describe('provide logo - get url', () => {
       it('should get image url - data type undefined', () => {
         initializeComponent()
-        component.dataType = undefined
-        component.themeName = theme1.name
+        fixture.componentRef.setInput('dataType', undefined)
+        fixture.componentRef.setInput('themeName', theme1.name)
+        fixture.detectChanges()
 
         const url = component.getImageUrl(theme1.name, 'other')
 
@@ -323,25 +320,27 @@ describe('OneCXThemeDataComponent', () => {
 
       it('should get image url - use input image url', () => {
         initializeComponent()
-        component.dataType = 'logo'
-        component.logEnabled = false
-        component.logPrefix = 'url'
-        component.themeName = theme1.name
-        component.imageUrl = '/url'
+        fixture.componentRef.setInput('dataType', 'logo')
+        fixture.componentRef.setInput('logEnabled', false)
+        fixture.componentRef.setInput('logPrefix', 'url')
+        fixture.componentRef.setInput('themeName', theme1.name)
+        fixture.componentRef.setInput('imageUrl', '/url')
+        fixture.detectChanges()
 
         const url = component.getImageUrl(theme1.name, 'url')
 
-        expect(url).toBe(component.imageUrl)
+        expect(url).toBe(component.imageUrl())
       })
 
       it('should get url - use default image url', () => {
         initializeComponent()
-        component.dataType = 'logo'
-        component.logEnabled = false
-        component.logPrefix = 'default url'
-        component.themeName = theme1.name
+        fixture.componentRef.setInput('dataType', 'logo')
+        fixture.componentRef.setInput('logEnabled', false)
+        fixture.componentRef.setInput('logPrefix', 'default url')
+        fixture.componentRef.setInput('themeName', theme1.name)
+        fixture.componentRef.setInput('useDefaultLogo', true)
         component.defaultImageUrl = '/default/url'
-        component.useDefaultLogo = true // enable use of default image
+        fixture.detectChanges()
 
         const url = component.getImageUrl(theme1.name, 'default')
 
