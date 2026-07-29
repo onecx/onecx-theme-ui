@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, EventEmitter, inject, Input, OnChanges } from '@angular/core'
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  effect,
+  EventEmitter,
+  inject,
+  input,
+  Input
+} from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { AsyncPipe, Location } from '@angular/common'
 import { TranslateModule } from '@ngx-translate/core'
@@ -35,22 +44,22 @@ type DataType = 'logo' | 'favicon' | 'themes' | 'theme'
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-data.component.html'
 })
-export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWebcomponent, OnChanges {
+export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWebcomponent {
   private readonly remoteComponentConfig = inject<ReplaySubject<RemoteComponentConfig>>(REMOTE_COMPONENT_CONFIG)
   private readonly appConfigService = inject(AppConfigService)
   private readonly destroyRef = inject(DestroyRef)
   private readonly slotService = inject(SlotService)
   private readonly themeApi = inject(ThemesAPIService)
   // input
-  @Input() refresh: boolean | undefined = false // on any change here a reload is triggered
-  @Input() dataType: DataType | undefined = undefined // which response data is expected
-  @Input() themeName: string | undefined = undefined // search parameter
-  @Input() imageId: string | undefined = undefined
-  @Input() imageUrl: string | undefined = undefined
-  @Input() imageStyleClass: string | undefined = undefined
-  @Input() useDefaultLogo = false // used if logo loading failed
-  @Input() logPrefix: string | undefined = undefined
-  @Input() logEnabled = false
+  readonly refresh = input(false) // on any change here a reload is triggered
+  readonly dataType = input<DataType>() // which response data is expected
+  readonly themeName = input<string>() // search parameter
+  readonly imageId = input<string>()
+  readonly imageUrl = input<string>()
+  readonly imageStyleClass = input<string>()
+  readonly useDefaultLogo = input(false) // used if logo loading failed
+  readonly logPrefix = input<string>()
+  readonly logEnabled = input(false)
   @Input() set ocxRemoteComponentConfig(config: RemoteComponentConfig) {
     this.ocxInitRemoteComponent(config)
   }
@@ -79,13 +88,15 @@ export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWeb
   /**
    * Prepare searches on each change
    */
-  public ngOnChanges(): void {
-    if (this.dataType === 'themes') this.getThemes()
-    if (this.dataType === 'theme') this.getTheme()
-    if (this.dataType === 'logo') {
-      // start image existence life cycle here: url => image => default (opt)
-      this.imageUrl$.next(this.getImageUrl(this.themeName, 'url'))
-    }
+  constructor() {
+    effect(() => {
+      if (this.dataType() === 'themes') this.getThemes()
+      if (this.dataType() === 'theme') this.getTheme()
+      if (this.dataType() === 'logo') {
+        // start image existence life cycle here: url => image => default (opt)
+        this.imageUrl$.next(this.getImageUrl(this.themeName(), 'url'))
+      }
+    })
   }
 
   /**
@@ -93,7 +104,7 @@ export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWeb
    */
   private getThemes(): void {
     const criteria: SearchThemeRequest = {
-      name: this.themeName,
+      name: this.themeName(),
       pageSize: 1000
     }
     this.themes$ = this.themeApi.searchThemes({ searchThemeRequest: criteria }).pipe(
@@ -113,8 +124,9 @@ export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWeb
    * THEME
    */
   private getTheme() {
-    if (!this.themeName) return
-    this.theme$ = this.themeApi.getThemeByName({ name: this.themeName }).pipe(
+    const themeName = this.themeName()
+    if (!themeName) return
+    this.theme$ = this.themeApi.getThemeByName({ name: themeName }).pipe(
       first(),
       map((data) => data.resource),
       catchError((err) => {
@@ -134,27 +146,27 @@ export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWeb
   }
 
   // try next prio level depending on previous used URL
-  public onImageLoadError(usedUrl: string): void {
+  public onImageLoadError(usedUrl: string | undefined): void {
     this.log('onImageLoadError using => ' + usedUrl)
-    if (usedUrl === this.imageUrl) {
-      this.imageUrl$.next(this.getImageUrl(this.themeName, 'image'))
-    } else if (usedUrl === this.getImageUrl(this.themeName, 'image')) {
-      this.imageUrl$.next(this.getImageUrl(this.themeName, 'default'))
+    if (usedUrl === this.imageUrl()) {
+      this.imageUrl$.next(this.getImageUrl(this.themeName(), 'image'))
+    } else if (usedUrl === this.getImageUrl(this.themeName(), 'image')) {
+      this.imageUrl$.next(this.getImageUrl(this.themeName(), 'default'))
     }
   }
 
   public getImageUrl(themeName: string | undefined, prioType: string): string | undefined {
-    if (!prioType || !['logo', 'favicon'].includes(this.dataType ?? 'unknown')) return undefined
+    if (!prioType || !['logo', 'favicon'].includes(this.dataType() ?? 'unknown')) return undefined
     this.log('getImageUrl on prioType => ' + prioType)
 
     // if URL exist
-    if (['url'].includes(prioType) && this.imageUrl && this.imageUrl !== '') {
-      this.log('getImageUrl => ' + this.imageUrl)
-      return this.imageUrl
+    if (['url'].includes(prioType) && this.imageUrl() && this.imageUrl() !== '') {
+      this.log('getImageUrl => ' + this.imageUrl())
+      return this.imageUrl()
     } else if (['url', 'image'].includes(prioType)) {
       this.log('getImageUrl => ' + Utils.bffImageUrl(this.themeApi.configuration.basePath, themeName, LogoRefType.Logo))
       return Utils.bffImageUrl(this.themeApi.configuration.basePath, themeName, LogoRefType.Logo)
-    } else if (['url', 'image', 'default'].includes(prioType) && this.useDefaultLogo && this.defaultImageUrl !== '') {
+    } else if (['url', 'image', 'default'].includes(prioType) && this.useDefaultLogo() && this.defaultImageUrl !== '') {
       // if user wants to have the default (as asset)
       return this.defaultImageUrl
     }
@@ -164,6 +176,6 @@ export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWeb
   }
 
   private log(text: string) {
-    if (this.logEnabled) console.info('onecx-theme-data: ' + (this.logPrefix ?? '') + ' => ' + text)
+    if (this.logEnabled()) console.info('onecx-theme-data: ' + (this.logPrefix() ?? '') + ' => ' + text)
   }
 }
