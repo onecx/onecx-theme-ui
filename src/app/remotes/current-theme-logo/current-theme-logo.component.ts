@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, EventEmitter, inject, Input, OnInit } from '@angular/core'
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  EventEmitter,
+  inject,
+  input,
+  Input,
+  OnInit
+} from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { AsyncPipe, Location } from '@angular/common'
 import { BehaviorSubject, first, ReplaySubject } from 'rxjs'
@@ -30,13 +39,13 @@ export class OneCXCurrentThemeLogoComponent implements OnInit, ocxRemoteComponen
   private readonly themeApi = inject(ThemesAPIService)
   private readonly themeService = inject(ThemeService)
   // input
-  @Input() refresh: boolean | undefined = false // on any change here a reload is triggered
-  @Input() imageId: string | undefined = undefined
-  @Input() imageUrl: string | undefined = undefined
-  @Input() imageStyleClass: string | undefined = undefined
-  @Input() useDefaultLogo = false // used if logo loading failed
-  @Input() logPrefix: string | undefined = undefined
-  @Input() logEnabled = false
+  readonly refresh = input(false) // on any change here a reload is triggered
+  readonly imageId = input<string>()
+  readonly imageUrl = input<string | undefined>()
+  readonly imageStyleClass = input<string>()
+  readonly useDefaultLogo = input(false) // used if logo loading failed
+  readonly logPrefix = input<string>()
+  readonly logEnabled = input(false)
   @Input() set ocxRemoteComponentConfig(config: RemoteComponentConfig) {
     this.ocxInitRemoteComponent(config)
   }
@@ -78,9 +87,9 @@ export class OneCXCurrentThemeLogoComponent implements OnInit, ocxRemoteComponen
   }
 
   // try next prio level depending on previous used URL
-  public onImageLoadError(usedUrl: string): void {
+  public onImageLoadError(usedUrl?: string): void {
     this.log('onImageLoadError using => ' + usedUrl)
-    if (usedUrl === this.imageUrl) {
+    if (usedUrl === this.imageUrl()) {
       this.log('onImageLoadError using => image')
       this.imageUrl$.next(this.getImageUrl(this.themeName, 'image'))
     } else if (usedUrl === this.getImageUrl(this.themeName, 'image')) {
@@ -93,13 +102,13 @@ export class OneCXCurrentThemeLogoComponent implements OnInit, ocxRemoteComponen
     this.log('getImageUrl on prioType => ' + prioType)
 
     // if URL exist
-    if (['url'].includes(prioType) && this.imageUrl && this.imageUrl !== '') {
-      this.log('getImageUrl => ' + this.imageUrl)
-      return this.imageUrl
+    if (['url'].includes(prioType) && this.imageUrl() && this.imageUrl() !== '') {
+      this.log('getImageUrl => ' + this.imageUrl())
+      return this.imageUrl()
     } else if (['url', 'image'].includes(prioType)) {
       this.log('getImageUrl => ' + Utils.bffImageUrl(this.themeApi.configuration.basePath, themeName, LogoRefType.Logo))
       return Utils.bffImageUrl(this.themeApi.configuration.basePath, themeName, LogoRefType.Logo)
-    } else if (['url', 'image', 'default'].includes(prioType) && this.useDefaultLogo && this.defaultImageUrl !== '') {
+    } else if (['url', 'image', 'default'].includes(prioType) && this.useDefaultLogo() && this.defaultImageUrl !== '') {
       // if user wants to have the default (as asset)
       return this.defaultImageUrl
     }
@@ -109,6 +118,6 @@ export class OneCXCurrentThemeLogoComponent implements OnInit, ocxRemoteComponen
   }
 
   private log(text: string) {
-    if (this.logEnabled) console.info('onecx-current-theme-logo: ' + (this.logPrefix ?? '') + ' => ' + text)
+    if (this.logEnabled()) console.info('onecx-current-theme-logo: ' + (this.logPrefix() ?? '') + ' => ' + text)
   }
 }

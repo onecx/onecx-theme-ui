@@ -99,8 +99,8 @@ describe('OneCXCurrentThemeLogoComponent', () => {
   describe('provide logo', () => {
     it('should load - initially', (done) => {
       initializeComponent()
-      component.logEnabled = true
-      component.logPrefix = 'get image url'
+      fixture.componentRef.setInput('logEnabled', true)
+      fixture.componentRef.setInput('logPrefix', 'get image url')
       component.themeName = theme1.name
 
       component.onImageLoad()
@@ -119,12 +119,12 @@ describe('OneCXCurrentThemeLogoComponent', () => {
     describe('provide logo - on error', () => {
       it('should load - failed - used: url', (done) => {
         initializeComponent()
-        component.logEnabled = true // log without prefix !
+        fixture.componentRef.setInput('logEnabled', true)
         component.themeName = theme1.name
-        component.imageUrl = 'http://image/url'
+        fixture.componentRef.setInput('imageUrl', 'http://image/url')
         spyOn(component, 'getImageUrl').and.callThrough()
 
-        component.onImageLoadError(component.imageUrl) // on error using url use the image as next
+        component.onImageLoadError(component.imageUrl()) // on error using url use the image as next
 
         component.imageUrl$?.subscribe({
           next: (data) => {
@@ -140,10 +140,10 @@ describe('OneCXCurrentThemeLogoComponent', () => {
 
       it('should use image - failed - use default', (done) => {
         initializeComponent()
-        component.logEnabled = false
-        component.logPrefix = 'default logo'
+        fixture.componentRef.setInput('logEnabled', false)
+        fixture.componentRef.setInput('logPrefix', 'default logo')
         component.themeName = theme1.name
-        component.imageUrl = '/image-url'
+        fixture.componentRef.setInput('imageUrl', '/image-url')
         spyOn(component, 'getImageUrl').and.callThrough()
 
         component.onImageLoadError('http://onecx-theme-bff:8080/images/' + theme1.name + '/logo')
@@ -164,23 +164,23 @@ describe('OneCXCurrentThemeLogoComponent', () => {
     describe('provide logo - get url', () => {
       it('should get image url - use input image url', () => {
         initializeComponent()
-        component.logEnabled = false
-        component.logPrefix = 'url'
+        fixture.componentRef.setInput('logEnabled', false)
+        fixture.componentRef.setInput('logPrefix', 'url')
         component.themeName = theme1.name
-        component.imageUrl = '/url'
+        fixture.componentRef.setInput('imageUrl', '/url')
 
         const url = component.getImageUrl(theme1.name, 'url')
 
-        expect(url).toBe(component.imageUrl)
+        expect(url).toBe(component.imageUrl())
       })
 
       it('should get url - use default image url', () => {
         initializeComponent()
-        component.logEnabled = false
-        component.logPrefix = 'default url'
+        fixture.componentRef.setInput('logEnabled', false)
+        fixture.componentRef.setInput('logPrefix', 'default url')
         component.themeName = theme1.name
         component.defaultImageUrl = '/default/url'
-        component.useDefaultLogo = true // enable use of default image
+        fixture.componentRef.setInput('useDefaultLogo', true)
 
         const url = component.getImageUrl(theme1.name, 'default')
 
@@ -189,11 +189,11 @@ describe('OneCXCurrentThemeLogoComponent', () => {
 
       it('should get url - unknown prio type', () => {
         initializeComponent()
-        component.logEnabled = false
-        component.logPrefix = 'default url'
+        fixture.componentRef.setInput('logEnabled', false)
+        fixture.componentRef.setInput('logPrefix', 'default url')
         component.themeName = theme1.name
         component.defaultImageUrl = '/default/url'
-        component.useDefaultLogo = false // enable use of default image
+        fixture.componentRef.setInput('useDefaultLogo', false)
 
         const url = component.getImageUrl(theme1.name, 'unknown')
 
