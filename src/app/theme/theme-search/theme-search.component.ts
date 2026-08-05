@@ -10,6 +10,7 @@ import { CardModule } from 'primeng/card'
 import { FloatLabelModule } from 'primeng/floatlabel'
 import { InputGroupModule } from 'primeng/inputgroup'
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon'
+import { InputTextModule } from 'primeng/inputtext'
 import { MessageModule } from 'primeng/message'
 import { TooltipModule } from 'primeng/tooltip'
 
@@ -30,6 +31,7 @@ import { ImageContainerComponent } from 'src/app/shared/image-container/image-co
 
 import { ThemeCreateComponent } from '../theme-create/theme-create.component'
 import { ThemeImportComponent } from '../theme-import/theme-import.component'
+import { I } from '@angular/cdk/a11y-module.d-DBHGyKoh'
 
 @Component({
   standalone: true,
@@ -41,6 +43,7 @@ import { ThemeImportComponent } from '../theme-import/theme-import.component'
     FloatLabelModule,
     InputGroupModule,
     InputGroupAddonModule,
+    InputTextModule,
     MessageModule,
     RouterModule,
     TooltipModule,
