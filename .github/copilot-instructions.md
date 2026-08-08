@@ -1,6 +1,6 @@
 ## Project overview
 
-Angular 19 micro-frontend with **standalone components**, **OnPush change detection** and **signal-first** state management.
+Angular 19 micro-frontend with **standalone components**, **OnPush change detection**
 Testing framework: **Karma + Jasmine** — do NOT replace with Jest and do NOT add Jest dependencies.
 
 ---
@@ -24,6 +24,12 @@ OneCX (@onecx/*)
 Local (src/app/*)
 ```
 
+### Module Imports
+- Between the sections, add a blank line.
+- Do not suggest legacy NgModules.
+- Avoid adding redundant template imports in spec files since standalone components self-contain their template dependencies.
+- If there are multiple imports from the same module, combine them into a single import statement and order them alphabetically.
+
 ---
 
 ## Angular 19 patterns (mandatory)
@@ -32,6 +38,7 @@ Local (src/app/*)
 - All components are **standalone** (`standalone: true` in `@Component`).
 - Always use **`ChangeDetectionStrategy.OnPush`**.
 - Use **`inject()`** for dependency injection — never inject via constructor parameters.
+- Do not use these modules in component templates: `CommonModule`, `BrowserModule`. Standalone components self-contain their template dependencies. In case of CommonModule use the specific parts of it which are needed, e.g. `AsyncPipe`, `NgIf`, `NgForOf`, `NgClass`, etc.
 
 ### Component API — signals only
 | Decorator (old) | Modern equivalent |
@@ -102,4 +109,3 @@ public readonly headers = computed(() => {
 - Name tests: `should <behaviour> when <condition>`.
 - Verify that a method or signal exists in the source before writing a test for it.
 - Mock services with `jasmine.createSpyObj()` or `{ provide: X, useValue: mockObj }`.
-

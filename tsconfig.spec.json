@@ -4,7 +4,7 @@
     "composite": false,
     "declaration": false,
     "outDir": "./dist/test",
-    "types": ["jasmine", "node"],
+    "types": ["jasmine", "node", "zone.js"],
     "useDefineForClassFields": false
   },
   "files": ["src/test.ts", "src/polyfills.ts"],
