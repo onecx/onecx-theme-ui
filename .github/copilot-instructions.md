@@ -1,6 +1,6 @@
 ## Project overview
 
-Angular 19 micro-frontend with **standalone components**, **OnPush change detection**
+Angular 19 micro-frontend with **standalone components**, **OnPush change detection** and **signal-first** state management.
 Testing framework: **Karma + Jasmine** — do NOT replace with Jest and do NOT add Jest dependencies.
 
 ---
