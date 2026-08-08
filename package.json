@@ -22,7 +22,7 @@
     "prepare": "husky || true",
     "start": "ng serve --configuration=development --proxy-config=proxy.conf.js",
     "test": "ng test",
-    "test:ci": "ng test --watch=false --browsers=ChromeHeadless --code-coverage",
+    "test:ci": "ng test --no-watch --code-coverage",
     "karma": "rm -rf reports && npm run test:ci",
     "sonar": "npx sonar-scanner",
     "apigen-cleanup": "rm -rf $npm_package_config_openapiOutput",
