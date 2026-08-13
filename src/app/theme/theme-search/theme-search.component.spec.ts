@@ -139,7 +139,8 @@ describe('ThemeSearchComponent', () => {
         next: (result) => {
           if (result) {
             expect(result).toHaveSize(0)
-            expect(component.exceptionKey).toEqual('EXCEPTIONS.HTTP_STATUS_405.THEME')
+            // maped to unknown error status code 0
+            expect(component.exceptionKey).toEqual('EXCEPTIONS.HTTP_STATUS_0.THEME')
           }
           done()
         },

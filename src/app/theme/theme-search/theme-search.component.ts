@@ -100,7 +100,7 @@ export class ThemeSearchComponent implements OnInit {
               return themes as unknown[] as RowListGridData[]
             }),
             catchError((err) => {
-              this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + err.status + '.THEME'
+              this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + Utils.mapping_error_status(err.status) + '.THEME'
               console.error('searchThemes', err)
               return of([] as RowListGridData[])
             }),
