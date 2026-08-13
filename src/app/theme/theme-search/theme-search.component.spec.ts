@@ -10,6 +10,7 @@ import { providePermissionService } from '@onecx/angular-utils'
 
 import { SearchThemeResponse, Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeSearchComponent } from './theme-search.component'
+import { provideNoopAnimations } from '@angular/platform-browser/animations'
 
 describe('ThemeSearchComponent', () => {
   let component: ThemeSearchComponent
@@ -35,6 +36,7 @@ describe('ThemeSearchComponent', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         providePermissionService(),
+        provideNoopAnimations(),
         provideRouter([{ path: '', component: ThemeSearchComponent }])
       ]
     })

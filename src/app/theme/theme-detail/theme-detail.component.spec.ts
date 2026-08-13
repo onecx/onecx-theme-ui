@@ -424,18 +424,6 @@ describe('ThemeDetailComponent', () => {
         expect(component.themeUseLoadingState()).toBe('timeout')
         expect(component.themeUsedName()).toBe(theme.name)
       }))
-
-      it('should stop getting theme use data process if data received', fakeAsync(() => {
-        component.themeUseLoadingState.set('initial')
-        component['themeUseTimeoutTimer'] = setTimeout(() => {}, 10)
-
-        component.onTabChange('3', theme)
-        tick(component['MAX_LOADING_TIME'] + 100) // wait for timer to trigger
-
-        expect(component.selectedTabIndex).toBe('3')
-        expect(component.themeUseLoadingState()).toBe('timeout')
-        expect(component.themeUsedName()).toBe(theme.name)
-      }))
     })
 
     describe('stop', () => {
