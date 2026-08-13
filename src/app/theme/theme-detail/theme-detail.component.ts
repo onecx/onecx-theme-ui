@@ -574,15 +574,18 @@ export class ThemeDetailComponent implements OnInit {
    */
   public onUseThemeAsTemplate(selectedTheme: Theme): void {
     if (selectedTheme.id)
-      this.themeApi.getThemeById({ id: selectedTheme.id }).subscribe((response) => {
-        this.initSubComponentData({
-          ...response.resource,
-          ...this.undefinedThemeData, // reset main properties: id, name etc.
-          name: this.theme()?.name,
-          displayName: (selectedTheme.displayName ?? 'copy of ') + response.resource.displayName,
-          modificationCount: this.theme()?.modificationCount // use the original value
+      this.themeApi
+        .getThemeById({ id: selectedTheme.id })
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe((response) => {
+          this.initSubComponentData({
+            ...response.resource,
+            ...this.undefinedThemeData, // reset main properties: id, name etc.
+            name: this.theme()?.name,
+            displayName: (selectedTheme.displayName ?? 'copy of ') + response.resource.displayName,
+            modificationCount: this.theme()?.modificationCount // use the original value
+          })
+          this.msgService.info({ summaryKey: 'THEME.TEMPLATE.CONFIRMATION.OK' })
         })
-        this.msgService.info({ summaryKey: 'THEME.TEMPLATE.CONFIRMATION.OK' })
-      })
   }
 }
