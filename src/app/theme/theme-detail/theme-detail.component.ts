@@ -39,7 +39,7 @@ import { ThemeDeleteComponent } from '../theme-delete/theme-delete.component'
 
 export type ChangeMode = 'VIEW' | 'EDIT'
 export type LoadingState = 'initial' | 'ready' | 'loading' | 'timeout'
-type ThemeData = {
+export type ThemeData = {
   theme: Theme
   propsValid: boolean | undefined
   colorsValid: boolean | undefined
@@ -91,7 +91,7 @@ export class ThemeDetailComponent implements OnInit {
   public readonly themeUsedByWorkspaces = signal<Workspace[]>([])
   public readonly themeUseLoadingState = signal<LoadingState>('initial')
   // signals: Combine the data from the sub components to a single theme object
-  public themeData = computed(() => this.computeThemeData())
+  public readonly themeData = computed(() => this.computeThemeData())
   // signals: components
   public readonly tabComponent = viewChild(Tabs)
   public readonly themePropsComponent = viewChild(ThemePropsComponent)
