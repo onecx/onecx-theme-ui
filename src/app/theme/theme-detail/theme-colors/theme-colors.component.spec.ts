@@ -194,17 +194,10 @@ describe('ThemeColorsComponent', () => {
   })
 
   describe('autoApply', () => {
-    it('should apply CSS variable when autoApply is true and a color value changes', async () => {
+    beforeEach(() => {
+      fixture.componentRef.setInput('changeMode', 'EDIT')
       fixture.componentRef.setInput('autoApply', true)
       fixture.detectChanges()
-      const spy = spyOn(document.documentElement.style, 'setProperty')
-
-      component.generalForm.get('primary-color')?.setValue('#ff5500')
-      await fixture.whenStable()
-      fixture.detectChanges()
-
-      expect(spy).toHaveBeenCalledWith('--primary-color', '#ff5500')
-      expect(spy).toHaveBeenCalledWith('--primary-color-rgb', '255,85,0')
     })
 
     it('should not apply CSS variable when autoApply is false', async () => {
@@ -219,9 +212,18 @@ describe('ThemeColorsComponent', () => {
       expect(spy).not.toHaveBeenCalled()
     })
 
-    it('should handle invalid hex gracefully (no rgb property set)', async () => {
-      fixture.componentRef.setInput('autoApply', true)
+    it('should apply CSS variable when autoApply is true and a color value changes', async () => {
+      const spy = spyOn(document.documentElement.style, 'setProperty')
+
+      component.generalForm.get('primary-color')?.setValue('#ff5500')
+      await fixture.whenStable()
       fixture.detectChanges()
+
+      expect(spy).toHaveBeenCalledWith('--primary-color', '#ff5500')
+      expect(spy).toHaveBeenCalledWith('--primary-color-rgb', '255,85,0')
+    })
+
+    it('should handle invalid hex gracefully (no rgb property set)', async () => {
       const spy = spyOn(document.documentElement.style, 'setProperty')
 
       component.generalForm.get('primary-color')?.setValue('not-a-hex')
@@ -233,8 +235,6 @@ describe('ThemeColorsComponent', () => {
     })
 
     it('should use empty string when form value is null', async () => {
-      fixture.componentRef.setInput('autoApply', true)
-      fixture.detectChanges()
       const spy = spyOn(document.documentElement.style, 'setProperty')
 
       component.generalForm.get('primary-color')?.setValue(null)
@@ -245,8 +245,6 @@ describe('ThemeColorsComponent', () => {
     })
 
     it('should debounce rapid value changes', async () => {
-      fixture.componentRef.setInput('autoApply', true)
-      fixture.detectChanges()
       const spy = spyOn(document.documentElement.style, 'setProperty')
 
       component.generalForm.get('primary-color')?.setValue('#111111')
@@ -260,8 +258,6 @@ describe('ThemeColorsComponent', () => {
     })
 
     it('should apply CSS variable for topbar form controls', async () => {
-      fixture.componentRef.setInput('autoApply', true)
-      fixture.detectChanges()
       const spy = spyOn(document.documentElement.style, 'setProperty')
 
       component.topbarForm.get('topbar-bg-color')?.setValue('#003366')
@@ -273,8 +269,6 @@ describe('ThemeColorsComponent', () => {
     })
 
     it('should apply CSS variable for sidebar form controls', async () => {
-      fixture.componentRef.setInput('autoApply', true)
-      fixture.detectChanges()
       const spy = spyOn(document.documentElement.style, 'setProperty')
 
       component.sidebarForm.get('menu-text-color')?.setValue('#99ccff')

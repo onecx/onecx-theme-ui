@@ -136,35 +136,26 @@ export class ThemeColorsComponent {
 
   private initColorForms() {
     for (const v of themeVariables.general) {
-      const fc = new FormControl<string | null>(null)
-      fc.valueChanges
-        .pipe(debounceTime(300))
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe((formVal) => {
-          if (this.autoApply()) this.updateCssVar(v, formVal)
-        })
-      this.generalForm.addControl(v, fc)
+      this.generalForm.addControl(v, new FormControl<string | null>(null))
     }
     for (const v of themeVariables.topbar) {
-      const fc = new FormControl<string | null>(null)
-      fc.valueChanges
-        .pipe(debounceTime(300))
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe((formVal) => {
-          if (this.autoApply()) this.updateCssVar(v, formVal)
-        })
-      this.topbarForm.addControl(v, fc)
+      this.topbarForm.addControl(v, new FormControl<string | null>(null))
     }
     for (const v of themeVariables.sidebar) {
-      const fc = new FormControl<string | null>(null)
-      fc.valueChanges
-        .pipe(debounceTime(300))
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe((formVal) => {
-          if (this.autoApply()) this.updateCssVar(v, formVal)
-        })
-      this.sidebarForm.addControl(v, fc)
+      this.sidebarForm.addControl(v, new FormControl<string | null>(null))
     }
+    // Change detection: When a form value changes and autoApply is true, update the CSS variable
+    this.colorsForm.valueChanges
+      .pipe(debounceTime(300), takeUntilDestroyed(this.destroyRef))
+      .subscribe((allFormValues) => {
+        if (!this.autoApply()) return
+        const values = allFormValues as Record<string, Record<string, string | null>>
+        for (const groupValues of Object.values(values)) {
+          for (const [variableName, formVal] of Object.entries(groupValues)) {
+            this.updateCssVar(variableName, formVal)
+          }
+        }
+      })
   }
 
   private fillForm(theme: Theme): void {
