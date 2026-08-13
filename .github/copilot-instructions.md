@@ -1,7 +1,39 @@
-## Project overview
+# GitHub Copilot Instructions 
 
-Angular 19 micro-frontend with **standalone components**, **OnPush change detection** and **signal-first** state management.
-Testing framework: **Karma + Jasmine** — do NOT replace with Jest and do NOT add Jest dependencies.
+## Project overview & Context
+- Angular 19 **Module Federation micro-frontend** for a OneCX project.
+- Built with **standalone components**, **OnPush change detection**, and **signal-first** state management.
+  - **Do not convert everything to pure Standalone components.** Follow the existing NgModule bootstrap structure for Module Federation (`app.module.ts`, `*theme*.module.ts`) as outlined in the architecture diagram.
+- The project uses PrimeNG components (p-button, p-select, p-message, etc.).
+- Testing framework: **Karma + Jasmine** — do NOT replace with Jest and do NOT add Jest dependencies.
+
+## Role
+- You are an expert Angular 19 developer working on a OneCX Microfrontend (Remote) environment.
+
+## Core Directives
+- You must strictly follow the rules, architecture, and syntax patterns defined in `../coding_standard.md`. Never invent patterns that deviate from that file.
+- **Code Generation:** Do not generate explanations or markdown prose unless explicitly asked. Just output the code.
+- **Context Awareness:** When creating or modifying components, always check if it is a Remote Component (`src/app/remotes/`) or a standard feature component, and apply the respective file-specific rules from `coding_standard.md`.
+- **Refactoring:** If you see legacy patterns (like standard standalone functions instead of the `Utils` object, or missing `id`/`ariaLabel` tags), automatically fix them in your suggestions.
+
+## Migration Directive (Temporary)
+- This repository is being migrated from legacy hybrid Angular architecture to the unified OneCX Standard.
+- If you see old constructor-based Dependency Injection, automatically refactor it to use `inject()`.
+- Convert old structural directives (*ngIf/*ngFor) to the new Control Flow (@if/@for) whenever you touch a template.
+
+---
+
+## Commands
+
+```bash
+npm start               # Dev server on localhost:4200 (proxy via proxy.conf.js)
+npm run build           # Production build → dist/onecx-theme-ui
+npm run test            # Run all Karma/Jasmine tests (watch mode)
+npm run karma           # CI mode: no watch, headless, with coverage → reports/
+npm run lint            # ESLint + Prettier check
+npm run format          # ESLint --fix + Prettier write
+npm run apigen          # Regenerate OpenAPI client from openapi-bff.yaml
+```
 
 ---
 
@@ -96,8 +128,7 @@ public readonly headers = computed(() => {
 
 ---
 
-## Testing (Karma / Jasmine)
-
+## Unit Testing (Karma / Jasmine) in TestBed
 - **100% coverage** (statements, branches, functions, lines) for all new or changed code.
 - Use `TestBed.createComponent()` — no shallow rendering, no `NO_ERRORS_SCHEMA`.
 - Do not stub templates via `overrideComponent({ set: { template: '' } })`.
@@ -109,3 +140,10 @@ public readonly headers = computed(() => {
 - Name tests: `should <behaviour> when <condition>`.
 - Verify that a method or signal exists in the source before writing a test for it.
 - Mock services with `jasmine.createSpyObj()` or `{ provide: X, useValue: mockObj }`.
+- Always mirror the exact setup from `coding_standard.md`: use `overrideComponent` for API mocks, reset spies in `beforeEach()`, and always defer component creation to a local `initTestComponent()` helper.
+- Never write tests without `TranslateTestingModule` loading the real JSON files as defined in the standards.
+
+
+---
+
+For architecture, code-style rules, and project-specific patterns see [coding_standards.md](coding_standards.md).

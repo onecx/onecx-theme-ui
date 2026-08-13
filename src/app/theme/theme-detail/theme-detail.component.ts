@@ -269,15 +269,17 @@ export class ThemeDetailComponent implements OnInit {
   private stopGettingThemeUseData(workspaces: Workspace[]): void {
     this.themeUsedByWorkspaces.set(workspaces)
     this.themeUsed.set(workspaces.length > 0)
-    const themeUseLoadingDuration = performance.now() - this.themeUseStartTime!
-    // Switch not to fast to the ready state, to avoid flickering of the loading indicator.
-    const rest = this.MIN_LOADING_TIME - themeUseLoadingDuration
-    if (rest > 0) {
-      setTimeout(() => {
+    if (this.themeUseStartTime) {
+      const themeUseLoadingDuration = performance.now() - this.themeUseStartTime
+      // Switch not to fast to the ready state, to avoid flickering of the loading indicator.
+      const rest = this.MIN_LOADING_TIME - themeUseLoadingDuration
+      if (rest > 0) {
+        setTimeout(() => {
+          this.themeUseLoadingState.set('ready')
+        }, rest)
+      } else {
         this.themeUseLoadingState.set('ready')
-      }, rest)
-    } else {
-      this.themeUseLoadingState.set('ready')
+      }
     }
     // clear the timeout timer if it is still running, to avoid unnecessary state changes
     if (this.themeUseTimeoutTimer) {

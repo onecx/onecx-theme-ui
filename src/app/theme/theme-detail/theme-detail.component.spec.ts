@@ -449,6 +449,20 @@ describe('ThemeDetailComponent', () => {
         expect(stopSpy).toHaveBeenCalledOnceWith(workspaces)
       })
 
+      it('should set ready signal if time is over min loading time', fakeAsync(() => {
+        fixture = TestBed.createComponent(ThemeDetailComponent)
+        component = fixture.componentInstance
+        fixture.detectChanges() // trigger ngOnInit
+        const stopSpy = spyOn<any>(component, 'stopGettingThemeUseData').and.callThrough()
+        component['themeUseTimeoutTimer'] = setTimeout(() => {}, 1) // should exist for cleanup only
+        component['themeUseStartTime'] = component['MIN_LOADING_TIME'] // time is over min loading time
+
+        component.slotEmitter.emit(workspaces)
+        tick(component['MIN_LOADING_TIME']) // wait until min loading time
+
+        expect(stopSpy).toHaveBeenCalledOnceWith(workspaces)
+      }))
+
       it('should wait until min loading time before stopping theme use data process', fakeAsync(() => {
         fixture = TestBed.createComponent(ThemeDetailComponent)
         component = fixture.componentInstance

@@ -1,4 +1,4 @@
-import { DoBootstrap, Injector, NgModule, inject, provideAppInitializer } from '@angular/core'
+import { DoBootstrap, inject, Injector, NgModule, provideAppInitializer } from '@angular/core'
 import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { RouterModule, Routes, Router } from '@angular/router'

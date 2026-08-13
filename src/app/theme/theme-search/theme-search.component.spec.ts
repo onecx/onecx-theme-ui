@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { provideNoopAnimations } from '@angular/platform-browser/animations'
 import { provideRouter, Router } from '@angular/router'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 import { of, throwError } from 'rxjs'
@@ -24,10 +23,9 @@ describe('ThemeSearchComponent', () => {
     fixture.detectChanges()
   }
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       imports: [
-        ThemeSearchComponent,
         TranslateTestingModule.withTranslations({
           de: require('src/assets/i18n/de.json'),
           en: require('src/assets/i18n/en.json')
@@ -37,7 +35,6 @@ describe('ThemeSearchComponent', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         providePermissionService(),
-        provideNoopAnimations(),
         provideRouter([{ path: '', component: ThemeSearchComponent }])
       ]
     })
@@ -47,7 +44,7 @@ describe('ThemeSearchComponent', () => {
         }
       })
       .compileComponents()
-  }))
+  })
 
   beforeEach(() => {
     // reset spy BEFORE creating component so initTestComponent uses neutral value
