@@ -92,9 +92,10 @@ export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWeb
     effect(() => {
       const dataType = this.dataType()
       const themeName = this.themeName()
+      const imageUrl = this.imageUrl()
       if (dataType === 'themes') this.getThemes()
       if (dataType === 'theme') this.getTheme()
-      if (['logo', 'logo-small', 'favicon'].includes(dataType ?? '')) {
+      if (['logo', 'logo-small', 'favicon'].includes(dataType ?? '') || imageUrl) {
         // start image existence life cycle here: url => image => default (opt)
         this.imageUrl$.next(this.getImageUrl(themeName, 'url'))
       }
