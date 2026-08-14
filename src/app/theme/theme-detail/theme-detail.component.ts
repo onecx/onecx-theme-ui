@@ -39,7 +39,7 @@ import { ThemeDeleteComponent } from '../theme-delete/theme-delete.component'
 
 export type ChangeMode = 'VIEW' | 'EDIT'
 export type LoadingState = 'initial' | 'ready' | 'loading' | 'timeout'
-type ThemeData = {
+export type ThemeData = {
   theme: Theme
   propsValid: boolean | undefined
   colorsValid: boolean | undefined
@@ -91,7 +91,7 @@ export class ThemeDetailComponent implements OnInit {
   public readonly themeUsedByWorkspaces = signal<Workspace[]>([])
   public readonly themeUseLoadingState = signal<LoadingState>('initial')
   // signals: Combine the data from the sub components to a single theme object
-  public themeData = computed(() => this.computeThemeData())
+  public readonly themeData = computed(() => this.computeThemeData())
   // signals: components
   public readonly tabComponent = viewChild(Tabs)
   public readonly themePropsComponent = viewChild(ThemePropsComponent)
@@ -113,7 +113,7 @@ export class ThemeDetailComponent implements OnInit {
   public Utils = Utils
   // page header
   public actions$: Observable<Action[]> = of([])
-  public headerImageUrl?: string
+  public headerImageUrl: string | undefined = undefined
   // data
   public paramThemeName: string | null = null
   public readonly theme = signal<Theme | undefined>(undefined)
@@ -269,15 +269,17 @@ export class ThemeDetailComponent implements OnInit {
   private stopGettingThemeUseData(workspaces: Workspace[]): void {
     this.themeUsedByWorkspaces.set(workspaces)
     this.themeUsed.set(workspaces.length > 0)
-    const themeUseLoadingDuration = performance.now() - this.themeUseStartTime!
-    // Switch not to fast to the ready state, to avoid flickering of the loading indicator.
-    const rest = this.MIN_LOADING_TIME - themeUseLoadingDuration
-    if (rest > 0) {
-      setTimeout(() => {
+    if (this.themeUseStartTime) {
+      const themeUseLoadingDuration = performance.now() - this.themeUseStartTime
+      // Switch not to fast to the ready state, to avoid flickering of the loading indicator.
+      const rest = this.MIN_LOADING_TIME - themeUseLoadingDuration
+      if (rest > 0) {
+        setTimeout(() => {
+          this.themeUseLoadingState.set('ready')
+        }, rest)
+      } else {
         this.themeUseLoadingState.set('ready')
-      }, rest)
-    } else {
-      this.themeUseLoadingState.set('ready')
+      }
     }
     // clear the timeout timer if it is still running, to avoid unnecessary state changes
     if (this.themeUseTimeoutTimer) {
@@ -446,9 +448,10 @@ export class ThemeDetailComponent implements OnInit {
    * DIALOG
    */
   public prepareHeaderUrl(theme?: Theme): void {
-    if (!theme) return undefined
-    if (theme.logoUrl) this.headerImageUrl = theme.logoUrl
-    else this.headerImageUrl = Utils.bffImageUrl(this.imageBasePath, theme.name, LogoRefType.Logo)
+    if (theme) {
+      if (theme.logoUrl) this.headerImageUrl = theme.logoUrl
+      else this.headerImageUrl = Utils.bffImageUrl(this.imageBasePath, theme.name, LogoRefType.Logo)
+    } else this.headerImageUrl = undefined
   }
 
   // default: we guess the Theme is in use so that deletion is not offered
@@ -572,15 +575,18 @@ export class ThemeDetailComponent implements OnInit {
    */
   public onUseThemeAsTemplate(selectedTheme: Theme): void {
     if (selectedTheme.id)
-      this.themeApi.getThemeById({ id: selectedTheme.id }).subscribe((response) => {
-        this.initSubComponentData({
-          ...response.resource,
-          ...this.undefinedThemeData, // reset main properties: id, name etc.
-          name: this.theme()?.name,
-          displayName: (selectedTheme.displayName ?? 'copy of ') + response.resource.displayName,
-          modificationCount: this.theme()?.modificationCount // use the original value
+      this.themeApi
+        .getThemeById({ id: selectedTheme.id })
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe((response) => {
+          this.initSubComponentData({
+            ...response.resource,
+            ...this.undefinedThemeData, // reset main properties: id, name etc.
+            name: this.theme()?.name,
+            displayName: (selectedTheme.displayName ?? 'copy of ') + response.resource.displayName,
+            modificationCount: this.theme()?.modificationCount // use the original value
+          })
+          this.msgService.info({ summaryKey: 'THEME.TEMPLATE.CONFIRMATION.OK' })
         })
-        this.msgService.info({ summaryKey: 'THEME.TEMPLATE.CONFIRMATION.OK' })
-      })
   }
 }

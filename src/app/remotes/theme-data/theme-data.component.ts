@@ -34,7 +34,7 @@ import {
 import { Utils, LogoRefType } from 'src/app/shared/utils'
 import { environment } from 'src/environments/environment'
 
-type DataType = 'logo' | 'favicon' | 'themes' | 'theme'
+type DataType = 'logo' | 'logo-small' | 'favicon' | 'themes' | 'theme'
 
 @Component({
   selector: 'app-theme-data',
@@ -90,11 +90,14 @@ export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWeb
    */
   constructor() {
     effect(() => {
-      if (this.dataType() === 'themes') this.getThemes()
-      if (this.dataType() === 'theme') this.getTheme()
-      if (this.dataType() === 'logo') {
+      const dataType = this.dataType()
+      const themeName = this.themeName()
+      const imageUrl = this.imageUrl()
+      if (dataType === 'themes') this.getThemes()
+      if (dataType === 'theme') this.getTheme()
+      if (['logo', 'logo-small', 'favicon'].includes(dataType ?? '') || imageUrl) {
         // start image existence life cycle here: url => image => default (opt)
-        this.imageUrl$.next(this.getImageUrl(this.themeName(), 'url'))
+        this.imageUrl$.next(this.getImageUrl(themeName, 'url'))
       }
     })
   }
@@ -156,7 +159,7 @@ export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWeb
   }
 
   public getImageUrl(themeName: string | undefined, prioType: string): string | undefined {
-    if (!prioType || !['logo', 'favicon'].includes(this.dataType() ?? 'unknown')) return undefined
+    if (!prioType || !['logo', 'logo-small', 'favicon'].includes(this.dataType() ?? 'unknown')) return undefined
     this.log('getImageUrl on prioType => ' + prioType)
 
     // if URL exist
@@ -164,8 +167,11 @@ export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWeb
       this.log('getImageUrl => ' + this.imageUrl())
       return this.imageUrl()
     } else if (['url', 'image'].includes(prioType)) {
-      this.log('getImageUrl => ' + Utils.bffImageUrl(this.themeApi.configuration.basePath, themeName, LogoRefType.Logo))
-      return Utils.bffImageUrl(this.themeApi.configuration.basePath, themeName, LogoRefType.Logo)
+      this.log(
+        'getImageUrl => ' +
+          Utils.bffImageUrl(this.themeApi.configuration.basePath, themeName, this.dataType() as LogoRefType)
+      )
+      return Utils.bffImageUrl(this.themeApi.configuration.basePath, themeName, this.dataType() as LogoRefType)
     } else if (['url', 'image', 'default'].includes(prioType) && this.useDefaultLogo() && this.defaultImageUrl !== '') {
       // if user wants to have the default (as asset)
       return this.defaultImageUrl

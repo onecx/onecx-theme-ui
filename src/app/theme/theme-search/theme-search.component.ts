@@ -58,8 +58,8 @@ import { ThemeImportComponent } from '../theme-import/theme-import.component'
   styleUrl: './theme-search.component.scss'
 })
 export class ThemeSearchComponent implements OnInit {
-  public readonly route = inject(ActivatedRoute)
-  public readonly router = inject(Router)
+  private readonly route = inject(ActivatedRoute)
+  private readonly router = inject(Router)
   private readonly themeApi = inject(ThemesAPIService)
   private readonly translate = inject(TranslateService)
   private readonly imageApi = inject(ImagesInternalAPIService)
@@ -70,7 +70,7 @@ export class ThemeSearchComponent implements OnInit {
   public readonly themeImported = signal(false)
   // data
   private readonly dataSubject$ = new BehaviorSubject<RowListGridData[]>([])
-  public data$: Observable<RowListGridData[] | null> = this.dataSubject$.asObservable()
+  public data$: Observable<RowListGridData[]> = this.dataSubject$.asObservable()
   private readonly loadTrigger$ = new Subject<void>()
   public filteredData: RowListGridData[] | undefined = undefined
   // dialog
@@ -100,7 +100,7 @@ export class ThemeSearchComponent implements OnInit {
               return themes as unknown[] as RowListGridData[]
             }),
             catchError((err) => {
-              this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + err.status + '.THEME'
+              this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + Utils.mapping_error_status(err.status) + '.THEME'
               console.error('searchThemes', err)
               return of([] as RowListGridData[])
             }),

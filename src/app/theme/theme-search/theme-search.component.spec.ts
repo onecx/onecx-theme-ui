@@ -1,7 +1,6 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { provideNoopAnimations } from '@angular/platform-browser/animations'
 import { provideRouter, Router } from '@angular/router'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 import { of, throwError } from 'rxjs'
@@ -11,6 +10,7 @@ import { providePermissionService } from '@onecx/angular-utils'
 
 import { SearchThemeResponse, Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { ThemeSearchComponent } from './theme-search.component'
+import { provideNoopAnimations } from '@angular/platform-browser/animations'
 
 describe('ThemeSearchComponent', () => {
   let component: ThemeSearchComponent
@@ -24,10 +24,9 @@ describe('ThemeSearchComponent', () => {
     fixture.detectChanges()
   }
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       imports: [
-        ThemeSearchComponent,
         TranslateTestingModule.withTranslations({
           de: require('src/assets/i18n/de.json'),
           en: require('src/assets/i18n/en.json')
@@ -47,7 +46,7 @@ describe('ThemeSearchComponent', () => {
         }
       })
       .compileComponents()
-  }))
+  })
 
   beforeEach(() => {
     // reset spy BEFORE creating component so initTestComponent uses neutral value
@@ -142,7 +141,8 @@ describe('ThemeSearchComponent', () => {
         next: (result) => {
           if (result) {
             expect(result).toHaveSize(0)
-            expect(component.exceptionKey).toEqual('EXCEPTIONS.HTTP_STATUS_405.THEME')
+            // maped to unknown error status code 0
+            expect(component.exceptionKey).toEqual('EXCEPTIONS.HTTP_STATUS_0.THEME')
           }
           done()
         },

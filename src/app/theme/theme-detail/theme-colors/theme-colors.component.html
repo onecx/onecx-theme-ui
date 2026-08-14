@@ -1,8 +1,8 @@
-<div class="my-3 flex flex-column row-gap-5">
+<div class="mb-3 flex flex-column row-gap-0">
   <!-- step overall groups in this order: general, topbar, sidebar -->
   @for (group of groups; track group.key) {
     <div
-      class="mb-4 text-center border-bottom-1"
+      class="mt-3 mb-4 text-center border-bottom-1"
       style="border-color: var(--p-stone-300)"
       [title]="group.titleKey | translate"
     >

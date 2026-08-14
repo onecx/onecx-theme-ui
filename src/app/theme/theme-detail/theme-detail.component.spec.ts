@@ -16,7 +16,7 @@ import { SlotService } from '@onecx/angular-remote-components'
 import { ImagesInternalAPIService, Theme, ThemesAPIService } from 'src/app/shared/generated'
 import { Utils, LogoRefType } from 'src/app/shared/utils'
 
-import { ThemeDetailComponent } from './theme-detail.component'
+import { ThemeData, ThemeDetailComponent } from './theme-detail.component'
 import { Workspace } from './theme-use/theme-use.component'
 
 const theme: Theme = {
@@ -48,8 +48,9 @@ describe('ThemeDetailComponent', () => {
     'searchThemes'
   ])
   const currentTheme$ = new BehaviorSubject<any>({ name: 'currentTheme' })
-  const mockThemeService = { currentTheme$: currentTheme$.asObservable() }
   const mockSlotService = jasmine.createSpyObj('SlotService', ['init', 'isSomeComponentDefinedForSlot'])
+  const mockThemeService = { currentTheme$: currentTheme$.asObservable() }
+  const mockThemeDataSignal = signal({ theme: {}, propsValid: false, colorsValid: true } as ThemeData)
   const imgServiceSpy = { configuration: { basePath: '/basePath' } }
 
   function initTestComponent(): void {
@@ -423,18 +424,6 @@ describe('ThemeDetailComponent', () => {
         expect(component.themeUseLoadingState()).toBe('timeout')
         expect(component.themeUsedName()).toBe(theme.name)
       }))
-
-      it('should stop getting theme use data process if data received', fakeAsync(() => {
-        component.themeUseLoadingState.set('initial')
-        component['themeUseTimeoutTimer'] = setTimeout(() => {}, 10)
-
-        component.onTabChange('3', theme)
-        tick(component['MAX_LOADING_TIME'] + 100) // wait for timer to trigger
-
-        expect(component.selectedTabIndex).toBe('3')
-        expect(component.themeUseLoadingState()).toBe('timeout')
-        expect(component.themeUsedName()).toBe(theme.name)
-      }))
     })
 
     describe('stop', () => {
@@ -448,6 +437,20 @@ describe('ThemeDetailComponent', () => {
 
         expect(stopSpy).toHaveBeenCalledOnceWith(workspaces)
       })
+
+      it('should set ready signal if time is over min loading time', fakeAsync(() => {
+        fixture = TestBed.createComponent(ThemeDetailComponent)
+        component = fixture.componentInstance
+        fixture.detectChanges() // trigger ngOnInit
+        const stopSpy = spyOn<any>(component, 'stopGettingThemeUseData').and.callThrough()
+        component['themeUseTimeoutTimer'] = setTimeout(() => {}, 1) // should exist for cleanup only
+        component['themeUseStartTime'] = component['MIN_LOADING_TIME'] // time is over min loading time
+
+        component.slotEmitter.emit(workspaces)
+        tick(component['MIN_LOADING_TIME']) // wait until min loading time
+
+        expect(stopSpy).toHaveBeenCalledOnceWith(workspaces)
+      }))
 
       it('should wait until min loading time before stopping theme use data process', fakeAsync(() => {
         fixture = TestBed.createComponent(ThemeDetailComponent)
@@ -574,11 +577,11 @@ describe('ThemeDetailComponent', () => {
     })
 
     it('should do nothing if theme is undefined', () => {
-      component.headerImageUrl = 'previous'
+      component.headerImageUrl = '/url'
 
       component.prepareHeaderUrl(undefined)
 
-      expect(component.headerImageUrl).toBe('previous')
+      expect(component.headerImageUrl).toBeUndefined()
     })
   })
 
@@ -718,8 +721,7 @@ describe('ThemeDetailComponent', () => {
 
     it('should trigger save action callback', (done: DoneFn) => {
       component.changeMode = 'EDIT'
-      component.themeData = signal({ theme: {}, propsValid: false, colorsValid: true }) as any
-      spyOn(console, 'log')
+      mockThemeDataSignal.set({ theme: {}, propsValid: false, colorsValid: true })
       component.preparePageActions(theme)
 
       component.actions$.subscribe((actions) => {
@@ -788,10 +790,16 @@ describe('ThemeDetailComponent', () => {
 
   describe('onUpdateTheme', () => {
     beforeEach(() => {
-      component.themeData = signal({ theme: { ...theme, properties: {} }, propsValid: true, colorsValid: true }) as any
+      // make sure that the component uses the mockThemeDataSignal instead of the computed property
+      Object.defineProperty(component, 'themeData', {
+        writable: true,
+        configurable: true,
+        value: mockThemeDataSignal
+      })
+      fixture.detectChanges()
+      mockThemeDataSignal.set({ theme: { ...theme, properties: {} }, propsValid: true, colorsValid: true })
       component['paramThemeName'] = theme.name!
       component.theme.set({ ...theme, id: 'themeId', modificationCount: 1 })
-      spyOn(console, 'log')
     })
 
     it('should call updateTheme on save with valid forms', () => {
@@ -807,7 +815,7 @@ describe('ThemeDetailComponent', () => {
     })
 
     it('should not proceed if propsValid is false', () => {
-      component.themeData = signal({ theme: {}, propsValid: false, colorsValid: true }) as any
+      mockThemeDataSignal.set({ theme: {}, propsValid: false, colorsValid: true })
 
       component['onUpdateTheme']()
 
@@ -815,7 +823,7 @@ describe('ThemeDetailComponent', () => {
     })
 
     it('should not proceed if propsValid is undefined (no child component)', () => {
-      component.themeData = signal({ theme: {}, propsValid: undefined, colorsValid: true }) as any
+      mockThemeDataSignal.set({ theme: {}, propsValid: undefined, colorsValid: true })
 
       component['onUpdateTheme']()
 
@@ -823,7 +831,7 @@ describe('ThemeDetailComponent', () => {
     })
 
     it('should not proceed if colorsValid is false', () => {
-      component.themeData = signal({ theme: {}, propsValid: true, colorsValid: false }) as any
+      mockThemeDataSignal.set({ theme: {}, propsValid: true, colorsValid: false })
 
       component['onUpdateTheme']()
 
@@ -842,11 +850,11 @@ describe('ThemeDetailComponent', () => {
     })
 
     it('should clear empty URL strings', () => {
-      component.themeData = signal({
+      mockThemeDataSignal.set({
         theme: { ...theme, logoUrl: '', smallLogoUrl: '', faviconUrl: '' },
         propsValid: true,
         colorsValid: true
-      }) as any
+      })
       themesApiSpy.updateTheme.and.returnValue(of({ resource: theme }) as any)
       themesApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
 
@@ -892,6 +900,15 @@ describe('ThemeDetailComponent', () => {
   })
 
   describe('onSaveAs', () => {
+    beforeEach(() => {
+      // make sure that the component uses the mockThemeDataSignal instead of the computed property
+      Object.defineProperty(component, 'themeData', {
+        writable: true,
+        configurable: true,
+        value: mockThemeDataSignal
+      })
+      fixture.detectChanges()
+    })
     const copyOfPrefix = 'Copy of '
 
     it('should set themeForCreation and open dialog in VIEW mode', () => {
@@ -920,9 +937,8 @@ describe('ThemeDetailComponent', () => {
 
     it('should use sub-component data in EDIT mode', () => {
       component.changeMode = 'EDIT'
-      component.themeData = signal({ theme: { ...theme, properties: {} }, propsValid: true, colorsValid: true }) as any
+      mockThemeDataSignal.set({ theme: { ...theme, properties: {} }, propsValid: true, colorsValid: true })
       component.theme.set({ ...theme, modificationCount: 2 })
-      spyOn(console, 'log')
 
       component.onSaveAs(copyOfPrefix)
 
@@ -932,8 +948,7 @@ describe('ThemeDetailComponent', () => {
 
     it('should not open dialog if sub-component data is invalid in EDIT mode', () => {
       component.changeMode = 'EDIT'
-      component.themeData = signal({ theme: {}, propsValid: false, colorsValid: true }) as any
-      spyOn(console, 'log')
+      mockThemeDataSignal.set({ theme: { ...theme, properties: {} }, propsValid: false, colorsValid: false })
 
       component.onSaveAs(copyOfPrefix)
 

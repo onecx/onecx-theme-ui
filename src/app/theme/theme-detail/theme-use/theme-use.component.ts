@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject, input, OnInit } from '@angular/core'
 import { AsyncPipe } from '@angular/common'
 import { Router, RouterModule } from '@angular/router'
 import { TranslateModule } from '@ngx-translate/core'
@@ -35,7 +35,7 @@ export type Workspace = {
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-use.component.html'
 })
-export class ThemeUseComponent {
+export class ThemeUseComponent implements OnInit {
   private readonly router = inject(Router)
   private readonly workspaceService = inject(WorkspaceService)
   // signals
@@ -44,14 +44,13 @@ export class ThemeUseComponent {
   // dialog
   public workspaceEndpointExist = false
 
-  constructor() {
-    // check endpoint exists
-    this.workspaceEndpointExist = Utils.doesEndpointExist(
+  public ngOnInit(): void {
+    Utils.doesEndpointExist(
       this.workspaceService,
       'onecx-workspace',
       'onecx-workspace-ui',
       'workspace-detail'
-    )
+    ).subscribe((ex) => (this.workspaceEndpointExist = ex))
   }
 
   public getWorkspaceEndpointUrl$(name?: string): Observable<string | undefined> {
