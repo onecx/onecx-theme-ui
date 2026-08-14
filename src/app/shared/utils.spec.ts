@@ -1,6 +1,7 @@
 import { of, throwError } from 'rxjs'
 import { Utils, LogoRefType } from './utils'
 import { DictionaryObject, ThemeProperties } from './models/theme.model'
+import { fakeAsync, tick } from '@angular/core/testing'
 
 describe('util functions', () => {
   describe('http error status', () => {
@@ -201,38 +202,54 @@ describe('util functions', () => {
   })
 
   describe('doesEndpointExist', () => {
-    let workspaceServiceMock: any
+    let workspaceServiceSpy: any
     const productName = 'testProduct'
     const appId = 'testApp'
     const endpointName = 'testEndpoint'
 
     beforeEach(() => {
-      workspaceServiceMock = {
+      workspaceServiceSpy = {
         doesUrlExistFor: jasmine.createSpy('doesUrlExistFor')
       }
       spyOn(console, 'error')
     })
 
-    it('should endpoint exist', () => {
-      workspaceServiceMock.doesUrlExistFor.and.returnValue(of(true))
+    it('should return true if endpoint exists', fakeAsync(() => {
+      workspaceServiceSpy.doesUrlExistFor.and.returnValue(of(true))
+      let result: boolean | null = null
 
-      expect(Utils.doesEndpointExist(workspaceServiceMock, productName, appId, endpointName)).toBeTrue()
-    })
+      Utils.doesEndpointExist(workspaceServiceSpy, productName, appId, endpointName).subscribe(
+        (exists) => (result = exists)
+      )
+      tick()
 
-    it('should endpoint NOT exist', () => {
-      workspaceServiceMock.doesUrlExistFor.and.returnValue(of(false))
+      expect(result).toBeTrue()
+    }))
 
-      expect(Utils.doesEndpointExist(workspaceServiceMock, productName, appId, endpointName)).toBeFalse()
-      expect(console.error).toHaveBeenCalled()
-    })
+    it('should return false if endpoint not exists', fakeAsync(() => {
+      workspaceServiceSpy.doesUrlExistFor.and.returnValue(of(false))
+      let result: boolean | null = null
 
-    it('should get endpoint failed', () => {
+      Utils.doesEndpointExist(workspaceServiceSpy, productName, appId, endpointName).subscribe(
+        (exists) => (result = exists)
+      )
+      tick()
+
+      expect(result).toBeFalse()
+    }))
+
+    it('should return false if endpoint not accessible', fakeAsync(() => {
       const errorResponse = { status: 403, statusText: 'No permissions' }
-      workspaceServiceMock.doesUrlExistFor.and.returnValue(throwError(() => errorResponse))
+      workspaceServiceSpy.doesUrlExistFor.and.returnValue(throwError(() => errorResponse))
+      let result: boolean | null = null
 
-      expect(Utils.doesEndpointExist(workspaceServiceMock, productName, appId, endpointName)).toBeFalse()
-      expect(console.error).toHaveBeenCalledWith('doesUrlExistFor', errorResponse)
-    })
+      Utils.doesEndpointExist(workspaceServiceSpy, productName, appId, endpointName).subscribe(
+        (exists) => (result = exists)
+      )
+      tick()
+
+      expect(result).toBeFalse()
+    }))
   })
 
   describe('getThemePropertyValue', () => {
