@@ -577,11 +577,11 @@ describe('ThemeDetailComponent', () => {
     })
 
     it('should do nothing if theme is undefined', () => {
-      component.headerImageUrl = 'previous'
+      component.headerImageUrl = '/url'
 
       component.prepareHeaderUrl(undefined)
 
-      expect(component.headerImageUrl).toBe('previous')
+      expect(component.headerImageUrl).toBeUndefined()
     })
   })
 

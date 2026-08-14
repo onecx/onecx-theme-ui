@@ -113,7 +113,7 @@ export class ThemeDetailComponent implements OnInit {
   public Utils = Utils
   // page header
   public actions$: Observable<Action[]> = of([])
-  public headerImageUrl?: string
+  public headerImageUrl: string | undefined = undefined
   // data
   public paramThemeName: string | null = null
   public readonly theme = signal<Theme | undefined>(undefined)
@@ -448,9 +448,10 @@ export class ThemeDetailComponent implements OnInit {
    * DIALOG
    */
   public prepareHeaderUrl(theme?: Theme): void {
-    if (!theme) return undefined
-    if (theme.logoUrl) this.headerImageUrl = theme.logoUrl
-    else this.headerImageUrl = Utils.bffImageUrl(this.imageBasePath, theme.name, LogoRefType.Logo)
+    if (theme) {
+      if (theme.logoUrl) this.headerImageUrl = theme.logoUrl
+      else this.headerImageUrl = Utils.bffImageUrl(this.imageBasePath, theme.name, LogoRefType.Logo)
+    } else this.headerImageUrl = undefined
   }
 
   // default: we guess the Theme is in use so that deletion is not offered
