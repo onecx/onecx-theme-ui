@@ -73,9 +73,9 @@
                   </label>
                 </p-floatlabel>
                 <p-button
+                  id="th_search_filter_clear"
                   icon="pi pi-filter-slash"
                   (onClick)="globalFilterInput.value = ''; onClearGlobalFilter()"
-                  (onKeydown)="globalFilterInput.value = ''; onClearGlobalFilter()"
                   [disabled]="globalFilterInput.value === ''"
                   [ariaLabel]="'DIALOG.DATAVIEW.FILTER.CLEAR' | translate"
                   [pTooltip]="'DIALOG.DATAVIEW.FILTER.CLEAR' | translate"
