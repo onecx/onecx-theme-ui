@@ -61,7 +61,7 @@ describe('ThemeSearchComponent', () => {
       expect(component).toBeTruthy()
     })
 
-    it('should load themes and init actions on initialization', (done) => {
+    it('should load themes on initialization', (done) => {
       const themesResponse = {
         stream: [
           { name: 'theme1', displayName: 'Theme 1' },
@@ -82,7 +82,9 @@ describe('ThemeSearchComponent', () => {
         },
         error: done.fail
       })
+    })
 
+    it('should init actions on initialization', () => {
       let actions: any = []
       component.actions$!.subscribe((act) => (actions = act))
       expect(actions).toHaveSize(2)
