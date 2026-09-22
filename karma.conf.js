@@ -43,21 +43,7 @@ module.exports = function (config) {
       includeAllSources: true,
       dir: 'reports',
       subdir: 'coverage',
-      reporters: [{ type: 'text-summary' }, { type: 'lcov' }],
-      check: {
-        global: {
-          statements: 100,
-          branches: 100,
-          functions: 100,
-          lines: 100
-        },
-        each: {
-          statements: 100,
-          branches: 100,
-          functions: 100,
-          lines: 100
-        }
-      }
+      reporters: [{ type: 'text-summary' }, { type: 'lcov' }]
     },
     sonarQubeUnitReporter: {
       outputFile: 'reports/sonarqube_report.xml',

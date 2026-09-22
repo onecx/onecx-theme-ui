@@ -1,6 +1,16 @@
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, input } from '@angular/core'
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop'
-import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, FormBuilder } from '@angular/forms'
+import {
+  AbstractControl,
+  ValidationErrors,
+  ValidatorFn,
+  FormsModule,
+  ReactiveFormsModule,
+  FormControl,
+  FormGroup,
+  FormBuilder,
+  Validators
+} from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { combineLatest, debounceTime, map, startWith } from 'rxjs'
 
@@ -22,6 +32,28 @@ import { PortalMessageService } from '@onecx/angular-integration-interface'
 import { Theme } from 'src/app/shared/generated'
 import { themeVariables } from '../theme-variables'
 import { ChangeMode } from '../theme-detail.component'
+
+/**
+ * Validates whether the entered value is a valid hex code or a CSS color name.
+ */
+export function colorValueValidator(): ValidatorFn {
+  // Regex for valid Hex color codes: #RGB, #RGBA, #RRGGBB, #RRGGBBAA
+  const hexRegex = /^#([0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/
+
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = control.value
+    if (!value) return null
+    const trimmedValue = String(value).trim()
+    if (hexRegex.test(trimmedValue)) return null // hex?
+
+    // Is it a valid CSS color name?
+    // Use the native CSS.supports API of the browser
+    if (typeof CSS !== 'undefined' && CSS.supports && CSS.supports('color', trimmedValue)) {
+      return null
+    }
+    return { invalidColor: { value: control.value } }
+  }
+}
 
 @Component({
   selector: 'app-theme-colors',
@@ -97,7 +129,7 @@ export class ThemeColorsComponent {
     ),
     { requireSync: true }
   )
-  public isComponentValid = computed(() => {
+  public isThemeFormValid = computed(() => {
     return this.isGeneralFormValid() && this.isTopbarFormValid() && this.isSidebarFormValid()
   })
   // Combine the form values to a Theme
@@ -136,13 +168,13 @@ export class ThemeColorsComponent {
 
   private initColorForms() {
     for (const v of themeVariables.general) {
-      this.generalForm.addControl(v, new FormControl<string | null>(null))
+      this.generalForm.addControl(v, new FormControl<string | null>(null, [Validators.required, colorValueValidator()]))
     }
     for (const v of themeVariables.topbar) {
-      this.topbarForm.addControl(v, new FormControl<string | null>(null))
+      this.topbarForm.addControl(v, new FormControl<string | null>(null, [colorValueValidator()]))
     }
     for (const v of themeVariables.sidebar) {
-      this.sidebarForm.addControl(v, new FormControl<string | null>(null))
+      this.sidebarForm.addControl(v, new FormControl<string | null>(null, [colorValueValidator()]))
     }
     // Change detection: When a form value changes and autoApply is true, update the CSS variable
     this.colorsForm.valueChanges

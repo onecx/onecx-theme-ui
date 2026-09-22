@@ -235,10 +235,12 @@ export class ThemeDetailComponent implements OnInit {
    * If the data is not received within timeout time, the loading state is set to "timeout".
    */
   private computeThemeData(): ThemeData {
+    // values
     const themeProps = this.themePropsComponent()?.combinedFormValues()
     const themeColors = this.themeColorsComponent()?.combinedFormValues()
-    const propsValid = this.themePropsComponent()?.isComponentValid()
-    const colorsValid = this.themeColorsComponent()?.isComponentValid()
+    // validity
+    const propsValid = this.themePropsComponent()?.isThemeFormValid()
+    const colorsValid = this.themeColorsComponent()?.isThemeFormValid()
     return {
       theme: { ...themeProps, properties: { ...themeColors?.properties, ...themeProps?.properties } },
       propsValid: propsValid,

@@ -69,7 +69,7 @@ export class ThemePropsComponent implements OnChanges {
   // signals for forms, initialized in constructor
   public readonly isBasicFormValid!: Signal<boolean>
   public readonly isFontFormValid!: Signal<boolean>
-  public readonly isComponentValid!: Signal<boolean>
+  public readonly isThemeFormValid!: Signal<boolean>
   public readonly combinedFormValues!: Signal<Theme>
   // signals for forms, initialized in constructor: URLs
   private readonly logoUrlValue!: Signal<string | null>
@@ -135,7 +135,7 @@ export class ThemePropsComponent implements OnChanges {
       { requireSync: true }
     )
     // build a combined signal for overall form validation: for use in detail component
-    this.isComponentValid = computed(() => {
+    this.isThemeFormValid = computed(() => {
       return this.isBasicFormValid() && this.isFontFormValid()
     })
     // Combine the form values to a Theme
