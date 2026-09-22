@@ -44,6 +44,7 @@ export type ThemeData = {
   propsValid: boolean | undefined
   colorsValid: boolean | undefined
 }
+export type Theme2 = Theme & { displayNameLimited: string | undefined }
 
 @Component({
   standalone: true,
@@ -117,7 +118,7 @@ export class ThemeDetailComponent implements OnInit {
   // data
   public paramThemeName: string | null = null
   public readonly theme = signal<Theme | undefined>(undefined)
-  public themes$: Observable<Theme[]> | undefined
+  public themes$: Observable<Theme2[]> | undefined
   public themeForProps: Theme | undefined
   public themeForColors: Theme | undefined
   // image
@@ -215,7 +216,7 @@ export class ThemeDetailComponent implements OnInit {
       map(
         (data) =>
           data.stream
-            ?.map((theme) => ({ ...theme, displayName: Utils.limitText(theme.displayName, 30) }))
+            ?.map((theme) => ({ ...theme, displayNameLimited: Utils.limitText(theme.displayName, 30) }))
             ?.sort(Utils.sortByDisplayName) ?? []
       ),
       catchError((err) => {
