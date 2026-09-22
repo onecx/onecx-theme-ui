@@ -250,7 +250,7 @@ export class ThemePropsComponent implements OnChanges {
     }
   }
   private proccessFile(file: File, refType: LogoRefType): void {
-    const regex = /^.*.(jpg|jpeg|png|svg)$/
+    const regex = /^.*\.(jpg|jpeg|png|svg)$/i
     if (file.size > this.imageMaxSize)
       this.msgService.error({ summaryKey: 'IMAGE.CONSTRAINT.FAILED', detailKey: 'IMAGE.CONSTRAINT.SIZE' })
     else if (!regex.exec(file.name))
