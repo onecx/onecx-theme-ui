@@ -102,8 +102,8 @@ export class ThemeDetailComponent implements OnInit {
   private readonly MIN_LOADING_TIME = 1500 // 1.5 seconds
   private readonly MAX_LOADING_TIME = 4000 // 4 seconds
   // dialog
-  public loading = true
-  public exceptionKey: string | undefined = undefined
+  public readonly loading = signal(true)
+  public readonly exceptionKey = signal<string | undefined>(undefined)
   public changeMode: ChangeMode = 'VIEW'
   public autoApply = false
   public showOperatorMessage = true // display initially only
@@ -169,7 +169,7 @@ export class ThemeDetailComponent implements OnInit {
 
   private getTheme(): void {
     if (!this.paramThemeName) return
-    this.loading = true
+    this.loading.set(true)
     combineLatest([
       this.themeService.currentTheme$.pipe(first()),
       this.themeApi.getThemeByName({ name: this.paramThemeName })
@@ -183,14 +183,14 @@ export class ThemeDetailComponent implements OnInit {
           return response.resource
         }),
         catchError((err) => {
-          this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + Utils.mapping_error_status(err.status) + '.THEME'
+          this.exceptionKey.set('EXCEPTIONS.HTTP_STATUS_' + Utils.mapping_error_status(err.status) + '.THEME')
           console.error('getThemeByName', err)
           this.prepareHeaderUrl()
           this.preparePageActions()
           return of(undefined)
         }),
         finalize(() => {
-          this.loading = false
+          this.loading.set(false)
           this.tabComponent()?.value.set(this.selectedTabIndex) // Forces tab change
         })
       )
@@ -219,7 +219,7 @@ export class ThemeDetailComponent implements OnInit {
             ?.sort(Utils.sortByDisplayName) ?? []
       ),
       catchError((err) => {
-        this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + Utils.mapping_error_status(err.status) + '.THEME'
+        this.exceptionKey.set('EXCEPTIONS.HTTP_STATUS_' + Utils.mapping_error_status(err.status) + '.THEME')
         console.error('searchThemes', err)
         return of([])
       })

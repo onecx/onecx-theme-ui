@@ -250,7 +250,7 @@ describe('ThemeDetailComponent', () => {
       expect(component.themeForProps).toEqual({ ...theme, id: undefined })
       expect(component.themeForColors).toEqual({ properties: theme.properties })
       expect(component.headerImageUrl).toBe(theme.logoUrl)
-      expect(component.loading).toBeFalse()
+      expect(component.loading()).toBeFalse()
     })
 
     it('should set isCurrentTheme and autoApply when theme matches current theme', () => {
@@ -281,8 +281,8 @@ describe('ThemeDetailComponent', () => {
       component['getTheme']()
 
       expect(console.error).toHaveBeenCalledWith('getThemeByName', errorResponse)
-      expect(component.exceptionKey).toBe('EXCEPTIONS.HTTP_STATUS_403.THEME')
-      expect(component.loading).toBeFalse()
+      expect(component.exceptionKey()).toBe('EXCEPTIONS.HTTP_STATUS_403.THEME')
+      expect(component.loading()).toBeFalse()
     })
 
     it('should map unknown error status to 0', () => {
@@ -292,7 +292,7 @@ describe('ThemeDetailComponent', () => {
 
       component['getTheme']()
 
-      expect(component.exceptionKey).toBe('EXCEPTIONS.HTTP_STATUS_0.THEME')
+      expect(component.exceptionKey()).toBe('EXCEPTIONS.HTTP_STATUS_0.THEME')
     })
   })
 
@@ -323,7 +323,7 @@ describe('ThemeDetailComponent', () => {
       component.themes$!.subscribe((result) => {
         expect(result).toEqual([])
         expect(console.error).toHaveBeenCalledWith('searchThemes', errorResponse)
-        expect(component.exceptionKey).toBe('EXCEPTIONS.HTTP_STATUS_500.THEME')
+        expect(component.exceptionKey()).toBe('EXCEPTIONS.HTTP_STATUS_500.THEME')
         done()
       })
     })

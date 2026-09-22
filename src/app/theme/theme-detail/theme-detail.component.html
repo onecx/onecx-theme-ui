@@ -1,6 +1,6 @@
 <ocx-portal-page permission="THEME#VIEW" helpArticleId="PAGE_THEME_DETAIL">
   <ocx-page-header
-    [loading]="loading"
+    [loading]="loading()"
     [header]="theme()?.displayName"
     [subheader]="'DIALOG.HEADER.DETAIL.SUBHEADER' | translate"
     [actions]="(actions$ | async) ?? []"
@@ -10,6 +10,7 @@
   </ocx-page-header>
 
   <ocx-content class="ocx-content">
+    @let exceptionMessage = exceptionKey();
     <!-- showOperatorMessage -->
     <ng-container *ocxIfPermission="'THEME#EDIT'">
       @if (theme()?.operator && showOperatorMessage) {
@@ -81,19 +82,19 @@
         <!-- PROPS -->
         <p-tabpanel value="0">
           <div class="pt-2 pb-4 px-0 sm:px-3">
-            @if (loading) {
+            @if (loading()) {
               <p-message
                 id="th_detail_loading_message"
                 severity="info"
                 styleClass="m-3"
                 [text]="'ACTIONS.LOADING' | translate"
               ></p-message>
-            } @else if (exceptionKey) {
+            } @else if (exceptionMessage) {
               <p-message
                 id="th_detail_error_message"
                 severity="error"
                 styleClass="m-3"
-                [text]="exceptionKey | translate"
+                [text]="exceptionMessage | translate"
               ></p-message>
             } @else if (theme()) {
               <app-theme-apply
@@ -113,19 +114,19 @@
         <!-- COLORS -->
         <p-tabpanel value="1">
           <div class="mt-0 mb-4 mx-0 sm:mx-3">
-            @if (loading) {
+            @if (loading()) {
               <p-message
                 id="th_detail_loading_message"
                 severity="info"
                 styleClass="m-3"
                 [text]="'ACTIONS.LOADING' | translate"
               ></p-message>
-            } @else if (exceptionKey) {
+            } @else if (exceptionMessage) {
               <p-message
                 id="th_detail_error_message"
                 severity="error"
                 styleClass="m-3"
-                [text]="exceptionKey | translate"
+                [text]="exceptionMessage | translate"
               ></p-message>
             } @else if (theme()) {
               <app-theme-apply
