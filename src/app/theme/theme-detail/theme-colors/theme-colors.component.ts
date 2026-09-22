@@ -48,7 +48,7 @@ export function colorValueValidator(): ValidatorFn {
 
     // Is it a valid CSS color name?
     // Use the native CSS.supports API of the browser
-    if (typeof CSS !== 'undefined' && CSS.supports && CSS.supports('color', trimmedValue)) {
+    if (typeof CSS !== 'undefined' && CSS.supports?.('color', trimmedValue)) {
       return null
     }
     return { invalidColor: { value: control.value } }
