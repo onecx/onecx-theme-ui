@@ -67,7 +67,7 @@ export class ThemeImportComponent {
     themeName: new FormControl<string | null>(null, [
       Validators.required,
       Validators.minLength(2),
-      Validators.maxLength(100)
+      Validators.maxLength(50)
     ]),
     displayName: new FormControl<string | null>(null, [
       Validators.required,
