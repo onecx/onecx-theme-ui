@@ -5,7 +5,34 @@ import { PortalMessageService } from '@onecx/angular-integration-interface'
 
 import { Theme } from 'src/app/shared/generated'
 import { themeVariables } from '../theme-variables'
-import { ThemeColorsComponent } from './theme-colors.component'
+import { colorValueValidator, ThemeColorsComponent } from './theme-colors.component'
+import { FormControl } from '@angular/forms'
+
+const generalColors = {
+  'primary-color': '#000000',
+  'secondary-color': '#000000',
+  'text-color': '#000000',
+  'text-secondary-color': '#000000',
+  'body-bg-color': '#000000',
+  'content-bg-color': '#000000',
+  'content-alt-bg-color': '#000000',
+  'overlay-content-bg-color': '#000000',
+  'hover-bg-color': '#000000',
+  'solid-surface-text-color': '#000000',
+  'divider-color': '#000000',
+  'button-hover-bg': '#000000',
+  'button-active-bg': '#000000',
+  'danger-button-bg': '#000000',
+  'info-message-bg': '#000000',
+  'success-message-bg': '#000000',
+  'warning-message-bg': '#000000',
+  'error-message-bg': '#000000'
+}
+const properties = {
+  general: generalColors,
+  topbar: {},
+  sidebar: {}
+}
 
 describe('ThemeColorsComponent', () => {
   let component: ThemeColorsComponent
@@ -82,56 +109,7 @@ describe('ThemeColorsComponent', () => {
     })
   })
 
-  describe('signals', () => {
-    it('isComponentValid should be false when forms are disabled (initial state)', () => {
-      // default from beforeEach: theme=undefined, changeMode=VIEW → all sub-forms disabled
-      expect(component.isComponentValid()).toBeFalse()
-    })
-
-    it('isComponentValid should be true when all forms are enabled and valid', fakeAsync(() => {
-      const theme: Theme = { name: 'test', properties: {} }
-      fixture.componentRef.setInput('changeMode', 'EDIT')
-      fixture.componentRef.setInput('theme', theme)
-      fixture.detectChanges()
-      flush()
-
-      expect(component.isComponentValid()).toBeTrue()
-    }))
-
-    it('isComponentValid should be false when general form has errors', fakeAsync(() => {
-      const theme: Theme = { name: 'test', properties: {} }
-      fixture.componentRef.setInput('changeMode', 'EDIT')
-      fixture.componentRef.setInput('theme', theme)
-      fixture.detectChanges()
-      flush()
-      component.generalForm.setErrors({ invalid: true })
-
-      expect(component.isComponentValid()).toBeFalse()
-    }))
-
-    it('isComponentValid should be false when topbar form has errors', fakeAsync(() => {
-      const theme: Theme = { name: 'test', properties: {} }
-      fixture.componentRef.setInput('changeMode', 'EDIT')
-      fixture.componentRef.setInput('theme', theme)
-      fixture.detectChanges()
-      flush()
-      component.topbarForm.setErrors({ invalid: true })
-
-      expect(component.isComponentValid()).toBeFalse()
-    }))
-
-    it('isComponentValid should be false when sidebar form has errors', fakeAsync(() => {
-      const theme: Theme = { name: 'test', properties: {} }
-      fixture.componentRef.setInput('changeMode', 'EDIT')
-      fixture.componentRef.setInput('theme', theme)
-      flush()
-      component.sidebarForm.setErrors({ invalid: true })
-
-      expect(component.isComponentValid()).toBeFalse()
-    }))
-  })
-
-  describe('ngOnChanges', () => {
+  describe('form', () => {
     it('should fill the form when theme is set', fakeAsync(() => {
       const theme: Theme = {
         name: 'test-theme',
@@ -190,6 +168,102 @@ describe('ThemeColorsComponent', () => {
 
       expect(component.generalForm.get('primary-color')?.value).toBeNull()
       expect(component.generalForm.get('secondary-color')?.value).toBe('#222222')
+    }))
+  })
+
+  describe('form validation', () => {
+    // valid properties for the theme (all general colors are defined)
+    const theme: Theme = { name: 'test', properties: properties }
+
+    function setEditModeWithTheme() {
+      fixture.componentRef.setInput('changeMode', 'EDIT')
+      fixture.componentRef.setInput('theme', theme)
+      fixture.detectChanges()
+      flush()
+    }
+
+    it('isThemeFormValid should be false when forms are disabled (initial state)', () => {
+      // default from beforeEach: theme=undefined, changeMode=VIEW → all sub-forms disabled
+      expect(component.isThemeFormValid()).toBeFalse()
+    })
+
+    it('isThemeFormValid should be true when all forms are enabled and valid', fakeAsync(() => {
+      setEditModeWithTheme()
+      expect(component.isThemeFormValid()).toBeTrue()
+    }))
+
+    it('isThemeFormValid should be false when general form has errors', fakeAsync(() => {
+      setEditModeWithTheme()
+      component.generalForm.setErrors({ invalid: true })
+
+      expect(component.isThemeFormValid()).toBeFalse()
+    }))
+
+    it('isThemeFormValid should be false when topbar form has errors', fakeAsync(() => {
+      setEditModeWithTheme()
+      component.topbarForm.setErrors({ invalid: true })
+
+      expect(component.isThemeFormValid()).toBeFalse()
+    }))
+
+    it('isThemeFormValid should be false when sidebar form has errors', fakeAsync(() => {
+      setEditModeWithTheme()
+      component.sidebarForm.setErrors({ invalid: true })
+
+      expect(component.isThemeFormValid()).toBeFalse()
+    }))
+  })
+
+  describe('onChangeColorValue', () => {
+    it('should keep the form valid when color value is valid HEX', fakeAsync(() => {
+      const theme: Theme = {
+        name: 'test-theme',
+        properties: { general: generalColors, topbar: {}, sidebar: {} }
+      }
+      fixture.componentRef.setInput('changeMode', 'EDIT')
+      fixture.componentRef.setInput('theme', theme)
+      fixture.detectChanges()
+      flush()
+
+      expect(component.generalForm.get('primary-color')?.value).toBe(generalColors['primary-color'])
+      expect(component.generalForm.valid).toBeTrue()
+    }))
+
+    it('should keep the form valid when color value is an known color', () => {
+      spyOn(CSS as any, 'supports').and.callFake((property: string, value: string) => {
+        if (value === 'unknowncolor') return false
+        return true
+      })
+
+      const validator = colorValueValidator()
+      expect(validator(new FormControl('white'))).toBeNull()
+    })
+
+    it('should make the form invalid when color value is an unknown color', () => {
+      spyOn(CSS as any, 'supports').and.callFake((property: string, value: string) => {
+        if (value === 'unknowncolor') return false
+        return true
+      })
+
+      const validator = colorValueValidator()
+      expect(validator(new FormControl('unknowncolor'))).toEqual({
+        invalidColor: { value: 'unknowncolor' }
+      })
+    })
+
+    it('should make the form invalid if color value is invalid', fakeAsync(() => {
+      const val = '#xyz'
+      const theme: Theme = {
+        name: 'test-theme',
+        properties: { general: { ...generalColors, 'primary-color': val }, topbar: {}, sidebar: {} }
+      }
+      fixture.componentRef.setInput('changeMode', 'EDIT')
+      fixture.componentRef.setInput('theme', theme)
+      fixture.detectChanges()
+      flush()
+
+      expect(component.generalForm.get('primary-color')?.value).toBe(val)
+      expect(component.generalForm.valid).toBeFalse()
     }))
   })
 

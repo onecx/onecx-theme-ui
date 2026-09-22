@@ -1,6 +1,6 @@
 <ocx-portal-page permission="THEME#VIEW" helpArticleId="PAGE_THEME_DETAIL">
   <ocx-page-header
-    [loading]="loading"
+    [loading]="loading()"
     [header]="theme()?.displayName"
     [subheader]="'DIALOG.HEADER.DETAIL.SUBHEADER' | translate"
     [actions]="(actions$ | async) ?? []"
@@ -10,6 +10,7 @@
   </ocx-page-header>
 
   <ocx-content class="ocx-content">
+    @let exceptionMessage = exceptionKey();
     <!-- showOperatorMessage -->
     <ng-container *ocxIfPermission="'THEME#EDIT'">
       @if (theme()?.operator && showOperatorMessage) {
@@ -80,20 +81,20 @@
       <p-tabpanels>
         <!-- PROPS -->
         <p-tabpanel value="0">
-          <div class="mt-1 mb-3 mx-0 sm:mx-3">
-            @if (loading) {
+          <div class="pt-2 pb-4 px-0 sm:px-3">
+            @if (loading()) {
               <p-message
                 id="th_detail_loading_message"
                 severity="info"
                 styleClass="m-3"
                 [text]="'ACTIONS.LOADING' | translate"
               ></p-message>
-            } @else if (exceptionKey) {
+            } @else if (exceptionMessage) {
               <p-message
                 id="th_detail_error_message"
                 severity="error"
                 styleClass="m-3"
-                [text]="exceptionKey | translate"
+                [text]="exceptionMessage | translate"
               ></p-message>
             } @else if (theme()) {
               <app-theme-apply
@@ -112,20 +113,20 @@
 
         <!-- COLORS -->
         <p-tabpanel value="1">
-          <div class="mt-1 mb-2 mx-0 sm:mx-3">
-            @if (loading) {
+          <div class="mt-0 mb-4 mx-0 sm:mx-3">
+            @if (loading()) {
               <p-message
                 id="th_detail_loading_message"
                 severity="info"
                 styleClass="m-3"
                 [text]="'ACTIONS.LOADING' | translate"
               ></p-message>
-            } @else if (exceptionKey) {
+            } @else if (exceptionMessage) {
               <p-message
                 id="th_detail_error_message"
                 severity="error"
                 styleClass="m-3"
-                [text]="exceptionKey | translate"
+                [text]="exceptionMessage | translate"
               ></p-message>
             } @else if (theme()) {
               <app-theme-apply
@@ -149,12 +150,12 @@
         @if (changeMode === 'VIEW') {
           <!-- VARIABLES -->
           <p-tabpanel value="2" id="th_detail_panel_variables">
-            <pre class="my-2 mx-3 pt-1 pb-0 surface-50">{{ theme()?.properties | json }}</pre>
+            <pre class="m-3 surface-50">{{ theme()?.properties | json }}</pre>
           </p-tabpanel>
 
           <!-- USE -->
           <p-tabpanel value="3">
-            <div class="m-2">
+            <div class="p-4">
               <app-theme-use
                 [workspaces]="themeUsedByWorkspaces()"
                 [isComponentDefined]="isComponentDefined()"
@@ -164,7 +165,7 @@
 
           <!-- INTERN -->
           <p-tabpanel value="4">
-            <div class="m-2 mt-4">
+            <div class="p-4">
               <app-theme-intern [theme]="theme()" [dateFormat]="dateFormat"></app-theme-intern>
             </div>
           </p-tabpanel>

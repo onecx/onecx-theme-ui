@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, inject, input, OnInit } from '@angular/core'
-import { AsyncPipe } from '@angular/common'
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core'
+import { toObservable, toSignal } from '@angular/core/rxjs-interop'
 import { Router, RouterModule } from '@angular/router'
 import { TranslateModule } from '@ngx-translate/core'
-import { Observable, of } from 'rxjs'
+import { combineLatest, map, Observable, of, switchMap } from 'rxjs'
 
 import { MessageModule } from 'primeng/message'
 import { TooltipModule } from 'primeng/tooltip'
@@ -28,36 +28,57 @@ export type Workspace = {
   disabled?: boolean
 }
 
+export const WORKSPACE_DETAIL_ENDPOINT = {
+  productName: 'onecx-workspace',
+  appId: 'onecx-workspace-ui',
+  endpointName: 'workspace-detail'
+}
+
 @Component({
   selector: 'app-theme-use',
   standalone: true,
-  imports: [AsyncPipe, MessageModule, RouterModule, TooltipModule, TranslateModule],
+  imports: [MessageModule, RouterModule, TooltipModule, TranslateModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-use.component.html'
 })
-export class ThemeUseComponent implements OnInit {
+export class ThemeUseComponent {
   private readonly router = inject(Router)
   private readonly workspaceService = inject(WorkspaceService)
   // signals
   public workspaces = input<Workspace[]>()
   public isComponentDefined = input<boolean>(false)
   // dialog
-  public workspaceEndpointExist = false
-
-  public ngOnInit(): void {
+  public readonly workspaceEndpointExist = toSignal(
     Utils.doesEndpointExist(
       this.workspaceService,
-      'onecx-workspace',
-      'onecx-workspace-ui',
-      'workspace-detail'
-    ).subscribe((ex) => (this.workspaceEndpointExist = ex))
-  }
-
-  public getWorkspaceEndpointUrl$(name?: string): Observable<string | undefined> {
-    if (this.workspaceEndpointExist && name)
-      return this.workspaceService.getUrl('onecx-workspace', 'onecx-workspace-ui', 'workspace-detail', {
-        'workspace-name': name
-      })
-    return of(undefined)
-  }
+      WORKSPACE_DETAIL_ENDPOINT.productName,
+      WORKSPACE_DETAIL_ENDPOINT.appId,
+      WORKSPACE_DETAIL_ENDPOINT.endpointName
+    ),
+    { initialValue: false }
+  )
+  // resolved workspace-detail URLs keyed by workspace name; resolved once per workspaces/endpoint change instead of per row in the template
+  private readonly workspaceUrls$: Observable<Map<string, string | undefined>> = combineLatest([
+    toObservable(this.workspaces),
+    toObservable(this.workspaceEndpointExist)
+  ]).pipe(
+    switchMap(([workspaces, exists]) => {
+      if (!exists || !workspaces?.length) return of(new Map<string, string | undefined>())
+      return combineLatest(
+        workspaces.map((workspace) =>
+          this.workspaceService
+            .getUrl(
+              WORKSPACE_DETAIL_ENDPOINT.productName,
+              WORKSPACE_DETAIL_ENDPOINT.appId,
+              WORKSPACE_DETAIL_ENDPOINT.endpointName,
+              { 'workspace-name': workspace.name }
+            )
+            .pipe(map((url) => [workspace.name, url] as const))
+        )
+      ).pipe(map((entries) => new Map(entries)))
+    })
+  )
+  public readonly workspaceUrls = toSignal(this.workspaceUrls$, {
+    initialValue: new Map<string, string | undefined>()
+  })
 }

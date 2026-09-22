@@ -16,7 +16,6 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch'
 import { TooltipModule } from 'primeng/tooltip'
 
 import { Theme } from 'src/app/shared/generated'
-import { Utils } from 'src/app/shared/utils'
 import { DictionaryObjectString } from 'src/app/shared/models/theme.model'
 
 import { ChangeMode } from '../theme-detail.component'
@@ -91,7 +90,7 @@ export class ThemeApplyComponent {
       dismissableMask: true,
       closeOnEscape: true,
       header: data['THEME.TEMPLATE.CONFIRMATION.HEADER'],
-      message: data['THEME.TEMPLATE.CONFIRMATION.MESSAGE'].replace('{{ITEM}}', Utils.limitText(themeName, 50)),
+      message: data['THEME.TEMPLATE.CONFIRMATION.MESSAGE'].replace('{{ITEM}}', themeName),
       acceptLabel: data['ACTIONS.CONFIRMATION.YES'],
       rejectLabel: data['ACTIONS.CONFIRMATION.NO'],
 

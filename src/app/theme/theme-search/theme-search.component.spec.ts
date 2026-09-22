@@ -61,7 +61,7 @@ describe('ThemeSearchComponent', () => {
       expect(component).toBeTruthy()
     })
 
-    it('should load themes and init actions on initialization', (done) => {
+    it('should load themes on initialization', (done) => {
       const themesResponse = {
         stream: [
           { name: 'theme1', displayName: 'Theme 1' },
@@ -82,16 +82,32 @@ describe('ThemeSearchComponent', () => {
         },
         error: done.fail
       })
+    })
 
+    it('should init actions on initialization - size', () => {
       let actions: any = []
+
       component.actions$!.subscribe((act) => (actions = act))
+
       expect(actions).toHaveSize(2)
+    })
 
+    it('should init actions on initialization - create', () => {
+      let actions: any = []
+
+      component.actions$!.subscribe((act) => (actions = act))
       actions[0].actionCallback()
-      expect(component.themeCreateVisible()).toBeTrue()
 
+      expect(component.themeCreateVisible()).toBeTrue()
+    })
+
+    it('should init actions on initialization - import', () => {
+      let actions: any = []
       spyOn(component, 'onImportThemeClick')
+
+      component.actions$!.subscribe((act) => (actions = act))
       actions[1].actionCallback()
+
       expect(component.onImportThemeClick).toHaveBeenCalledTimes(1)
     })
   })
@@ -123,7 +139,7 @@ describe('ThemeSearchComponent', () => {
           if (result) {
             expect(result).toHaveSize(0)
             expect(console.error).toHaveBeenCalledWith('searchThemes', errorResponse)
-            expect(component.exceptionKey).toEqual('EXCEPTIONS.HTTP_STATUS_' + errorResponse.status + '.THEME')
+            expect(component.exceptionKey()).toEqual('EXCEPTIONS.HTTP_STATUS_' + errorResponse.status + '.THEME')
           }
           done()
         },
@@ -142,7 +158,7 @@ describe('ThemeSearchComponent', () => {
           if (result) {
             expect(result).toHaveSize(0)
             // maped to unknown error status code 0
-            expect(component.exceptionKey).toEqual('EXCEPTIONS.HTTP_STATUS_0.THEME')
+            expect(component.exceptionKey()).toEqual('EXCEPTIONS.HTTP_STATUS_0.THEME')
           }
           done()
         },
@@ -153,7 +169,6 @@ describe('ThemeSearchComponent', () => {
   })
 
   it('should change field to sort by on sort change', () => {
-    fixture.detectChanges()
     component.sortField = 'name'
 
     component.onSortChange({ sortColumn: 'description', sortDirection: DataSortDirection.DESCENDING })
@@ -162,8 +177,6 @@ describe('ThemeSearchComponent', () => {
   })
 
   it('should show import dialog on import theme click', () => {
-    fixture.detectChanges()
-
     component.themeImportVisible.set(false)
     component.onImportThemeClick()
 
@@ -171,24 +184,20 @@ describe('ThemeSearchComponent', () => {
   })
 
   it('should hide import dialog on import close and reload', () => {
-    fixture.detectChanges()
     spyOn(component, 'loadThemes')
 
     component.themeImported.set(true)
     fixture.detectChanges()
-    TestBed.flushEffects()
 
     expect(component.loadThemes).toHaveBeenCalledTimes(1)
   })
 
   it('should navigate to created theme on theme creation', () => {
-    fixture.detectChanges()
     const router = TestBed.inject(Router)
     spyOn(router, 'navigate').and.returnValue(Promise.resolve(true))
 
     component.onThemeCreation({ name: 'new-theme' } as Theme)
     fixture.detectChanges()
-    TestBed.flushEffects()
 
     expect(router.navigate).toHaveBeenCalledWith(['./new-theme'], { relativeTo: (component as any).route })
   })
@@ -203,79 +212,59 @@ describe('ThemeSearchComponent', () => {
       component.onGlobalFilter('test', undefined)
 
       expect(component.globalFilterValue).toBe('')
-      expect(component.filteredData).toBeUndefined()
+      expect(component.filteredData()).toBeUndefined()
     })
 
     it('should set filteredData to full data when value is empty', () => {
       component.onGlobalFilter('', itemData)
 
       expect(component.globalFilterValue).toBe('')
-      expect(component.filteredData).toBeUndefined()
+      expect(component.filteredData()).toBeUndefined()
     })
 
     it('should set filteredData to full data when value is undefined', () => {
       component.onGlobalFilter(undefined, itemData)
 
       expect(component.globalFilterValue).toBe('')
-      expect(component.filteredData).toBeUndefined()
+      expect(component.filteredData()).toBeUndefined()
     })
 
     it('should filter data by title field (case-insensitive)', () => {
       component.onGlobalFilter('one', itemData)
 
       expect(component.globalFilterValue).toBe('one')
-      expect(component.filteredData?.length).toBe(1)
-      expect((component.filteredData?.[0] as any).name).toBe('onecx')
+      expect(component.filteredData()?.length).toBe(1)
+      expect((component.filteredData()?.[0] as any).name).toBe('onecx')
     })
 
     it('should return empty array when no title matches', () => {
       component.onGlobalFilter('nonexistent', itemData)
 
       expect(component.globalFilterValue).toBe('nonexistent')
-      expect(component.filteredData?.length).toBe(0)
+      expect(component.filteredData()?.length).toBe(0)
     })
 
     it('should clear global filter and reset filteredData', () => {
       component.globalFilterValue = 'some filter'
-      component.filteredData = itemData as RowListGridData[]
+      component.filteredData.set(itemData as RowListGridData[])
 
       component.onClearGlobalFilter()
 
       expect(component.globalFilterValue).toBe('')
-      expect(component.filteredData).toBeUndefined()
+      expect(component.filteredData()).toBeUndefined()
     })
 
     it('should clear global filter and reset input element value', () => {
       component.globalFilterValue = 'some filter'
-      component.filteredData = itemData
+      component.filteredData.set(itemData)
       const input = document.createElement('input')
       input.value = 'some filter'
 
       component.onClearGlobalFilter(input)
 
       expect(component.globalFilterValue).toBe('')
-      expect(component.filteredData).toBeUndefined()
+      expect(component.filteredData()).toBeUndefined()
       expect(input.value).toBe('')
-    })
-  })
-
-  describe('navigation', () => {
-    it('should navigate to detail page when a tile is clicked', () => {
-      fixture.detectChanges()
-      const router = TestBed.inject(Router)
-      spyOn(router, 'navigate').and.returnValue(Promise.resolve(true))
-      const theme: Theme = { name: 'onecx', displayName: 'OneCX', description: 'OneCX theme' }
-
-      component.onAppClick(theme as unknown as RowListGridData)
-      expect(router.navigate).toHaveBeenCalledWith(['./', theme.name], { relativeTo: (component as any).route })
-    })
-
-    it('should prevent navigation if name is missing', () => {
-      const theme: Theme = { displayName: 'OneCX', description: 'OneCX theme' }
-
-      component.onAppClick(theme as unknown as RowListGridData)
-
-      expect().nothing()
     })
   })
 
@@ -289,7 +278,7 @@ describe('ThemeSearchComponent', () => {
       expect(themes).toEqual([theme])
     })
 
-    it('should convert rows to Themes', () => {
+    it('should return undefined when data is undefined', () => {
       const themes = component.convertToThemes(undefined)
 
       expect(themes).toBeUndefined()

@@ -69,7 +69,7 @@ export class ThemePropsComponent implements OnChanges {
   // signals for forms, initialized in constructor
   public readonly isBasicFormValid!: Signal<boolean>
   public readonly isFontFormValid!: Signal<boolean>
-  public readonly isComponentValid!: Signal<boolean>
+  public readonly isThemeFormValid!: Signal<boolean>
   public readonly combinedFormValues!: Signal<Theme>
   // signals for forms, initialized in constructor: URLs
   private readonly logoUrlValue!: Signal<string | null>
@@ -81,7 +81,7 @@ export class ThemePropsComponent implements OnChanges {
   // image
   public bffUrl: Partial<Record<LogoRefType, string | undefined>> = {}
   public imageBasePath = this.imageApi.configuration.basePath
-  public imageMaxSize = 100000
+  public readonly imageMaxSize = 100000
   // make it available in HTML
   public Utils = Utils
   public getLocation = getLocation
@@ -135,7 +135,7 @@ export class ThemePropsComponent implements OnChanges {
       { requireSync: true }
     )
     // build a combined signal for overall form validation: for use in detail component
-    this.isComponentValid = computed(() => {
+    this.isThemeFormValid = computed(() => {
       return this.isBasicFormValid() && this.isFontFormValid()
     })
     // Combine the form values to a Theme
@@ -250,7 +250,7 @@ export class ThemePropsComponent implements OnChanges {
     }
   }
   private proccessFile(file: File, refType: LogoRefType): void {
-    const regex = /^.*.(jpg|jpeg|png|svg)$/
+    const regex = /^.*\.(jpg|jpeg|png|svg)$/i
     if (file.size > this.imageMaxSize)
       this.msgService.error({ summaryKey: 'IMAGE.CONSTRAINT.FAILED', detailKey: 'IMAGE.CONSTRAINT.SIZE' })
     else if (!regex.exec(file.name))

@@ -83,26 +83,26 @@ describe('ThemePropsComponent', () => {
   })
 
   describe('signals', () => {
-    it('isComponentValid should be false when no theme is set (forms disabled)', () => {
+    it('isThemeFormValid should be false when no theme is set (forms disabled)', () => {
       initTestComponent()
-      expect(component.isComponentValid() as unknown as boolean).toBeFalse()
+      expect(component.isThemeFormValid() as unknown as boolean).toBeFalse()
     })
 
-    it('isComponentValid should be true when theme is valid in EDIT mode', () => {
+    it('isThemeFormValid should be true when theme is valid in EDIT mode', () => {
       initTestComponent()
       fixture.componentRef.setInput('changeMode', 'EDIT')
       component.theme.set(validTheme)
       component.ngOnChanges({ theme: new SimpleChange(undefined, validTheme, true) })
-      expect(component.isComponentValid() as unknown as boolean).toBeTrue()
+      expect(component.isThemeFormValid() as unknown as boolean).toBeTrue()
     })
 
-    it('isComponentValid should be false when font form is invalid', () => {
+    it('isThemeFormValid should be false when font form is invalid', () => {
       initTestComponent()
       fixture.componentRef.setInput('changeMode', 'EDIT')
       component.theme.set(validTheme)
       component.ngOnChanges({ theme: new SimpleChange(undefined, validTheme, true) })
       component.fontForm.controls['font-family'].setErrors({ invalid: true })
-      expect(component.isComponentValid() as unknown as boolean).toBeFalse()
+      expect(component.isThemeFormValid() as unknown as boolean).toBeFalse()
     })
   })
 

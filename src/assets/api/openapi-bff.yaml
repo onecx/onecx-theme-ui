@@ -586,6 +586,10 @@ components:
     mandatory:
      type: boolean
      default: false
+    fonts:
+      type: string
+    customCssVariables:
+      type: string
   ThemeUpdateCreate:
    type: object
    properties:
@@ -631,6 +635,10 @@ components:
     mandatory:
      type: boolean
      default: false
+    fonts:
+      type: string
+    customCssVariables:
+      type: string
   GetThemeResponse:
    required:
     - resource
@@ -818,6 +826,10 @@ components:
     mandatory:
      type: boolean
      default: false
+    fonts:
+      type: string
+    customCssVariables:
+      type: string
   ThemeOverride:
    type: object
    properties:

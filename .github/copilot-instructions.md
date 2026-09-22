@@ -81,6 +81,10 @@ Local (src/app/*)
 | `@ViewChild()` | `viewChild<T>()` |
 | `@ViewChildren()` | `viewChildren<T>()` |
 
+- Always mark signals as `readonly` to indicate they should not be reassigned.
+- Always mark computed signals as `readonly` to indicate they should not be reassigned.
+- Do not use aliases for signals; always refer to them by their declared name.
+
 **Exception:** Remote components that implement `ocxRemoteComponent` / `ocxRemoteWebcomponent` keep `@Input()` as required by the web-component interface contract.
 
 ### Signals — local state
@@ -146,4 +150,4 @@ public readonly headers = computed(() => {
 
 ---
 
-For architecture, code-style rules, and project-specific patterns see [coding_standards.md](coding_standards.md).
+For architecture, code-style rules, and project-specific patterns see [coding_standards.md](../coding_standards.md).
