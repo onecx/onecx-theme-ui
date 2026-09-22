@@ -39,17 +39,31 @@ module.exports = function (config) {
     jasmineHtmlReporter: {
       suppressAll: true
     },
+    coverageReporter: {
+      includeAllSources: true,
+      dir: 'reports',
+      subdir: 'coverage',
+      reporters: [{ type: 'text-summary' }, { type: 'lcov' }],
+      check: {
+        global: {
+          statements: 100,
+          branches: 100,
+          functions: 100,
+          lines: 100
+        },
+        each: {
+          statements: 100,
+          branches: 100,
+          functions: 100,
+          lines: 100
+        }
+      }
+    },
     sonarQubeUnitReporter: {
       outputFile: 'reports/sonarqube_report.xml',
       testPaths: ['./src/app'],
       testFilePattern: '**/*.spec.ts',
       useBrowserName: false
-    },
-    coverageReporter: {
-      includeAllSources: true,
-      dir: 'reports',
-      subdir: 'coverage',
-      reporters: [{ type: 'text-summary' }, { type: 'lcov' }]
     }
   })
 }
