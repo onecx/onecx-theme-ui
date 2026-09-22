@@ -28,6 +28,12 @@ export type Workspace = {
   disabled?: boolean
 }
 
+export const WORKSPACE_DETAIL_ENDPOINT = {
+  productName: 'onecx-workspace',
+  appId: 'onecx-workspace-ui',
+  endpointName: 'workspace-detail'
+}
+
 @Component({
   selector: 'app-theme-use',
   standalone: true,
@@ -43,7 +49,12 @@ export class ThemeUseComponent {
   public isComponentDefined = input<boolean>(false)
   // dialog
   public readonly workspaceEndpointExist = toSignal(
-    Utils.doesEndpointExist(this.workspaceService, 'onecx-workspace', 'onecx-workspace-ui', 'workspace-detail'),
+    Utils.doesEndpointExist(
+      this.workspaceService,
+      WORKSPACE_DETAIL_ENDPOINT.productName,
+      WORKSPACE_DETAIL_ENDPOINT.appId,
+      WORKSPACE_DETAIL_ENDPOINT.endpointName
+    ),
     { initialValue: false }
   )
   // resolved workspace-detail URLs keyed by workspace name; resolved once per workspaces/endpoint change instead of per row in the template
@@ -56,7 +67,12 @@ export class ThemeUseComponent {
       return combineLatest(
         workspaces.map((workspace) =>
           this.workspaceService
-            .getUrl('onecx-workspace', 'onecx-workspace-ui', 'workspace-detail', { 'workspace-name': workspace.name })
+            .getUrl(
+              WORKSPACE_DETAIL_ENDPOINT.productName,
+              WORKSPACE_DETAIL_ENDPOINT.appId,
+              WORKSPACE_DETAIL_ENDPOINT.endpointName,
+              { 'workspace-name': workspace.name }
+            )
             .pipe(map((url) => [workspace.name, url] as const))
         )
       ).pipe(map((entries) => new Map(entries)))

@@ -81,7 +81,7 @@ export class ThemePropsComponent implements OnChanges {
   // image
   public bffUrl: Partial<Record<LogoRefType, string | undefined>> = {}
   public imageBasePath = this.imageApi.configuration.basePath
-  public imageMaxSize = 100000
+  public readonly imageMaxSize = 100000
   // make it available in HTML
   public Utils = Utils
   public getLocation = getLocation

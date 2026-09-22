@@ -124,7 +124,7 @@ export class ThemeDetailComponent implements OnInit {
   // image
   public imageBasePath = this.imageApi.configuration.basePath
   // receive the slot output
-  public slotName = 'onecx-workspace-data'
+  public readonly slotName = 'onecx-workspace-data'
   // EventEmitter is required here (not Subject) because ocx-slot [outputs] is typed as
   // { [key: string]: EventEmitter<any> } and calls .emit() on the provided instance.
   public readonly slotEmitter = new EventEmitter<Workspace[]>()
