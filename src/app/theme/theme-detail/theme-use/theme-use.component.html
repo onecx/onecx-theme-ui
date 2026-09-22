@@ -4,36 +4,46 @@
     id="th_detail_use_workspaces_using_theme_missing_component_message"
     [text]="'DIALOG.WORKSPACES_USING_THEME.MISSING_COMPONENT' | translate"
   ></p-message>
-} @else if (workspaces()) {
-  @if (workspaces()?.length === 0) {
+} @else {
+  @let loadingState = useLoadingState();
+  @if (loadingState === 'loading' || loadingState === 'timeout') {
     <p-message
-      severity="info"
-      id="th_detail_use_workspaces_using_theme_unused_message"
-      [text]="'DIALOG.WORKSPACES_USING_THEME.UNUSED' | translate"
+      severity="warn"
+      id="th_detail_use_workspaces_using_theme_loading_message"
+      [text]="'DIALOG.WORKSPACES_USING_THEME.' + loadingState.toUpperCase() | translate"
     ></p-message>
-  } @else {
-    {{ 'DIALOG.WORKSPACES_USING_THEME.USED' | translate }}
-    <ul class="ml-0 mt-2">
-      @for (w of workspaces(); track w.name) {
-        <li class="mb-1">
-          @if (workspaceEndpointExist()) {
-            <a
-              tabindex="0"
-              id="ws_detail_use_item_workspace_link"
-              class="max-w-15rem md:max-w-20rem lg:max-w-30rem xl:max-w-full cursor-pointer font-italic text-primary text-responsive"
-              [routerLink]="[workspaceUrls().get(w.name)]"
-              [attr.aria-label]="'ACTIONS.NAVIGATION.GOTO_WORKSPACE' | translate"
-              [pTooltip]="'ACTIONS.NAVIGATION.GOTO_WORKSPACE' | translate"
-              tooltipPosition="right"
-              tooltipEvent="hover"
-            >
+  } @else if (loadingState === 'ready') {
+    @let workSpaces = workspaces();
+    @if (workSpaces?.length === 0) {
+      <p-message
+        severity="info"
+        id="th_detail_use_workspaces_using_theme_unused_message"
+        [text]="'DIALOG.WORKSPACES_USING_THEME.UNUSED' | translate"
+      ></p-message>
+    } @else {
+      {{ 'DIALOG.WORKSPACES_USING_THEME.USED' | translate }}
+      <ul class="ml-0 mt-2">
+        @for (w of workSpaces; track w.name) {
+          <li class="mb-1">
+            @if (workspaceEndpointExist()) {
+              <a
+                tabindex="0"
+                id="ws_detail_use_item_workspace_link"
+                class="max-w-15rem md:max-w-20rem lg:max-w-30rem xl:max-w-full cursor-pointer font-italic text-primary text-responsive"
+                [routerLink]="[workspaceUrls().get(w.name)]"
+                [attr.aria-label]="'ACTIONS.NAVIGATION.GOTO_WORKSPACE' | translate"
+                [pTooltip]="'ACTIONS.NAVIGATION.GOTO_WORKSPACE' | translate"
+                tooltipPosition="right"
+                tooltipEvent="hover"
+              >
+                {{ w.displayName }}
+              </a>
+            } @else {
               {{ w.displayName }}
-            </a>
-          } @else {
-            {{ w.displayName }}
-          }
-        </li>
-      }
-    </ul>
+            }
+          </li>
+        }
+      </ul>
+    }
   }
 }
