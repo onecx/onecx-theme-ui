@@ -16,7 +16,6 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch'
 import { TooltipModule } from 'primeng/tooltip'
 
 import { Theme } from 'src/app/shared/generated'
-import { Utils } from 'src/app/shared/utils'
 import { DictionaryObjectString } from 'src/app/shared/models/theme.model'
 
 import { ChangeMode } from '../theme-detail.component'
