@@ -80,7 +80,7 @@
       <p-tabpanels>
         <!-- PROPS -->
         <p-tabpanel value="0">
-          <div class="mt-1 mb-3 mx-0 sm:mx-3">
+          <div class="pt-2 pb-4 px-0 sm:px-3">
             @if (loading) {
               <p-message
                 id="th_detail_loading_message"
@@ -149,12 +149,12 @@
         @if (changeMode === 'VIEW') {
           <!-- VARIABLES -->
           <p-tabpanel value="2" id="th_detail_panel_variables">
-            <pre class="my-2 mx-3 pt-1 pb-0 surface-50">{{ theme()?.properties | json }}</pre>
+            <pre class="m-3 surface-50">{{ theme()?.properties | json }}</pre>
           </p-tabpanel>
 
           <!-- USE -->
           <p-tabpanel value="3">
-            <div class="m-2">
+            <div class="p-4">
               <app-theme-use
                 [workspaces]="themeUsedByWorkspaces()"
                 [isComponentDefined]="isComponentDefined()"
@@ -164,7 +164,7 @@
 
           <!-- INTERN -->
           <p-tabpanel value="4">
-            <div class="m-2 mt-4">
+            <div class="p-4">
               <app-theme-intern [theme]="theme()" [dateFormat]="dateFormat"></app-theme-intern>
             </div>
           </p-tabpanel>

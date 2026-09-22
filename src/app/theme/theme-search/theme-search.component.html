@@ -3,19 +3,20 @@
     [header]="'DIALOG.SEARCH.HEADER' | translate"
     [subheader]="'DIALOG.SEARCH.SUBHEADER' | translate"
     [manualBreadcrumbs]="false"
-    [actions]="(actions$ | async) ?? []"
+    [actions]="actions()"
   >
   </ocx-page-header>
-  @let data = (data$ | async) ?? [];
+  @let rows = data();
+  @let exceptionMessage = exceptionKey();
   <ocx-content class="ocx-content">
-    @if (exceptionKey) {
+    @if (exceptionMessage) {
       <p-message
         id="th_search_message_error"
         severity="error"
         styleClass="m-3"
-        [text]="exceptionKey | translate"
+        [text]="exceptionMessage | translate"
       ></p-message>
-    } @else if (loading) {
+    } @else if (loading()) {
       <p-message
         id="th_search_message_loading"
         severity="info"
@@ -27,7 +28,7 @@
         <ocx-interactive-data-view
           id="th_search_dataview"
           styleClass="p-0"
-          [data]="filteredData ?? data"
+          [data]="filteredData() ?? rows"
           [emptyResultsMessage]="'ACTIONS.SEARCH.NO_DATA' | translate"
           [listGridPaginator]="true"
           [pageSizes]="[20, 40, 100]"
@@ -57,7 +58,7 @@
                     id="th_search_filter"
                     class="text-responsive"
                     [value]="globalFilterValue"
-                    (input)="onGlobalFilter(globalFilterInput.value, data)"
+                    (input)="onGlobalFilter(globalFilterInput.value, rows)"
                     [ariaLabel]="'DIALOG.DATAVIEW.FILTER.LABEL' | translate"
                     [pTooltip]="
                       ('DIALOG.DATAVIEW.FILTER.OF' | translate) +
@@ -75,7 +76,7 @@
                 <p-button
                   id="th_search_filter_clear"
                   icon="pi pi-filter-slash"
-                  (onClick)="globalFilterInput.value = ''; onClearGlobalFilter()"
+                  (onClick)="onClearGlobalFilter()"
                   [disabled]="globalFilterInput.value === ''"
                   [ariaLabel]="'DIALOG.DATAVIEW.FILTER.CLEAR' | translate"
                   [pTooltip]="'DIALOG.DATAVIEW.FILTER.CLEAR' | translate"
@@ -151,8 +152,9 @@
                 [style]="{ margin: '0rem;' }"
                 styleClass="cursor-pointer hover:bg-gray-200 text-center m-2 p-1"
                 [attr.aria-label]="item.name"
-                (click)="onAppClick(item)"
-                (keydown.enter)="onAppClick(item)"
+                [routerLink]="['./', item.name]"
+                (keydown.enter)="$any($event.target).click()"
+                (keydown.space)="$event.preventDefault(); $any($event.target).click()"
                 role="button"
                 tabindex="0"
               >
@@ -216,14 +218,14 @@
       [(visible)]="themeCreateVisible"
       (created)="onThemeCreation($event)"
       [themeToBeCreated]="undefined"
-      [themes]="convertToThemes(data)"
+      [themes]="convertToThemes(rows)"
     ></app-theme-create>
 
     <!-- IMPORT -->
     <app-theme-import
       [(visible)]="themeImportVisible"
       (uploaded)="onThemeCreation($event)"
-      [themes]="convertToThemes(data)"
+      [themes]="convertToThemes(rows)"
     ></app-theme-import>
   </ocx-content>
 </ocx-portal-page>

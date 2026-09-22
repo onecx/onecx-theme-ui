@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, effect, inject, OnInit, signal } from '@angular/core'
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
-import { AsyncPipe } from '@angular/common'
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop'
 import { ActivatedRoute, Router, RouterModule } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { BehaviorSubject, catchError, finalize, map, Observable, of, Subject, switchMap } from 'rxjs'
@@ -36,7 +35,6 @@ import { ThemeImportComponent } from '../theme-import/theme-import.component'
   standalone: true,
   imports: [
     AngularAcceleratorModule,
-    AsyncPipe,
     ButtonModule,
     CardModule,
     FloatLabelModule,
@@ -71,12 +69,35 @@ export class ThemeSearchComponent implements OnInit {
   // data
   private readonly dataSubject$ = new BehaviorSubject<RowListGridData[]>([])
   public data$: Observable<RowListGridData[]> = this.dataSubject$.asObservable()
+  public readonly data = toSignal(this.data$, { initialValue: [] as RowListGridData[] })
   private readonly loadTrigger$ = new Subject<void>()
-  public filteredData: RowListGridData[] | undefined = undefined
+  public readonly filteredData = signal<RowListGridData[] | undefined>(undefined)
   // dialog
-  public loading = false
-  public exceptionKey: string | undefined = undefined
-  public actions$: Observable<Action[]> | undefined
+  public readonly loading = signal(false)
+  public readonly exceptionKey = signal<string | undefined>(undefined)
+  public readonly actions$: Observable<Action[]> = this.translate
+    .get(['ACTIONS.CREATE.THEME', 'ACTIONS.CREATE.THEME.TOOLTIP', 'ACTIONS.IMPORT.LABEL', 'ACTIONS.IMPORT.TOOLTIP'])
+    .pipe(
+      map((data) => [
+        {
+          label: data['ACTIONS.CREATE.THEME'],
+          title: data['ACTIONS.CREATE.THEME.TOOLTIP'],
+          actionCallback: () => this.themeCreateVisible.set(true),
+          permission: 'THEME#CREATE',
+          icon: 'pi pi-plus',
+          show: 'always'
+        },
+        {
+          label: data['ACTIONS.IMPORT.LABEL'],
+          title: data['ACTIONS.IMPORT.TOOLTIP'],
+          actionCallback: () => this.onImportThemeClick(),
+          permission: 'THEME#IMPORT',
+          icon: 'pi pi-upload',
+          show: 'always'
+        }
+      ])
+    )
+  public readonly actions = toSignal(this.actions$, { initialValue: [] as Action[] })
   public globalFilterValue = ''
   public sortColumns = this.prepareSortColumns()
   public sortColumnKeys = this.sortColumns.map((c) => c.id)
@@ -91,8 +112,8 @@ export class ThemeSearchComponent implements OnInit {
     this.loadTrigger$
       .pipe(
         switchMap(() => {
-          this.loading = true
-          this.exceptionKey = undefined
+          this.loading.set(true)
+          this.exceptionKey.set(undefined)
           return this.themeApi.searchThemes({ searchThemeRequest: {} }).pipe(
             map((data) => {
               const themes = data?.stream ?? []
@@ -100,11 +121,11 @@ export class ThemeSearchComponent implements OnInit {
               return themes as unknown[] as RowListGridData[]
             }),
             catchError((err) => {
-              this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + Utils.mapping_error_status(err.status) + '.THEME'
+              this.exceptionKey.set('EXCEPTIONS.HTTP_STATUS_' + Utils.mapping_error_status(err.status) + '.THEME')
               console.error('searchThemes', err)
               return of([] as RowListGridData[])
             }),
-            finalize(() => (this.loading = false))
+            finalize(() => this.loading.set(false))
           )
         }),
         takeUntilDestroyed(this.destroyRef)
@@ -119,7 +140,6 @@ export class ThemeSearchComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.prepareActionButtons()
     this.loadThemes()
   }
 
@@ -132,32 +152,6 @@ export class ThemeSearchComponent implements OnInit {
     return data as unknown[] as Theme[]
   }
 
-  private prepareActionButtons(): void {
-    this.actions$ = this.translate
-      .get(['ACTIONS.CREATE.THEME', 'ACTIONS.CREATE.THEME.TOOLTIP', 'ACTIONS.IMPORT.LABEL', 'ACTIONS.IMPORT.TOOLTIP'])
-      .pipe(
-        map((data) => {
-          return [
-            {
-              label: data['ACTIONS.CREATE.THEME'],
-              title: data['ACTIONS.CREATE.THEME.TOOLTIP'],
-              actionCallback: () => this.themeCreateVisible.set(true),
-              permission: 'THEME#CREATE',
-              icon: 'pi pi-plus',
-              show: 'always'
-            },
-            {
-              label: data['ACTIONS.IMPORT.LABEL'],
-              title: data['ACTIONS.IMPORT.TOOLTIP'],
-              actionCallback: () => this.onImportThemeClick(),
-              permission: 'THEME#IMPORT',
-              icon: 'pi pi-upload',
-              show: 'always'
-            }
-          ]
-        })
-      )
-  }
   private prepareSortColumns(): DataTableColumn[] {
     return [
       {
@@ -187,31 +181,27 @@ export class ThemeSearchComponent implements OnInit {
   public onGlobalFilter(value?: string, data?: RowListGridData[]): void {
     if (!data) return
     this.globalFilterValue = value ?? ''
-    if (this.globalFilterValue === '') this.filteredData = undefined
+    if (this.globalFilterValue === '') this.filteredData.set(undefined)
     else {
-      this.filteredData = data?.filter(
-        (row) =>
-          row['name']?.toString().toLowerCase().includes(this.globalFilterValue.toLowerCase()) ||
-          row['displayName']?.toString().toLowerCase().includes(this.globalFilterValue.toLowerCase())
+      this.filteredData.set(
+        data?.filter(
+          (row) =>
+            row['name']?.toString().toLowerCase().includes(this.globalFilterValue.toLowerCase()) ||
+            row['displayName']?.toString().toLowerCase().includes(this.globalFilterValue.toLowerCase())
+        )
       )
     }
   }
 
   public onClearGlobalFilter(input?: HTMLInputElement): void {
     this.globalFilterValue = ''
-    this.filteredData = undefined
+    this.filteredData.set(undefined)
     if (input) input.value = ''
   }
 
   public onSortChange(event: { sortColumn: string; sortDirection: DataSortDirection }): void {
     this.sortField = event.sortColumn
     this.sortDirection = event.sortDirection
-  }
-
-  public onAppClick(item: RowListGridData): void {
-    const theme = item as unknown as Theme
-    if (!theme?.name) return
-    this.router.navigate(['./', theme.name], { relativeTo: this.route })
   }
 
   public onImportThemeClick(): void {
