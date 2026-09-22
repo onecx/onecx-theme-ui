@@ -88,6 +88,10 @@ export class ThemeColorsComponent {
   public readonly theme = input<Theme | undefined>()
   public readonly changeMode = input.required<ChangeMode>()
   public readonly autoApply = input.required<boolean>()
+  // Inline CSS variable values captured before the first auto-apply mutation, so they can be
+  // restored when the editing session ends (avoids leaking edited theme colors into the rest of the SPA).
+  // `undefined` until the first mutation; font variables are excluded on purpose (auto-apply never writes them).
+  private styleBaseline: Record<string, string> | undefined
   // Form
   public themeVars = themeVariables // used to initialize the form fields
   public generalForm: FormGroup = new FormGroup({})
@@ -164,6 +168,8 @@ export class ThemeColorsComponent {
         this.colorsForm.reset()
       }
     })
+    // restore the pre-edit CSS variable values when the component is destroyed
+    this.destroyRef.onDestroy(() => this.restoreBaseline())
   }
 
   private initColorForms() {
@@ -212,11 +218,40 @@ export class ThemeColorsComponent {
 
   // Applying Styles
   private updateCssVar(varName: string, value: string | null): void {
+    if (!this.styleBaseline) this.captureBaseline() // capture before the first mutation
     document.documentElement.style.setProperty(`--${varName}`, value || '')
     const rgb = this.hexToRgb(value || '')
     if (rgb) {
       document.documentElement.style.setProperty(`--${varName}-rgb`, `${rgb.r},${rgb.g},${rgb.b}`)
     }
+  }
+
+  // Color variables that auto-apply can mutate (general/topbar/sidebar). Font vars are untouched.
+  private cssVarNames(): string[] {
+    return [...themeVariables.general, ...themeVariables.topbar, ...themeVariables.sidebar]
+  }
+
+  // Snapshot the current inline values of all color variables (and their -rgb variants) so they
+  // can be restored when the editing session ends. `''` means "not set inline".
+  private captureBaseline(): void {
+    const style = document.documentElement.style
+    const baseline: Record<string, string> = {}
+    for (const name of this.cssVarNames()) {
+      baseline[`--${name}`] = style.getPropertyValue(`--${name}`)
+      baseline[`--${name}-rgb`] = style.getPropertyValue(`--${name}-rgb`)
+    }
+    this.styleBaseline = baseline
+  }
+
+  // Restore the pre-edit CSS variable values. Setting an empty string clears the inline override,
+  // reverting to the stylesheet value. No-op if no mutation ever happened (baseline not captured).
+  private restoreBaseline(): void {
+    if (!this.styleBaseline) return
+    const style = document.documentElement.style
+    for (const [prop, value] of Object.entries(this.styleBaseline)) {
+      style.setProperty(prop, value)
+    }
+    this.styleBaseline = undefined
   }
 
   private hexToRgb(hex: string): { r: number; g: number; b: number } | null {
