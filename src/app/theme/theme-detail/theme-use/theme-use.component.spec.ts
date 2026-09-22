@@ -6,6 +6,7 @@ import { of } from 'rxjs'
 import { WorkspaceService } from '@onecx/angular-integration-interface'
 
 import { ThemeUseComponent } from './theme-use.component'
+import { provideNoopAnimations } from '@angular/platform-browser/animations'
 
 describe('ThemeUseComponent', () => {
   let component: ThemeUseComponent
@@ -22,7 +23,11 @@ describe('ThemeUseComponent', () => {
           en: require('src/assets/i18n/en.json')
         }).withDefaultLanguage('de')
       ],
-      providers: [provideRouter([]), { provide: WorkspaceService, useValue: workspaceServiceSpy }]
+      providers: [
+        provideRouter([]),
+        provideNoopAnimations(),
+        { provide: WorkspaceService, useValue: workspaceServiceSpy }
+      ]
     }).compileComponents()
   }))
 
