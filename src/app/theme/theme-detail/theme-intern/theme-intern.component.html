@@ -34,7 +34,7 @@
     </div>
   </div>
 
-  <p-float-label variant="on" class="w-full mb-1">
+  <p-float-label variant="on" class="">
     <input
       pInputText
       type="text"
@@ -53,72 +53,80 @@
   </p-float-label>
 
   <div class="flex flex-wrap row-gap-3 sm:row-gap-4">
-    <p-float-label variant="on" class="w-full mb-1 w-12 sm:w-5 sm:pr-3">
-      <input
-        pInputText
-        type="text"
-        id="th_detail_item_creationDate"
-        class="w-full pt-3 pb-2 text-responsive"
-        [value]="creationDate()"
-        [disabled]="true"
-        [ariaLabel]="'INTERNAL.CREATION_DATE' | translate"
-        [pTooltip]="'INTERNAL.TOOLTIPS.CREATION_DATE' | translate"
-        tooltipPosition="top"
-        tooltipEvent="hover"
-      />
-      <label for="th_detail_item_creationDate" aria-hidden="true">{{ 'INTERNAL.CREATION_DATE' | translate }}</label>
-    </p-float-label>
-    <p-float-label variant="on" class="w-12 sm:w-7 sm:pl-3 mb-1">
-      <input
-        pInputText
-        type="text"
-        id="th_detail_item_creationUser"
-        class="w-full pt-3 pb-2 text-responsive"
-        [value]="theme()?.creationUser"
-        [disabled]="true"
-        [ariaLabel]="'INTERNAL.CREATION_USER' | translate"
-        [pTooltip]="'INTERNAL.TOOLTIPS.CREATION_USER' | translate"
-        tooltipPosition="top"
-        tooltipEvent="hover"
-      />
-      <label for="th_detail_item_creationUser" aria-hidden="true">{{ 'INTERNAL.CREATION_USER' | translate }}</label>
-    </p-float-label>
+    <div class="w-12 sm:w-5 sm:pr-3">
+      <p-float-label variant="on">
+        <input
+          pInputText
+          type="text"
+          id="th_detail_item_creationDate"
+          class="w-full pt-3 pb-2 text-responsive"
+          [value]="creationDate()"
+          [disabled]="true"
+          [ariaLabel]="'INTERNAL.CREATION_DATE' | translate"
+          [pTooltip]="'INTERNAL.TOOLTIPS.CREATION_DATE' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
+        />
+        <label for="th_detail_item_creationDate" aria-hidden="true">{{ 'INTERNAL.CREATION_DATE' | translate }}</label>
+      </p-float-label>
+    </div>
+    <div class="w-12 sm:w-7 sm:pl-3">
+      <p-float-label variant="on">
+        <input
+          pInputText
+          type="text"
+          id="th_detail_item_creationUser"
+          class="w-full pt-3 pb-2 text-responsive"
+          [value]="theme()?.creationUser"
+          [disabled]="true"
+          [ariaLabel]="'INTERNAL.CREATION_USER' | translate"
+          [pTooltip]="'INTERNAL.TOOLTIPS.CREATION_USER' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
+        />
+        <label for="th_detail_item_creationUser" aria-hidden="true">{{ 'INTERNAL.CREATION_USER' | translate }}</label>
+      </p-float-label>
+    </div>
   </div>
 
   <div class="flex flex-wrap row-gap-3 sm:row-gap-4">
-    <p-float-label variant="on" class="w-full mb-1 w-12 sm:w-5 sm:pr-3">
-      <input
-        pInputText
-        type="text"
-        id="th_detail_item_modificationDate"
-        class="w-full pt-3 pb-2 text-responsive"
-        [value]="modificationDate()"
-        [disabled]="true"
-        [ariaLabel]="'INTERNAL.MODIFICATION_DATE' | translate"
-        [pTooltip]="'INTERNAL.TOOLTIPS.MODIFICATION_DATE' | translate"
-        tooltipPosition="top"
-        tooltipEvent="hover"
-      />
-      <label for="th_detail_item_modificationDate" aria-hidden="true">
-        {{ 'INTERNAL.MODIFICATION_DATE' | translate }}
-      </label>
-    </p-float-label>
-    <p-float-label variant="on" class="w-12 sm:w-7 sm:pl-3 mb-1">
-      <input
-        pInputText
-        type="text"
-        id="th_detail_item_modificationUser"
-        class="w-full pt-3 pb-2 text-responsive"
-        [value]="theme()?.modificationUser"
-        [disabled]="true"
-        [ariaLabel]="'INTERNAL.MODIFICATION_USER' | translate"
-        [pTooltip]="'INTERNAL.TOOLTIPS.MODIFICATION_USER' | translate"
-        tooltipPosition="top"
-        tooltipEvent="hover"
-      />
-      <label for="th_detail_item_modificationUser" aria-hidden="true">
-        {{ 'INTERNAL.MODIFICATION_USER' | translate }}
-      </label>
-    </p-float-label>
+    <div class="w-12 sm:w-5 sm:pr-3">
+      <p-float-label variant="on">
+        <input
+          pInputText
+          type="text"
+          id="th_detail_item_modificationDate"
+          class="w-full pt-3 pb-2 text-responsive"
+          [value]="modificationDate()"
+          [disabled]="true"
+          [ariaLabel]="'INTERNAL.MODIFICATION_DATE' | translate"
+          [pTooltip]="'INTERNAL.TOOLTIPS.MODIFICATION_DATE' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
+        />
+        <label for="th_detail_item_modificationDate" aria-hidden="true">
+          {{ 'INTERNAL.MODIFICATION_DATE' | translate }}
+        </label>
+      </p-float-label>
+    </div>
+    <div class="w-12 sm:w-7 sm:pl-3">
+      <p-float-label variant="on">
+        <input
+          pInputText
+          type="text"
+          id="th_detail_item_modificationUser"
+          class="w-full pt-3 pb-2 text-responsive"
+          [value]="theme()?.modificationUser"
+          [disabled]="true"
+          [ariaLabel]="'INTERNAL.MODIFICATION_USER' | translate"
+          [pTooltip]="'INTERNAL.TOOLTIPS.MODIFICATION_USER' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
+        />
+        <label for="th_detail_item_modificationUser" aria-hidden="true">
+          {{ 'INTERNAL.MODIFICATION_USER' | translate }}
+        </label>
+      </p-float-label>
+    </div>
   </div>
 </div>
