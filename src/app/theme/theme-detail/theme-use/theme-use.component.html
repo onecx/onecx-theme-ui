@@ -4,8 +4,7 @@
     id="th_detail_use_workspaces_using_theme_missing_component_message"
     [text]="'DIALOG.WORKSPACES_USING_THEME.MISSING_COMPONENT' | translate"
   ></p-message>
-}
-@if (isComponentDefined() === true && workspaces()) {
+} @else if (workspaces()) {
   @if (workspaces()?.length === 0) {
     <p-message
       severity="info"

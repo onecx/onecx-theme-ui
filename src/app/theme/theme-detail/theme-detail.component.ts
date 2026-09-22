@@ -151,21 +151,29 @@ export class ThemeDetailComponent implements OnInit {
     this.slotEmitter.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((res) => {
       this.stopGettingThemeUseData(res)
     })
-    this.themeUsed.set(false)
-    this.dateFormat = this.user.lang$.getValue() === 'de' ? 'dd.MM.yyyy HH:mm:ss' : this.dateFormat
-    this.paramThemeName = this.route.snapshot.paramMap.get('name')
-    // Common start
-    this.theme.set(undefined)
-    this.getTheme()
     // Re-initialize the component when the route parameter changes (e.g. after creating a new theme)
     this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const newThemeName = params.get('name')
       if (newThemeName && newThemeName !== this.paramThemeName) {
         this.paramThemeName = newThemeName
-        this.changeMode = 'VIEW'
-        this.getTheme()
+        this.initThemeDetail()
       }
     })
+    this.dateFormat = this.user.lang$.getValue() === 'de' ? 'dd.MM.yyyy HH:mm:ss' : this.dateFormat
+    this.paramThemeName = this.route.snapshot.paramMap.get('name')
+    // Common start
+    this.initThemeDetail()
+  }
+
+  // reset the theme detail component to its initial state and load the theme
+  private initThemeDetail() {
+    this.changeMode = 'VIEW'
+    this.theme.set(undefined)
+    this.themeUsed.set(false)
+    this.themeUsedName.set(undefined)
+    this.themeUseLoadingState.set('initial')
+    this.themeUsedByWorkspaces.set([])
+    this.getTheme()
   }
 
   private getTheme(): void {
