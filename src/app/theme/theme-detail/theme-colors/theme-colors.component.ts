@@ -167,12 +167,15 @@ export class ThemeColorsComponent {
   }
 
   private initColorForms() {
+    // For each general color a value is required!
     for (const v of themeVariables.general) {
       this.generalForm.addControl(v, new FormControl<string | null>(null, [Validators.required, colorValueValidator()]))
     }
+    // optional color values
     for (const v of themeVariables.topbar) {
       this.topbarForm.addControl(v, new FormControl<string | null>(null, [colorValueValidator()]))
     }
+    // optional color values
     for (const v of themeVariables.sidebar) {
       this.sidebarForm.addControl(v, new FormControl<string | null>(null, [colorValueValidator()]))
     }
