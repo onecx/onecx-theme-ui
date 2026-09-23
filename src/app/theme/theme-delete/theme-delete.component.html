@@ -9,7 +9,10 @@
     [resizable]="true"
     [style]="{ 'max-width': '450px' }"
   >
+    <!-- better performance to map multiple used signals -->
     @let loadingState = useLoadingState();
+    @let theme = themeToBeDeleted();
+    @let themeIsUsed = themeUsed();
     <ng-template pTemplate="content">
       <div class="flex column-gap-3 row-gap-1 justify-content-start align-items-center">
         @let icon =
@@ -17,10 +20,10 @@
             ? 'pi-spin pi-cog'
             : loadingState === 'timeout'
               ? 'pi-exclamation-triangle'
-              : loadingState === 'ready' && (themeToBeDeleted()?.mandatory || themeUsed())
+              : loadingState === 'ready' && (theme?.mandatory || themeIsUsed)
                 ? 'pi-ban'
                 : 'pi-question-circle';
-        @let color = loadingState === 'ready' && !themeUsed() ? 'var(--danger-button-bg)' : 'var(--text-color)';
+        @let color = loadingState === 'ready' && !themeIsUsed ? 'var(--danger-button-bg)' : 'var(--text-color)';
         <div [class]="'text-3xl pi ' + icon" [style.color]="color"></div>
 
         <div class="w-full mt-1 flex flex-column row-gap-3">
@@ -36,14 +39,14 @@
               severity="info"
               [text]="'ACTIONS.DELETE.MESSAGE_TIMEOUT' | translate"
             ></p-message>
-          } @else if (loadingState === 'ready' && themeToBeDeleted()) {
-            @if (themeToBeDeleted()?.mandatory) {
+          } @else if (loadingState === 'ready' && theme) {
+            @if (theme?.mandatory) {
               <p-message
                 id="th_delete_message_reject_mandatory"
                 severity="info"
                 [text]="'ACTIONS.DELETE.MESSAGE_REJECT_MANDATORY' | translate"
               ></p-message>
-            } @else if (themeUsed()) {
+            } @else if (themeIsUsed) {
               <p-message
                 id="th_delete_message_reject_used"
                 severity="error"
@@ -55,9 +58,9 @@
                   {{ 'ACTIONS.DELETE.THEME_MESSAGE' | translate }}
                 </div>
                 <div id="th_delete_theme_display_name" class="my-2 font-bold danger-action-text text-center">
-                  {{ themeToBeDeleted()?.displayName }}
+                  {{ theme?.displayName }}
                 </div>
-                @if (themeToBeDeleted()?.operator) {
+                @if (theme?.operator) {
                   <p-message
                     id="th_delete_operator_hint"
                     severity="info"
@@ -79,13 +82,7 @@
 
     <ng-template pTemplate="footer">
       <div class="flex flex-wrap column-gap-2 row-gap-1 justify-content-end">
-        @if (
-          !themeToBeDeleted() ||
-          themeToBeDeleted()?.mandatory ||
-          themeUsed() ||
-          loadingState === 'loading' ||
-          loadingState === 'timeout'
-        ) {
+        @if (!theme || theme?.mandatory || themeIsUsed || loadingState === 'loading' || loadingState === 'timeout') {
           <p-button
             icon="pi pi-times"
             id="th_delete_action_close"
@@ -95,7 +92,7 @@
             tooltipPosition="top"
             tooltipEvent="hover"
           ></p-button>
-        } @else if (themeToBeDeleted() && !themeToBeDeleted()?.mandatory && !themeUsed()) {
+        } @else if (theme && !theme?.mandatory && !themeIsUsed) {
           <p-button
             icon="pi pi-times"
             id="th_delete_action_no"
@@ -108,7 +105,7 @@
           <p-button
             icon="pi pi-check"
             id="th_delete_action_yes"
-            (onClick)="onDeleteTheme(themeToBeDeleted())"
+            (onClick)="onDeleteTheme(theme)"
             [label]="'ACTIONS.CONFIRMATION.YES' | translate"
             [pTooltip]="'ACTIONS.CONFIRMATION.YES.TOOLTIP' | translate"
             tooltipPosition="top"

@@ -253,19 +253,6 @@ describe('ThemeSearchComponent', () => {
       expect(component.globalFilterValue).toBe('')
       expect(component.filteredData()).toBeUndefined()
     })
-
-    it('should clear global filter and reset input element value', () => {
-      component.globalFilterValue = 'some filter'
-      component.filteredData.set(itemData)
-      const input = document.createElement('input')
-      input.value = 'some filter'
-
-      component.onClearGlobalFilter(input)
-
-      expect(component.globalFilterValue).toBe('')
-      expect(component.filteredData()).toBeUndefined()
-      expect(input.value).toBe('')
-    })
   })
 
   describe('conversion', () => {

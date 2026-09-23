@@ -259,10 +259,6 @@ export class ThemeDetailComponent implements OnInit {
   // Initialize the process of checking if the theme is used in workspaces
   private startGettingThemeUseData(theme?: Theme): void {
     if (theme && this.themeUseLoadingState() === 'initial') {
-      if (theme.mandatory) {
-        this.themeUseLoadingState.set('ready') // stop here
-        return
-      }
       this.themeUseLoadingState.set('loading')
       // best customer experience: show the loading indicator for at least 1.5 seconds, even if the data is received faster
       this.themeUseStartTime = performance.now() // store the start time for measuring loading duration
@@ -340,7 +336,7 @@ export class ThemeDetailComponent implements OnInit {
   /**
    * SAVE
    */
-  private prepareThemeData(): Theme | undefined {
+  private prepareThemeDataToSave(): Theme | undefined {
     // check form state in sub components before saving: must be valid!
     if (!this.themeData().propsValid) {
       this.msgService.error({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
@@ -352,12 +348,17 @@ export class ThemeDetailComponent implements OnInit {
     }
 
     let data = this.themeData().theme // combined data from sub components
-    // combine with the original theme data to preserve properties (modificationCount!)
+    // combine with the original theme data to preserve some properties
     data = {
       ...data,
       id: undefined,
       operator: undefined,
-      modificationCount: this.theme()?.modificationCount, // the original value!
+      // preserve the original modification count
+      modificationCount: this.theme()?.modificationCount,
+      // preserve: not used, to be deleted
+      fonts: this.theme()?.fonts,
+      // preserve: used as Theme overrides in Shell UI (JSON) => design tokens
+      customCssVariables: this.theme()?.customCssVariables,
       // prevent empty strings for urls, as it causes issues for the image service
       logoUrl: data.logoUrl === '' ? undefined : data.logoUrl,
       smallLogoUrl: data.smallLogoUrl === '' ? undefined : data.smallLogoUrl,
@@ -367,7 +368,7 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   private onUpdateTheme(): void {
-    const themeData = this.prepareThemeData()
+    const themeData = this.prepareThemeDataToSave()
     if (!themeData) return
     // save
     const themeId = this.theme()?.id
@@ -397,7 +398,7 @@ export class ThemeDetailComponent implements OnInit {
   public onSaveAs(copyOfPrefix: string): void {
     let themeData: Theme | undefined
     if (this.changeMode === 'EDIT') {
-      themeData = this.prepareThemeData()
+      themeData = this.prepareThemeDataToSave()
       if (!themeData) return
     } else {
       themeData = this.theme()

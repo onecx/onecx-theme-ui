@@ -27,5 +27,7 @@ export interface EximTheme {
     overrides?: Array<ThemeOverride>;
     images?: { [key: string]: Image; };
     mandatory?: boolean;
+    fonts?: string;
+    customCssVariables?: string;
 }
 

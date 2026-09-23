@@ -297,7 +297,7 @@ describe('ThemeColorsComponent', () => {
       expect(spy).toHaveBeenCalledWith('--primary-color-rgb', '255,85,0')
     })
 
-    it('should handle invalid hex gracefully (no rgb property set)', async () => {
+    it('should clear the -rgb variant for an invalid color', async () => {
       const spy = spyOn(document.documentElement.style, 'setProperty')
 
       component.generalForm.get('primary-color')?.setValue('not-a-hex')
@@ -305,7 +305,7 @@ describe('ThemeColorsComponent', () => {
       fixture.detectChanges()
 
       expect(spy).toHaveBeenCalledWith('--primary-color', 'not-a-hex')
-      expect(spy).not.toHaveBeenCalledWith('--primary-color-rgb', jasmine.anything())
+      expect(spy).toHaveBeenCalledWith('--primary-color-rgb', '')
     })
 
     it('should use empty string when form value is null', async () => {
@@ -351,6 +351,113 @@ describe('ThemeColorsComponent', () => {
 
       expect(spy).toHaveBeenCalledWith('--menu-text-color', '#99ccff')
       expect(spy).toHaveBeenCalledWith('--menu-text-color-rgb', '153,204,255')
+    })
+  })
+
+  describe('color to rgb resolution', () => {
+    beforeEach(() => {
+      // clear inline color variables so tests are isolated from each other (documentElement is shared)
+      const style = document.documentElement.style
+      for (const group of [themeVariables.general, themeVariables.topbar, themeVariables.sidebar]) {
+        for (const name of group) {
+          style.removeProperty(`--${name}`)
+          style.removeProperty(`--${name}-rgb`)
+        }
+      }
+      fixture.componentRef.setInput('changeMode', 'EDIT')
+      fixture.componentRef.setInput('autoApply', true)
+      fixture.detectChanges()
+    })
+
+    function setPrimaryColor(value: string | null) {
+      return new Promise<void>((resolve) => {
+        component.generalForm.get('primary-color')?.setValue(value)
+        fixture.whenStable().then(() => {
+          fixture.detectChanges()
+          resolve()
+        })
+      })
+    }
+
+    // wait until the given inline CSS variables have the expected values (a pending debounce
+    // may still be running, and whenStable resolves immediately if the app is already stable)
+    async function waitForVars(values: Record<string, string>, timeout = 1000): Promise<void> {
+      const style = document.documentElement.style
+      const start = Date.now()
+      const check = () => Object.entries(values).every(([key, value]) => style.getPropertyValue(key) === value)
+      while (!check() && Date.now() - start < timeout) {
+        await new Promise((resolve) => setTimeout(resolve, 20))
+      }
+    }
+
+    it('should resolve a 3-digit hex value to its rgb components', async () => {
+      await setPrimaryColor('#f00')
+      const style = document.documentElement.style
+      expect(style.getPropertyValue('--primary-color')).toBe('#f00')
+      expect(style.getPropertyValue('--primary-color-rgb')).toBe('255,0,0')
+    })
+
+    it('should resolve an 8-digit hex value (rgb part, alpha ignored)', async () => {
+      await setPrimaryColor('#ff550080')
+      const style = document.documentElement.style
+      expect(style.getPropertyValue('--primary-color-rgb')).toBe('255,85,0')
+    })
+
+    it('should resolve a named color to its rgb components', async () => {
+      await setPrimaryColor('white')
+      const style = document.documentElement.style
+      expect(style.getPropertyValue('--primary-color-rgb')).toBe('255,255,255')
+    })
+
+    it('should resolve a rgb() value to its rgb components', async () => {
+      await setPrimaryColor('rgb(10, 20, 30)')
+      const style = document.documentElement.style
+      expect(style.getPropertyValue('--primary-color-rgb')).toBe('10,20,30')
+    })
+
+    it('should clear the -rgb variant for an unresolvable color', async () => {
+      await setPrimaryColor('not-a-color')
+      const style = document.documentElement.style
+      expect(style.getPropertyValue('--primary-color')).toBe('not-a-color')
+      expect(style.getPropertyValue('--primary-color-rgb')).toBe('')
+    })
+
+    it('should clear both variables when the value is null/empty', async () => {
+      const style = document.documentElement.style
+      await setPrimaryColor('#ff5500')
+      await waitForVars({ '--primary-color-rgb': '255,85,0' })
+
+      await setPrimaryColor(null)
+      await waitForVars({ '--primary-color': '', '--primary-color-rgb': '' })
+
+      expect(style.getPropertyValue('--primary-color')).toBe('')
+      expect(style.getPropertyValue('--primary-color-rgb')).toBe('')
+    })
+
+    it('should not leave a stale -rgb value from a previous color', async () => {
+      const style = document.documentElement.style
+      await setPrimaryColor('#ff5500')
+      await waitForVars({ '--primary-color-rgb': '255,85,0' })
+
+      await setPrimaryColor('#00ff00')
+      await waitForVars({ '--primary-color-rgb': '0,255,0' })
+
+      expect(style.getPropertyValue('--primary-color')).toBe('#00ff00')
+      expect(style.getPropertyValue('--primary-color-rgb')).toBe('0,255,0')
+    })
+
+    it('should clear the -rgb variant when the computed color cannot be parsed as rgb()', async () => {
+      // safety net: some browsers/configurations may report computed colors in a non-rgb syntax (e.g. oklch)
+      const originalGetComputedStyle = window.getComputedStyle
+      window.getComputedStyle = () => ({ color: 'oklch(0.7 0.2 200)' }) as CSSStyleDeclaration
+      try {
+        await setPrimaryColor('white')
+        const style = document.documentElement.style
+        expect(style.getPropertyValue('--primary-color')).toBe('white')
+        expect(style.getPropertyValue('--primary-color-rgb')).toBe('')
+      } finally {
+        window.getComputedStyle = originalGetComputedStyle
+      }
     })
   })
 
