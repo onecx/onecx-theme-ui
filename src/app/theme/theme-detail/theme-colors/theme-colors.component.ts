@@ -237,7 +237,7 @@ export class ThemeColorsComponent {
       const m = /rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})/.exec(computed)
       return m ? { r: Number(m[1]), g: Number(m[2]), b: Number(m[3]) } : null
     } finally {
-      document.body.removeChild(probe)
+      probe.remove()
     }
   }
 

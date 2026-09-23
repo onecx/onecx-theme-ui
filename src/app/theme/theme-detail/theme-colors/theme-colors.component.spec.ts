@@ -423,19 +423,27 @@ describe('ThemeColorsComponent', () => {
     })
 
     it('should clear both variables when the value is null/empty', async () => {
+      const style = document.documentElement.style
       await setPrimaryColor('#ff5500')
       await waitForVars({ '--primary-color-rgb': '255,85,0' })
 
       await setPrimaryColor(null)
       await waitForVars({ '--primary-color': '', '--primary-color-rgb': '' })
+
+      expect(style.getPropertyValue('--primary-color')).toBe('')
+      expect(style.getPropertyValue('--primary-color-rgb')).toBe('')
     })
 
     it('should not leave a stale -rgb value from a previous color', async () => {
+      const style = document.documentElement.style
       await setPrimaryColor('#ff5500')
       await waitForVars({ '--primary-color-rgb': '255,85,0' })
 
       await setPrimaryColor('#00ff00')
       await waitForVars({ '--primary-color-rgb': '0,255,0' })
+
+      expect(style.getPropertyValue('--primary-color')).toBe('#00ff00')
+      expect(style.getPropertyValue('--primary-color-rgb')).toBe('0,255,0')
     })
 
     it('should clear the -rgb variant when the computed color cannot be parsed as rgb()', async () => {
