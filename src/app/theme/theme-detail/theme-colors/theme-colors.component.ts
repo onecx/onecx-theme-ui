@@ -2,14 +2,13 @@ import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, injec
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop'
 import {
   AbstractControl,
-  ValidationErrors,
-  ValidatorFn,
   FormsModule,
   ReactiveFormsModule,
   FormControl,
   FormGroup,
   FormBuilder,
-  Validators
+  ValidationErrors,
+  ValidatorFn
 } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { combineLatest, debounceTime, map, startWith } from 'rxjs'
