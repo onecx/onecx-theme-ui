@@ -193,10 +193,9 @@ export class ThemeSearchComponent implements OnInit {
     }
   }
 
-  public onClearGlobalFilter(input?: HTMLInputElement): void {
+  public onClearGlobalFilter(): void {
     this.globalFilterValue = ''
     this.filteredData.set(undefined)
-    if (input) input.value = ''
   }
 
   public onSortChange(event: { sortColumn: string; sortDirection: DataSortDirection }): void {
