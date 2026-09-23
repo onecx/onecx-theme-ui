@@ -219,10 +219,28 @@ export class ThemeColorsComponent {
   // Applying Styles
   private updateCssVar(varName: string, value: string | null): void {
     if (!this.styleBaseline) this.captureBaseline() // capture before the first mutation
-    document.documentElement.style.setProperty(`--${varName}`, value || '')
-    const rgb = this.hexToRgb(value || '')
-    if (rgb) {
-      document.documentElement.style.setProperty(`--${varName}-rgb`, `${rgb.r},${rgb.g},${rgb.b}`)
+    const cssValue = (value ?? '').trim()
+    document.documentElement.style.setProperty(`--${varName}`, cssValue)
+    // always keep the -rgb variant consistent with the color variable: update it or clear it
+    const rgb = this.colorToRgb(cssValue)
+    document.documentElement.style.setProperty(`--${varName}-rgb`, rgb ? `${rgb.r},${rgb.g},${rgb.b}` : '')
+  }
+
+  // Resolve any valid CSS color (hex forms, rgb()/hsl(), color names, …) to its rgb components
+  // by letting the browser normalize it. Returns null for empty or unparseable values.
+  private colorToRgb(color: string): { r: number; g: number; b: number } | null {
+    if (!color) return null
+    const probe = document.createElement('span')
+    probe.style.color = color
+    if (!probe.style.color) return null // invalid value rejected by the browser
+    document.body.appendChild(probe)
+    try {
+      // computed style is normalized by the browser to rgb(r, g, b) / rgba(r, g, b, a)
+      const computed = getComputedStyle(probe).color
+      const m = /rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})/.exec(computed)
+      return m ? { r: Number(m[1]), g: Number(m[2]), b: Number(m[3]) } : null
+    } finally {
+      document.body.removeChild(probe)
     }
   }
 
@@ -252,16 +270,5 @@ export class ThemeColorsComponent {
       style.setProperty(prop, value)
     }
     this.styleBaseline = undefined
-  }
-
-  private hexToRgb(hex: string): { r: number; g: number; b: number } | null {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-    return result
-      ? {
-          r: Number.parseInt(result[1], 16),
-          g: Number.parseInt(result[2], 16),
-          b: Number.parseInt(result[3], 16)
-        }
-      : null
   }
 }
