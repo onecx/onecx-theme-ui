@@ -10,6 +10,7 @@ import { TooltipModule } from 'primeng/tooltip'
 import { WorkspaceService } from '@onecx/angular-integration-interface'
 
 import { Utils } from 'src/app/shared/utils'
+import { LoadingState } from '../theme-detail.component'
 
 export type Workspace = {
   name: string
@@ -47,6 +48,7 @@ export class ThemeUseComponent {
   // signals
   public workspaces = input<Workspace[]>()
   public isComponentDefined = input<boolean>(false)
+  public useLoadingState = input.required<LoadingState>()
   // dialog
   public readonly workspaceEndpointExist = toSignal(
     Utils.doesEndpointExist(

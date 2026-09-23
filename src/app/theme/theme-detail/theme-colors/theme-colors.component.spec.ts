@@ -354,6 +354,89 @@ describe('ThemeColorsComponent', () => {
     })
   })
 
+  describe('CSS variable baseline (restore on destroy)', () => {
+    beforeEach(() => {
+      // clear inline color variables so tests are isolated from each other (documentElement is shared)
+      const style = document.documentElement.style
+      for (const group of [themeVariables.general, themeVariables.topbar, themeVariables.sidebar]) {
+        for (const name of group) {
+          style.removeProperty(`--${name}`)
+          style.removeProperty(`--${name}-rgb`)
+        }
+      }
+    })
+
+    function setEditModeWithAutoApply() {
+      fixture.componentRef.setInput('changeMode', 'EDIT')
+      fixture.componentRef.setInput('autoApply', true)
+      fixture.detectChanges()
+    }
+
+    it('should restore the pre-edit value of a modified variable on destroy', async () => {
+      setEditModeWithAutoApply()
+      const style = document.documentElement.style
+      // original inline value (before any auto-apply mutation)
+      style.setProperty('--primary-color', '#111111')
+      const original = style.getPropertyValue('--primary-color')
+
+      component.generalForm.get('primary-color')?.setValue('#ff5500')
+      await fixture.whenStable()
+      expect(style.getPropertyValue('--primary-color')).toBe('#ff5500')
+
+      fixture.destroy()
+      expect(style.getPropertyValue('--primary-color')).toBe(original)
+    })
+
+    it('should restore untouched variables to their own original values (full-set snapshot)', async () => {
+      setEditModeWithAutoApply()
+      const style = document.documentElement.style
+      style.setProperty('--primary-color', '#111111')
+      style.setProperty('--secondary-color', '#222222')
+
+      // only primary-color is changed; secondary-color stays untouched
+      component.generalForm.get('primary-color')?.setValue('#ff5500')
+      await fixture.whenStable()
+
+      fixture.destroy()
+      expect(style.getPropertyValue('--primary-color')).toBe('#111111')
+      expect(style.getPropertyValue('--secondary-color')).toBe('#222222')
+    })
+
+    it('should also restore the -rgb variant to its original value', async () => {
+      setEditModeWithAutoApply()
+      const style = document.documentElement.style
+      style.setProperty('--primary-color', '#ffffff')
+      style.setProperty('--primary-color-rgb', '9,9,9')
+
+      component.generalForm.get('primary-color')?.setValue('#ff5500')
+      await fixture.whenStable()
+      expect(style.getPropertyValue('--primary-color-rgb')).toBe('255,85,0')
+
+      fixture.destroy()
+      expect(style.getPropertyValue('--primary-color-rgb')).toBe('9,9,9')
+    })
+
+    it('should clear a variable that had no inline value (revert to stylesheet) on destroy', async () => {
+      setEditModeWithAutoApply()
+      const style = document.documentElement.style
+      // no inline value for --primary-color beforehand
+      expect(style.getPropertyValue('--primary-color')).toBe('')
+
+      component.generalForm.get('primary-color')?.setValue('#ff5500')
+      await fixture.whenStable()
+      expect(style.getPropertyValue('--primary-color')).toBe('#ff5500')
+
+      fixture.destroy()
+      expect(style.getPropertyValue('--primary-color')).toBe('')
+    })
+
+    it('should be a no-op and not throw on destroy when no mutation ever happened', () => {
+      setEditModeWithAutoApply()
+      // no color changed → baseline never captured
+      expect(() => fixture.destroy()).not.toThrow()
+    })
+  })
+
   describe('onChangeColorValue', () => {
     it('should do nothing when changeMode is VIEW', () => {
       fixture.componentRef.setInput('changeMode', 'VIEW')

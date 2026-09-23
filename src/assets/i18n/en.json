@@ -145,6 +145,8 @@
       "VARIABLES.TOOLTIP": "JSON representation of Theme Variables"
     },
     "WORKSPACES_USING_THEME": {
+      "LOADING": "Determining the usage of the Theme in Workspaces...",
+      "TIMEOUT": "A timeout occurred while determining the usage of the Theme in Workspaces.",
       "MISSING_COMPONENT": "Information on using the Theme in a Workspace could not be obtained.",
       "USED": "The Theme is used by the following Workspaces: ",
       "UNUSED": "The Theme is not used by any Workspace."

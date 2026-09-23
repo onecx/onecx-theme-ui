@@ -9,33 +9,34 @@
     [resizable]="true"
     [style]="{ 'max-width': '450px' }"
   >
+    @let loadingState = useLoadingState();
     <ng-template pTemplate="content">
       <div class="flex column-gap-3 row-gap-1 justify-content-start align-items-center">
         @let icon =
-          useLoadingState() === 'loading'
+          loadingState === 'loading'
             ? 'pi-spin pi-cog'
-            : useLoadingState() === 'timeout'
+            : loadingState === 'timeout'
               ? 'pi-exclamation-triangle'
-              : useLoadingState() === 'ready' && (themeToBeDeleted()?.mandatory || themeUsed())
+              : loadingState === 'ready' && (themeToBeDeleted()?.mandatory || themeUsed())
                 ? 'pi-ban'
                 : 'pi-question-circle';
-        @let color = useLoadingState() === 'ready' && !themeUsed() ? 'var(--danger-button-bg)' : 'var(--text-color)';
+        @let color = loadingState === 'ready' && !themeUsed() ? 'var(--danger-button-bg)' : 'var(--text-color)';
         <div [class]="'text-3xl pi ' + icon" [style.color]="color"></div>
 
         <div class="w-full mt-1 flex flex-column row-gap-3">
-          @if (useLoadingState() === 'loading') {
+          @if (loadingState === 'loading') {
             <p-message
               id="th_delete_message_loading"
               severity="info"
               [text]="'ACTIONS.DELETE.MESSAGE_CHECK_USE' | translate"
             ></p-message>
-          } @else if (useLoadingState() === 'timeout') {
+          } @else if (loadingState === 'timeout') {
             <p-message
               id="th_delete_message_timeout"
               severity="info"
               [text]="'ACTIONS.DELETE.MESSAGE_TIMEOUT' | translate"
             ></p-message>
-          } @else if (useLoadingState() === 'ready' && themeToBeDeleted()) {
+          } @else if (loadingState === 'ready' && themeToBeDeleted()) {
             @if (themeToBeDeleted()?.mandatory) {
               <p-message
                 id="th_delete_message_reject_mandatory"
@@ -82,8 +83,8 @@
           !themeToBeDeleted() ||
           themeToBeDeleted()?.mandatory ||
           themeUsed() ||
-          useLoadingState() === 'loading' ||
-          useLoadingState() === 'timeout'
+          loadingState === 'loading' ||
+          loadingState === 'timeout'
         ) {
           <p-button
             icon="pi pi-times"
