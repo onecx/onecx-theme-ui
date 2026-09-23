@@ -31,5 +31,7 @@ export interface ThemeUpdateCreate {
     properties?: object;
     overrides?: Array<ThemeOverride>;
     mandatory?: boolean;
+    fonts?: string;
+    customCssVariables?: string;
 }
 

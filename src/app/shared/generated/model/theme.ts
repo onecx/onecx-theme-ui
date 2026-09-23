@@ -33,5 +33,7 @@ export interface Theme {
     overrides?: Array<ThemeOverride>;
     operator?: boolean;
     mandatory?: boolean;
+    fonts?: string;
+    customCssVariables?: string;
 }
 
