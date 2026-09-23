@@ -500,7 +500,7 @@ describe('ThemeDetailComponent', () => {
       component.onDeleteTheme(aTheme)
 
       expect(component.themeDeleteVisible()).toBeTrue()
-      expect(component.themeUseLoadingState()).toBe('ready') // no use detection for mandatory themes
+      expect(component.themeUseLoadingState()).toBe('loading')
     })
 
     it('should navigate back on theme deleted', () => {

@@ -259,10 +259,6 @@ export class ThemeDetailComponent implements OnInit {
   // Initialize the process of checking if the theme is used in workspaces
   private startGettingThemeUseData(theme?: Theme): void {
     if (theme && this.themeUseLoadingState() === 'initial') {
-      if (theme.mandatory) {
-        this.themeUseLoadingState.set('ready') // stop here
-        return
-      }
       this.themeUseLoadingState.set('loading')
       // best customer experience: show the loading indicator for at least 1.5 seconds, even if the data is received faster
       this.themeUseStartTime = performance.now() // store the start time for measuring loading duration
