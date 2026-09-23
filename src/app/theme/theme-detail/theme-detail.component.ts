@@ -358,9 +358,10 @@ export class ThemeDetailComponent implements OnInit {
       id: undefined,
       operator: undefined,
       // preserve the original modification count
-      modificationCount: this.theme()?.modificationCount, // the original value!
-      // preserve not used properties from the original theme
+      modificationCount: this.theme()?.modificationCount,
+      // preserve: not used, to be deleted
       fonts: this.theme()?.fonts,
+      // preserve: used as Theme overrides in Shell UI (JSON) => design tokens
       customCssVariables: this.theme()?.customCssVariables,
       // prevent empty strings for urls, as it causes issues for the image service
       logoUrl: data.logoUrl === '' ? undefined : data.logoUrl,
