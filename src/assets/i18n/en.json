@@ -250,7 +250,7 @@
       "NAME": "Unique name of the Theme, cannot be changed. Used as reference to the Theme.",
       "DISPLAY_NAME": "Display Name",
       "FONT_FAMILY": "Used font family (CSS property: font-family), e.g. 'Arial', 'Times New Roman', etc.",
-      "FONT_SIZE": "Used basic font size (CSS property: font-size), e.g. '16px', '1em', etc.",
+      "FONT_SIZE": "Used basic font size (CSS property: font-size), the range is 8-40px and 0.5-2.5rem",
       "ITEM_COLOR": "Select a Color",
       "ITEM_COLOR_PICKER": "Select a color with the color picker",
       "VERSION": "Version of the Theme",
