@@ -8,13 +8,13 @@ export function fontSizeValidator(): ValidatorFn {
     if (!value) return null
 
     const trimmedValue = String(value).trim()
-    const match = trimmedValue.match(fontSizeRegex)
+    const match = fontSizeRegex.exec(trimmedValue)
 
     if (!match) {
       return { invalidFontSize: { value: control.value } }
     }
 
-    const numValue = parseFloat(match[1])
+    const numValue = Number.parseFloat(match[1])
     const unit = match[2].toLowerCase()
 
     if (unit === 'px') {
