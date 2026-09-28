@@ -1,16 +1,18 @@
+import { HttpResponse, provideHttpClient } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { SimpleChange } from '@angular/core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
+import { FormControl } from '@angular/forms'
+import { provideNoopAnimations } from '@angular/platform-browser/animations'
 import { TranslateTestingModule } from 'ngx-translate-testing'
+import { of, throwError } from 'rxjs'
 
 import { PortalMessageService } from '@onecx/angular-integration-interface'
 
-import { ThemePropsComponent } from './theme-props.component'
 import { MimeType, ImagesInternalAPIService, Theme } from 'src/app/shared/generated'
-import { of, throwError } from 'rxjs'
-import { HttpResponse, provideHttpClient } from '@angular/common/http'
+import { fontSizeValidator } from 'src/app/shared/validators/font-size.validator'
 import { Utils, LogoRefType } from 'src/app/shared/utils'
-import { provideNoopAnimations } from '@angular/platform-browser/animations'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { ThemePropsComponent } from './theme-props.component'
 
 const validTheme = {
   id: 'id',
@@ -80,6 +82,58 @@ describe('ThemePropsComponent', () => {
   it('should create', () => {
     initTestComponent()
     expect(component).toBeTruthy()
+  })
+
+  describe('fontSizeValidator', () => {
+    it('should accept valid font-size values in px range 8-40', () => {
+      const validator = fontSizeValidator()
+
+      expect(validator(new FormControl('8px'))).toBeNull()
+      expect(validator(new FormControl('12.5px'))).toBeNull()
+      expect(validator(new FormControl('40px'))).toBeNull()
+    })
+
+    it('should accept valid font-size values in rem range 0.5-2.5', () => {
+      const validator = fontSizeValidator()
+
+      expect(validator(new FormControl('0.5rem'))).toBeNull()
+      expect(validator(new FormControl('1.25rem'))).toBeNull()
+      expect(validator(new FormControl('2.5rem'))).toBeNull()
+    })
+
+    it('should reject invalid format or unsupported units', () => {
+      const validator = fontSizeValidator()
+
+      expect(validator(new FormControl('large'))).toEqual({ invalidFontSize: { value: 'large' } })
+      expect(validator(new FormControl('16'))).toEqual({ invalidFontSize: { value: '16' } })
+    })
+
+    it('should reject px values outside range 8-40', () => {
+      const validator = fontSizeValidator()
+
+      const tooSmall = validator(new FormControl('7px'))
+      expect(tooSmall).toEqual(jasmine.objectContaining({ invalidFontSizeRange: jasmine.any(Object) }))
+
+      const tooLarge = validator(new FormControl('41px'))
+      expect(tooLarge).toEqual(jasmine.objectContaining({ invalidFontSizeRange: jasmine.any(Object) }))
+    })
+
+    it('should reject rem values outside range 0.5-2.5', () => {
+      const validator = fontSizeValidator()
+
+      const tooSmall = validator(new FormControl('0.4rem'))
+      expect(tooSmall).toEqual(jasmine.objectContaining({ invalidFontSizeRange: jasmine.any(Object) }))
+
+      const tooLarge = validator(new FormControl('2.6rem'))
+      expect(tooLarge).toEqual(jasmine.objectContaining({ invalidFontSizeRange: jasmine.any(Object) }))
+    })
+
+    it('should accept empty values', () => {
+      const validator = fontSizeValidator()
+
+      expect(validator(new FormControl(null))).toBeNull()
+      expect(validator(new FormControl(''))).toBeNull()
+    })
   })
 
   describe('signals', () => {
