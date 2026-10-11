@@ -14,7 +14,7 @@
     [breakpoints]="{ '991px': '700px' }"
   >
     <form [formGroup]="formGroup" class="pt-1 flex flex-wrap flex-column gap-4 justify-content-between">
-      <p-float-label variant="on">
+      <p-floatlabel variant="on">
         <input
           pInputText
           type="text"
@@ -29,8 +29,8 @@
         <label class="ocx-required-label" for="th_create_form_name" aria-hidden="true">
           {{ 'THEME.NAME' | translate }}
         </label>
-      </p-float-label>
-      <p-float-label variant="on">
+      </p-floatlabel>
+      <p-floatlabel variant="on">
         <input
           pInputText
           type="text"
@@ -45,8 +45,8 @@
         <label class="ocx-required-label" for="th_create_form_display_name" aria-hidden="true">
           {{ 'THEME.DISPLAY_NAME' | translate }}
         </label>
-      </p-float-label>
-      <p-float-label variant="on">
+      </p-floatlabel>
+      <p-floatlabel variant="on">
         <textarea
           class="w-full"
           pInputTextarea
@@ -62,7 +62,7 @@
         <label for="th_create_form_description" aria-hidden="true">
           {{ 'THEME.DESCRIPTION' | translate }}
         </label>
-      </p-float-label>
+      </p-floatlabel>
 
       @if (!themeToBeCreated()) {
         <p-message id="th_create_hint" severity="info" [text]="'ACTIONS.CREATE.THEME.HINT' | translate"></p-message>

@@ -2,10 +2,10 @@
   <ocx-page-header
     [header]="'DIALOG.SEARCH.HEADER' | translate"
     [subheader]="'DIALOG.SEARCH.SUBHEADER' | translate"
-    [manualBreadcrumbs]="false"
     [actions]="actions()"
   >
   </ocx-page-header>
+
   @let rows = data();
   @let exceptionMessage = exceptionKey();
   <ocx-content class="ocx-content">
@@ -110,8 +110,8 @@
               <div class="p-0 col-5 sm:col-6 xl:col-6">
                 <div class="flex flex-column row-gap-1 justify-content-center">
                   <div
-                    class="sm:font-bold word-break-all"
                     [id]="'th_search_data_list_row_' + item.name + '_display_name'"
+                    class="sm:font-bold word-break-all"
                     [attr.aria-label]="item.displayName"
                     [pTooltip]="item.displayName?.length < 40 ? '' : item.displayName"
                     tooltipPosition="top"
@@ -149,9 +149,10 @@
           <ng-template pTemplate="gridItem" let-item>
             <div class="col-6 md:col-4 lg:col-4 xl:col-3 p-2">
               <p-card
+                [id]="'th_search_data_grid_row_' + item.name"
                 [style]="{ margin: '0rem;' }"
                 styleClass="cursor-pointer hover:bg-gray-200 text-center m-2 p-1"
-                [attr.aria-label]="item.name"
+                [attr.aria-label]="item.displayName"
                 [routerLink]="['./', item.name]"
                 (keydown.enter)="$any($event.target).click()"
                 (keydown.space)="$event.preventDefault(); $any($event.target).click()"

@@ -56,12 +56,12 @@ import { ThemeImportComponent } from '../theme-import/theme-import.component'
   styleUrl: './theme-search.component.scss'
 })
 export class ThemeSearchComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef)
   private readonly route = inject(ActivatedRoute)
   private readonly router = inject(Router)
   private readonly themeApi = inject(ThemesAPIService)
   private readonly translate = inject(TranslateService)
   private readonly imageApi = inject(ImagesInternalAPIService)
-  private readonly destroyRef = inject(DestroyRef)
   // signals
   public readonly themeImportVisible = signal(false)
   public readonly themeCreateVisible = signal(false)

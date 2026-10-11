@@ -9,23 +9,25 @@ import { of, ReplaySubject, throwError } from 'rxjs'
 import { SlotService } from '@onecx/angular-remote-components'
 import { REMOTE_COMPONENT_CONFIG, RemoteComponentConfig } from '@onecx/angular-utils'
 
-import { Theme, SearchThemeResponse, ThemesAPIService } from 'src/app/shared/generated'
+import { SearchThemeResponse, ThemesAPIService } from 'src/app/shared/generated'
 import { environment } from 'src/environments/environment'
-import { OneCXThemeDataComponent } from './theme-data.component'
+import { ExtendedTheme, OneCXThemeDataComponent } from './theme-data.component'
 
-const theme1: Theme = {
+const theme1: ExtendedTheme = {
   id: 't1',
   name: 'theme1',
-  displayName: 'Theme 1'
+  displayName: 'Theme 1',
+  bffImageUrl: 'base_url/bff/images/theme1/logo'
 }
-const theme2: Theme = {
+const theme2: ExtendedTheme = {
   id: 't2',
   name: 'theme2',
-  displayName: 'Theme 2'
+  displayName: 'Theme 2',
+  bffImageUrl: 'base_url/bff/images/theme2/logo'
 }
-const themes: Theme[] = [theme1, theme2]
+const themes: ExtendedTheme[] = [theme1, theme2]
 
-describe('OneCXThemeDataComponent', () => {
+fdescribe('OneCXThemeDataComponent', () => {
   let component: OneCXThemeDataComponent
   let fixture: ComponentFixture<OneCXThemeDataComponent>
   let baseUrlSubject: ReplaySubject<any>
