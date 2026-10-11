@@ -28,13 +28,13 @@ import { TooltipModule } from 'primeng/tooltip'
 import { getLocation } from '@onecx/accelerator'
 import { PortalMessageService } from '@onecx/angular-integration-interface'
 
+import { DictionaryObject } from 'src/app/shared/models/theme.model'
 import { Utils, LogoRefType } from 'src/app/shared/utils'
 import { ImagesInternalAPIService, MimeType, Theme, UploadImageRequestParams } from 'src/app/shared/generated'
 import { ImageContainerComponent } from 'src/app/shared/image-container/image-container.component'
-
+import { fontSizeValidator } from 'src/app/shared/validators/font-size.validator'
 import { themeVariables } from '../theme-variables'
 import { ChangeMode } from '../theme-detail.component'
-import { DictionaryObject } from 'src/app/shared/models/theme.model'
 
 @Component({
   selector: 'app-theme-props',
@@ -89,6 +89,7 @@ export class ThemePropsComponent implements OnChanges {
   // data
   public basicForm: FormGroup = new FormGroup({})
   public fontForm: FormGroup = new FormGroup({})
+  public readonly fontSizeControlName = 'font-size'
 
   constructor() {
     this.initForms()
@@ -199,7 +200,10 @@ export class ThemePropsComponent implements OnChanges {
     })
     // font
     for (const v of themeVariables.font) {
-      const fc = new FormControl<string | null>(null, [Validators.maxLength(255)])
+      const validators = [Validators.maxLength(10)]
+      if (v === this.fontSizeControlName) validators.push(fontSizeValidator())
+
+      const fc = new FormControl<string | null>(null, validators)
       this.fontForm.addControl(v, fc)
     }
   }

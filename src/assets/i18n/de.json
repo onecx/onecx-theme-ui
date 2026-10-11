@@ -250,7 +250,7 @@
       "NAME": "Eindeutiger Name des Themes, der nicht geändert werden kann. Wird als Referenz auf das Theme benutzt.",
       "DISPLAY_NAME": "Anzeigename",
       "FONT_FAMILY": "Verwendete Schriftarten (CSS-Eigenschaft: font-family), z. B. 'Arial', 'Times New Roman', etc.",
-      "FONT_SIZE": "Verwendete Grundschriftgröße (CSS-Eigenschaft: font-size), z. B. '16px', '1em', etc.",
+      "FONT_SIZE": "Verwendete Grundschriftgröße (CSS-Eigenschaft: font-size), Der Bereich liegt bei 8-40px und 0,5-2,5rem",
       "ITEM_COLOR": "Wähle eine Farbe",
       "ITEM_COLOR_PICKER": "Wähle eine Farbe mit dem Farbwähler",
       "VERSION": "Version des Themes",
