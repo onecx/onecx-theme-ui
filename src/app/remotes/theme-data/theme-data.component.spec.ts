@@ -11,6 +11,7 @@ import { REMOTE_COMPONENT_CONFIG, RemoteComponentConfig } from '@onecx/angular-u
 
 import { SearchThemeResponse, ThemesAPIService } from 'src/app/shared/generated'
 import { environment } from 'src/environments/environment'
+import { Utils, LogoRefType } from 'src/app/shared/utils'
 import { ExtendedTheme, OneCXThemeDataComponent } from './theme-data.component'
 
 const theme1: ExtendedTheme = {
@@ -27,7 +28,7 @@ const theme2: ExtendedTheme = {
 }
 const themes: ExtendedTheme[] = [theme1, theme2]
 
-fdescribe('OneCXThemeDataComponent', () => {
+describe('OneCXThemeDataComponent', () => {
   let component: OneCXThemeDataComponent
   let fixture: ComponentFixture<OneCXThemeDataComponent>
   let baseUrlSubject: ReplaySubject<any>
@@ -201,7 +202,8 @@ fdescribe('OneCXThemeDataComponent', () => {
 
     it('should get theme - successful with data', (done) => {
       initializeComponent()
-      themeApiSpy.getThemeByName.and.returnValue(of(theme1))
+      // getThemeByName returns { resource } => the map reads data.resource and enriches it
+      themeApiSpy.getThemeByName.and.returnValue(of({ resource: theme1 }))
       fixture.componentRef.setInput('dataType', 'theme')
       fixture.componentRef.setInput('themeName', theme1.name)
       fixture.detectChanges()
@@ -209,7 +211,10 @@ fdescribe('OneCXThemeDataComponent', () => {
       component.theme$?.subscribe({
         next: (data) => {
           if (data) {
-            expect(data).toEqual(theme1)
+            expect(data.name).toBe(theme1.name)
+            expect(data.bffImageUrl).toBe(
+              Utils.bffImageUrl((themeApiSpy as any).configuration.basePath, theme1.name, LogoRefType.Logo)
+            )
           }
           done()
         },
