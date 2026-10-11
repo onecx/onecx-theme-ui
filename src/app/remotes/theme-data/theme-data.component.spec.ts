@@ -9,26 +9,35 @@ import { of, ReplaySubject, throwError } from 'rxjs'
 import { SlotService } from '@onecx/angular-remote-components'
 import { REMOTE_COMPONENT_CONFIG, RemoteComponentConfig } from '@onecx/angular-utils'
 
-import { Theme, SearchThemeResponse, ThemesAPIService } from 'src/app/shared/generated'
+import { SearchThemeResponse, ThemesAPIService } from 'src/app/shared/generated'
 import { environment } from 'src/environments/environment'
-import { OneCXThemeDataComponent } from './theme-data.component'
+import { Utils, LogoRefType } from 'src/app/shared/utils'
+import { ExtendedTheme, OneCXThemeDataComponent } from './theme-data.component'
 
-const theme1: Theme = {
+const theme1: ExtendedTheme = {
   id: 't1',
   name: 'theme1',
-  displayName: 'Theme 1'
+  displayName: 'Theme 1',
+  bffImageUrl: 'base_url/bff/images/theme1/logo'
 }
-const theme2: Theme = {
+const theme2: ExtendedTheme = {
   id: 't2',
   name: 'theme2',
-  displayName: 'Theme 2'
+  displayName: 'Theme 2',
+  bffImageUrl: 'base_url/bff/images/theme2/logo'
 }
-const themes: Theme[] = [theme1, theme2]
+const themes: ExtendedTheme[] = [theme1, theme2]
 
 describe('OneCXThemeDataComponent', () => {
   let component: OneCXThemeDataComponent
   let fixture: ComponentFixture<OneCXThemeDataComponent>
   let baseUrlSubject: ReplaySubject<any>
+
+  function initializeComponent() {
+    fixture = TestBed.createComponent(OneCXThemeDataComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+  }
 
   const themeApiSpy = {
     searchThemes: jasmine.createSpy('searchThemes').and.returnValue(of({})),
@@ -37,12 +46,6 @@ describe('OneCXThemeDataComponent', () => {
   const slotServiceSpy = {
     init: jasmine.createSpy('init'),
     isSomeComponentDefinedForSlot: jasmine.createSpy('isSomeComponentDefinedForSlot').and.returnValue(of(false))
-  }
-
-  function initializeComponent() {
-    fixture = TestBed.createComponent(OneCXThemeDataComponent)
-    component = fixture.componentInstance
-    fixture.detectChanges()
   }
 
   beforeEach(waitForAsync(() => {
@@ -199,7 +202,8 @@ describe('OneCXThemeDataComponent', () => {
 
     it('should get theme - successful with data', (done) => {
       initializeComponent()
-      themeApiSpy.getThemeByName.and.returnValue(of(theme1))
+      // getThemeByName returns { resource } => the map reads data.resource and enriches it
+      themeApiSpy.getThemeByName.and.returnValue(of({ resource: theme1 }))
       fixture.componentRef.setInput('dataType', 'theme')
       fixture.componentRef.setInput('themeName', theme1.name)
       fixture.detectChanges()
@@ -207,7 +211,10 @@ describe('OneCXThemeDataComponent', () => {
       component.theme$?.subscribe({
         next: (data) => {
           if (data) {
-            expect(data).toEqual(theme1)
+            expect(data.name).toBe(theme1.name)
+            expect(data.bffImageUrl).toBe(
+              Utils.bffImageUrl((themeApiSpy as any).configuration.basePath, theme1.name, LogoRefType.Logo)
+            )
           }
           done()
         },

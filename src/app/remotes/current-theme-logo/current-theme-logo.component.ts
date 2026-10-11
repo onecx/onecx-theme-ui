@@ -87,14 +87,15 @@ export class OneCXCurrentThemeLogoComponent implements ocxRemoteComponent, ocxRe
 
   public getImageUrl(themeName: string | undefined, prioType: string): string | undefined {
     this.log('getImageUrl on prioType => ' + prioType)
+    const bffImageUrl = Utils.bffImageUrl(this.themeApi.configuration.basePath, themeName, LogoRefType.Logo)
 
     // if URL exist
     if (['url'].includes(prioType) && this.imageUrl() && this.imageUrl() !== '') {
       this.log('getImageUrl => ' + this.imageUrl())
       return this.imageUrl()
     } else if (['url', 'image'].includes(prioType)) {
-      this.log('getImageUrl => ' + Utils.bffImageUrl(this.themeApi.configuration.basePath, themeName, LogoRefType.Logo))
-      return Utils.bffImageUrl(this.themeApi.configuration.basePath, themeName, LogoRefType.Logo)
+      this.log('getImageUrl => ' + bffImageUrl)
+      return bffImageUrl
     } else if (['url', 'image', 'default'].includes(prioType) && this.useDefaultLogo() && this.defaultImageUrl !== '') {
       // if user wants to have the default (as asset)
       return this.defaultImageUrl

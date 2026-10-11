@@ -119,11 +119,11 @@
               id="th_detail_basic_field_logo_url"
               class="w-full pt-3 pb-2 text-responsive"
               formControlName="logoUrl"
+              [escape]="false"
               [ariaLabel]="('IMAGE.LOGO' | translate) + ':  ' + ('IMAGE.TOOLTIPS.URL' | translate)"
               [pTooltip]="('IMAGE.TOOLTIPS.URL' | translate) + ('VALIDATION.HINTS.FORMAT_IMAGE_URL' | translate)"
               tooltipPosition="top"
               tooltipEvent="hover"
-              [escape]="false"
             />
             <label for="th_detail_basic_field_logo_url" aria-hidden="true">
               {{ 'IMAGE.LOGO_URL' | translate }}
@@ -213,11 +213,11 @@
               id="th_detail_basic_field_logo_small_url"
               class="w-full pt-3 pb-2 text-responsive"
               formControlName="smallLogoUrl"
+              [escape]="false"
               [ariaLabel]="('IMAGE.LOGO_SMALL' | translate) + ':  ' + ('IMAGE.TOOLTIPS.URL' | translate)"
               [pTooltip]="('IMAGE.TOOLTIPS.URL' | translate) + ('VALIDATION.HINTS.FORMAT_IMAGE_URL' | translate)"
               tooltipPosition="top"
               tooltipEvent="hover"
-              [escape]="false"
             />
             <label for="th_detail_basic_field_logo_small_url" aria-hidden="true">
               {{ 'IMAGE.LOGO_URL' | translate }}
@@ -307,11 +307,11 @@
               id="th_detail_basic_field_favicon_url"
               class="w-full pt-3 pb-2 text-responsive"
               formControlName="faviconUrl"
+              [escape]="false"
               [ariaLabel]="('IMAGE.FAVICON' | translate) + ':  ' + ('IMAGE.TOOLTIPS.URL' | translate)"
               [pTooltip]="('IMAGE.TOOLTIPS.URL' | translate) + ('VALIDATION.HINTS.FORMAT_IMAGE_URL' | translate)"
               tooltipPosition="top"
               tooltipEvent="hover"
-              [escape]="false"
             />
             <label for="th_detail_basic_field_favicon_url" aria-hidden="true">
               {{ 'IMAGE.FAVICON_URL' | translate }}

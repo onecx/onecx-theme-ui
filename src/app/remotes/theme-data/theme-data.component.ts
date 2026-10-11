@@ -35,6 +35,7 @@ import { Utils, LogoRefType } from 'src/app/shared/utils'
 import { environment } from 'src/environments/environment'
 
 type DataType = 'logo' | 'logo-small' | 'favicon' | 'themes' | 'theme'
+export type ExtendedTheme = Theme & { bffImageUrl?: string }
 
 @Component({
   selector: 'app-theme-data',
@@ -60,16 +61,17 @@ export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWeb
   readonly useDefaultLogo = input(false) // used if logo loading failed
   readonly logPrefix = input<string>()
   readonly logEnabled = input(false)
+
   @Input() set ocxRemoteComponentConfig(config: RemoteComponentConfig) {
     this.ocxInitRemoteComponent(config)
   }
   // output
-  @Input() themes = new EventEmitter<Theme[]>()
-  @Input() theme = new EventEmitter<Theme>()
+  @Input() themes = new EventEmitter<ExtendedTheme[]>()
+  @Input() theme = new EventEmitter<ExtendedTheme>()
   @Input() imageLoadingFailed = new EventEmitter<boolean>()
 
-  public themes$: Observable<Theme[]> | undefined
-  public theme$: Observable<Theme> | undefined
+  public themes$: Observable<ExtendedTheme[]> | undefined
+  public theme$: Observable<ExtendedTheme> | undefined
   public imageUrl$ = new BehaviorSubject<string | undefined>(undefined)
   public defaultImageUrl: string | undefined = undefined
 
@@ -113,7 +115,17 @@ export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWeb
     this.themes$ = this.themeApi.searchThemes({ searchThemeRequest: criteria }).pipe(
       first(),
       map((response: SearchThemeResponse) => {
-        return response.stream?.sort(Utils.sortByDisplayName) ?? []
+        let themes: ExtendedTheme[] = []
+        if (response.stream && response.stream?.length > 0) {
+          themes = response.stream.map((item) => {
+            return {
+              ...item,
+              bffImageUrl: Utils.bffImageUrl(this.themeApi.configuration.basePath, item.name, LogoRefType.Logo)
+            } as ExtendedTheme
+          })
+          themes.sort(Utils.sortByDisplayName)
+        }
+        return themes
       }),
       catchError((err) => {
         console.error('onecx-theme-data.searchThemes', err)
@@ -131,10 +143,16 @@ export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWeb
     if (!themeName) return
     this.theme$ = this.themeApi.getThemeByName({ name: themeName }).pipe(
       first(),
-      map((data) => data.resource),
+      map((data) => {
+        const theme: ExtendedTheme = data.resource
+        if (theme) {
+          theme.bffImageUrl = Utils.bffImageUrl(this.themeApi.configuration.basePath, theme.name, LogoRefType.Logo)
+        }
+        return theme
+      }),
       catchError((err) => {
         console.error('onecx-theme-data.getThemeByName', err)
-        return of({})
+        return of({} as ExtendedTheme)
       })
     )
     this.theme$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(this.theme)
