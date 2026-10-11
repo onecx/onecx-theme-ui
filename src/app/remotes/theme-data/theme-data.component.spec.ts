@@ -33,6 +33,12 @@ describe('OneCXThemeDataComponent', () => {
   let fixture: ComponentFixture<OneCXThemeDataComponent>
   let baseUrlSubject: ReplaySubject<any>
 
+  function initializeComponent() {
+    fixture = TestBed.createComponent(OneCXThemeDataComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+  }
+
   const themeApiSpy = {
     searchThemes: jasmine.createSpy('searchThemes').and.returnValue(of({})),
     getThemeByName: jasmine.createSpy('getThemeByName').and.returnValue(of({}))
@@ -40,12 +46,6 @@ describe('OneCXThemeDataComponent', () => {
   const slotServiceSpy = {
     init: jasmine.createSpy('init'),
     isSomeComponentDefinedForSlot: jasmine.createSpy('isSomeComponentDefinedForSlot').and.returnValue(of(false))
-  }
-
-  function initializeComponent() {
-    fixture = TestBed.createComponent(OneCXThemeDataComponent)
-    component = fixture.componentInstance
-    fixture.detectChanges()
   }
 
   beforeEach(waitForAsync(() => {
