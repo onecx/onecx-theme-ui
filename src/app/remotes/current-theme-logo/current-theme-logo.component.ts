@@ -46,7 +46,6 @@ export class OneCXCurrentThemeLogoComponent implements ocxRemoteComponent, ocxRe
   public imageUrl$ = new BehaviorSubject<string | undefined>(undefined)
   public defaultImageUrl: string | undefined = undefined
   private readonly currentTheme = toSignal(this.themeService.currentTheme$.asObservable())
-  public imageBasePath = this.themeApi.configuration.basePath
 
   constructor() {
     effect(() => {
