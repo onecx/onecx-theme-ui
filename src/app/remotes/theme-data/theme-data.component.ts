@@ -144,7 +144,7 @@ export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWeb
     this.theme$ = this.themeApi.getThemeByName({ name: themeName }).pipe(
       first(),
       map((data) => {
-        let theme: ExtendedTheme = data.resource
+        const theme: ExtendedTheme = data.resource
         if (theme) {
           theme.bffImageUrl = Utils.bffImageUrl(this.themeApi.configuration.basePath, theme.name, LogoRefType.Logo)
         }
