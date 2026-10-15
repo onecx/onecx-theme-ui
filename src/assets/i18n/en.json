@@ -133,6 +133,8 @@
     "TABS": {
       "COLORS": "Colors",
       "COLORS.TOOLTIP": "Color values of the Theme",
+      "CSS": "CSS Variables",
+      "CSS.TOOLTIP": "Custom CSS variables of the Theme",
       "EXTRAS": "Extras",
       "EXTRAS.TOOLTIP": "Additional properties of the Theme (Fonts, Iconsets etc.)",
       "INTERN": "Internal",
@@ -201,6 +203,15 @@
     "DESIGNER.CREATE.SUBHEADER": "Create a new Theme",
     "DESIGNER.TOP.SECTION": "Theme applying and template selection",
     "NO_PROPERTIES": "No properties specified",
+    "CSS": {
+      "EMPTY": "No CSS variables specified",
+      "CONTEXT": "Context",
+      "CONTENT": "Content",
+      "TOOLTIPS": {
+        "CONTEXT": "Name of the CSS context",
+        "CONTENT": "CSS variables defined for this context"
+      }
+    },
     "COLORS": {
       "GENERAL": "General Colors",
       "TOPBAR": "Topbar Colors",

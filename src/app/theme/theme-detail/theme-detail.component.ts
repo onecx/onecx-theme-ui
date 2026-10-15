@@ -21,7 +21,6 @@ import { Tabs, TabsModule } from 'primeng/tabs'
 import { TooltipModule } from 'primeng/tooltip'
 
 import { PortalMessageService, ThemeService, UserService } from '@onecx/angular-integration-interface'
-
 import { Action, AngularAcceleratorModule } from '@onecx/angular-accelerator'
 import { PortalPageComponent } from '@onecx/angular-utils'
 
@@ -31,6 +30,7 @@ import { ExportThemeRequest, ImagesInternalAPIService, Theme, ThemesAPIService }
 
 import { ThemeApplyComponent } from './theme-apply/theme-apply.component'
 import { ThemeColorsComponent } from './theme-colors/theme-colors.component'
+import { ThemeCssComponent } from './theme-css/theme-css.component'
 import { ThemePropsComponent } from './theme-props/theme-props.component'
 import { ThemeUseComponent, Workspace } from './theme-use/theme-use.component'
 import { ThemeInternComponent } from './theme-intern/theme-intern.component'
@@ -50,8 +50,8 @@ export type Theme2 = Theme & { displayNameLimited: string | undefined }
   standalone: true,
   imports: [
     AngularAcceleratorModule,
-    AsyncPipe, // used in HTML
-    JsonPipe, // used in HTML
+    AsyncPipe,
+    JsonPipe,
     MessageModule,
     TabsModule,
     TooltipModule,
@@ -64,7 +64,8 @@ export type Theme2 = Theme & { displayNameLimited: string | undefined }
     ThemeUseComponent,
     ThemeApplyComponent,
     ThemePropsComponent,
-    ThemeColorsComponent
+    ThemeColorsComponent,
+    ThemeCssComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-detail.component.html',
@@ -306,7 +307,7 @@ export class ThemeDetailComponent implements OnInit {
     if (theme) {
       this.showOperatorMessage = false
       this.selectedTabIndex = typeof tabValue === 'number' ? tabValue.toString() : tabValue
-      if (this.selectedTabIndex === '3') {
+      if (this.selectedTabIndex === '4') {
         this.startGettingThemeUseData(theme)
       }
     } else this.selectedTabIndex = '0'
@@ -327,7 +328,7 @@ export class ThemeDetailComponent implements OnInit {
       this.preparePageActions(theme)
     }
     if (requestedMode === 'EDIT') {
-      if (Number(this.selectedTabIndex) > 1) this.selectedTabIndex = '0'
+      if (Number(this.selectedTabIndex) > 2) this.selectedTabIndex = '0'
       this.getTheme()
       this.getThemes()
     }

@@ -1,0 +1,42 @@
+<div class="mt-4 mb-5 mx-0 sm:mx-2 flex flex-column row-gap-4">
+  @if (entries.length === 0) {
+    <p class="m-3" id="th_detail_css_empty_message">{{ 'THEME.CSS.EMPTY' | translate }}</p>
+  }
+  @for (entry of entries; track $index) {
+    <div class="flex flex-column sm:flex-row column-gap-4 row-gap-2 align-items-start" [formGroup]="entry">
+      <p-floatlabel variant="on" class="sm:w-4">
+        <input
+          pInputText
+          type="text"
+          [id]="'th_detail_css_context_' + $index"
+          class="w-full pt-3 pb-2 text-responsive"
+          formControlName="context"
+          [ariaLabel]="'THEME.CSS.CONTEXT' | translate"
+          [pTooltip]="'THEME.CSS.TOOLTIPS.CONTEXT' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
+        />
+        <label [for]="'th_detail_css_context_' + $index" aria-hidden="true">
+          {{ 'THEME.CSS.CONTEXT' | translate }}
+        </label>
+      </p-floatlabel>
+      <p-floatlabel variant="on" class="flex-grow-1">
+        <textarea
+          pInputTextarea
+          autoresize="true"
+          rows="4"
+          class="w-full"
+          [id]="'th_detail_css_content_' + $index"
+          formControlName="content"
+          [ariaLabel]="'THEME.CSS.CONTENT' | translate"
+          [pTooltip]="'THEME.CSS.TOOLTIPS.CONTENT' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
+        ></textarea>
+        <label [for]="'th_detail_css_content_' + $index" aria-hidden="true">
+          {{ 'THEME.CSS.CONTENT' | translate }}
+        </label>
+      </p-floatlabel>
+    </div>
+  }
+</div>
