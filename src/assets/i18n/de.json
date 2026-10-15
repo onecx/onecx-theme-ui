@@ -207,9 +207,17 @@
       "EMPTY": "Keine CSS-Variablen angegeben",
       "CONTEXT": "Kontext",
       "CONTENT": "Inhalt",
+      "ACTIONS": {
+        "ADD": "Kontext hinzufügen"
+      },
       "TOOLTIPS": {
         "CONTEXT": "Name des CSS-Kontexts",
-        "CONTENT": "Für diesen Kontext definierte CSS-Variablen"
+        "CONTENT": "Für diesen Kontext definierte CSS-Variablen",
+        "ADD": "Neuen CSS-Kontext hinzufügen",
+        "REMOVE": "Diesen CSS-Kontext entfernen"
+      },
+      "VALIDATION": {
+        "DUPLICATE_CONTEXT": "Kontextnamen müssen eindeutig sein. Bitte benennen Sie den doppelten Kontext um."
       }
     },
     "COLORS": {

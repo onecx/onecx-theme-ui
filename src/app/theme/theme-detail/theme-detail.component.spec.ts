@@ -374,12 +374,12 @@ describe('ThemeDetailComponent', () => {
       expect(component.selectedTabIndex).toBe('2')
     })
 
-    it('should start getting theme use data when tabIndex is 3', () => {
+    it('should start getting theme use data when tabIndex is 4', () => {
       spyOn<any>(component, 'startGettingThemeUseData')
 
-      component.onTabChange('3', theme)
+      component.onTabChange('4', theme)
 
-      expect(component.selectedTabIndex).toBe('3')
+      expect(component.selectedTabIndex).toBe('4')
       expect(component['startGettingThemeUseData']).toHaveBeenCalledWith(theme)
     })
 
@@ -405,9 +405,9 @@ describe('ThemeDetailComponent', () => {
     it('should start first time - normal theme', () => {
       component.themeUseLoadingState.set('initial')
 
-      component.onTabChange('3', theme)
+      component.onTabChange('4', theme)
 
-      expect(component.selectedTabIndex).toBe('3')
+      expect(component.selectedTabIndex).toBe('4')
       expect(component.themeUseLoadingState()).toBe('loading')
       expect(component.themeUsedName()).toBe(theme.name)
     })
@@ -417,10 +417,10 @@ describe('ThemeDetailComponent', () => {
         component.themeUseLoadingState.set('initial')
         component['themeUseTimeoutTimer'] = setTimeout(() => {}, 10)
 
-        component.onTabChange('3', theme)
+        component.onTabChange('4', theme)
         tick(component['MAX_LOADING_TIME'] + 100) // wait for timer to trigger
 
-        expect(component.selectedTabIndex).toBe('3')
+        expect(component.selectedTabIndex).toBe('4')
         expect(component.themeUseLoadingState()).toBe('timeout')
         expect(component.themeUsedName()).toBe(theme.name)
       }))
@@ -721,7 +721,7 @@ describe('ThemeDetailComponent', () => {
 
     it('should trigger save action callback', (done: DoneFn) => {
       component.changeMode = 'EDIT'
-      mockThemeDataSignal.set({ theme: {}, propsValid: false, colorsValid: true })
+      mockThemeDataSignal.set({ theme: {}, propsValid: false, colorsValid: true, cssValid: true })
       component.preparePageActions(theme)
 
       component.actions$.subscribe((actions) => {
@@ -778,7 +778,7 @@ describe('ThemeDetailComponent', () => {
     it('should toggle to EDIT and call getTheme', () => {
       spyOn(component as any, 'getTheme')
       spyOn(component as any, 'getThemes')
-      component.selectedTabIndex = '2'
+      component.selectedTabIndex = '3'
 
       component['onChangeMode']('EDIT', theme)
 
@@ -797,7 +797,12 @@ describe('ThemeDetailComponent', () => {
         value: mockThemeDataSignal
       })
       fixture.detectChanges()
-      mockThemeDataSignal.set({ theme: { ...theme, properties: {} }, propsValid: true, colorsValid: true })
+      mockThemeDataSignal.set({
+        theme: { ...theme, properties: {} },
+        propsValid: true,
+        colorsValid: true,
+        cssValid: true
+      })
       component['paramThemeName'] = theme.name!
       component.theme.set({ ...theme, id: 'themeId', modificationCount: 1 })
     })
@@ -815,7 +820,7 @@ describe('ThemeDetailComponent', () => {
     })
 
     it('should not proceed if propsValid is false', () => {
-      mockThemeDataSignal.set({ theme: {}, propsValid: false, colorsValid: true })
+      mockThemeDataSignal.set({ theme: {}, propsValid: false, colorsValid: true, cssValid: true })
 
       component['onUpdateTheme']()
 
@@ -823,7 +828,7 @@ describe('ThemeDetailComponent', () => {
     })
 
     it('should not proceed if propsValid is undefined (no child component)', () => {
-      mockThemeDataSignal.set({ theme: {}, propsValid: undefined, colorsValid: true })
+      mockThemeDataSignal.set({ theme: {}, propsValid: undefined, colorsValid: true, cssValid: true })
 
       component['onUpdateTheme']()
 
@@ -831,7 +836,15 @@ describe('ThemeDetailComponent', () => {
     })
 
     it('should not proceed if colorsValid is false', () => {
-      mockThemeDataSignal.set({ theme: {}, propsValid: true, colorsValid: false })
+      mockThemeDataSignal.set({ theme: {}, propsValid: true, colorsValid: false, cssValid: true })
+
+      component['onUpdateTheme']()
+
+      expect(themesApiSpy.updateTheme).not.toHaveBeenCalled()
+    })
+
+    it('should not proceed if cssValid is false', () => {
+      mockThemeDataSignal.set({ theme: {}, propsValid: true, colorsValid: true, cssValid: false })
 
       component['onUpdateTheme']()
 
@@ -853,7 +866,8 @@ describe('ThemeDetailComponent', () => {
       mockThemeDataSignal.set({
         theme: { ...theme, logoUrl: '', smallLogoUrl: '', faviconUrl: '' },
         propsValid: true,
-        colorsValid: true
+        colorsValid: true,
+        cssValid: true
       })
       themesApiSpy.updateTheme.and.returnValue(of({ resource: theme }) as any)
       themesApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
@@ -937,7 +951,12 @@ describe('ThemeDetailComponent', () => {
 
     it('should use sub-component data in EDIT mode', () => {
       component.changeMode = 'EDIT'
-      mockThemeDataSignal.set({ theme: { ...theme, properties: {} }, propsValid: true, colorsValid: true })
+      mockThemeDataSignal.set({
+        theme: { ...theme, properties: {} },
+        propsValid: true,
+        colorsValid: true,
+        cssValid: true
+      })
       component.theme.set({ ...theme, modificationCount: 2 })
 
       component.onSaveAs(copyOfPrefix)
@@ -948,7 +967,12 @@ describe('ThemeDetailComponent', () => {
 
     it('should not open dialog if sub-component data is invalid in EDIT mode', () => {
       component.changeMode = 'EDIT'
-      mockThemeDataSignal.set({ theme: { ...theme, properties: {} }, propsValid: false, colorsValid: false })
+      mockThemeDataSignal.set({
+        theme: { ...theme, properties: {} },
+        propsValid: false,
+        colorsValid: false,
+        cssValid: false
+      })
 
       component.onSaveAs(copyOfPrefix)
 

@@ -43,6 +43,7 @@ export type ThemeData = {
   theme: Theme
   propsValid: boolean | undefined
   colorsValid: boolean | undefined
+  cssValid: boolean | undefined
 }
 export type Theme2 = Theme & { displayNameLimited: string | undefined }
 
@@ -98,6 +99,7 @@ export class ThemeDetailComponent implements OnInit {
   public readonly tabComponent = viewChild(Tabs)
   public readonly themePropsComponent = viewChild(ThemePropsComponent)
   public readonly themeColorsComponent = viewChild(ThemeColorsComponent)
+  public readonly themeCssComponent = viewChild(ThemeCssComponent)
   // private timer to avoid long waits for getting workspace data
   private themeUseTimeoutTimer: ReturnType<typeof setTimeout> | undefined
   private themeUseStartTime: number | undefined
@@ -247,13 +249,20 @@ export class ThemeDetailComponent implements OnInit {
     // values
     const themeProps = this.themePropsComponent()?.combinedFormValues()
     const themeColors = this.themeColorsComponent()?.combinedFormValues()
+    const themeCss = this.themeCssComponent()?.combinedFormValues()
     // validity
     const propsValid = this.themePropsComponent()?.isThemeFormValid()
     const colorsValid = this.themeColorsComponent()?.isThemeFormValid()
+    const cssValid = this.themeCssComponent()?.isThemeFormValid()
     return {
-      theme: { ...themeProps, properties: { ...themeColors?.properties, ...themeProps?.properties } },
+      theme: {
+        ...themeProps,
+        properties: { ...themeColors?.properties, ...themeProps?.properties },
+        customCssVariables: themeCss?.customCssVariables
+      },
       propsValid: propsValid,
-      colorsValid: colorsValid
+      colorsValid: colorsValid,
+      cssValid: cssValid
     } as ThemeData
   }
 
@@ -347,6 +356,10 @@ export class ThemeDetailComponent implements OnInit {
       this.msgService.error({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
       return undefined
     }
+    if (!this.themeData().cssValid) {
+      this.msgService.error({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
+      return undefined
+    }
 
     let data = this.themeData().theme // combined data from sub components
     // combine with the original theme data to preserve some properties
@@ -358,8 +371,6 @@ export class ThemeDetailComponent implements OnInit {
       modificationCount: this.theme()?.modificationCount,
       // preserve: not used, to be deleted
       fonts: this.theme()?.fonts,
-      // preserve: used as Theme overrides in Shell UI (JSON) => design tokens
-      customCssVariables: this.theme()?.customCssVariables,
       // prevent empty strings for urls, as it causes issues for the image service
       logoUrl: data.logoUrl === '' ? undefined : data.logoUrl,
       smallLogoUrl: data.smallLogoUrl === '' ? undefined : data.smallLogoUrl,

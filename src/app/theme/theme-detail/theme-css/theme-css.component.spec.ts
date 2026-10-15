@@ -96,4 +96,102 @@ describe('ThemeCssComponent', () => {
     fixture.detectChanges()
     expect(component.cssForm.disabled).toBeFalse()
   })
+
+  it('should add a new empty entry when onAddEntry is called in EDIT mode', () => {
+    initTestComponent()
+    fixture.componentRef.setInput('changeMode', 'EDIT')
+    fixture.componentRef.setInput('theme', { customCssVariables: JSON.stringify({ shell: 'value' }) })
+    fixture.detectChanges()
+
+    component.onAddEntry()
+
+    expect(component.entries.length).toBe(2)
+    expect(component.entries[1].get('context')?.value).toBe('')
+    expect(component.entries[1].get('content')?.value).toBe('')
+  })
+
+  it('should not add a new entry when onAddEntry is called in VIEW mode', () => {
+    initTestComponent()
+    fixture.componentRef.setInput('theme', { customCssVariables: JSON.stringify({ shell: 'value' }) })
+    fixture.detectChanges()
+
+    component.onAddEntry()
+
+    expect(component.entries.length).toBe(1)
+  })
+
+  it('should remove an entry when onRemoveEntry is called in EDIT mode', () => {
+    initTestComponent()
+    fixture.componentRef.setInput('changeMode', 'EDIT')
+    fixture.componentRef.setInput('theme', { customCssVariables: JSON.stringify({ shell: 'value', other: 'value2' }) })
+    fixture.detectChanges()
+
+    component.onRemoveEntry(0)
+
+    expect(component.entries.length).toBe(1)
+    expect(component.entries[0].get('context')?.value).toBe('other')
+  })
+
+  it('should not remove an entry when onRemoveEntry is called in VIEW mode', () => {
+    initTestComponent()
+    fixture.componentRef.setInput('theme', { customCssVariables: JSON.stringify({ shell: 'value' }) })
+    fixture.detectChanges()
+
+    component.onRemoveEntry(0)
+
+    expect(component.entries.length).toBe(1)
+  })
+
+  it('should mark the form invalid when two entries share the same context', () => {
+    initTestComponent()
+    fixture.componentRef.setInput('changeMode', 'EDIT')
+    fixture.componentRef.setInput('theme', { customCssVariables: JSON.stringify({ shell: 'value' }) })
+    fixture.detectChanges()
+
+    component.onAddEntry()
+    component.entries[1].get('context')?.setValue('shell')
+
+    expect(component.cssForm.errors?.['duplicateContext']).toBeTrue()
+    expect(component.isThemeFormValid()).toBeFalse()
+  })
+
+  it('should mark the form invalid when a context is empty', () => {
+    initTestComponent()
+    fixture.componentRef.setInput('changeMode', 'EDIT')
+    fixture.componentRef.setInput('theme', { customCssVariables: JSON.stringify({ shell: 'value' }) })
+    fixture.detectChanges()
+
+    component.entries[0].get('context')?.setValue('')
+
+    expect(component.isThemeFormValid()).toBeFalse()
+  })
+
+  it('should mark the form valid when all contexts are set and unique', () => {
+    initTestComponent()
+    fixture.componentRef.setInput('changeMode', 'EDIT')
+    fixture.componentRef.setInput('theme', { customCssVariables: JSON.stringify({ shell: 'value' }) })
+    fixture.detectChanges()
+
+    expect(component.isThemeFormValid()).toBeTrue()
+  })
+
+  it('should combine entries back into the customCssVariables JSON string', () => {
+    initTestComponent()
+    fixture.componentRef.setInput('changeMode', 'EDIT')
+    fixture.componentRef.setInput('theme', { customCssVariables: JSON.stringify({ shell: 'value' }) })
+    fixture.detectChanges()
+
+    component.entries[0].get('content')?.setValue('updated-value')
+
+    expect(component.combinedFormValues().customCssVariables).toBe(JSON.stringify({ shell: 'updated-value' }, null, 2))
+  })
+
+  it('should return undefined customCssVariables when there are no entries', () => {
+    initTestComponent()
+    fixture.componentRef.setInput('changeMode', 'EDIT')
+    fixture.componentRef.setInput('theme', {})
+    fixture.detectChanges()
+
+    expect(component.combinedFormValues().customCssVariables).toBeUndefined()
+  })
 })

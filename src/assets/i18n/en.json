@@ -207,9 +207,17 @@
       "EMPTY": "No CSS variables specified",
       "CONTEXT": "Context",
       "CONTENT": "Content",
+      "ACTIONS": {
+        "ADD": "Add context"
+      },
       "TOOLTIPS": {
         "CONTEXT": "Name of the CSS context",
-        "CONTENT": "CSS variables defined for this context"
+        "CONTENT": "CSS variables defined for this context",
+        "ADD": "Add a new CSS context",
+        "REMOVE": "Remove this CSS context"
+      },
+      "VALIDATION": {
+        "DUPLICATE_CONTEXT": "Context names must be unique. Please rename the duplicate context."
       }
     },
     "COLORS": {
