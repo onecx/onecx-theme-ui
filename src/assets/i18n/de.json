@@ -133,6 +133,8 @@
     "TABS": {
       "COLORS": "Farben",
       "COLORS.TOOLTIP": "Farbwerte des Themes",
+      "CSS": "CSS-Variablen",
+      "CSS.TOOLTIP": "Benutzerdefinierte CSS-Variablen des Themes",
       "EXTRAS": "Extras",
       "EXTRAS.TOOLTIP": "Zusätzliche Eigenschaften des Themes (Fonts, Iconsets etc.)",
       "INTERN": "Intern",
@@ -201,6 +203,24 @@
     "DESIGNER.CREATE.SUBHEADER": "Ein neues Theme erstellen",
     "DESIGNER.TOP.SECTION": "Theme anwenden und Vorlage wählen",
     "NO_PROPERTIES": "Keine Farbwerte enthalten",
+    "CSS": {
+      "EMPTY": "Kein Kontext mit CSS-Variablen erfasst.",
+      "CONTEXT": "Kontext",
+      "CONTENT": "Inhalt",
+      "ACTIONS": {
+        "ADD": "Kontext hinzufügen"
+      },
+      "TOOLTIPS": {
+        "CONTEXT": "Name des CSS-Kontexts",
+        "CONTENT": "CSS-Variablen",
+        "ADD": "Neuen CSS-Kontext hinzufügen",
+        "REMOVE": "Diesen CSS-Kontext entfernen"
+      },
+      "VALIDATION": {
+        "DUPLICATE_CONTEXT": "Kontextnamen müssen eindeutig sein. Bitte Kontext umbenennen.",
+        "INVALID_CONTENT": "Inhalt muss ein gültiges JSON-Objekt sein, z. B. { \"--my-var\": \"red\" }."
+      }
+    },
     "COLORS": {
       "GENERAL": "Allgemeine Farben",
       "TOPBAR": "Topbar Farben",

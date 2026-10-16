@@ -9,18 +9,18 @@
   >
   </ocx-page-header>
 
-  <ocx-content class="ocx-content">
+  <ocx-content class="relative ocx-content">
     @let exceptionMessage = exceptionKey();
     <!-- showOperatorMessage -->
     <ng-container *ocxIfPermission="'THEME#EDIT'">
       @if (theme()?.operator && showOperatorMessage) {
         <p-message
-          [style]="{ 'margin-top': '35px', right: '22px', left: '22px' }"
-          styleClass="absolute z-1"
+          id="th_detail_css_operator_message"
+          styleClass="absolute z-1 operator-message"
           severity="warn"
           closable="true"
           variant="text"
-          [life]="3000"
+          [life]="1000"
           [text]="('INTERNAL.OPERATOR_HINT' | translate) + ': ' + ('INTERNAL.OPERATOR_MESSAGE' | translate)"
         >
         </p-message>
@@ -49,6 +49,15 @@
         </p-tab>
         <p-tab
           value="2"
+          [ariaLabel]="'DIALOG.TABS.CSS' | translate"
+          [pTooltip]="'DIALOG.TABS.CSS.TOOLTIP' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
+        >
+          {{ 'DIALOG.TABS.CSS' | translate }}
+        </p-tab>
+        <p-tab
+          value="3"
           [disabled]="changeMode !== 'VIEW'"
           [ariaLabel]="'DIALOG.TABS.VARIABLES' | translate"
           [pTooltip]="'DIALOG.TABS.VARIABLES.TOOLTIP' | translate"
@@ -58,7 +67,7 @@
           {{ 'DIALOG.TABS.VARIABLES' | translate }}
         </p-tab>
         <p-tab
-          value="3"
+          value="4"
           [disabled]="changeMode !== 'VIEW'"
           [ariaLabel]="'DIALOG.TABS.USE' | translate"
           [pTooltip]="'DIALOG.TABS.USE.TOOLTIP' | translate"
@@ -68,7 +77,7 @@
           {{ 'DIALOG.TABS.USE' | translate }}
         </p-tab>
         <p-tab
-          value="4"
+          value="5"
           [disabled]="changeMode !== 'VIEW'"
           [ariaLabel]="'DIALOG.TABS.INTERN' | translate"
           [pTooltip]="'DIALOG.TABS.INTERN.TOOLTIP' | translate"
@@ -147,30 +156,35 @@
           </div>
         </p-tabpanel>
 
-        @if (changeMode === 'VIEW') {
-          <!-- VARIABLES -->
-          <p-tabpanel value="2" id="th_detail_panel_variables">
-            <pre class="m-3 surface-50">{{ theme()?.properties | json }}</pre>
-          </p-tabpanel>
+        <!-- CSS VARIABLES -->
+        <p-tabpanel value="2">
+          <div class="pt-2 pb-4 px-0 sm:px-3">
+            <app-theme-css [theme]="themeForCss" [changeMode]="changeMode"></app-theme-css>
+          </div>
+        </p-tabpanel>
 
-          <!-- USE -->
-          <p-tabpanel value="3">
-            <div class="p-4">
-              <app-theme-use
-                [workspaces]="themeUsedByWorkspaces()"
-                [isComponentDefined]="isComponentDefined()"
-                [useLoadingState]="themeUseLoadingState()"
-              ></app-theme-use>
-            </div>
-          </p-tabpanel>
+        <!-- THEME VARIABLES -->
+        <p-tabpanel value="3" id="th_detail_panel_variables">
+          <pre class="m-3 surface-50">{{ theme()?.properties | json }}</pre>
+        </p-tabpanel>
 
-          <!-- INTERN -->
-          <p-tabpanel value="4">
-            <div class="p-4">
-              <app-theme-intern [theme]="theme()" [dateFormat]="dateFormat"></app-theme-intern>
-            </div>
-          </p-tabpanel>
-        }
+        <!-- USE -->
+        <p-tabpanel value="4">
+          <div class="p-4">
+            <app-theme-use
+              [workspaces]="themeUsedByWorkspaces()"
+              [isComponentDefined]="isComponentDefined()"
+              [useLoadingState]="themeUseLoadingState()"
+            ></app-theme-use>
+          </div>
+        </p-tabpanel>
+
+        <!-- INTERN -->
+        <p-tabpanel value="5">
+          <div class="p-4">
+            <app-theme-intern [theme]="theme()" [dateFormat]="dateFormat"></app-theme-intern>
+          </div>
+        </p-tabpanel>
       </p-tabpanels>
     </p-tabs>
   </ocx-content>
