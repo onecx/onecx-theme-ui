@@ -38,18 +38,18 @@ describe('ThemeCssComponent', () => {
     initTestComponent()
     fixture.componentRef.setInput('theme', { customCssVariables: JSON.stringify({ ctx: { a: 'b' } }) })
     fixture.detectChanges()
-    expect(component.entries.length).toBe(1)
+    expect(component.entries).toHaveSize(1)
 
     fixture.componentRef.setInput('theme', undefined)
     fixture.detectChanges()
-    expect(component.entries.length).toBe(0)
+    expect(component.entries).toHaveSize(0)
   })
 
   it('should display no entries when customCssVariables is undefined', () => {
     initTestComponent()
     fixture.componentRef.setInput('theme', {})
     fixture.detectChanges()
-    expect(component.entries.length).toBe(0)
+    expect(component.entries).toHaveSize(0)
   })
 
   it('should display no entries when customCssVariables is not valid JSON', () => {
@@ -57,7 +57,7 @@ describe('ThemeCssComponent', () => {
     spyOn(console, 'error')
     fixture.componentRef.setInput('theme', { customCssVariables: 'not-json' })
     fixture.detectChanges()
-    expect(component.entries.length).toBe(0)
+    expect(component.entries).toHaveSize(0)
     expect(console.error).toHaveBeenCalled()
   })
 
@@ -65,14 +65,14 @@ describe('ThemeCssComponent', () => {
     initTestComponent()
     fixture.componentRef.setInput('theme', { customCssVariables: JSON.stringify(['a', 'b']) })
     fixture.detectChanges()
-    expect(component.entries.length).toBe(0)
+    expect(component.entries).toHaveSize(0)
   })
 
   it('should create one entry per top-level property with its value serialized as formatted JSON text', () => {
     initTestComponent()
     fixture.componentRef.setInput('theme', { customCssVariables: JSON.stringify({ shell: { '--my-var': 'red' } }) })
     fixture.detectChanges()
-    expect(component.entries.length).toBe(1)
+    expect(component.entries).toHaveSize(1)
     expect(component.entries[0].get('context')?.value).toBe('shell')
     expect(component.entries[0].get('content')?.value).toBe(JSON.stringify({ '--my-var': 'red' }, null, 2))
     expect(component.entries[0].get('content')?.errors).toBeNull()
@@ -111,7 +111,7 @@ describe('ThemeCssComponent', () => {
 
     component.onAddEntry()
 
-    expect(component.entries.length).toBe(2)
+    expect(component.entries).toHaveSize(2)
     expect(component.entries[1].get('context')?.value).toBe('')
     expect(component.entries[1].get('content')?.value).toBe('{}')
   })
@@ -123,7 +123,7 @@ describe('ThemeCssComponent', () => {
 
     component.onAddEntry()
 
-    expect(component.entries.length).toBe(1)
+    expect(component.entries).toHaveSize(1)
   })
 
   it('should remove an entry when onRemoveEntry is called in EDIT mode', () => {
@@ -136,7 +136,7 @@ describe('ThemeCssComponent', () => {
 
     component.onRemoveEntry(0)
 
-    expect(component.entries.length).toBe(1)
+    expect(component.entries).toHaveSize(1)
     expect(component.entries[0].get('context')?.value).toBe('other')
   })
 
@@ -147,7 +147,7 @@ describe('ThemeCssComponent', () => {
 
     component.onRemoveEntry(0)
 
-    expect(component.entries.length).toBe(1)
+    expect(component.entries).toHaveSize(1)
   })
 
   it('should mark the form invalid when two entries share the same context', () => {

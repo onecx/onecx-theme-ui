@@ -13,8 +13,8 @@
 
 :host ::ng-deep {
   .ocx-content > div {
-    margin-bottom: 0 !important;
-    padding: 0 !important;
+    margin-bottom: 0;
+    padding: 0;
   }
   .p-tabs .p-tabpanels {
     padding: 0;
@@ -30,12 +30,12 @@
     max-width: 90%;
   }
   .animation-delay-3000 {
-    animation-delay: 1000ms !important;
+    animation-delay: 1000ms;
   }
 
   .p-select-option,
   .p-listbox-option {
-    padding: 0.5rem 1rem !important;
+    padding: 0.5rem 1rem;
   }
 
   /* ZEBRA rows on select lists */
