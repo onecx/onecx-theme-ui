@@ -204,7 +204,7 @@
     "DESIGNER.TOP.SECTION": "Theme applying and template selection",
     "NO_PROPERTIES": "No properties specified",
     "CSS": {
-      "EMPTY": "No CSS variables specified",
+      "EMPTY": "No Context with CSS variables specified.",
       "CONTEXT": "Context",
       "CONTENT": "Content",
       "ACTIONS": {
@@ -212,12 +212,13 @@
       },
       "TOOLTIPS": {
         "CONTEXT": "Name of the CSS context",
-        "CONTENT": "CSS variables defined for this context",
+        "CONTENT": "CSS variables",
         "ADD": "Add a new CSS context",
         "REMOVE": "Remove this CSS context"
       },
       "VALIDATION": {
-        "DUPLICATE_CONTEXT": "Context names must be unique. Please rename the duplicate context."
+        "DUPLICATE_CONTEXT": "Context names must be unique. Please rename the context.",
+        "INVALID_CONTENT": "Content must be a valid JSON object, e.g. { \"--my-var\": \"red\" }."
       }
     },
     "COLORS": {

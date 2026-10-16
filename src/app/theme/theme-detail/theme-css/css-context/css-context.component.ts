@@ -5,6 +5,7 @@ import { TranslateModule } from '@ngx-translate/core'
 import { ButtonModule } from 'primeng/button'
 import { FloatLabelModule } from 'primeng/floatlabel'
 import { InputTextModule } from 'primeng/inputtext'
+import { MessageModule } from 'primeng/message'
 import { TextareaModule } from 'primeng/textarea'
 import { TooltipModule } from 'primeng/tooltip'
 
@@ -18,6 +19,7 @@ import { ChangeMode } from '../../theme-detail.component'
     FloatLabelModule,
     FormsModule,
     InputTextModule,
+    MessageModule,
     ReactiveFormsModule,
     TextareaModule,
     TooltipModule,

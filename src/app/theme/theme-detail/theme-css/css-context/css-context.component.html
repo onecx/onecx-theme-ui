@@ -68,6 +68,14 @@
         tooltipPosition="top"
         tooltipEvent="hover"
       ></textarea>
+      @if (group().get('content')?.errors?.['invalidJson']) {
+        <p-message
+          [id]="'th_detail_css_card_' + index() + '_content_error'"
+          severity="error"
+          styleClass="w-fit mt-2"
+          [text]="'THEME.CSS.VALIDATION.INVALID_CONTENT' | translate"
+        />
+      }
     }
   </div>
 </div>

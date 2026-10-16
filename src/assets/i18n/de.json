@@ -204,7 +204,7 @@
     "DESIGNER.TOP.SECTION": "Theme anwenden und Vorlage wählen",
     "NO_PROPERTIES": "Keine Farbwerte enthalten",
     "CSS": {
-      "EMPTY": "Keine CSS-Variablen angegeben",
+      "EMPTY": "Kein Kontext mit CSS-Variablen erfasst.",
       "CONTEXT": "Kontext",
       "CONTENT": "Inhalt",
       "ACTIONS": {
@@ -212,12 +212,13 @@
       },
       "TOOLTIPS": {
         "CONTEXT": "Name des CSS-Kontexts",
-        "CONTENT": "Für diesen Kontext definierte CSS-Variablen",
+        "CONTENT": "CSS-Variablen",
         "ADD": "Neuen CSS-Kontext hinzufügen",
         "REMOVE": "Diesen CSS-Kontext entfernen"
       },
       "VALIDATION": {
-        "DUPLICATE_CONTEXT": "Kontextnamen müssen eindeutig sein. Bitte benennen Sie den doppelten Kontext um."
+        "DUPLICATE_CONTEXT": "Kontextnamen müssen eindeutig sein. Bitte Kontext umbenennen.",
+        "INVALID_CONTENT": "Inhalt muss ein gültiges JSON-Objekt sein, z. B. { \"--my-var\": \"red\" }."
       }
     },
     "COLORS": {
