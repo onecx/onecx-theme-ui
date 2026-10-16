@@ -5,22 +5,15 @@
   display: flex;
   flex-direction: column;
 }
+
 .font-monospace {
-  font-family: monospace !important;
+  font-family: monospace;
+  line-height: 1.5;
 }
 
-/* on <p-card> */
-.flexible-json-card {
-  display: block;
-  height: 500px;
-  width: 100% !important;
-  max-width: none !important;
-}
 .flexible-json-textarea {
-  flex: 1 1 auto;
   width: 100%;
   max-width: 100%;
-  height: 100%;
 
   white-space: pre;
   overflow-y: auto;
@@ -30,68 +23,11 @@
   border: 1px solid #ced4da;
   border-radius: 6px;
   padding: 10px;
-  line-height: 1.5;
   resize: both;
 }
-.p-textarea-fluid {
-  width: none;
-}
+
 .pseudo-card {
   box-shadow:
     rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
     rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
-}
-
-/* disable style encapsulation for deep child elements */
-:host ::ng-deep {
-  // make the card fill its grid column and let the content area fill the remaining space
-  .p-card {
-    height: 100%;
-  }
-  .p-card-body {
-    height: 100%;
-  }
-  .p-card-content {
-    flex: 1 1 auto;
-    display: flex;
-  }
-  // shared by the VIEW-mode text and the EDIT-mode floatlabel, so both stretch the same way
-  .p-card-content .css-content {
-    flex: 1 1 auto;
-    display: flex;
-  }
-  textarea {
-    flex: 1 1 auto;
-    height: 100%;
-    resize: none;
-  }
-
-  .flexible-json-card .p-card {
-    width: 100% !important;
-    max-width: none !important;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box; // Verhindert, dass Padding die Card sprengt
-  }
-
-  // 3. Den inneren Body-Container anpassen
-  .flexible-json-card .p-card-body {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 auto;
-    width: 100% !important;
-    max-width: 100% !important;
-    overflow: hidden; // Kapselt die Breite im Flex-Layout
-  }
-  // 3. Den p-card-content Bereich (wo Ihre TextArea lebt) auf 100% Flexbox stellen
-  .flexible-json-card .p-card-content {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 auto;
-    width: 100% !important;
-    max-width: 100% !important;
-    height: 100%;
-    padding: 0; // Maximiert den Platz für die TextArea
-  }
 }
