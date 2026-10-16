@@ -5,8 +5,6 @@ import {
   FormArray,
   FormControl,
   FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
   ValidationErrors,
   ValidatorFn,
   Validators
@@ -15,13 +13,11 @@ import { TranslateModule } from '@ngx-translate/core'
 import { map, startWith } from 'rxjs'
 
 import { ButtonModule } from 'primeng/button'
-import { FloatLabelModule } from 'primeng/floatlabel'
-import { InputTextModule } from 'primeng/inputtext'
 import { MessageModule } from 'primeng/message'
-import { TextareaModule } from 'primeng/textarea'
 import { TooltipModule } from 'primeng/tooltip'
 
 import { Theme } from 'src/app/shared/generated'
+import { CssContextComponent } from './css-context/css-context.component'
 import { ChangeMode } from '../theme-detail.component'
 
 // a single top-level entry of the customCssVariables JSON: context (key) and content (value)
@@ -41,20 +37,9 @@ function duplicateContextValidator(): ValidatorFn {
 @Component({
   selector: 'app-theme-css',
   standalone: true,
-  imports: [
-    ButtonModule,
-    FloatLabelModule,
-    FormsModule,
-    InputTextModule,
-    MessageModule,
-    ReactiveFormsModule,
-    TextareaModule,
-    TooltipModule,
-    TranslateModule
-  ],
+  imports: [ButtonModule, CssContextComponent, MessageModule, TooltipModule, TranslateModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './theme-css.component.html',
-  styleUrl: './theme-css.component.scss'
+  templateUrl: './theme-css.component.html'
 })
 export class ThemeCssComponent implements OnChanges {
   public readonly theme = input<Theme | undefined>()

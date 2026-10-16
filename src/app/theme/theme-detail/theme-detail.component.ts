@@ -124,6 +124,7 @@ export class ThemeDetailComponent implements OnInit {
   public themes$: Observable<Theme2[]> | undefined
   public themeForProps: Theme | undefined
   public themeForColors: Theme | undefined
+  public themeForCss: Theme | undefined
   // image
   public imageBasePath = this.imageApi.configuration.basePath
   // receive the slot output
@@ -218,6 +219,8 @@ export class ThemeDetailComponent implements OnInit {
     if (!theme) return
     this.themeForProps = { ...theme, id: undefined }
     this.themeForColors = { properties: theme.properties } // pass only properties
+    // new reference on every call so added/edited CSS entries are discarded when editing is cancelled
+    this.themeForCss = { customCssVariables: theme.customCssVariables }
   }
 
   // Get themes for the template dropdown

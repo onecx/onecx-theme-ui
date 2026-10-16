@@ -9,18 +9,18 @@
   >
   </ocx-page-header>
 
-  <ocx-content class="ocx-content">
+  <ocx-content class="relative ocx-content">
     @let exceptionMessage = exceptionKey();
     <!-- showOperatorMessage -->
     <ng-container *ocxIfPermission="'THEME#EDIT'">
       @if (theme()?.operator && showOperatorMessage) {
         <p-message
-          [style]="{ 'margin-top': '35px', right: '22px', left: '22px' }"
-          styleClass="absolute z-1"
+          id="th_detail_css_operator_message"
+          styleClass="absolute z-1 operator-message"
           severity="warn"
           closable="true"
           variant="text"
-          [life]="3000"
+          [life]="1000"
           [text]="('INTERNAL.OPERATOR_HINT' | translate) + ': ' + ('INTERNAL.OPERATOR_MESSAGE' | translate)"
         >
         </p-message>
@@ -158,8 +158,8 @@
 
         <!-- CSS VARIABLES -->
         <p-tabpanel value="2">
-          <div class="p-4">
-            <app-theme-css [theme]="theme()" [changeMode]="changeMode"></app-theme-css>
+          <div class="pt-2 pb-4 px-0 sm:px-3">
+            <app-theme-css [theme]="themeForCss" [changeMode]="changeMode"></app-theme-css>
           </div>
         </p-tabpanel>
 

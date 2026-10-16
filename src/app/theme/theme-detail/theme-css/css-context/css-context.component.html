@@ -1,0 +1,73 @@
+<!-- SIMULATED CARD -->
+<div [formGroup]="group()" class="h-full pseudo-card border-round">
+  <!-- CARD HEADER -->
+  <div class="p-3 flex align-items-center column-gap-3 surface-ground">
+    @if (changeMode() === 'VIEW') {
+      <div
+        [id]="'th_detail_css_card_' + index() + '_header'"
+        class="flex-grow-1 font-bold text-md text-responsive"
+        [attr.aria-label]="'THEME.CSS.TOOLTIPS.CONTEXT' | translate"
+        [pTooltip]="'THEME.CSS.TOOLTIPS.CONTEXT' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      >
+        {{ group().get('context')?.value }}
+      </div>
+    } @else {
+      <p-floatlabel variant="on" class="flex-grow-1">
+        <input
+          pInputText
+          [id]="'th_detail_css_card_' + index() + '_context'"
+          class="w-full pt-3 pb-2 text-responsive"
+          formControlName="context"
+          [ariaLabel]="'THEME.CSS.CONTEXT' | translate"
+          [pTooltip]="'THEME.CSS.TOOLTIPS.CONTEXT' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
+        />
+        <label [for]="'th_detail_css_card_' + index() + '_context'" aria-hidden="true">
+          {{ 'THEME.CSS.CONTEXT' | translate }}
+        </label>
+      </p-floatlabel>
+      <p-button
+        [id]="'th_detail_css_card_' + index() + '_action_remove'"
+        icon="pi pi-trash"
+        (onClick)="onRemove()"
+        [ariaLabel]="'THEME.CSS.TOOLTIPS.REMOVE' | translate"
+        [pTooltip]="'THEME.CSS.TOOLTIPS.REMOVE' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      ></p-button>
+    }
+  </div>
+
+  <!-- CARD CONTENT -->
+  <div class="p-3 flex-grow-1 surface-card">
+    @if (changeMode() === 'VIEW') {
+      <div
+        [id]="'th_detail_css_card_' + index() + '_content'"
+        class="font-monospace"
+        style="white-space: pre-wrap"
+        [attr.aria-label]="'THEME.CSS.TOOLTIPS.CONTENT' | translate"
+        [pTooltip]="'THEME.CSS.TOOLTIPS.CONTENT' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      >
+        {{ group().get('content')?.value }}
+      </div>
+    } @else {
+      <textarea
+        pInputTextarea
+        [id]="'th_detail_css_card_' + index() + '_content'"
+        class="font-monospace flexible-json-textarea"
+        formControlName="content"
+        [fluid]="true"
+        [autoResize]="true"
+        [ariaLabel]="'THEME.CSS.CONTENT' | translate"
+        [pTooltip]="'THEME.CSS.TOOLTIPS.CONTENT' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      ></textarea>
+    }
+  </div>
+</div>

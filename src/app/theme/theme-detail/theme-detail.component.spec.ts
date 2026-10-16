@@ -225,14 +225,24 @@ describe('ThemeDetailComponent', () => {
       expect(component.themeForColors).toEqual({ properties: theme.properties })
     })
 
+    it('should set themeForCss with a fresh reference from theme', () => {
+      const themeWithCss = { ...theme, customCssVariables: JSON.stringify({ shell: 'value' }) }
+
+      component['initSubComponentData'](themeWithCss)
+
+      expect(component.themeForCss).toEqual({ customCssVariables: themeWithCss.customCssVariables })
+    })
+
     it('should do nothing if theme is undefined', () => {
       component.themeForProps = undefined
       component.themeForColors = undefined
+      component.themeForCss = undefined
 
       component['initSubComponentData'](undefined)
 
       expect(component.themeForProps).toBeUndefined()
       expect(component.themeForColors).toBeUndefined()
+      expect(component.themeForCss).toBeUndefined()
     })
   })
 
@@ -773,6 +783,16 @@ describe('ThemeDetailComponent', () => {
 
       expect(component.changeMode).toBe('VIEW')
       expect(component['preparePageActions']).toHaveBeenCalled()
+    })
+
+    it('should assign a new themeForCss reference on cancel so added/edited entries are discarded', () => {
+      const previousThemeForCss = { customCssVariables: JSON.stringify({ shell: 'stale-value' }) }
+      component.themeForCss = previousThemeForCss
+
+      component['onChangeMode']('VIEW', theme)
+
+      expect(component.themeForCss).not.toBe(previousThemeForCss)
+      expect(component.themeForCss).toEqual({ customCssVariables: theme.customCssVariables })
     })
 
     it('should toggle to EDIT and call getTheme', () => {

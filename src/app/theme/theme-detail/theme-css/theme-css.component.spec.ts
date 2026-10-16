@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
+import { provideNoopAnimations } from '@angular/platform-browser/animations'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 
 import { ThemeCssComponent } from './theme-css.component'
@@ -23,7 +24,8 @@ describe('ThemeCssComponent', () => {
           de: require('src/assets/i18n/de.json'),
           en: require('src/assets/i18n/en.json')
         }).withDefaultLanguage('de')
-      ]
+      ],
+      providers: [provideNoopAnimations()]
     }).compileComponents()
   }))
 
@@ -173,6 +175,18 @@ describe('ThemeCssComponent', () => {
     fixture.detectChanges()
 
     expect(component.isThemeFormValid()).toBeTrue()
+  })
+
+  it('should treat a missing context value as an empty string when checking for duplicates', () => {
+    initTestComponent()
+    fixture.componentRef.setInput('changeMode', 'EDIT')
+    fixture.componentRef.setInput('theme', { customCssVariables: JSON.stringify({ shell: 'value' }) })
+    fixture.detectChanges()
+
+    // emitEvent: false avoids recomputing combinedFormValues, which assumes a non-null context
+    component.entries[0].get('context')?.setValue(null, { emitEvent: false })
+
+    expect(component.cssForm.errors).toBeNull()
   })
 
   it('should combine entries back into the customCssVariables JSON string', () => {
