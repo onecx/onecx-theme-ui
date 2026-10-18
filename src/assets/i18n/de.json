@@ -134,7 +134,7 @@
       "COLORS": "Farben",
       "COLORS.TOOLTIP": "Farbwerte des Themes",
       "CSS": "CSS-Variablen",
-      "CSS.TOOLTIP": "Benutzerdefinierte CSS-Variablen des Themes",
+      "CSS.TOOLTIP": "Definieren von speziellen CSS Eigenschaften und Design Tokens.",
       "EXTRAS": "Extras",
       "EXTRAS.TOOLTIP": "Zusätzliche Eigenschaften des Themes (Fonts, Iconsets etc.)",
       "INTERN": "Intern",
@@ -204,20 +204,21 @@
     "DESIGNER.TOP.SECTION": "Theme anwenden und Vorlage wählen",
     "NO_PROPERTIES": "Keine Farbwerte enthalten",
     "CSS": {
-      "EMPTY": "Kein Kontext mit CSS-Variablen erfasst.",
+      "TITLE": "CSS-Variablen für bestimmte Anwendungsbereiche können hier als Kontext definiert werden.",
+      "EMPTY": "Im Änderungsmodus können Sie Kontexte hinzufügen.",
       "CONTEXT": "Kontext",
       "CONTENT": "Inhalt",
       "ACTIONS": {
         "ADD": "Kontext hinzufügen"
       },
       "TOOLTIPS": {
-        "CONTEXT": "Name des CSS-Kontexts",
-        "CONTENT": "CSS-Variablen",
-        "ADD": "Neuen CSS-Kontext hinzufügen",
-        "REMOVE": "Diesen CSS-Kontext entfernen"
+        "CONTEXT": "Kontextname: Top-Level Bezeichner (z.B. PrimeNG)",
+        "CONTENT": "CSS-Variablen für Eigenschaften und Design Tokens",
+        "ADD": "Neuen Kontext hinzufügen",
+        "REMOVE": "Diesen Kontext entfernen"
       },
       "VALIDATION": {
-        "DUPLICATE_CONTEXT": "Kontextnamen müssen eindeutig sein. Bitte Kontext umbenennen.",
+        "DUPLICATE_CONTEXT": "Kontextnamen müssen eindeutig sein. Bitte anderen Namen wählen.",
         "INVALID_CONTENT": "Inhalt muss ein gültiges JSON-Objekt sein, z. B. { \"--my-var\": \"red\" }."
       }
     },
