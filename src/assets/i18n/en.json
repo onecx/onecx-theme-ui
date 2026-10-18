@@ -209,7 +209,7 @@
       "CONTEXT": "Context",
       "CONTENT": "Content",
       "ACTIONS": {
-        "ADD": "Add context"
+        "ADD": "Add Context"
       },
       "TOOLTIPS": {
         "CONTEXT": "Name of the CSS context: Top-level identifier (e.g. PrimeNG)",
