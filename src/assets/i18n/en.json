@@ -133,6 +133,8 @@
     "TABS": {
       "COLORS": "Colors",
       "COLORS.TOOLTIP": "Color values of the Theme",
+      "CSS": "CSS Variables",
+      "CSS.TOOLTIP": "Defining custom CSS properties and design tokens.",
       "EXTRAS": "Extras",
       "EXTRAS.TOOLTIP": "Additional properties of the Theme (Fonts, Iconsets etc.)",
       "INTERN": "Internal",
@@ -201,6 +203,25 @@
     "DESIGNER.CREATE.SUBHEADER": "Create a new Theme",
     "DESIGNER.TOP.SECTION": "Theme applying and template selection",
     "NO_PROPERTIES": "No properties specified",
+    "CSS": {
+      "TITLE": "CSS variables for specific application areas can be defined here as a context.",
+      "EMPTY": "In edit mode, you can add contexts.",
+      "CONTEXT": "Context",
+      "CONTENT": "Content",
+      "ACTIONS": {
+        "ADD": "Add context"
+      },
+      "TOOLTIPS": {
+        "CONTEXT": "Name of the CSS context: Top-level identifier (e.g. PrimeNG)",
+        "CONTENT": "CSS variables for properties and design tokens",
+        "ADD": "Add a new context",
+        "REMOVE": "Remove this context"
+      },
+      "VALIDATION": {
+        "DUPLICATE_CONTEXT": "Context names must be unique. Please choose a different name.",
+        "INVALID_CONTENT": "Content must be a valid JSON object, e.g. { \"--my-var\": \"red\" }."
+      }
+    },
     "COLORS": {
       "GENERAL": "General Colors",
       "TOPBAR": "Topbar Colors",

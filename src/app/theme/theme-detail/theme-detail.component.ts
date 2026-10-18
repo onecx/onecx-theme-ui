@@ -21,7 +21,6 @@ import { Tabs, TabsModule } from 'primeng/tabs'
 import { TooltipModule } from 'primeng/tooltip'
 
 import { PortalMessageService, ThemeService, UserService } from '@onecx/angular-integration-interface'
-
 import { Action, AngularAcceleratorModule } from '@onecx/angular-accelerator'
 import { PortalPageComponent } from '@onecx/angular-utils'
 
@@ -31,6 +30,7 @@ import { ExportThemeRequest, ImagesInternalAPIService, Theme, ThemesAPIService }
 
 import { ThemeApplyComponent } from './theme-apply/theme-apply.component'
 import { ThemeColorsComponent } from './theme-colors/theme-colors.component'
+import { ThemeCssComponent } from './theme-css/theme-css.component'
 import { ThemePropsComponent } from './theme-props/theme-props.component'
 import { ThemeUseComponent, Workspace } from './theme-use/theme-use.component'
 import { ThemeInternComponent } from './theme-intern/theme-intern.component'
@@ -43,6 +43,7 @@ export type ThemeData = {
   theme: Theme
   propsValid: boolean | undefined
   colorsValid: boolean | undefined
+  cssValid: boolean | undefined
 }
 export type Theme2 = Theme & { displayNameLimited: string | undefined }
 
@@ -50,8 +51,8 @@ export type Theme2 = Theme & { displayNameLimited: string | undefined }
   standalone: true,
   imports: [
     AngularAcceleratorModule,
-    AsyncPipe, // used in HTML
-    JsonPipe, // used in HTML
+    AsyncPipe,
+    JsonPipe,
     MessageModule,
     TabsModule,
     TooltipModule,
@@ -64,7 +65,8 @@ export type Theme2 = Theme & { displayNameLimited: string | undefined }
     ThemeUseComponent,
     ThemeApplyComponent,
     ThemePropsComponent,
-    ThemeColorsComponent
+    ThemeColorsComponent,
+    ThemeCssComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-detail.component.html',
@@ -97,6 +99,7 @@ export class ThemeDetailComponent implements OnInit {
   public readonly tabComponent = viewChild(Tabs)
   public readonly themePropsComponent = viewChild(ThemePropsComponent)
   public readonly themeColorsComponent = viewChild(ThemeColorsComponent)
+  public readonly themeCssComponent = viewChild(ThemeCssComponent)
   // private timer to avoid long waits for getting workspace data
   private themeUseTimeoutTimer: ReturnType<typeof setTimeout> | undefined
   private themeUseStartTime: number | undefined
@@ -121,6 +124,7 @@ export class ThemeDetailComponent implements OnInit {
   public themes$: Observable<Theme2[]> | undefined
   public themeForProps: Theme | undefined
   public themeForColors: Theme | undefined
+  public themeForCss: Theme | undefined
   // image
   public imageBasePath = this.imageApi.configuration.basePath
   // receive the slot output
@@ -215,6 +219,8 @@ export class ThemeDetailComponent implements OnInit {
     if (!theme) return
     this.themeForProps = { ...theme, id: undefined }
     this.themeForColors = { properties: theme.properties } // pass only properties
+    // new reference on every call so added/edited CSS entries are discarded when editing is cancelled
+    this.themeForCss = { customCssVariables: theme.customCssVariables }
   }
 
   // Get themes for the template dropdown
@@ -246,13 +252,20 @@ export class ThemeDetailComponent implements OnInit {
     // values
     const themeProps = this.themePropsComponent()?.combinedFormValues()
     const themeColors = this.themeColorsComponent()?.combinedFormValues()
+    const themeCss = this.themeCssComponent()?.combinedFormValues()
     // validity
     const propsValid = this.themePropsComponent()?.isThemeFormValid()
     const colorsValid = this.themeColorsComponent()?.isThemeFormValid()
+    const cssValid = this.themeCssComponent()?.isThemeFormValid()
     return {
-      theme: { ...themeProps, properties: { ...themeColors?.properties, ...themeProps?.properties } },
+      theme: {
+        ...themeProps,
+        properties: { ...themeColors?.properties, ...themeProps?.properties },
+        customCssVariables: themeCss?.customCssVariables
+      },
       propsValid: propsValid,
-      colorsValid: colorsValid
+      colorsValid: colorsValid,
+      cssValid: cssValid
     } as ThemeData
   }
 
@@ -306,7 +319,7 @@ export class ThemeDetailComponent implements OnInit {
     if (theme) {
       this.showOperatorMessage = false
       this.selectedTabIndex = typeof tabValue === 'number' ? tabValue.toString() : tabValue
-      if (this.selectedTabIndex === '3') {
+      if (this.selectedTabIndex === '4') {
         this.startGettingThemeUseData(theme)
       }
     } else this.selectedTabIndex = '0'
@@ -327,7 +340,7 @@ export class ThemeDetailComponent implements OnInit {
       this.preparePageActions(theme)
     }
     if (requestedMode === 'EDIT') {
-      if (Number(this.selectedTabIndex) > 1) this.selectedTabIndex = '0'
+      if (Number(this.selectedTabIndex) > 2) this.selectedTabIndex = '0'
       this.getTheme()
       this.getThemes()
     }
@@ -346,6 +359,10 @@ export class ThemeDetailComponent implements OnInit {
       this.msgService.error({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
       return undefined
     }
+    if (!this.themeData().cssValid) {
+      this.msgService.error({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
+      return undefined
+    }
 
     let data = this.themeData().theme // combined data from sub components
     // combine with the original theme data to preserve some properties
@@ -357,8 +374,6 @@ export class ThemeDetailComponent implements OnInit {
       modificationCount: this.theme()?.modificationCount,
       // preserve: not used, to be deleted
       fonts: this.theme()?.fonts,
-      // preserve: used as Theme overrides in Shell UI (JSON) => design tokens
-      customCssVariables: this.theme()?.customCssVariables,
       // prevent empty strings for urls, as it causes issues for the image service
       logoUrl: data.logoUrl === '' ? undefined : data.logoUrl,
       smallLogoUrl: data.smallLogoUrl === '' ? undefined : data.smallLogoUrl,

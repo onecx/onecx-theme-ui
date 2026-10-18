@@ -1,0 +1,44 @@
+<div class="mx-0 sm:mx-2">
+  <div class="mt-3 flex flex-row flex-wrap justify-content-between row-gap-2">
+    <h3>{{ 'THEME.CSS.TITLE' | translate }}</h3>
+    @if (changeMode() === 'EDIT') {
+      <p-button
+        id="th_detail_css_action_add"
+        icon="pi pi-plus"
+        (onClick)="onAddEntry()"
+        [label]="'THEME.CSS.ACTIONS.ADD' | translate"
+        [ariaLabel]="'THEME.CSS.TOOLTIPS.ADD' | translate"
+        [pTooltip]="'THEME.CSS.TOOLTIPS.ADD' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      ></p-button>
+    }
+  </div>
+  @if (changeMode() === 'VIEW' && entries.length === 0) {
+    <p-message id="th_detail_css_empty_message" severity="info" [text]="'THEME.CSS.EMPTY' | translate" />
+  }
+  <div class="mt-3 flex flex-column row-gap-4">
+    @if (changeMode() === 'EDIT') {
+      @if (cssForm.errors?.['duplicateContext']) {
+        <p-message
+          id="th_detail_css_error_duplicate_context"
+          severity="error"
+          styleClass="w-fit"
+          [text]="'THEME.CSS.VALIDATION.DUPLICATE_CONTEXT' | translate"
+        />
+      }
+    }
+    @if (entries.length > 0) {
+      <div class="flex flex-row column-gap-6">
+        @for (entry of entries; track $index) {
+          <app-css-context
+            [group]="entry"
+            [changeMode]="changeMode()"
+            [index]="$index"
+            (remove)="onRemoveEntry($index)"
+          />
+        }
+      </div>
+    }
+  </div>
+</div>
