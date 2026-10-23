@@ -49,6 +49,15 @@
         </p-tab>
         <p-tab
           value="2"
+          [ariaLabel]="'DIALOG.TABS.EXTRAS' | translate"
+          [pTooltip]="'DIALOG.TABS.EXTRAS.TOOLTIP' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
+        >
+          {{ 'DIALOG.TABS.EXTRAS' | translate }}
+        </p-tab>
+        <p-tab
+          value="3"
           [disabled]="changeMode !== 'VIEW'"
           [ariaLabel]="'DIALOG.TABS.VARIABLES' | translate"
           [pTooltip]="'DIALOG.TABS.VARIABLES.TOOLTIP' | translate"
@@ -58,7 +67,7 @@
           {{ 'DIALOG.TABS.VARIABLES' | translate }}
         </p-tab>
         <p-tab
-          value="3"
+          value="4"
           [disabled]="changeMode !== 'VIEW'"
           [ariaLabel]="'DIALOG.TABS.USE' | translate"
           [pTooltip]="'DIALOG.TABS.USE.TOOLTIP' | translate"
@@ -68,7 +77,7 @@
           {{ 'DIALOG.TABS.USE' | translate }}
         </p-tab>
         <p-tab
-          value="4"
+          value="5"
           [disabled]="changeMode !== 'VIEW'"
           [ariaLabel]="'DIALOG.TABS.INTERN' | translate"
           [pTooltip]="'DIALOG.TABS.INTERN.TOOLTIP' | translate"
@@ -147,13 +156,45 @@
           </div>
         </p-tabpanel>
 
+        <!-- EXTRAS -->
+        <p-tabpanel value="2">
+          <div class="pt-2 mb-4 mx-0 sm:mx-3">
+            @if (loading()) {
+              <p-message
+                id="th_detail_loading_message"
+                severity="info"
+                styleClass="m-3"
+                [text]="'ACTIONS.LOADING' | translate"
+              ></p-message>
+            } @else if (exceptionMessage) {
+              <p-message
+                id="th_detail_error_message"
+                severity="error"
+                styleClass="m-3"
+                [text]="exceptionMessage | translate"
+              ></p-message>
+            } @else if (theme()) {
+              <app-theme-apply
+                [theme]="theme()"
+                [themes$]="themes$"
+                [changeMode]="changeMode"
+                [isCurrentTheme]="isCurrentTheme"
+                [autoApply]="autoApply"
+                (autoApplyChange)="onChangeAutoApply($event)"
+                (templatingThemeData)="onUseThemeAsTemplate($event)"
+              ></app-theme-apply>
+              <app-theme-extra [theme]="themeForProps" [changeMode]="changeMode"></app-theme-extra>
+            }
+          </div>
+        </p-tabpanel>
+
         <!-- THEME VARIABLES -->
-        <p-tabpanel value="2" id="th_detail_panel_variables">
+        <p-tabpanel value="3" id="th_detail_panel_variables">
           <pre class="m-3 surface-50">{{ theme()?.properties | json }}</pre>
         </p-tabpanel>
 
         <!-- USE -->
-        <p-tabpanel value="3">
+        <p-tabpanel value="4">
           <div class="p-4">
             <app-theme-use
               [workspaces]="themeUsedByWorkspaces()"
@@ -164,7 +205,7 @@
         </p-tabpanel>
 
         <!-- INTERN -->
-        <p-tabpanel value="4">
+        <p-tabpanel value="5">
           <div class="p-4">
             <app-theme-intern [theme]="theme()" [dateFormat]="dateFormat"></app-theme-intern>
           </div>

@@ -30,6 +30,7 @@ import { ExportThemeRequest, ImagesInternalAPIService, Theme, ThemesAPIService }
 
 import { ThemeApplyComponent } from './theme-apply/theme-apply.component'
 import { ThemeColorsComponent } from './theme-colors/theme-colors.component'
+import { ThemeExtraComponent } from './theme-extra/theme-extra.component'
 import { ThemePropsComponent } from './theme-props/theme-props.component'
 import { ThemeUseComponent, Workspace } from './theme-use/theme-use.component'
 import { ThemeInternComponent } from './theme-intern/theme-intern.component'
@@ -42,6 +43,7 @@ export type ThemeData = {
   theme: Theme
   propsValid: boolean | undefined
   colorsValid: boolean | undefined
+  extraValid: boolean | undefined
 }
 export type Theme2 = Theme & { displayNameLimited: string | undefined }
 
@@ -63,7 +65,8 @@ export type Theme2 = Theme & { displayNameLimited: string | undefined }
     ThemeUseComponent,
     ThemeApplyComponent,
     ThemePropsComponent,
-    ThemeColorsComponent
+    ThemeColorsComponent,
+    ThemeExtraComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-detail.component.html',
@@ -96,6 +99,7 @@ export class ThemeDetailComponent implements OnInit {
   public readonly tabComponent = viewChild(Tabs)
   public readonly themePropsComponent = viewChild(ThemePropsComponent)
   public readonly themeColorsComponent = viewChild(ThemeColorsComponent)
+  public readonly themeExtraComponent = viewChild(ThemeExtraComponent)
   // private timer to avoid long waits for getting workspace data
   private themeUseTimeoutTimer: ReturnType<typeof setTimeout> | undefined
   private themeUseStartTime: number | undefined
@@ -245,16 +249,19 @@ export class ThemeDetailComponent implements OnInit {
     // values
     const themeProps = this.themePropsComponent()?.combinedFormValues()
     const themeColors = this.themeColorsComponent()?.combinedFormValues()
+    const themeExtra = this.themeExtraComponent()?.combinedFormValues()
     // validity
     const propsValid = this.themePropsComponent()?.isThemeFormValid()
     const colorsValid = this.themeColorsComponent()?.isThemeFormValid()
+    const extraValid = this.themeExtraComponent()?.isThemeFormValid()
     return {
       theme: {
         ...themeProps,
-        properties: { ...themeColors?.properties, ...themeProps?.properties }
+        properties: { ...themeColors?.properties, ...themeProps?.properties, ...themeExtra?.properties }
       },
       propsValid: propsValid,
-      colorsValid: colorsValid
+      colorsValid: colorsValid,
+      extraValid: extraValid
     } as ThemeData
   }
 
@@ -308,7 +315,7 @@ export class ThemeDetailComponent implements OnInit {
     if (theme) {
       this.showOperatorMessage = false
       this.selectedTabIndex = typeof tabValue === 'number' ? tabValue.toString() : tabValue
-      if (this.selectedTabIndex === '3') {
+      if (this.selectedTabIndex === '4') {
         this.startGettingThemeUseData(theme)
       }
     } else this.selectedTabIndex = '0'
@@ -345,6 +352,10 @@ export class ThemeDetailComponent implements OnInit {
       return undefined
     }
     if (!this.themeData().colorsValid) {
+      this.msgService.error({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
+      return undefined
+    }
+    if (!this.themeData().extraValid) {
       this.msgService.error({ summaryKey: 'VALIDATION.ERRORS.FORM_INVALID' })
       return undefined
     }
