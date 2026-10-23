@@ -26,6 +26,10 @@ describe('ThemeImportComponent', () => {
   const msgServiceSpy = jasmine.createSpyObj<PortalMessageService>('PortalMessageService', ['success', 'error'])
   const themesApiSpy = jasmine.createSpyObj<ThemesAPIService>('ThemesAPIService', ['importThemes'])
 
+  // onImportSelectFile reads the file fire-and-forget (it no longer returns a promise),
+  // so flush the microtask queue to let the async processing settle before asserting.
+  const settle = () => new Promise<void>((resolve) => setTimeout(resolve, 0))
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -81,6 +85,22 @@ describe('ThemeImportComponent', () => {
   })
 
   describe('upload', () => {
+    it('should return early when event has no files', () => {
+      const event = jasmine.createSpyObj('event', [], { files: undefined })
+
+      component.onImportSelectFile(event)
+
+      expect(component.themeSnapshot()).toBeNull()
+    })
+
+    it('should return early when event files is empty', () => {
+      const event = jasmine.createSpyObj('event', [], { files: [] })
+
+      component.onImportSelectFile(event)
+
+      expect(component.themeSnapshot()).toBeNull()
+    })
+
     it('should read file on theme import select - with displayName', async () => {
       const themeSnapshot = JSON.stringify({
         themes: {
@@ -94,9 +114,11 @@ describe('ThemeImportComponent', () => {
         }
       })
       const file = new File([themeSnapshot], 'file_name')
+      spyOn(file, 'text').and.resolveTo(themeSnapshot)
       const event = jasmine.createSpyObj('event', [], { files: [file] })
 
-      await component.onImportSelectFile(event)
+      component.onImportSelectFile(event)
+      await settle()
 
       expect(component.importError()).toBe('NONE')
       expect(component.themeSnapshot()).toBeDefined()
@@ -115,9 +137,11 @@ describe('ThemeImportComponent', () => {
         }
       })
       const file = new File([themeSnapshot], 'file_name')
+      spyOn(file, 'text').and.resolveTo(themeSnapshot)
       const event = jasmine.createSpyObj('event', [], { files: [file] })
 
-      await component.onImportSelectFile(event)
+      component.onImportSelectFile(event)
+      await settle()
 
       expect(component.importError()).toBe('NONE')
       expect(component.themeSnapshot()).toBeDefined()
@@ -128,10 +152,13 @@ describe('ThemeImportComponent', () => {
 
     it('should indicate and log error on invalid data', async () => {
       spyOn(console, 'error')
-      const file = new File(['{"invalid": "invalidProperty"}'], 'file_name')
+      const invalidContent = '{"invalid": "invalidProperty"}'
+      const file = new File([invalidContent], 'file_name')
+      spyOn(file, 'text').and.resolveTo(invalidContent)
       const event = jasmine.createSpyObj('event', [], { files: [file] })
 
-      await component.onImportSelectFile(event)
+      component.onImportSelectFile(event)
+      await settle()
 
       expect(component.importError()).toBe('CONTENT')
       expect(component.themeSnapshot()).toBeDefined()
@@ -142,12 +169,17 @@ describe('ThemeImportComponent', () => {
       spyOn(console, 'error')
 
       const file = new File(['notJsonFile'], 'file_name')
+      spyOn(file, 'text').and.resolveTo('notJsonFile')
       const event = jasmine.createSpyObj('event', [], { files: [file] })
 
-      await component.onImportSelectFile(event)
+      component.onImportSelectFile(event)
+      await settle()
 
-      expect(console.error).toHaveBeenCalledOnceWith('Theme Import Error: parse error', jasmine.any(Object))
+      expect(component.importError()).toBe('GENERAL')
       expect(component.themeSnapshot()).toBeNull()
+      expect(console.error).toHaveBeenCalledOnceWith(
+        jasmine.objectContaining({ message: jasmine.stringMatching('Theme Import Error: parse error') })
+      )
     })
 
     it('should indicate theme name existance if already present', async () => {
@@ -161,9 +193,11 @@ describe('ThemeImportComponent', () => {
         }
       })
       const file = new File([themeSnapshot], 'file_name')
+      spyOn(file, 'text').and.resolveTo(themeSnapshot)
       const event = jasmine.createSpyObj('event', [], { files: [file] })
 
-      await component.onImportSelectFile(event)
+      component.onImportSelectFile(event)
+      await settle()
 
       expect(component.importError()).toBe('NONE')
       expect(component.themeSnapshot()).toBeDefined()
@@ -207,7 +241,7 @@ describe('ThemeImportComponent', () => {
       component.formGroup.controls['displayName'].setValue('themeDisplayName')
       component.properties.set({})
 
-      component.onThemeUpload()
+      component.onImportUpload()
 
       expect(msgServiceSpy.success).toHaveBeenCalledOnceWith({ summaryKey: 'THEME.IMPORT.THEME_SUCCESS' })
       expect(component.uploaded.emit).toHaveBeenCalledWith({
@@ -222,7 +256,7 @@ describe('ThemeImportComponent', () => {
       component.formGroup.controls['displayName'].setValue('themeDisplayName')
       component.properties.set({})
 
-      component.onThemeUpload()
+      component.onImportUpload()
 
       expect(component.themeNameExists()).toBe(false)
       expect(component.displayNameExists()).toBe(false)
@@ -235,7 +269,7 @@ describe('ThemeImportComponent', () => {
       component.formGroup.controls['displayName'].setValue(null)
       component.formGroup.controls['displayName'].setErrors({ required: true })
       component.formGroup.controls['displayName'].markAsDirty()
-      component.onThemeUpload()
+      component.onImportUpload()
 
       expect(themesApiSpy.importThemes).not.toHaveBeenCalled()
     })
@@ -251,7 +285,7 @@ describe('ThemeImportComponent', () => {
       component.formGroup.controls['themeName'].setValue('themeName')
       component.formGroup.controls['displayName'].setValue('themeDisplayName')
       component.properties.set({})
-      component.onThemeUpload()
+      component.onImportUpload()
 
       expect(msgServiceSpy.error).toHaveBeenCalledOnceWith({ summaryKey: 'THEME.IMPORT.THEME_FAIL' })
     })

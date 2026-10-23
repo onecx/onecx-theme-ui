@@ -98,34 +98,42 @@ export class ThemeImportComponent {
     })
   }
 
-  public async onImportSelectFile(event: FileSelectEvent): Promise<void> {
+  public onImportSelectFile(event: FileSelectEvent): void {
     this.onImportClear()
-    return event.files[0].text().then((text) => {
-      try {
-        const snapshot: ThemeSnapshot = JSON.parse(text)
-        this.themeSnapshot.set(snapshot)
-        if (this.isThemeImportRequestDTO(snapshot)) {
-          if (snapshot.themes) {
-            // the theme export does not include more than one theme, so we can safely take the first key
-            const key: string[] = Object.keys(snapshot.themes)
-            this.properties.set(snapshot.themes[key[0]].properties as ThemeProperties)
-            this.formGroup.controls['themeName'].setValue(key[0])
-            this.formGroup.controls['displayName'].setValue(snapshot.themes[key[0]].displayName ?? null)
-            if (this.formGroup.controls['displayName'].value === null) {
-              this.formGroup.controls['displayName'].setErrors({ required: true })
-              this.formGroup.controls['displayName'].markAsDirty()
-            }
-          }
-          this.onThemeNameChange()
-        } else {
-          console.error('Theme Import Error: not valid data ')
-          this.importError.set('CONTENT')
-        }
-      } catch (err) {
-        console.error('Theme Import Error: parse error', err)
-        this.importError.set('GENERAL')
-      }
+    if (!event.files || event.files.length === 0) {
+      return
+    }
+    this.processFileAsync(event.files[0]).catch((error) => {
+      console.error(error)
+      this.importError.set('GENERAL')
     })
+  }
+
+  private async processFileAsync(file: File) {
+    try {
+      const text = await file.text()
+      const snapshot: ThemeSnapshot = JSON.parse(text)
+      this.themeSnapshot.set(snapshot)
+      if (this.isThemeImportRequestDTO(snapshot)) {
+        if (snapshot.themes) {
+          // the theme export does not include more than one theme, so we can safely take the first key
+          const key: string[] = Object.keys(snapshot.themes)
+          this.properties.set(snapshot.themes[key[0]].properties as ThemeProperties)
+          this.formGroup.controls['themeName'].setValue(key[0])
+          this.formGroup.controls['displayName'].setValue(snapshot.themes[key[0]].displayName ?? null)
+          if (this.formGroup.controls['displayName'].value === null) {
+            this.formGroup.controls['displayName'].setErrors({ required: true })
+            this.formGroup.controls['displayName'].markAsDirty()
+          }
+        }
+        this.onThemeNameChange()
+      } else {
+        console.error('Theme Import Error: not valid data ')
+        this.importError.set('CONTENT')
+      }
+    } catch (err) {
+      throw new Error(`Theme Import Error: parse error: ${err}`)
+    }
   }
 
   public onThemeNameChange() {
@@ -145,7 +153,7 @@ export class ThemeImportComponent {
     this.displayNameExists.set(false)
   }
 
-  public onThemeUpload(): void {
+  public onImportUpload(): void {
     if (!this.formGroup.valid || !this.properties()) return
     const snapshot = this.themeSnapshot()
     if (!snapshot?.themes) return
