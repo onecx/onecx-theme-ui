@@ -199,29 +199,8 @@
     }
   },
   "THEME": {
-    "DESIGNER.EDIT.SUBHEADER": "Theme Details ändern",
-    "DESIGNER.CREATE.SUBHEADER": "Ein neues Theme erstellen",
-    "DESIGNER.TOP.SECTION": "Theme anwenden und Vorlage wählen",
     "NO_PROPERTIES": "Keine Farbwerte enthalten",
-    "CSS": {
-      "TITLE": "CSS-Variablen für bestimmte Anwendungsbereiche können hier als Kontext definiert werden.",
-      "EMPTY": "Im Änderungsmodus können Sie Kontexte hinzufügen.",
-      "CONTEXT": "Kontext",
-      "CONTENT": "Inhalt",
-      "ACTIONS": {
-        "ADD": "Kontext hinzufügen"
-      },
-      "TOOLTIPS": {
-        "CONTEXT": "Kontextname: Top-Level Bezeichner (z.B. PrimeNG)",
-        "CONTENT": "CSS-Variablen für Eigenschaften und Design Tokens",
-        "ADD": "Neuen Kontext hinzufügen",
-        "REMOVE": "Diesen Kontext entfernen"
-      },
-      "VALIDATION": {
-        "DUPLICATE_CONTEXT": "Kontextnamen müssen eindeutig sein. Bitte anderen Namen wählen.",
-        "INVALID_CONTENT": "Inhalt muss ein gültiges JSON-Objekt sein, z. B. { \"--my-var\": \"red\" }."
-      }
-    },
+    "CUSTOM_CSS": "Extra CSS",
     "COLORS": {
       "GENERAL": "Allgemeine Farben",
       "TOPBAR": "Topbar Farben",
@@ -270,8 +249,8 @@
       "ID": "Eindeutige technische ID des Themes",
       "NAME": "Eindeutiger Name des Themes, der nicht geändert werden kann. Wird als Referenz auf das Theme benutzt.",
       "DISPLAY_NAME": "Anzeigename",
-      "FONT_FAMILY": "Verwendete Schriftarten (CSS-Eigenschaft: font-family), z. B. 'Arial', 'Times New Roman', etc.",
-      "FONT_SIZE": "Verwendete Grundschriftgröße (CSS-Eigenschaft: font-size), Der Bereich liegt bei 8-40px und 0,5-2,5rem",
+      "FONT_FAMILY": "Schriftarten (CSS-Eigenschaft: font-family), z. B. 'Arial', 'Times New Roman', etc.",
+      "FONT_SIZE": "Schriftgröße (CSS-Eigenschaft: font-size) als Basisgröße, mit einem erlaubten Bereich von 8-40 px und 0,5-2,5 rem",
       "ITEM_COLOR": "Wähle eine Farbe",
       "ITEM_COLOR_PICKER": "Wähle eine Farbe mit dem Farbwähler",
       "VERSION": "Version des Themes",

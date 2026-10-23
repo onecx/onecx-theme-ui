@@ -89,7 +89,6 @@ export class ThemePropsComponent implements OnChanges {
   // data
   public basicForm: FormGroup = new FormGroup({})
   public fontForm: FormGroup = new FormGroup({})
-  public readonly fontSizeControlName = 'font-size'
 
   constructor() {
     this.initForms()
@@ -200,8 +199,8 @@ export class ThemePropsComponent implements OnChanges {
     })
     // font
     for (const v of themeVariables.font) {
-      const validators = [Validators.maxLength(10)]
-      if (v === this.fontSizeControlName) validators.push(fontSizeValidator())
+      const validators = [Validators.maxLength(255)]
+      if (v === 'font-size') validators.push(fontSizeValidator())
 
       const fc = new FormControl<string | null>(null, validators)
       this.fontForm.addControl(v, fc)

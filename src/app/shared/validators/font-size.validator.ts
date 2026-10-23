@@ -1,7 +1,7 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms'
 
 export function fontSizeValidator(): ValidatorFn {
-  const fontSizeRegex = /^((?:\d+|\d*\.\d+))(px|rem)$/i
+  const fontSizeRegex = /^((?:\d+|\d*\.\d+))(px|em|rem)$/i
 
   return (control: AbstractControl): ValidationErrors | null => {
     const value = control.value
@@ -19,11 +19,11 @@ export function fontSizeValidator(): ValidatorFn {
 
     if (unit === 'px') {
       if (numValue < 8 || numValue > 40) {
-        return { invalidFontSizeRange: { value: control.value, min: 8, max: 40, unit: 'px' } }
+        return { invalidFontSizeRange: { value: control.value, min: 8, max: 40, unit: unit } }
       }
-    } else if (unit === 'rem') {
+    } else if (unit === 'rem' || unit === 'em') {
       if (numValue < 0.5 || numValue > 2.5) {
-        return { invalidFontSizeRange: { value: control.value, min: 0.5, max: 2.5, unit: 'rem' } }
+        return { invalidFontSizeRange: { value: control.value, min: 0.5, max: 2.5, unit: unit } }
       }
     }
 

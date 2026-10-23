@@ -225,24 +225,14 @@ describe('ThemeDetailComponent', () => {
       expect(component.themeForColors).toEqual({ properties: theme.properties })
     })
 
-    it('should set themeForCss with a fresh reference from theme', () => {
-      const themeWithCss = { ...theme, customCssVariables: JSON.stringify({ shell: 'value' }) }
-
-      component['initSubComponentData'](themeWithCss)
-
-      expect(component.themeForCss).toEqual({ customCssVariables: themeWithCss.customCssVariables })
-    })
-
     it('should do nothing if theme is undefined', () => {
       component.themeForProps = undefined
       component.themeForColors = undefined
-      component.themeForCss = undefined
 
       component['initSubComponentData'](undefined)
 
       expect(component.themeForProps).toBeUndefined()
       expect(component.themeForColors).toBeUndefined()
-      expect(component.themeForCss).toBeUndefined()
     })
   })
 
@@ -384,12 +374,12 @@ describe('ThemeDetailComponent', () => {
       expect(component.selectedTabIndex).toBe('2')
     })
 
-    it('should start getting theme use data when tabIndex is 4', () => {
+    it('should start getting theme use data when tabIndex is 3', () => {
       spyOn<any>(component, 'startGettingThemeUseData')
 
-      component.onTabChange('4', theme)
+      component.onTabChange('3', theme)
 
-      expect(component.selectedTabIndex).toBe('4')
+      expect(component.selectedTabIndex).toBe('3')
       expect(component['startGettingThemeUseData']).toHaveBeenCalledWith(theme)
     })
 
@@ -415,9 +405,9 @@ describe('ThemeDetailComponent', () => {
     it('should start first time - normal theme', () => {
       component.themeUseLoadingState.set('initial')
 
-      component.onTabChange('4', theme)
+      component.onTabChange('3', theme)
 
-      expect(component.selectedTabIndex).toBe('4')
+      expect(component.selectedTabIndex).toBe('3')
       expect(component.themeUseLoadingState()).toBe('loading')
       expect(component.themeUsedName()).toBe(theme.name)
     })
@@ -427,10 +417,10 @@ describe('ThemeDetailComponent', () => {
         component.themeUseLoadingState.set('initial')
         component['themeUseTimeoutTimer'] = setTimeout(() => {}, 10)
 
-        component.onTabChange('4', theme)
+        component.onTabChange('3', theme)
         tick(component['MAX_LOADING_TIME'] + 100) // wait for timer to trigger
 
-        expect(component.selectedTabIndex).toBe('4')
+        expect(component.selectedTabIndex).toBe('3')
         expect(component.themeUseLoadingState()).toBe('timeout')
         expect(component.themeUsedName()).toBe(theme.name)
       }))
@@ -731,7 +721,7 @@ describe('ThemeDetailComponent', () => {
 
     it('should trigger save action callback', (done: DoneFn) => {
       component.changeMode = 'EDIT'
-      mockThemeDataSignal.set({ theme: {}, propsValid: false, colorsValid: true, cssValid: true })
+      mockThemeDataSignal.set({ theme: {}, propsValid: false, colorsValid: true })
       component.preparePageActions(theme)
 
       component.actions$.subscribe((actions) => {
@@ -785,16 +775,6 @@ describe('ThemeDetailComponent', () => {
       expect(component['preparePageActions']).toHaveBeenCalled()
     })
 
-    it('should assign a new themeForCss reference on cancel so added/edited entries are discarded', () => {
-      const previousThemeForCss = { customCssVariables: JSON.stringify({ shell: 'stale-value' }) }
-      component.themeForCss = previousThemeForCss
-
-      component['onChangeMode']('VIEW', theme)
-
-      expect(component.themeForCss).not.toBe(previousThemeForCss)
-      expect(component.themeForCss).toEqual({ customCssVariables: theme.customCssVariables })
-    })
-
     it('should toggle to EDIT and call getTheme', () => {
       spyOn(component as any, 'getTheme')
       spyOn(component as any, 'getThemes')
@@ -820,8 +800,7 @@ describe('ThemeDetailComponent', () => {
       mockThemeDataSignal.set({
         theme: { ...theme, properties: {} },
         propsValid: true,
-        colorsValid: true,
-        cssValid: true
+        colorsValid: true
       })
       component['paramThemeName'] = theme.name!
       component.theme.set({ ...theme, id: 'themeId', modificationCount: 1 })
@@ -840,7 +819,7 @@ describe('ThemeDetailComponent', () => {
     })
 
     it('should not proceed if propsValid is false', () => {
-      mockThemeDataSignal.set({ theme: {}, propsValid: false, colorsValid: true, cssValid: true })
+      mockThemeDataSignal.set({ theme: {}, propsValid: false, colorsValid: true })
 
       component['onUpdateTheme']()
 
@@ -848,7 +827,7 @@ describe('ThemeDetailComponent', () => {
     })
 
     it('should not proceed if propsValid is undefined (no child component)', () => {
-      mockThemeDataSignal.set({ theme: {}, propsValid: undefined, colorsValid: true, cssValid: true })
+      mockThemeDataSignal.set({ theme: {}, propsValid: undefined, colorsValid: true })
 
       component['onUpdateTheme']()
 
@@ -856,15 +835,7 @@ describe('ThemeDetailComponent', () => {
     })
 
     it('should not proceed if colorsValid is false', () => {
-      mockThemeDataSignal.set({ theme: {}, propsValid: true, colorsValid: false, cssValid: true })
-
-      component['onUpdateTheme']()
-
-      expect(themesApiSpy.updateTheme).not.toHaveBeenCalled()
-    })
-
-    it('should not proceed if cssValid is false', () => {
-      mockThemeDataSignal.set({ theme: {}, propsValid: true, colorsValid: true, cssValid: false })
+      mockThemeDataSignal.set({ theme: {}, propsValid: true, colorsValid: false })
 
       component['onUpdateTheme']()
 
@@ -886,8 +857,7 @@ describe('ThemeDetailComponent', () => {
       mockThemeDataSignal.set({
         theme: { ...theme, logoUrl: '', smallLogoUrl: '', faviconUrl: '' },
         propsValid: true,
-        colorsValid: true,
-        cssValid: true
+        colorsValid: true
       })
       themesApiSpy.updateTheme.and.returnValue(of({ resource: theme }) as any)
       themesApiSpy.getThemeByName.and.returnValue(of({ resource: theme }) as any)
@@ -974,8 +944,7 @@ describe('ThemeDetailComponent', () => {
       mockThemeDataSignal.set({
         theme: { ...theme, properties: {} },
         propsValid: true,
-        colorsValid: true,
-        cssValid: true
+        colorsValid: true
       })
       component.theme.set({ ...theme, modificationCount: 2 })
 
@@ -990,8 +959,7 @@ describe('ThemeDetailComponent', () => {
       mockThemeDataSignal.set({
         theme: { ...theme, properties: {} },
         propsValid: false,
-        colorsValid: false,
-        cssValid: false
+        colorsValid: false
       })
 
       component.onSaveAs(copyOfPrefix)
