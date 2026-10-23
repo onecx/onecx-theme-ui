@@ -21,7 +21,7 @@
         (onClear)="onImportClear()"
         (onRemove)="onImportClear()"
         (onSelect)="onImportSelectFile($event)"
-        (uploadHandler)="onThemeUpload()"
+        (uploadHandler)="onImportUpload()"
         [showUploadButton]="importError() === 'NONE' && isFormValid()"
         [uploadLabel]="'ACTIONS.UPLOAD' | translate"
         [cancelLabel]="'ACTIONS.CANCEL' | translate"
@@ -32,7 +32,7 @@
         <p-message
           severity="error"
           id="th_import_parse_error"
-          [text]="'VALIDATION.ERRORS.IMPORT_PARSE_ERROR' | translate"
+          [text]="'VALIDATION.ERRORS.IMPORT_GENERAL_ERROR' | translate"
         ></p-message>
       } @else if (themeSnapshot()) {
         @if (importError() === 'CONTENT') {
@@ -116,6 +116,17 @@
           [label]="'ACTIONS.NAVIGATION.CLOSE' | translate"
           [ariaLabel]="'ACTIONS.NAVIGATION.CLOSE' | translate"
           [pTooltip]="'ACTIONS.NAVIGATION.CLOSE.TOOLTIP' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
+        ></p-button>
+        <p-button
+          icon="pi pi-upload"
+          id="th_import_button_upload"
+          (onClick)="onImportUpload()"
+          [disabled]="importError() !== 'NONE' || !isFormValid()"
+          [label]="'ACTIONS.UPLOAD' | translate"
+          [ariaLabel]="'ACTIONS.IMPORT.TOOLTIP' | translate"
+          [pTooltip]="'ACTIONS.IMPORT.TOOLTIP' | translate"
           tooltipPosition="top"
           tooltipEvent="hover"
         ></p-button>

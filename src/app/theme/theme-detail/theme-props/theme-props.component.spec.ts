@@ -95,15 +95,6 @@ describe('ThemePropsComponent', () => {
       component.ngOnChanges({ theme: new SimpleChange(undefined, validTheme, true) })
       expect(component.isThemeFormValid() as unknown as boolean).toBeTrue()
     })
-
-    it('isThemeFormValid should be false when font form is invalid', () => {
-      initTestComponent()
-      fixture.componentRef.setInput('changeMode', 'EDIT')
-      component.theme.set(validTheme)
-      component.ngOnChanges({ theme: new SimpleChange(undefined, validTheme, true) })
-      component.fontForm.controls['font-family'].setErrors({ invalid: true })
-      expect(component.isThemeFormValid() as unknown as boolean).toBeFalse()
-    })
   })
 
   describe('OnChanges', () => {
@@ -117,7 +108,6 @@ describe('ThemePropsComponent', () => {
       component.ngOnChanges({ theme: new SimpleChange(undefined, undefined, true) })
 
       expect(component.basicForm.disabled).toBeTrue()
-      expect(component.fontForm.disabled).toBeTrue()
     })
   })
 

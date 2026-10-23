@@ -14,7 +14,7 @@ import {
 import { toSignal } from '@angular/core/rxjs-interop'
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
-import { combineLatest, map, startWith } from 'rxjs'
+import { map, startWith } from 'rxjs'
 
 import { ButtonModule } from 'primeng/button'
 import { CheckboxModule } from 'primeng/checkbox'
@@ -28,12 +28,9 @@ import { TooltipModule } from 'primeng/tooltip'
 import { getLocation } from '@onecx/accelerator'
 import { PortalMessageService } from '@onecx/angular-integration-interface'
 
-import { DictionaryObject } from 'src/app/shared/models/theme.model'
 import { Utils, LogoRefType } from 'src/app/shared/utils'
 import { ImagesInternalAPIService, MimeType, Theme, UploadImageRequestParams } from 'src/app/shared/generated'
 import { ImageContainerComponent } from 'src/app/shared/image-container/image-container.component'
-import { fontSizeValidator } from 'src/app/shared/validators/font-size.validator'
-import { themeVariables } from '../theme-variables'
 import { ChangeMode } from '../theme-detail.component'
 
 @Component({
@@ -68,7 +65,6 @@ export class ThemePropsComponent implements OnChanges {
   public readonly headerImageUrl = output<string | undefined>()
   // signals for forms, initialized in constructor
   public readonly isBasicFormValid!: Signal<boolean>
-  public readonly isFontFormValid!: Signal<boolean>
   public readonly isThemeFormValid!: Signal<boolean>
   public readonly combinedFormValues!: Signal<Theme>
   // signals for forms, initialized in constructor: URLs
@@ -88,7 +84,6 @@ export class ThemePropsComponent implements OnChanges {
   public LogoRefType = LogoRefType
   // data
   public basicForm: FormGroup = new FormGroup({})
-  public fontForm: FormGroup = new FormGroup({})
 
   constructor() {
     this.initForms()
@@ -119,7 +114,7 @@ export class ThemePropsComponent implements OnChanges {
       const faviconUrl = this.faviconUrlValue()
       return faviconUrl === null || faviconUrl.trim().length === 0
     })
-    // build signals for form validation: basic and font form, for internal use in this component only
+    // build signals for form validation: basic form, for internal use in this component only
     this.isBasicFormValid = toSignal(
       this.basicForm.statusChanges.pipe(
         map((status) => status === 'VALID'),
@@ -127,26 +122,13 @@ export class ThemePropsComponent implements OnChanges {
       ),
       { requireSync: true }
     )
-    this.isFontFormValid = toSignal(
-      this.fontForm.statusChanges.pipe(
-        map((status) => status === 'VALID'),
-        startWith(this.fontForm.valid) // initial state on component init
-      ),
-      { requireSync: true }
-    )
     // build a combined signal for overall form validation: for use in detail component
-    this.isThemeFormValid = computed(() => {
-      return this.isBasicFormValid() && this.isFontFormValid()
-    })
+    this.isThemeFormValid = this.isBasicFormValid
     // Combine the form values to a Theme
     this.combinedFormValues = toSignal<Theme>(
-      combineLatest([
-        this.basicForm.valueChanges.pipe(startWith(this.basicForm.value)),
-        this.fontForm.valueChanges.pipe(startWith(this.fontForm.value))
-      ]).pipe(
-        map(([basicValue, fontValue]) => {
-          return { ...basicValue, properties: { font: fontValue } } as Theme
-        })
+      this.basicForm.valueChanges.pipe(
+        startWith(this.basicForm.value),
+        map((basicValue) => basicValue as Theme)
       ),
       { requireSync: true }
     )
@@ -154,16 +136,13 @@ export class ThemePropsComponent implements OnChanges {
 
   public ngOnChanges(changes: SimpleChanges): void {
     this.basicForm.disable()
-    this.fontForm.disable()
     if (this.theme() !== undefined) {
       if (changes['theme']) this.fillForm(this.theme()!)
       if (this.changeMode() !== 'VIEW') {
         this.basicForm.enable()
-        this.fontForm.enable()
       }
     } else {
       this.basicForm.reset()
-      this.fontForm.reset()
     }
   }
 
@@ -197,24 +176,11 @@ export class ThemePropsComponent implements OnChanges {
         Validators.pattern('^(http|https)://.{6,245}')
       ])
     })
-    // font
-    for (const v of themeVariables.font) {
-      const validators = [Validators.maxLength(255)]
-      if (v === 'font-size') validators.push(fontSizeValidator())
-
-      const fc = new FormControl<string | null>(null, validators)
-      this.fontForm.addControl(v, fc)
-    }
   }
 
   private fillForm(theme: Theme): void {
     this.basicForm.patchValue(theme)
     this.basicForm.get('name')?.disable()
-    this.fontForm.reset()
-    if (theme.properties) {
-      const font = Utils.getThemePropertyValue<DictionaryObject>(theme.properties, 'font')
-      if (font) this.fontForm.patchValue(font)
-    }
     // initialize image variables: used URLs and if logo URLs exist
     this.setBffImageUrl(theme, LogoRefType.Logo)
     this.setBffImageUrl(theme, LogoRefType.LogoSmall)
