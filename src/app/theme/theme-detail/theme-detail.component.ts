@@ -312,7 +312,7 @@ export class ThemeDetailComponent implements OnInit {
     if (theme) {
       this.showOperatorMessage = false
       this.selectedTabIndex = typeof tabValue === 'number' ? tabValue.toString() : tabValue
-      if (this.selectedTabIndex === '4') {
+      if (this.selectedTabIndex === '3') {
         this.startGettingThemeUseData(theme)
       }
     } else this.selectedTabIndex = '0'
