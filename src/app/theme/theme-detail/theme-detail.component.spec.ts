@@ -384,12 +384,12 @@ describe('ThemeDetailComponent', () => {
       expect(component.selectedTabIndex).toBe('2')
     })
 
-    it('should start getting theme use data when tabIndex is 4', () => {
+    it('should start getting theme use data when tabIndex is 3', () => {
       spyOn<any>(component, 'startGettingThemeUseData')
 
-      component.onTabChange('4', theme)
+      component.onTabChange('3', theme)
 
-      expect(component.selectedTabIndex).toBe('4')
+      expect(component.selectedTabIndex).toBe('3')
       expect(component['startGettingThemeUseData']).toHaveBeenCalledWith(theme)
     })
 
@@ -415,9 +415,9 @@ describe('ThemeDetailComponent', () => {
     it('should start first time - normal theme', () => {
       component.themeUseLoadingState.set('initial')
 
-      component.onTabChange('4', theme)
+      component.onTabChange('3', theme)
 
-      expect(component.selectedTabIndex).toBe('4')
+      expect(component.selectedTabIndex).toBe('3')
       expect(component.themeUseLoadingState()).toBe('loading')
       expect(component.themeUsedName()).toBe(theme.name)
     })
@@ -427,10 +427,10 @@ describe('ThemeDetailComponent', () => {
         component.themeUseLoadingState.set('initial')
         component['themeUseTimeoutTimer'] = setTimeout(() => {}, 10)
 
-        component.onTabChange('4', theme)
+        component.onTabChange('3', theme)
         tick(component['MAX_LOADING_TIME'] + 100) // wait for timer to trigger
 
-        expect(component.selectedTabIndex).toBe('4')
+        expect(component.selectedTabIndex).toBe('3')
         expect(component.themeUseLoadingState()).toBe('timeout')
         expect(component.themeUsedName()).toBe(theme.name)
       }))
