@@ -20,8 +20,7 @@ import { ChangeMode } from '../theme-detail.component'
   standalone: true,
   imports: [FloatLabelModule, FormsModule, InputTextModule, ReactiveFormsModule, TooltipModule, TranslateModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './theme-extra.component.html',
-  styleUrl: './theme-extra.component.scss'
+  templateUrl: './theme-extra.component.html'
 })
 export class ThemeExtraComponent {
   // signals
