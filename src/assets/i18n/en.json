@@ -137,7 +137,7 @@
       "EXTRAS.TOOLTIP": "Additional properties of the Theme (Fonts, CSS, Iconsets etc.)",
       "INTERN": "Internal",
       "INTERN.TOOLTIP": "Internal information",
-      "PROPS": "Basic",
+      "PROPS": "Properties",
       "PROPS.TOOLTIP": "Basic properties of the Theme",
       "USE": "Use",
       "USE.TOOLTIP": "List of Workspaces using the Theme",
