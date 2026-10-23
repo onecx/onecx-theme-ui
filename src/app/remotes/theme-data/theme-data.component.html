@@ -1,8 +1,7 @@
 @if (imageUrl$ | async; as url) {
   <img
-    [id]="imageId() ?? 'th_logo_' + themeName()"
-    [class]="'border-round-sm ' + (imageStyleClass() ?? '')"
-    style="border-radius: 0.25rem !important; max-height: 2rem !important; max-width: 5rem !important"
+    [id]="imageId() ?? 'th_data_logo_' + themeName()"
+    [class]="imageStyleClass() ?? 'border-round-sm max-h-3rem max-w-9rem vertical-align-middle'"
     alt="Theme Logo"
     [ocxSrc]="url"
     aria-label="Theme Logo"
