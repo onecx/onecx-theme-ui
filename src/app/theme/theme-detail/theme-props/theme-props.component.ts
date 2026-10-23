@@ -200,7 +200,7 @@ export class ThemePropsComponent implements OnChanges {
     })
     // font
     for (const v of themeVariables.font) {
-      const validators = [Validators.maxLength(10)]
+      const validators = [Validators.maxLength(255)]
       if (v === this.fontSizeControlName) validators.push(fontSizeValidator())
 
       const fc = new FormControl<string | null>(null, validators)

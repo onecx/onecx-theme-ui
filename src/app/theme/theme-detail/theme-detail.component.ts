@@ -30,7 +30,6 @@ import { ExportThemeRequest, ImagesInternalAPIService, Theme, ThemesAPIService }
 
 import { ThemeApplyComponent } from './theme-apply/theme-apply.component'
 import { ThemeColorsComponent } from './theme-colors/theme-colors.component'
-import { ThemeCssComponent } from './theme-css/theme-css.component'
 import { ThemePropsComponent } from './theme-props/theme-props.component'
 import { ThemeUseComponent, Workspace } from './theme-use/theme-use.component'
 import { ThemeInternComponent } from './theme-intern/theme-intern.component'
@@ -65,8 +64,7 @@ export type Theme2 = Theme & { displayNameLimited: string | undefined }
     ThemeUseComponent,
     ThemeApplyComponent,
     ThemePropsComponent,
-    ThemeColorsComponent,
-    ThemeCssComponent
+    ThemeColorsComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './theme-detail.component.html',
@@ -99,7 +97,6 @@ export class ThemeDetailComponent implements OnInit {
   public readonly tabComponent = viewChild(Tabs)
   public readonly themePropsComponent = viewChild(ThemePropsComponent)
   public readonly themeColorsComponent = viewChild(ThemeColorsComponent)
-  public readonly themeCssComponent = viewChild(ThemeCssComponent)
   // private timer to avoid long waits for getting workspace data
   private themeUseTimeoutTimer: ReturnType<typeof setTimeout> | undefined
   private themeUseStartTime: number | undefined
@@ -252,20 +249,16 @@ export class ThemeDetailComponent implements OnInit {
     // values
     const themeProps = this.themePropsComponent()?.combinedFormValues()
     const themeColors = this.themeColorsComponent()?.combinedFormValues()
-    const themeCss = this.themeCssComponent()?.combinedFormValues()
     // validity
     const propsValid = this.themePropsComponent()?.isThemeFormValid()
     const colorsValid = this.themeColorsComponent()?.isThemeFormValid()
-    const cssValid = this.themeCssComponent()?.isThemeFormValid()
     return {
       theme: {
         ...themeProps,
-        properties: { ...themeColors?.properties, ...themeProps?.properties },
-        customCssVariables: themeCss?.customCssVariables
+        properties: { ...themeColors?.properties, ...themeProps?.properties }
       },
       propsValid: propsValid,
-      colorsValid: colorsValid,
-      cssValid: cssValid
+      colorsValid: colorsValid
     } as ThemeData
   }
 

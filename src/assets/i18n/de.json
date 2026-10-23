@@ -199,29 +199,8 @@
     }
   },
   "THEME": {
-    "DESIGNER.EDIT.SUBHEADER": "Theme Details ändern",
-    "DESIGNER.CREATE.SUBHEADER": "Ein neues Theme erstellen",
-    "DESIGNER.TOP.SECTION": "Theme anwenden und Vorlage wählen",
     "NO_PROPERTIES": "Keine Farbwerte enthalten",
-    "CSS": {
-      "TITLE": "CSS-Variablen für bestimmte Anwendungsbereiche können hier als Kontext definiert werden.",
-      "EMPTY": "Im Änderungsmodus können Sie Kontexte hinzufügen.",
-      "CONTEXT": "Kontext",
-      "CONTENT": "Inhalt",
-      "ACTIONS": {
-        "ADD": "Kontext hinzufügen"
-      },
-      "TOOLTIPS": {
-        "CONTEXT": "Kontextname: Top-Level Bezeichner (z.B. PrimeNG)",
-        "CONTENT": "CSS-Variablen für Eigenschaften und Design Tokens",
-        "ADD": "Neuen Kontext hinzufügen",
-        "REMOVE": "Diesen Kontext entfernen"
-      },
-      "VALIDATION": {
-        "DUPLICATE_CONTEXT": "Kontextnamen müssen eindeutig sein. Bitte anderen Namen wählen.",
-        "INVALID_CONTENT": "Inhalt muss ein gültiges JSON-Objekt sein, z. B. { \"--my-var\": \"red\" }."
-      }
-    },
+    "CUSTOM_CSS": "Extra CSS",
     "COLORS": {
       "GENERAL": "Allgemeine Farben",
       "TOPBAR": "Topbar Farben",

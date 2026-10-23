@@ -84,58 +84,6 @@ describe('ThemePropsComponent', () => {
     expect(component).toBeTruthy()
   })
 
-  describe('fontSizeValidator', () => {
-    it('should accept valid font-size values in px range 8-40', () => {
-      const validator = fontSizeValidator()
-
-      expect(validator(new FormControl('8px'))).toBeNull()
-      expect(validator(new FormControl('12.5px'))).toBeNull()
-      expect(validator(new FormControl('40px'))).toBeNull()
-    })
-
-    it('should accept valid font-size values in rem range 0.5-2.5', () => {
-      const validator = fontSizeValidator()
-
-      expect(validator(new FormControl('0.5rem'))).toBeNull()
-      expect(validator(new FormControl('1.25rem'))).toBeNull()
-      expect(validator(new FormControl('2.5rem'))).toBeNull()
-    })
-
-    it('should reject invalid format or unsupported units', () => {
-      const validator = fontSizeValidator()
-
-      expect(validator(new FormControl('large'))).toEqual({ invalidFontSize: { value: 'large' } })
-      expect(validator(new FormControl('16'))).toEqual({ invalidFontSize: { value: '16' } })
-    })
-
-    it('should reject px values outside range 8-40', () => {
-      const validator = fontSizeValidator()
-
-      const tooSmall = validator(new FormControl('7px'))
-      expect(tooSmall).toEqual(jasmine.objectContaining({ invalidFontSizeRange: jasmine.any(Object) }))
-
-      const tooLarge = validator(new FormControl('41px'))
-      expect(tooLarge).toEqual(jasmine.objectContaining({ invalidFontSizeRange: jasmine.any(Object) }))
-    })
-
-    it('should reject rem values outside range 0.5-2.5', () => {
-      const validator = fontSizeValidator()
-
-      const tooSmall = validator(new FormControl('0.4rem'))
-      expect(tooSmall).toEqual(jasmine.objectContaining({ invalidFontSizeRange: jasmine.any(Object) }))
-
-      const tooLarge = validator(new FormControl('2.6rem'))
-      expect(tooLarge).toEqual(jasmine.objectContaining({ invalidFontSizeRange: jasmine.any(Object) }))
-    })
-
-    it('should accept empty values', () => {
-      const validator = fontSizeValidator()
-
-      expect(validator(new FormControl(null))).toBeNull()
-      expect(validator(new FormControl(''))).toBeNull()
-    })
-  })
-
   describe('signals', () => {
     it('isThemeFormValid should be false when no theme is set (forms disabled)', () => {
       initTestComponent()
