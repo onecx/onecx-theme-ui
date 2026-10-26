@@ -237,13 +237,8 @@ export class ThemeDetailComponent implements OnInit {
       })
     )
   }
-
   /**
-   * GETTING THEME USE IN WORKSPACES
-   * The theme use in workspaces is checked when the user opens the "Use" tab or when the user tries to delete a theme.
-   * The check is done by sending a request to the workspace service via a slot. The response is received via an event emitter.
-   * The loading state is managed by a signal and a timeout timer. The loading indicator is shown for at least 1.5 seconds.
-   * If the data is not received within timeout time, the loading state is set to "timeout".
+   *
    */
   private computeThemeData(): ThemeData {
     // values
@@ -257,6 +252,7 @@ export class ThemeDetailComponent implements OnInit {
     return {
       theme: {
         ...themeProps,
+        customCssVariables: themeExtra?.customCssVariables,
         properties: { ...themeColors?.properties, ...themeProps?.properties, ...themeExtra?.properties }
       },
       propsValid: propsValid,
@@ -265,6 +261,13 @@ export class ThemeDetailComponent implements OnInit {
     } as ThemeData
   }
 
+  /**
+   * GETTING THEME USE IN WORKSPACES
+   * The theme use in workspaces is checked when the user opens the "Use" tab or when the user tries to delete a theme.
+   * The check is done by sending a request to the workspace service via a slot. The response is received via an event emitter.
+   * The loading state is managed by a signal and a timeout timer. The loading indicator is shown for at least 1.5 seconds.
+   * If the data is not received within timeout time, the loading state is set to "timeout".
+   */
   // Initialize the process of checking if the theme is used in workspaces
   private startGettingThemeUseData(theme?: Theme): void {
     if (theme && this.themeUseLoadingState() === 'initial') {
