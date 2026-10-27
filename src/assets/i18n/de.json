@@ -198,7 +198,6 @@
   },
   "THEME": {
     "NO_PROPERTIES": "Keine Farbwerte enthalten",
-    "CUSTOM_CSS": "Extra CSS",
     "COLORS": {
       "GENERAL": "Allgemeine Farben",
       "TOPBAR": "Topbar Farben",
@@ -232,6 +231,7 @@
     },
     "GROUPS": {
       "BASE": "Basis",
+      "CSS": "CSS",
       "FONT": "Font"
     },
     "ID": "ID",
@@ -241,6 +241,7 @@
     "VERSION": "Version",
     "DESCRIPTION": "Beschreibung",
     "CSS_FILE": "CSS Datei",
+    "CUSTOM_CSS_VARIABLES": "Extra CSS Variables",
     "FONT_FAMILY": "Schriftart",
     "FONT_SIZE": "Schriftgröße",
     "TOOLTIPS": {
@@ -254,7 +255,8 @@
       "VERSION": "Version des Themes",
       "DESCRIPTION": "Beschreibung des Themes",
       "MANDATORY": "Das Theme ist notwendig für den Betrieb.",
-      "CSS_FILE": "CSS Datei"
+      "CSS_FILE": "CSS Datei",
+      "CUSTOM_CSS_VARIABLES": "Zusätzliche CSS-Variablen für direkte Anpassungen"
     }
   },
   "VALIDATION": {
