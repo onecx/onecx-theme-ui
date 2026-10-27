@@ -11,8 +11,9 @@ import { TooltipModule } from 'primeng/tooltip'
 
 import { DictionaryObject } from 'src/app/shared/models/theme.model'
 import { Utils } from 'src/app/shared/utils'
-import { Theme } from 'src/app/shared/generated'
+import { OverrideType, Theme, ThemeOverride } from 'src/app/shared/generated'
 import { fontSizeValidator } from 'src/app/shared/validators/font-size.validator'
+import { jsonValidator } from 'src/app/shared/validators/json.validator'
 import { themeVariables } from '../theme-variables'
 import { ChangeMode } from '../theme-detail.component'
 
@@ -38,6 +39,7 @@ export class ThemeExtraComponent {
   // data
   public fontForm: FormGroup = new FormGroup({})
   public cssForm: FormGroup = new FormGroup({})
+  public overrideForm: FormGroup = new FormGroup({})
   // signals for form validation and combined values, initialized in constructor
   public readonly isThemeFormValid!: Signal<boolean>
   public readonly combinedFormValues!: Signal<Theme>
@@ -45,25 +47,27 @@ export class ThemeExtraComponent {
   constructor() {
     this.initForms()
     this.isThemeFormValid = toSignal(
-      this.fontForm.statusChanges.pipe(
-        map((status) => status === 'VALID'),
-        startWith(this.fontForm.valid) // initial state on component init
-      ),
+      combineLatest([
+        this.fontForm.statusChanges.pipe(startWith(this.fontForm.status)),
+        this.overrideForm.statusChanges.pipe(startWith(this.overrideForm.status))
+      ]).pipe(map(([fontStatus, overrideStatus]) => fontStatus === 'VALID' && overrideStatus === 'VALID')),
       { requireSync: true }
     )
     // signal to consumer: values
     this.combinedFormValues = toSignal<Theme>(
       combineLatest([
         this.fontForm.valueChanges.pipe(startWith(this.fontForm.value)),
-        this.cssForm.valueChanges.pipe(startWith(this.cssForm.value))
+        this.cssForm.valueChanges.pipe(startWith(this.cssForm.value)),
+        this.overrideForm.valueChanges.pipe(startWith(this.overrideForm.value))
       ]).pipe(
         map(
-          ([fontValue, cssValue]) =>
+          ([fontValue, cssValue, overrideValue]) =>
             ({
               properties: {
                 font: fontValue
               },
-              customCssVariables: cssValue.customCssVariables
+              customCssVariables: cssValue.customCssVariables,
+              overrides: this.toOverrides(overrideValue)
             }) as Theme
         )
       ),
@@ -76,15 +80,18 @@ export class ThemeExtraComponent {
 
       this.fontForm.disable()
       this.cssForm.disable()
+      this.overrideForm.disable()
       if (currentTheme) {
         this.fillForm(currentTheme)
         if (mode !== 'VIEW') {
           this.fontForm.enable()
           this.cssForm.enable()
+          this.overrideForm.enable()
         }
       } else {
         this.fontForm.reset()
         this.cssForm.reset()
+        this.overrideForm.reset()
       }
     })
   }
@@ -98,6 +105,22 @@ export class ThemeExtraComponent {
       this.fontForm.addControl(v, fc)
     }
     this.cssForm.addControl('customCssVariables', new FormControl<string | null>(null, [Validators.maxLength(65535)]))
+    this.overrideForm.addControl(
+      'primengOverride',
+      new FormControl<string | null>(null, [Validators.maxLength(65535), jsonValidator()])
+    )
+    this.overrideForm.addControl(
+      'cssOverride',
+      new FormControl<string | null>(null, [Validators.maxLength(65535), jsonValidator()])
+    )
+  }
+
+  // only non-empty JSON values are sent as overrides
+  private toOverrides(value: { primengOverride?: string | null; cssOverride?: string | null }): ThemeOverride[] {
+    const overrides: ThemeOverride[] = []
+    if (value.primengOverride?.trim()) overrides.push({ type: OverrideType.Primeng, value: value.primengOverride })
+    if (value.cssOverride?.trim()) overrides.push({ type: OverrideType.Css, value: value.cssOverride })
+    return overrides
   }
 
   private fillForm(theme: Theme): void {
@@ -108,5 +131,10 @@ export class ThemeExtraComponent {
     }
     this.cssForm.reset()
     this.cssForm.get('customCssVariables')?.setValue(theme.customCssVariables)
+    this.overrideForm.reset()
+    this.overrideForm.patchValue({
+      primengOverride: theme.overrides?.find((o) => o.type === OverrideType.Primeng)?.value ?? null,
+      cssOverride: theme.overrides?.find((o) => o.type === OverrideType.Css)?.value ?? null
+    })
   }
 }

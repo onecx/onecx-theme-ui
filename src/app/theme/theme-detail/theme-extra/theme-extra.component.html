@@ -1,9 +1,5 @@
-<div class="flex flex-column row-gap-4">
-  <div class="mt-4 mx-0 sm:mx-2 text-center border-bottom-1" style="border-color: var(--p-stone-300)">
-    <div class="h-1rem mb-2 text-xl text-600 font-bold">{{ 'THEME.GROUPS.FONT' | translate }}</div>
-  </div>
-
-  <form [formGroup]="fontForm" class="mx-0 sm:mx-2 flex flex-column sm:flex-row gap-4">
+<div class="mt-4 mb-2 mx-0 sm:mx-2 flex flex-column row-gap-4">
+  <form [formGroup]="fontForm" class="flex flex-column sm:flex-row gap-4">
     <div class="flex-grow-1">
       <p-floatlabel variant="on">
         <input
@@ -38,11 +34,7 @@
     </div>
   </form>
 
-  <div class="mt-4 mx-0 sm:mx-2 text-center border-bottom-1" style="border-color: var(--p-stone-300)">
-    <div class="h-1rem mb-2 text-xl text-600 font-bold">{{ 'THEME.GROUPS.CSS' | translate }}</div>
-  </div>
-
-  <form [formGroup]="cssForm" class="mx-0 sm:mx-2 flex flex-column sm:flex-row gap-4">
+  <form [formGroup]="cssForm" class="">
     <div class="flex-grow-1">
       <p-floatlabel variant="on">
         <textarea
@@ -50,7 +42,7 @@
           rows="3"
           type="text"
           id="th_detail_css_custom_css_variables"
-          class="w-full pt-3 pb-2 text-responsive"
+          class="w-full pt-3 pb-2"
           formControlName="customCssVariables"
           [ariaLabel]="'THEME.TOOLTIPS.CUSTOM_CSS_VARIABLES' | translate"
           [pTooltip]="'THEME.TOOLTIPS.CUSTOM_CSS_VARIABLES' | translate"
@@ -61,6 +53,51 @@
           {{ 'THEME.CUSTOM_CSS_VARIABLES' | translate }}
         </label>
       </p-floatlabel>
+    </div>
+  </form>
+
+  <form [formGroup]="overrideForm" class="flex flex-column gap-4">
+    <div class="flex-grow-1">
+      <p-floatlabel variant="on">
+        <textarea
+          pTextarea
+          rows="8"
+          id="th_detail_override_primeng"
+          class="w-full pt-3 pb-2"
+          formControlName="primengOverride"
+          [ariaLabel]="'THEME.TOOLTIPS.PRIMENG_OVERRIDE' | translate"
+          [pTooltip]="'THEME.TOOLTIPS.PRIMENG_OVERRIDE' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
+        ></textarea>
+        <label for="th_detail_override_primeng" aria-hidden="true">{{ 'THEME.PRIMENG_OVERRIDE' | translate }}</label>
+      </p-floatlabel>
+      @if (overrideForm.controls['primengOverride'].hasError('invalidJson')) {
+        <small id="th_detail_override_primeng_error" class="p-error">
+          {{ 'VALIDATION.ERRORS.INVALID_JSON' | translate }}
+        </small>
+      }
+    </div>
+    <div class="flex-grow-1">
+      <p-floatlabel variant="on">
+        <textarea
+          pTextarea
+          rows="8"
+          id="th_detail_override_css"
+          class="w-full pt-3 pb-2"
+          formControlName="cssOverride"
+          [ariaLabel]="'THEME.TOOLTIPS.CSS_OVERRIDE' | translate"
+          [pTooltip]="'THEME.TOOLTIPS.CSS_OVERRIDE' | translate"
+          tooltipPosition="top"
+          tooltipEvent="hover"
+        ></textarea>
+        <label for="th_detail_override_css" aria-hidden="true">{{ 'THEME.CSS_OVERRIDE' | translate }}</label>
+      </p-floatlabel>
+      @if (overrideForm.controls['cssOverride'].hasError('invalidJson')) {
+        <small id="th_detail_override_css_error" class="p-error">
+          {{ 'VALIDATION.ERRORS.INVALID_JSON' | translate }}
+        </small>
+      }
     </div>
   </form>
 </div>
