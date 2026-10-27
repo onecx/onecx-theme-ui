@@ -232,7 +232,8 @@
     "GROUPS": {
       "BASE": "Basis",
       "CSS": "CSS",
-      "FONT": "Font"
+      "FONT": "Schrift",
+      "OVERRIDES": "Theme Überschreibungen"
     },
     "ID": "ID",
     "NAME": "Name",
@@ -242,6 +243,8 @@
     "DESCRIPTION": "Beschreibung",
     "CSS_FILE": "CSS Datei",
     "CUSTOM_CSS_VARIABLES": "Extra CSS Variables",
+    "PRIMENG_OVERRIDE": "PrimeNG-Override (JSON)",
+    "CSS_OVERRIDE": "CSS-Override (JSON)",
     "FONT_FAMILY": "Schriftart",
     "FONT_SIZE": "Schriftgröße",
     "TOOLTIPS": {
@@ -256,7 +259,9 @@
       "DESCRIPTION": "Beschreibung des Themes",
       "MANDATORY": "Das Theme ist notwendig für den Betrieb.",
       "CSS_FILE": "CSS Datei",
-      "CUSTOM_CSS_VARIABLES": "Zusätzliche CSS-Variablen für direkte Anpassungen"
+      "CUSTOM_CSS_VARIABLES": "Zusätzliche CSS-Variablen für direkte Anpassungen",
+      "PRIMENG_OVERRIDE": "JSON-Struktur zum Überschreiben der PrimeNG-Theme-Einstellungen",
+      "CSS_OVERRIDE": "JSON-Struktur zum Überschreiben der CSS-Einstellungen"
     }
   },
   "VALIDATION": {
@@ -267,6 +272,7 @@
       "IMPORT_CONTENT_ERROR": "Parserfehler: Die enthaltene Struktur entspricht nicht dem erwarteten Format. Bitte prüfen Sie die Datei und versuchen Sie es erneut.",
       "INTERNAL_ERROR": "Interner Fehler",
       "EMPTY_REQUIRED_FIELD": "Dieses Feld ist ein Pflichtfeld.",
+      "INVALID_JSON": "Der Inhalt ist kein gültiges JSON.",
       "MAXIMUM_LENGTH": "Es sind nur {{chars}} Zeichen erlaubt.",
       "MINIMUM_LENGTH": "Es sind mindestens {{chars}} Zeichen erforderlich.",
       "PATTERN_ERROR": "Ihre Eingabe entspricht nicht dem benötigten Format.",

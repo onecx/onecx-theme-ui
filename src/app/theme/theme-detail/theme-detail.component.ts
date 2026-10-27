@@ -253,6 +253,7 @@ export class ThemeDetailComponent implements OnInit {
       theme: {
         ...themeProps,
         customCssVariables: themeExtra?.customCssVariables,
+        overrides: themeExtra?.overrides,
         properties: { ...themeColors?.properties, ...themeProps?.properties, ...themeExtra?.properties }
       },
       propsValid: propsValid,

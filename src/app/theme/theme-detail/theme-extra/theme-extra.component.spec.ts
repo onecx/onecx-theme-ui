@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 
-import { Theme } from 'src/app/shared/generated'
+import { OverrideType, Theme } from 'src/app/shared/generated'
 import { ThemeExtraComponent } from './theme-extra.component'
 
 const validTheme: Theme = {
@@ -11,7 +11,11 @@ const validTheme: Theme = {
   properties: {
     font: { 'font-family': 'myFont', 'font-size': '16px' }
   },
-  customCssVariables: '.my-class { color: red; }'
+  customCssVariables: '.my-class { color: red; }',
+  overrides: [
+    { type: OverrideType.Primeng, value: '{"a":1}' },
+    { type: OverrideType.Css, value: '{"b":2}' }
+  ]
 }
 
 describe('ThemeExtraComponent', () => {
@@ -121,6 +125,70 @@ describe('ThemeExtraComponent', () => {
 
       expect(component.cssForm.controls['customCssVariables'].valid).toBeFalse()
     })
+
+    it('should disable the override form when no theme is set', () => {
+      initTestComponent()
+      expect(component.overrideForm.disabled).toBeTrue()
+    })
+
+    it('should fill and disable the override form in VIEW mode', () => {
+      initTestComponent()
+      fixture.componentRef.setInput('theme', validTheme)
+      fixture.detectChanges()
+
+      expect(component.overrideForm.getRawValue()).toEqual({ primengOverride: '{"a":1}', cssOverride: '{"b":2}' })
+      expect(component.overrideForm.disabled).toBeTrue()
+    })
+
+    it('should leave override controls empty when theme has no overrides', () => {
+      initTestComponent()
+      fixture.componentRef.setInput('theme', { ...validTheme, overrides: undefined })
+      fixture.detectChanges()
+
+      expect(component.overrideForm.getRawValue()).toEqual({ primengOverride: null, cssOverride: null })
+    })
+
+    it('should enable the override form in EDIT mode', () => {
+      initTestComponent()
+      fixture.componentRef.setInput('changeMode', 'EDIT')
+      fixture.componentRef.setInput('theme', validTheme)
+      fixture.detectChanges()
+
+      expect(component.overrideForm.enabled).toBeTrue()
+    })
+
+    it('should reset the override form when theme becomes undefined', () => {
+      initTestComponent()
+      fixture.componentRef.setInput('theme', validTheme)
+      fixture.detectChanges()
+      fixture.componentRef.setInput('theme', undefined)
+      fixture.detectChanges()
+
+      expect(component.overrideForm.controls['primengOverride'].value).toBeNull()
+    })
+
+    it('should mark primengOverride invalid when it is not JSON', () => {
+      initTestComponent()
+      fixture.componentRef.setInput('changeMode', 'EDIT')
+      fixture.componentRef.setInput('theme', validTheme)
+      fixture.detectChanges()
+
+      component.overrideForm.controls['primengOverride'].setValue('{ nope')
+
+      expect(component.overrideForm.controls['primengOverride'].hasError('invalidJson')).toBeTrue()
+    })
+
+    it('should show an error message when cssOverride is not JSON', () => {
+      initTestComponent()
+      fixture.componentRef.setInput('changeMode', 'EDIT')
+      fixture.componentRef.setInput('theme', validTheme)
+      fixture.detectChanges()
+
+      component.overrideForm.controls['cssOverride'].setValue('{ nope')
+      fixture.detectChanges()
+
+      expect(fixture.nativeElement.querySelector('#th_detail_override_css_error')).toBeTruthy()
+    })
   })
 
   describe('signals', () => {
@@ -148,6 +216,45 @@ describe('ThemeExtraComponent', () => {
       expect(component.combinedFormValues().properties).toEqual({
         font: { 'font-family': 'myFont', 'font-size': '16px' }
       })
+    })
+
+    it('isThemeFormValid should be false when an override is not valid JSON', () => {
+      initTestComponent()
+      fixture.componentRef.setInput('changeMode', 'EDIT')
+      fixture.componentRef.setInput('theme', validTheme)
+      fixture.detectChanges()
+      component.overrideForm.controls['cssOverride'].setValue('{ nope')
+
+      expect(component.isThemeFormValid()).toBeFalse()
+    })
+
+    it('isThemeFormValid should be true when all forms are valid', () => {
+      initTestComponent()
+      fixture.componentRef.setInput('changeMode', 'EDIT')
+      fixture.componentRef.setInput('theme', validTheme)
+      fixture.detectChanges()
+
+      expect(component.isThemeFormValid()).toBeTrue()
+    })
+
+    it('combinedFormValues should expose both overrides', () => {
+      initTestComponent()
+      fixture.componentRef.setInput('changeMode', 'EDIT')
+      fixture.componentRef.setInput('theme', validTheme)
+      fixture.detectChanges()
+
+      expect(component.combinedFormValues().overrides).toEqual(validTheme.overrides)
+    })
+
+    it('combinedFormValues should omit empty overrides', () => {
+      initTestComponent()
+      fixture.componentRef.setInput('changeMode', 'EDIT')
+      fixture.componentRef.setInput('theme', validTheme)
+      fixture.detectChanges()
+      component.overrideForm.controls['primengOverride'].setValue('  ')
+      component.overrideForm.controls['cssOverride'].setValue(null)
+
+      expect(component.combinedFormValues().overrides).toEqual([])
     })
 
     it('combinedFormValues should expose the customCssVariables', () => {
