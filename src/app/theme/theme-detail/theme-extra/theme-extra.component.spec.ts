@@ -166,29 +166,6 @@ describe('ThemeExtraComponent', () => {
 
       expect(component.overrideForm.controls['primengOverride'].value).toBeNull()
     })
-
-    it('should mark primengOverride invalid when it is not JSON', () => {
-      initTestComponent()
-      fixture.componentRef.setInput('changeMode', 'EDIT')
-      fixture.componentRef.setInput('theme', validTheme)
-      fixture.detectChanges()
-
-      component.overrideForm.controls['primengOverride'].setValue('{ nope')
-
-      expect(component.overrideForm.controls['primengOverride'].hasError('invalidJson')).toBeTrue()
-    })
-
-    it('should show an error message when cssOverride is not JSON', () => {
-      initTestComponent()
-      fixture.componentRef.setInput('changeMode', 'EDIT')
-      fixture.componentRef.setInput('theme', validTheme)
-      fixture.detectChanges()
-
-      component.overrideForm.controls['cssOverride'].setValue('{ nope')
-      fixture.detectChanges()
-
-      expect(fixture.nativeElement.querySelector('#th_detail_override_css_error')).toBeTruthy()
-    })
   })
 
   describe('signals', () => {
@@ -216,16 +193,6 @@ describe('ThemeExtraComponent', () => {
       expect(component.combinedFormValues().properties).toEqual({
         font: { 'font-family': 'myFont', 'font-size': '16px' }
       })
-    })
-
-    it('isThemeFormValid should be false when an override is not valid JSON', () => {
-      initTestComponent()
-      fixture.componentRef.setInput('changeMode', 'EDIT')
-      fixture.componentRef.setInput('theme', validTheme)
-      fixture.detectChanges()
-      component.overrideForm.controls['cssOverride'].setValue('{ nope')
-
-      expect(component.isThemeFormValid()).toBeFalse()
     })
 
     it('isThemeFormValid should be true when all forms are valid', () => {

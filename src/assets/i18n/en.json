@@ -243,8 +243,8 @@
     "DESCRIPTION": "Description",
     "CSS_FILE": "CSS File",
     "CUSTOM_CSS_VARIABLES": "Extra CSS Variables",
-    "PRIMENG_OVERRIDE": "PrimeNG Override (JSON)",
-    "CSS_OVERRIDE": "CSS Override (JSON)",
+    "PRIMENG_OVERRIDE": "PrimeNG Override",
+    "CSS_OVERRIDE": "CSS Override",
     "FONT_FAMILY": "Font Family",
     "FONT_SIZE": "Font Size",
     "TOOLTIPS": {

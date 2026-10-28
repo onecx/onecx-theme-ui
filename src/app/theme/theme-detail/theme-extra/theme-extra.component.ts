@@ -13,7 +13,6 @@ import { DictionaryObject } from 'src/app/shared/models/theme.model'
 import { Utils } from 'src/app/shared/utils'
 import { OverrideType, Theme, ThemeOverride } from 'src/app/shared/generated'
 import { fontSizeValidator } from 'src/app/shared/validators/font-size.validator'
-import { jsonValidator } from 'src/app/shared/validators/json.validator'
 import { themeVariables } from '../theme-variables'
 import { ChangeMode } from '../theme-detail.component'
 
@@ -105,17 +104,11 @@ export class ThemeExtraComponent {
       this.fontForm.addControl(v, fc)
     }
     this.cssForm.addControl('customCssVariables', new FormControl<string | null>(null, [Validators.maxLength(65535)]))
-    this.overrideForm.addControl(
-      'primengOverride',
-      new FormControl<string | null>(null, [Validators.maxLength(65535), jsonValidator()])
-    )
-    this.overrideForm.addControl(
-      'cssOverride',
-      new FormControl<string | null>(null, [Validators.maxLength(65535), jsonValidator()])
-    )
+    this.overrideForm.addControl('primengOverride', new FormControl<string | null>(null, [Validators.maxLength(65535)]))
+    this.overrideForm.addControl('cssOverride', new FormControl<string | null>(null, [Validators.maxLength(65535)]))
   }
 
-  // only non-empty JSON values are sent as overrides
+  // only non-empty values are sent as overrides
   private toOverrides(value: { primengOverride?: string | null; cssOverride?: string | null }): ThemeOverride[] {
     const overrides: ThemeOverride[] = []
     if (value.primengOverride?.trim()) overrides.push({ type: OverrideType.Primeng, value: value.primengOverride })
