@@ -243,8 +243,8 @@
     "DESCRIPTION": "Beschreibung",
     "CSS_FILE": "CSS Datei",
     "CUSTOM_CSS_VARIABLES": "Extra CSS Variables",
-    "PRIMENG_OVERRIDE": "PrimeNG-Override (JSON)",
-    "CSS_OVERRIDE": "CSS-Override (JSON)",
+    "PRIMENG_OVERRIDE": "PrimeNG-Override",
+    "CSS_OVERRIDE": "CSS-Override",
     "FONT_FAMILY": "Schriftart",
     "FONT_SIZE": "Schriftgröße",
     "TOOLTIPS": {
@@ -260,8 +260,8 @@
       "MANDATORY": "Das Theme ist notwendig für den Betrieb.",
       "CSS_FILE": "CSS Datei",
       "CUSTOM_CSS_VARIABLES": "Zusätzliche CSS-Variablen für direkte Anpassungen",
-      "PRIMENG_OVERRIDE": "JSON-Struktur zum Überschreiben der PrimeNG-Theme-Einstellungen",
-      "CSS_OVERRIDE": "JSON-Struktur zum Überschreiben der CSS-Einstellungen"
+      "PRIMENG_OVERRIDE": "CSS zum Überschreiben von PrimeNG-CSS",
+      "CSS_OVERRIDE": "CSS zum Überschreiben von Theme CSS"
     }
   },
   "VALIDATION": {
