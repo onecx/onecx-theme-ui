@@ -260,8 +260,8 @@
       "MANDATORY": "Das Theme ist notwendig für den Betrieb.",
       "CSS_FILE": "CSS Datei",
       "CUSTOM_CSS_VARIABLES": "Zusätzliche CSS-Variablen für direkte Anpassungen",
-      "PRIMENG_OVERRIDE": "JSON-Struktur zum Überschreiben der PrimeNG-Theme-Einstellungen",
-      "CSS_OVERRIDE": "JSON-Struktur zum Überschreiben der CSS-Einstellungen"
+      "PRIMENG_OVERRIDE": "CSS zum Überschreiben von PrimeNG-CSS",
+      "CSS_OVERRIDE": "CSS zum Überschreiben von Theme CSS"
     }
   },
   "VALIDATION": {

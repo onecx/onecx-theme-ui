@@ -72,11 +72,6 @@
         ></textarea>
         <label for="th_detail_override_primeng" aria-hidden="true">{{ 'THEME.PRIMENG_OVERRIDE' | translate }}</label>
       </p-floatlabel>
-      @if (overrideForm.controls['primengOverride'].hasError('invalidJson')) {
-        <small id="th_detail_override_primeng_error" class="p-error">
-          {{ 'VALIDATION.ERRORS.INVALID_JSON' | translate }}
-        </small>
-      }
     </div>
     <div class="flex-grow-1">
       <p-floatlabel variant="on">
@@ -93,11 +88,6 @@
         ></textarea>
         <label for="th_detail_override_css" aria-hidden="true">{{ 'THEME.CSS_OVERRIDE' | translate }}</label>
       </p-floatlabel>
-      @if (overrideForm.controls['cssOverride'].hasError('invalidJson')) {
-        <small id="th_detail_override_css_error" class="p-error">
-          {{ 'VALIDATION.ERRORS.INVALID_JSON' | translate }}
-        </small>
-      }
     </div>
   </form>
 </div>
