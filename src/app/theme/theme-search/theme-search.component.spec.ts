@@ -233,7 +233,7 @@ describe('ThemeSearchComponent', () => {
       component.onGlobalFilter('one', itemData)
 
       expect(component.globalFilterValue).toBe('one')
-      expect(component.filteredData()?.length).toBe(1)
+      expect(component.filteredData()).toHaveSize(1)
       expect((component.filteredData()?.[0] as any).name).toBe('onecx')
     })
 
@@ -241,7 +241,7 @@ describe('ThemeSearchComponent', () => {
       component.onGlobalFilter('nonexistent', itemData)
 
       expect(component.globalFilterValue).toBe('nonexistent')
-      expect(component.filteredData()?.length).toBe(0)
+      expect(component.filteredData()).toHaveSize(0)
     })
 
     it('should clear global filter and reset filteredData', () => {
