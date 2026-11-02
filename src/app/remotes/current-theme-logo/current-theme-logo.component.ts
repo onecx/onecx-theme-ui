@@ -56,7 +56,7 @@ export class OneCXCurrentThemeLogoComponent implements ocxRemoteComponent, ocxRe
 
   // initialize this component as remote
   public ocxInitRemoteComponent(config: RemoteComponentConfig): void {
-    this.appConfigService.init(config.baseUrl)
+    this.appConfigService.init(config.baseUrl).catch((err) => console.error(err))
     this.remoteComponentConfig.next(config)
     this.themeApi.configuration = new Configuration({
       basePath: Location.joinWithSlash(config.baseUrl, environment.apiPrefix)

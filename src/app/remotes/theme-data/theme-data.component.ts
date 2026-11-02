@@ -77,9 +77,9 @@ export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWeb
 
   // initialize this component as remote
   public ocxInitRemoteComponent(config: RemoteComponentConfig): void {
-    this.appConfigService.init(config.baseUrl)
+    this.appConfigService.init(config.baseUrl).catch((err) => console.error(err))
     this.remoteComponentConfig.next(config)
-    this.slotService.init()
+    this.slotService.init().catch((err) => console.error(err))
     this.themeApi.configuration = new Configuration({
       basePath: Location.joinWithSlash(config.baseUrl, environment.apiPrefix)
     })

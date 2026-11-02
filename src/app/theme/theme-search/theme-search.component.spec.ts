@@ -202,6 +202,18 @@ describe('ThemeSearchComponent', () => {
     expect(router.navigate).toHaveBeenCalledWith(['./new-theme'], { relativeTo: (component as any).route })
   })
 
+  it('should log navigation errors when creating a theme', async () => {
+    const router = TestBed.inject(Router)
+    const error = new Error('route failed')
+    spyOn(router, 'navigate').and.returnValue(Promise.reject(error))
+    spyOn(console, 'error')
+
+    component.onThemeCreation({ name: 'new-theme' } as Theme)
+    await Promise.resolve()
+
+    expect(console.error).toHaveBeenCalledWith(error)
+  })
+
   describe('filter data', () => {
     const itemData = [
       { name: 'onecx', displayName: 'OneCX', description: 'OneCX theme' },

@@ -432,7 +432,7 @@ export class ThemeDetailComponent implements OnInit {
     this.themeForCreation.set(undefined)
     this.themeCreateVisible.set(false)
     if (theme) {
-      this.router.navigate(['../' + theme.name], { relativeTo: this.route })
+      this.router.navigate(['../' + theme.name], { relativeTo: this.route }).catch((err) => console.error(err))
     }
   }
 
@@ -446,7 +446,7 @@ export class ThemeDetailComponent implements OnInit {
   }
 
   public onThemeDeletion(): void {
-    this.router.navigate(['..'], { relativeTo: this.route })
+    this.router.navigate(['..'], { relativeTo: this.route }).catch((err) => console.error(err))
   }
 
   /**

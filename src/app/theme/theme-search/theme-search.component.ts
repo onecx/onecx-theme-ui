@@ -209,7 +209,7 @@ export class ThemeSearchComponent implements OnInit {
 
   public onThemeCreation(theme: Theme | undefined): void {
     if (theme) {
-      this.router.navigate(['./' + theme.name], { relativeTo: this.route })
+      this.router.navigate(['./' + theme.name], { relativeTo: this.route }).catch((err) => console.error(err))
     }
   }
 }

@@ -40,4 +40,4 @@ bootstrapRemoteComponent(OneCXThemeDataComponent, 'ocx-theme-data-component', en
       useClass: AngularAcceleratorMissingTranslationHandler
     }
   })
-])
+]).catch((err) => console.error(err))

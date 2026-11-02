@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
+import { TranslateService } from '@ngx-translate/core'
 import { TranslateTestingModule } from 'ngx-translate-testing'
+import { throwError } from 'rxjs'
 
 import { PortalMessageService } from '@onecx/angular-integration-interface'
 
@@ -121,6 +123,19 @@ describe('ThemeApplyComponent', () => {
       expect(emitSpy).toHaveBeenCalled()
       const emitted = emitSpy.calls.mostRecent().args[0]
       expect(emitted?.id).toBe('1')
+    })
+
+    it('should log translation errors when confirming theme template', async () => {
+      const error = new Error('translation failed')
+      const translate = TestBed.inject(TranslateService)
+      spyOn(translate, 'get').and.returnValue(throwError(() => error))
+      spyOn(console, 'error')
+      const themes: Theme[] = [{ id: '1', name: 'theme-a', displayName: 'Theme A' }]
+
+      component.onSelectThemeTemplate({ value: 'theme-a' }, themes, dropdownMock)
+      await Promise.resolve()
+
+      expect(console.error).toHaveBeenCalledWith(error)
     })
 
     it('should clear dropdown on reject', async () => {

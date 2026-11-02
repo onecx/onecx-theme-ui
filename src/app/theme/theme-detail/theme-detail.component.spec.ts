@@ -106,6 +106,7 @@ describe('ThemeDetailComponent', () => {
     themesApiSpy.createTheme.calls.reset()
     locationSpy.back.calls.reset()
     // default values
+    mockSlotService.init.and.returnValue(Promise.resolve())
     mockSlotService.isSomeComponentDefinedForSlot.and.returnValue(of(true))
     themesApiSpy.getThemeByName.and.returnValue(of({ resource: {} }) as any)
     themesApiSpy.getThemeById.and.returnValue(of({ resource: {} }) as any)
@@ -505,11 +506,37 @@ describe('ThemeDetailComponent', () => {
 
     it('should navigate back on theme deleted', () => {
       const router = TestBed.inject(Router)
-      spyOn(router, 'navigate')
+      spyOn(router, 'navigate').and.returnValue(Promise.resolve(true))
 
       component.onThemeDeletion() // signal that theme was deleted
 
       expect(router.navigate).toHaveBeenCalledOnceWith(['..'], jasmine.any(Object))
+    })
+
+    it('should log navigation error when creating a theme', async () => {
+      const router = TestBed.inject(Router)
+      const error = new Error('navigation failed')
+      spyOn(router, 'navigate').and.returnValue(Promise.reject(error))
+      spyOn(console, 'error')
+
+      component.onThemeCreation({ name: 'new-theme', displayName: 'New Theme' } as Theme)
+      await new Promise((resolve) => setTimeout(resolve, 0))
+      await new Promise((resolve) => setTimeout(resolve, 0))
+
+      expect(console.error).toHaveBeenCalledWith(error)
+    })
+
+    it('should log navigation error when deleting a theme', async () => {
+      const router = TestBed.inject(Router)
+      const error = new Error('delete navigation failed')
+      spyOn(router, 'navigate').and.returnValue(Promise.reject(error))
+      spyOn(console, 'error')
+
+      component.onThemeDeletion()
+      await new Promise((resolve) => setTimeout(resolve, 0))
+      await new Promise((resolve) => setTimeout(resolve, 0))
+
+      expect(console.error).toHaveBeenCalledWith(error)
     })
   })
 
@@ -983,7 +1010,7 @@ describe('ThemeDetailComponent', () => {
   describe('theme creation', () => {
     it('should clear theme for creation and navigate on theme creation', () => {
       const router = TestBed.inject(Router)
-      spyOn(router, 'navigate')
+      spyOn(router, 'navigate').and.returnValue(Promise.resolve(true))
       component.themeForCreation.set(theme)
 
       component.onThemeCreation({ name: 'newTheme' })

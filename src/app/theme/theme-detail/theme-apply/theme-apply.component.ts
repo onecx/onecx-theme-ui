@@ -75,7 +75,7 @@ export class ThemeApplyComponent {
           'THEME.TEMPLATE.CONFIRMATION.MESSAGE'
         ])
         .pipe(map((data: DictionaryObjectString) => this.displayConfirmationForUsingTemplate(id, dn, data, box)))
-    )
+    ).catch((err) => console.error(err))
   }
   private displayConfirmationForUsingTemplate(
     themeId: string,
