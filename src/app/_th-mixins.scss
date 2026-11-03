@@ -9,7 +9,7 @@
     &.p-floatlabel-over {
       &:has(.p-filled) label,
       &:has(.p-focus) label {
-        top: -5px !important;
+        top: -5px;
         background-color: white;
         padding: 0 0.5rem;
       }
@@ -48,7 +48,7 @@
 @mixin compact-dropdown-list-items {
   :host ::ng-deep {
     .p-dropdown-panel .p-dropdown-items .p-dropdown-item {
-      padding: 0.4rem 1rem !important;
+      padding: 0.4rem 1rem;
     }
   }
 }
@@ -225,7 +225,7 @@
       }
       &.p-inputtext:hover,
       &.p-dropdown:hover {
-        border-color: rgb(0 0 0 / 30%) !important;
+        border-color: rgb(0 0 0 / 30%);
       }
     }
   }
@@ -418,7 +418,7 @@
       button[icon='pi pi-angle-double-right'],
       button:nth-child(2),
       button:nth-child(4) {
-        display: none !important;
+        display: none;
       }
     }
   }
@@ -439,7 +439,7 @@
 @mixin dialog-modal-dialog-content {
   :host ::ng-deep {
     .p-dialog .p-dialog-content {
-      border-radius: unset !important;
+      border-radius: unset;
     }
   }
 }
@@ -515,13 +515,13 @@
     td button.p-button {
       &.p-button-icon-only {
         padding: 0.5rem;
-        width: unset !important;
+        width: unset;
       }
       &.p-button-rounded {
-        height: unset !important;
+        height: unset;
       }
       &:disabled {
-        opacity: 0.38 !important;
+        opacity: 0.38;
       }
     }
   }
@@ -540,22 +540,22 @@
     /* responsive table result view */
     @media screen and (min-width: 576px) {
       .sm\:table-cell {
-        display: table-cell !important;
+        display: table-cell;
       }
     }
     @media screen and (min-width: 768px) {
       .md\:table-cell {
-        display: table-cell !important;
+        display: table-cell;
       }
     }
     @media screen and (min-width: 992px) {
       .lg\:table-cell {
-        display: table-cell !important;
+        display: table-cell;
       }
     }
     @media screen and (min-width: 1200px) {
       .xl\:table-cell {
-        display: table-cell !important;
+        display: table-cell;
       }
     }
   }
