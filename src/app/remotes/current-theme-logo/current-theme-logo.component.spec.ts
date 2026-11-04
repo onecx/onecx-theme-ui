@@ -94,6 +94,28 @@ describe('OneCXCurrentThemeLogoComponent', () => {
         done()
       })
     })
+
+    it('should log app config init errors', () => {
+      const config = { baseUrl: 'base_url' } as RemoteComponentConfig
+      const error = new Error('app config failed')
+
+      initializeComponent()
+
+      const appConfigInitSpy = spyOn(component['appConfigService'], 'init').and.callFake(() => {
+        return {
+          catch: (callback: (err: Error) => void) => {
+            callback(error)
+            return Promise.resolve()
+          }
+        } as any
+      })
+      spyOn(console, 'error')
+
+      component.ocxInitRemoteComponent(config)
+
+      expect(appConfigInitSpy).toHaveBeenCalledWith('base_url')
+      expect(console.error).toHaveBeenCalledWith(error)
+    })
   })
 
   describe('provide logo', () => {

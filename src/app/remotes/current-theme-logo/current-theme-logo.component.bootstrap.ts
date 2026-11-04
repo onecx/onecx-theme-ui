@@ -40,4 +40,4 @@ bootstrapRemoteComponent(OneCXCurrentThemeLogoComponent, 'ocx-current-theme-logo
       useClass: AngularAcceleratorMissingTranslationHandler
     }
   })
-])
+]).catch((err) => console.error(err))
