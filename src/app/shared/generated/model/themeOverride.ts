@@ -14,6 +14,8 @@ import { OverrideType } from './overrideType';
 
 export interface ThemeOverride { 
     type?: OverrideType;
+    alias?: string;
+    pos?: number;
     value?: string;
 }
 

@@ -245,6 +245,10 @@
     "CUSTOM_CSS_VARIABLES": "Extra CSS Variables",
     "PRIMENG_OVERRIDE": "PrimeNG Override",
     "CSS_OVERRIDE": "CSS Override",
+    "OVERRIDE_TYPE": "Type",
+    "OVERRIDE_VALUE": "Value",
+    "OVERRIDE_ALIAS": "Alias",
+    "ADD_OVERRIDE": "Add Override",
     "FONT_FAMILY": "Font Family",
     "FONT_SIZE": "Font Size",
     "TOOLTIPS": {
@@ -260,8 +264,13 @@
       "MANDATORY": "The Theme is required for operation.",
       "CSS_FILE": "CSS file name",
       "CUSTOM_CSS_VARIABLES": "Additional CSS Variables for direct customization",
-      "PRIMENG_OVERRIDE": "CSS to override PrimeNG CSS",
-      "CSS_OVERRIDE": "CSS to override Theme CSS"
+      "OVERRIDE_TYPE": "Type of the override",
+      "OVERRIDE_VALUE": "CSS content of the override",
+      "ADD_OVERRIDE": "Add a new override",
+      "REMOVE_OVERRIDE": "Remove this override",
+      "OVERRIDE_ALIAS": "Optional descriptive name of the override",
+      "MOVE_OVERRIDE_UP": "Move this override up",
+      "MOVE_OVERRIDE_DOWN": "Move this override down"
     }
   },
   "VALIDATION": {

@@ -245,6 +245,10 @@
     "CUSTOM_CSS_VARIABLES": "Extra CSS Variables",
     "PRIMENG_OVERRIDE": "PrimeNG-Override",
     "CSS_OVERRIDE": "CSS-Override",
+    "OVERRIDE_TYPE": "Typ",
+    "OVERRIDE_VALUE": "Wert",
+    "OVERRIDE_ALIAS": "Alias",
+    "ADD_OVERRIDE": "Überschreibung hinzufügen",
     "FONT_FAMILY": "Schriftart",
     "FONT_SIZE": "Schriftgröße",
     "TOOLTIPS": {
@@ -260,8 +264,13 @@
       "MANDATORY": "Das Theme ist notwendig für den Betrieb.",
       "CSS_FILE": "CSS Datei",
       "CUSTOM_CSS_VARIABLES": "Zusätzliche CSS-Variablen für direkte Anpassungen",
-      "PRIMENG_OVERRIDE": "CSS zum Überschreiben von PrimeNG-CSS",
-      "CSS_OVERRIDE": "CSS zum Überschreiben von Theme CSS"
+      "OVERRIDE_TYPE": "Typ der Überschreibung",
+      "OVERRIDE_VALUE": "CSS-Inhalt der Überschreibung",
+      "ADD_OVERRIDE": "Neue Überschreibung hinzufügen",
+      "REMOVE_OVERRIDE": "Diese Überschreibung entfernen",
+      "OVERRIDE_ALIAS": "Optionaler beschreibender Name der Überschreibung",
+      "MOVE_OVERRIDE_UP": "Diese Überschreibung nach oben verschieben",
+      "MOVE_OVERRIDE_DOWN": "Diese Überschreibung nach unten verschieben"
     }
   },
   "VALIDATION": {
