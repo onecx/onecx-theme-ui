@@ -159,7 +159,7 @@ describe('ThemeExtraComponent', () => {
       fixture.componentRef.setInput('theme', { ...validTheme, overrides: undefined })
       fixture.detectChanges()
 
-      expect(component.overrideRows.length).toBe(0)
+      expect(component.overrideRows).toHaveSize(0)
     })
 
     it('should enable the override form in EDIT mode', () => {
@@ -178,7 +178,7 @@ describe('ThemeExtraComponent', () => {
       fixture.componentRef.setInput('theme', undefined)
       fixture.detectChanges()
 
-      expect(component.overrideRows.length).toBe(0)
+      expect(component.overrideRows).toHaveSize(0)
     })
   })
 
@@ -195,7 +195,7 @@ describe('ThemeExtraComponent', () => {
       fixture.componentRef.setInput('theme', validTheme)
       fixture.detectChanges()
 
-      expect(fixture.nativeElement.querySelectorAll('textarea[id^="th_detail_override_value_"]').length).toBe(2)
+      expect(fixture.nativeElement.querySelectorAll('textarea[id^="th_detail_override_value_"]')).toHaveSize(2)
     })
 
     it('should show the add button in EDIT mode', () => {
@@ -257,11 +257,30 @@ describe('ThemeExtraComponent', () => {
       ])
     })
 
+    it('should place a row without pos after rows with a pos', () => {
+      initTestComponent()
+      fixture.componentRef.setInput('theme', {
+        ...validTheme,
+        overrides: [
+          { type: OverrideType.Css, value: '.a {}' },
+          { type: OverrideType.Css, pos: 1, value: '.b {}' },
+          { type: OverrideType.Css, value: '.c {}' }
+        ]
+      })
+      fixture.detectChanges()
+
+      expect(component.overrideRows.controls.map((row) => row.controls.value.value)).toEqual([
+        '.b {}',
+        '.a {}',
+        '.c {}'
+      ])
+    })
+
     it('should add an empty row when the add button is clicked', () => {
       initEditMode()
       fixture.nativeElement.querySelector('#th_detail_override_action_add button').click()
 
-      expect(component.overrideRows.length).toBe(3)
+      expect(component.overrideRows).toHaveSize(3)
     })
 
     it('should hide the remove buttons in VIEW mode', () => {
