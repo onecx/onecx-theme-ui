@@ -6,7 +6,7 @@
           pInputText
           type="text"
           id="th_detail_font_font_family"
-          class="w-full pt-3 pb-2 text-responsive"
+          class="w-full text-responsive"
           formControlName="font-family"
           [ariaLabel]="'THEME.TOOLTIPS.FONT_FAMILY' | translate"
           [pTooltip]="'THEME.TOOLTIPS.FONT_FAMILY' | translate"
@@ -22,7 +22,7 @@
           pInputText
           type="text"
           id="th_detail_font_font_size"
-          class="w-full pt-3 pb-2 text-responsive"
+          class="w-full text-responsive"
           formControlName="font-size"
           [ariaLabel]="'THEME.TOOLTIPS.FONT_SIZE' | translate"
           [pTooltip]="'THEME.TOOLTIPS.FONT_SIZE' | translate"
@@ -42,7 +42,7 @@
           rows="3"
           type="text"
           id="th_detail_css_custom_css_variables"
-          class="w-full pt-3 pb-2"
+          class="w-full"
           formControlName="customCssVariables"
           [ariaLabel]="'THEME.TOOLTIPS.CUSTOM_CSS_VARIABLES' | translate"
           [pTooltip]="'THEME.TOOLTIPS.CUSTOM_CSS_VARIABLES' | translate"
@@ -56,38 +56,106 @@
     </div>
   </form>
 
-  <form [formGroup]="overrideForm" class="flex flex-column gap-4">
-    <div class="flex-grow-1">
-      <p-floatlabel variant="on">
-        <textarea
-          pTextarea
-          rows="8"
-          id="th_detail_override_primeng"
-          class="w-full pt-3 pb-2"
-          formControlName="primengOverride"
-          [ariaLabel]="'THEME.TOOLTIPS.PRIMENG_OVERRIDE' | translate"
-          [pTooltip]="'THEME.TOOLTIPS.PRIMENG_OVERRIDE' | translate"
-          tooltipPosition="top"
-          tooltipEvent="hover"
-        ></textarea>
-        <label for="th_detail_override_primeng" aria-hidden="true">{{ 'THEME.PRIMENG_OVERRIDE' | translate }}</label>
-      </p-floatlabel>
+  <form [formGroup]="overrideForm" class="mt-2 flex flex-column gap-4">
+    <div formArrayName="items" class="flex flex-column gap-5">
+      @for (row of overrideRows.controls; track row; let i = $index) {
+        <div [formGroupName]="i" class="flex flex-column sm:flex-row gap-4">
+          <!-- ACTIONS -->
+          @if (isEditMode()) {
+            <div class="flex flex-column gap-4">
+              <p-button
+                [id]="'th_detail_override_action_up_' + i"
+                icon="pi pi-arrow-up"
+                class="p-button-icon-only"
+                (onClick)="moveOverride(i, -1)"
+                [disabled]="i === 0"
+                [ariaLabel]="'THEME.TOOLTIPS.MOVE_OVERRIDE_UP' | translate"
+                [pTooltip]="'THEME.TOOLTIPS.MOVE_OVERRIDE_UP' | translate"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+              ></p-button>
+              <p-button
+                [id]="'th_detail_override_action_remove_' + i"
+                icon="pi pi-trash"
+                class="p-button-icon-only"
+                (onClick)="removeOverride(i)"
+                [ariaLabel]="'THEME.TOOLTIPS.REMOVE_OVERRIDE' | translate"
+                [pTooltip]="'THEME.TOOLTIPS.REMOVE_OVERRIDE' | translate"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+              ></p-button>
+            </div>
+          }
+          <!-- TYPE / ALIAS -->
+          <div class="flex flex-column row-gap-4">
+            <p-floatlabel variant="on" class="sm:w-13rem flex-shrink-0">
+              <p-select
+                [inputId]="'th_detail_override_type_' + i"
+                formControlName="type"
+                [options]="overrideTypeOptions"
+                optionValue="value"
+                styleClass="w-full"
+                [showClear]="false"
+                [ariaLabel]="'THEME.TOOLTIPS.OVERRIDE_TYPE' | translate"
+                [pTooltip]="'THEME.TOOLTIPS.OVERRIDE_TYPE' | translate"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+              >
+                <ng-template #selectedItem let-option>{{ option.labelKey | translate }}</ng-template>
+                <ng-template #item let-option>{{ option.labelKey | translate }}</ng-template>
+              </p-select>
+              <label [for]="'th_detail_override_type_' + i" aria-hidden="true">
+                {{ 'THEME.OVERRIDE_TYPE' | translate }}
+              </label>
+            </p-floatlabel>
+            <p-floatlabel variant="on" class="sm:w-13rem flex-shrink-0">
+              <input
+                pInputText
+                type="text"
+                [id]="'th_detail_override_alias_' + i"
+                class="w-full"
+                formControlName="alias"
+                [ariaLabel]="'THEME.TOOLTIPS.OVERRIDE_ALIAS' | translate"
+                [pTooltip]="'THEME.TOOLTIPS.OVERRIDE_ALIAS' | translate"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+              />
+              <label [for]="'th_detail_override_alias_' + i" aria-hidden="true">
+                {{ 'THEME.OVERRIDE_ALIAS' | translate }}
+              </label>
+            </p-floatlabel>
+          </div>
+          <!-- VALUE -->
+          <p-floatlabel variant="on" class="flex-grow-1">
+            <textarea
+              pTextarea
+              rows="5"
+              [id]="'th_detail_override_value_' + i"
+              class="w-full"
+              formControlName="value"
+              [ariaLabel]="'THEME.TOOLTIPS.OVERRIDE_VALUE' | translate"
+              [pTooltip]="'THEME.TOOLTIPS.OVERRIDE_VALUE' | translate"
+              tooltipPosition="top"
+              tooltipEvent="hover"
+            ></textarea>
+            <label [for]="'th_detail_override_value_' + i" aria-hidden="true">
+              {{ 'THEME.OVERRIDE_VALUE' | translate }}
+            </label>
+          </p-floatlabel>
+        </div>
+      }
     </div>
-    <div class="flex-grow-1">
-      <p-floatlabel variant="on">
-        <textarea
-          pTextarea
-          rows="8"
-          id="th_detail_override_css"
-          class="w-full pt-3 pb-2"
-          formControlName="cssOverride"
-          [ariaLabel]="'THEME.TOOLTIPS.CSS_OVERRIDE' | translate"
-          [pTooltip]="'THEME.TOOLTIPS.CSS_OVERRIDE' | translate"
-          tooltipPosition="top"
-          tooltipEvent="hover"
-        ></textarea>
-        <label for="th_detail_override_css" aria-hidden="true">{{ 'THEME.CSS_OVERRIDE' | translate }}</label>
-      </p-floatlabel>
-    </div>
+    @if (isEditMode()) {
+      <p-button
+        id="th_detail_override_action_add"
+        icon="pi pi-plus"
+        [label]="'THEME.ADD_OVERRIDE' | translate"
+        (onClick)="addOverride()"
+        [ariaLabel]="'THEME.TOOLTIPS.ADD_OVERRIDE' | translate"
+        [pTooltip]="'THEME.TOOLTIPS.ADD_OVERRIDE' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      ></p-button>
+    }
   </form>
 </div>

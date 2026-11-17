@@ -1,11 +1,13 @@
-import { ChangeDetectionStrategy, Component, effect, input, Signal } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, effect, input, Signal } from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
-import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms'
+import { FormsModule, ReactiveFormsModule, FormArray, FormControl, FormGroup, Validators } from '@angular/forms'
 import { TranslateModule } from '@ngx-translate/core'
 import { map, startWith, combineLatest } from 'rxjs'
 
+import { ButtonModule } from 'primeng/button'
 import { FloatLabelModule } from 'primeng/floatlabel'
 import { InputTextModule } from 'primeng/inputtext'
+import { SelectModule } from 'primeng/select'
 import { TextareaModule } from 'primeng/textarea'
 import { TooltipModule } from 'primeng/tooltip'
 
@@ -16,13 +18,21 @@ import { fontSizeValidator } from 'src/app/shared/validators/font-size.validator
 import { themeVariables } from '../theme-variables'
 import { ChangeMode } from '../theme-detail.component'
 
+export type OverrideRowForm = FormGroup<{
+  type: FormControl<OverrideType | null>
+  alias: FormControl<string | null>
+  value: FormControl<string | null>
+}>
+
 @Component({
   selector: 'app-theme-extra',
   standalone: true,
   imports: [
+    ButtonModule,
     FloatLabelModule,
     FormsModule,
     InputTextModule,
+    SelectModule,
     TextareaModule,
     ReactiveFormsModule,
     TooltipModule,
@@ -38,7 +48,12 @@ export class ThemeExtraComponent {
   // data
   public fontForm: FormGroup = new FormGroup({})
   public cssForm: FormGroup = new FormGroup({})
-  public overrideForm: FormGroup = new FormGroup({})
+  public overrideForm = new FormGroup({ items: new FormArray<OverrideRowForm>([]) })
+  public readonly overrideTypeOptions = [
+    { value: OverrideType.Primeng, labelKey: 'THEME.PRIMENG_OVERRIDE' },
+    { value: OverrideType.Css, labelKey: 'THEME.CSS_OVERRIDE' }
+  ]
+  public readonly isEditMode = computed(() => this.changeMode() !== 'VIEW')
   // signals for form validation and combined values, initialized in constructor
   public readonly isThemeFormValid!: Signal<boolean>
   public readonly combinedFormValues!: Signal<Theme>
@@ -60,13 +75,13 @@ export class ThemeExtraComponent {
         this.overrideForm.valueChanges.pipe(startWith(this.overrideForm.value))
       ]).pipe(
         map(
-          ([fontValue, cssValue, overrideValue]) =>
+          ([fontValue, cssValue]) =>
             ({
               properties: {
                 font: fontValue
               },
               customCssVariables: cssValue.customCssVariables,
-              overrides: this.toOverrides(overrideValue)
+              overrides: this.toOverrides(this.overrideRows.value)
             }) as Theme
         )
       ),
@@ -77,22 +92,40 @@ export class ThemeExtraComponent {
       const currentTheme = this.theme()
       const mode = this.changeMode()
 
-      this.fontForm.disable()
-      this.cssForm.disable()
-      this.overrideForm.disable()
       if (currentTheme) {
         this.fillForm(currentTheme)
-        if (mode !== 'VIEW') {
-          this.fontForm.enable()
-          this.cssForm.enable()
-          this.overrideForm.enable()
-        }
       } else {
         this.fontForm.reset()
         this.cssForm.reset()
-        this.overrideForm.reset()
+        this.overrideRows.clear()
+      }
+      // rows are rebuilt on every fill, so the enabled state is applied afterwards
+      const editable = !!currentTheme && mode !== 'VIEW'
+      for (const form of [this.fontForm, this.cssForm, this.overrideForm]) {
+        if (editable) form.enable()
+        else form.disable()
       }
     })
+  }
+
+  public get overrideRows(): FormArray<OverrideRowForm> {
+    return this.overrideForm.controls.items
+  }
+
+  public addOverride(): void {
+    this.overrideRows.push(this.createOverrideRow())
+  }
+
+  public removeOverride(index: number): void {
+    this.overrideRows.removeAt(index)
+  }
+
+  public moveOverride(index: number, offset: -1 | 1): void {
+    const target = index + offset
+    if (target < 0 || target >= this.overrideRows.length) return
+    const row = this.overrideRows.at(index)
+    this.overrideRows.removeAt(index)
+    this.overrideRows.insert(target, row)
   }
 
   private initForms() {
@@ -104,16 +137,23 @@ export class ThemeExtraComponent {
       this.fontForm.addControl(v, fc)
     }
     this.cssForm.addControl('customCssVariables', new FormControl<string | null>(null, [Validators.maxLength(65535)]))
-    this.overrideForm.addControl('primengOverride', new FormControl<string | null>(null, [Validators.maxLength(65535)]))
-    this.overrideForm.addControl('cssOverride', new FormControl<string | null>(null, [Validators.maxLength(65535)]))
   }
 
-  // only non-empty values are sent as overrides
-  private toOverrides(value: { primengOverride?: string | null; cssOverride?: string | null }): ThemeOverride[] {
-    const overrides: ThemeOverride[] = []
-    if (value.primengOverride?.trim()) overrides.push({ type: OverrideType.Primeng, value: value.primengOverride })
-    if (value.cssOverride?.trim()) overrides.push({ type: OverrideType.Css, value: value.cssOverride })
-    return overrides
+  private createOverrideRow(override?: ThemeOverride): OverrideRowForm {
+    return new FormGroup({
+      type: new FormControl<OverrideType | null>(override?.type ?? OverrideType.Css, [Validators.required]),
+      alias: new FormControl<string | null>(override?.alias ?? null, [Validators.maxLength(255)]),
+      value: new FormControl<string | null>(override?.value ?? null, [Validators.maxLength(65535)])
+    })
+  }
+
+  // the row index is the pos; rows without a type or a non-blank value are not sent
+  private toOverrides(rows: Partial<{ type: OverrideType | null; alias: string | null; value: string | null }>[]) {
+    return rows.flatMap((row, pos): ThemeOverride[] =>
+      row.type && row.value?.trim()
+        ? [{ type: row.type, ...(row.alias ? { alias: row.alias } : {}), pos, value: row.value }]
+        : []
+    )
   }
 
   private fillForm(theme: Theme): void {
@@ -124,10 +164,10 @@ export class ThemeExtraComponent {
     }
     this.cssForm.reset()
     this.cssForm.get('customCssVariables')?.setValue(theme.customCssVariables)
-    this.overrideForm.reset()
-    this.overrideForm.patchValue({
-      primengOverride: theme.overrides?.find((o) => o.type === OverrideType.Primeng)?.value ?? null,
-      cssOverride: theme.overrides?.find((o) => o.type === OverrideType.Css)?.value ?? null
-    })
+    this.overrideRows.clear()
+    const byPos = [...(theme.overrides ?? [])].sort(
+      (a, b) => (a.pos ?? Number.MAX_SAFE_INTEGER) - (b.pos ?? Number.MAX_SAFE_INTEGER)
+    )
+    for (const override of byPos) this.overrideRows.push(this.createOverrideRow(override))
   }
 }
