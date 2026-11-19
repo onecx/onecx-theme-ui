@@ -53,7 +53,7 @@ export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWeb
   private readonly themeApi = inject(ThemesAPIService)
   // input
   readonly refresh = input(false) // on any change here a reload is triggered
-  readonly dataType = input<DataType>() // which response data is expected
+  readonly dataType = input<DataType>('theme') // which response data is expected
   readonly themeName = input<string>() // search parameter
   readonly imageId = input<string>()
   readonly imageUrl = input<string>()
@@ -68,7 +68,8 @@ export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWeb
   // output
   @Input() themes = new EventEmitter<ExtendedTheme[]>()
   @Input() theme = new EventEmitter<ExtendedTheme>()
-  @Input() imageLoadingFailed = new EventEmitter<boolean>()
+  @Input() imageLoadingFailed = new EventEmitter<boolean>() // deprecated
+  @Input() imageLoadingResult = new EventEmitter<boolean>()
 
   public themes$: Observable<ExtendedTheme[]> | undefined
   public theme$: Observable<ExtendedTheme> | undefined
@@ -97,7 +98,7 @@ export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWeb
       const imageUrl = this.imageUrl()
       if (dataType === 'themes') this.getThemes()
       if (dataType === 'theme') this.getTheme()
-      if (['logo', 'logo-small', 'favicon'].includes(dataType ?? '') || imageUrl) {
+      if ((themeName && ['logo', 'logo-small', 'favicon'].includes(dataType)) || imageUrl) {
         // start image existence life cycle here: url => image => default (opt)
         this.imageUrl$.next(this.getImageUrl(themeName, 'url'))
       }
@@ -164,6 +165,7 @@ export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWeb
   public onImageLoad() {
     this.log('onImageLoad => ok')
     this.imageLoadingFailed.emit(false)
+    this.imageLoadingResult.emit(true)
   }
 
   // try next prio level depending on previous used URL
@@ -196,6 +198,7 @@ export class OneCXThemeDataComponent implements ocxRemoteComponent, ocxRemoteWeb
     }
     this.log('getImageUrl => stop')
     this.imageLoadingFailed.emit(true) // finally inform caller about impossibility
+    this.imageLoadingResult.emit(false)
     return undefined
   }
 
