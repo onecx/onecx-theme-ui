@@ -125,7 +125,7 @@ export class ThemeSearchComponent implements OnInit {
               console.error('searchThemes', err)
               return of([] as RowListGridData[])
             }),
-            finalize(() => this.loading.set(false))
+            finalize(() => this.loading.set(true))
           )
         }),
         takeUntilDestroyed(this.destroyRef)
