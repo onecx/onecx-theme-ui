@@ -11,12 +11,9 @@
   @let exceptionMessage = exceptionKey();
   <ocx-content class="ocx-content">
     @if (exceptionMessage) {
-      <p-message
-        id="th_search_message_error"
-        severity="error"
-        styleClass="m-3"
-        [text]="exceptionMessage | translate"
-      ></p-message>
+      <p-message id="th_search_message_error" severity="error" styleClass="w-fit">
+        {{ exceptionMessage | translate }}
+      </p-message>
     } @else {
       <section [attr.aria-label]="'DIALOG.SEARCH.RESULTS' | translate">
         <ocx-interactive-data-view
